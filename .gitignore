@@ -1,0 +1,23 @@
+# === Java & Build ===
+# Chặn các file đã biên dịch (mã máy)
+*.class
+bin/
+target/
+
+# === IDE (Eclipse) ===
+# Chặn các cài đặt cá nhân của người dùng (giao diện, vị trí cửa sổ...)
+.settings/
+.metadata/
+
+# LƯU Ý QUAN TRỌNG: 
+# Vì bạn KHÔNG dùng Maven, bạn PHẢI cho phép Git lưu 2 file sau 
+# để team bạn đồng bộ được thư viện trong mục 'libs'.
+# Do đó, KHÔNG thêm .classpath và .project vào đây.
+
+# === Hệ điều hành ===
+.DS_Store
+Thumbs.db
+
+# === Thư viện ===
+# Chúng ta giữ lại thư mục libs/ vì bạn đã copy JAR vào đó để làm việc nhóm.
+# Nếu sau này dùng Maven, bạn sẽ chặn luôn các file .jar ở đây.
