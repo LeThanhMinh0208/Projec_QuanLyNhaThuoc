@@ -1,0 +1,39 @@
+/* Container chính có hiệu ứng đổ bóng */
+.root-container {
+    -fx-background-color: transparent;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 20, 0, 0, 0);
+}
+
+/* Phần bên trái: Nền xanh Gradient */
+.left-pane {
+    -fx-background-color: linear-gradient(to bottom right, #7dd3fc, #0284c7);
+}
+
+/* Phần bên phải: Nền trắng */
+.right-pane {
+    -fx-background-color: #ffffff;
+}
+
+/* Kiểu chung cho các ô nhập liệu (TextField & PasswordField) */
+.input-field {
+    -fx-background-color: #f0f9ff;
+    -fx-border-color: #bae6fd;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 0 10 0 10;
+}
+
+/* Nút Đăng nhập */
+.login-button {
+    -fx-background-color: #0284c7;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20;
+    -fx-cursor: hand;
+}
+
+/* Màu sắc văn bản */
+.text-long-nguyen { -fx-fill: #0284c7; }
+.text-pharma { -fx-fill: #7dd3fc; }
+.text-white { -fx-fill: #ffffff; }
+.text-light-blue { -fx-fill: #e0f2fe; }
