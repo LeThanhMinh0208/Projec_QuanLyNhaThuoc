@@ -1,153 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<BorderPane fx:controller="gui.main.GUI_TrangChuController"
-            prefHeight="720.0" prefWidth="1280.0"
-            style="-fx-background-color: #f4f7fa;"
-            xmlns="http://javafx.com/javafx/17"
-            xmlns:fx="http://javafx.com/fxml/1">
-
-    <!-- ===== SIDEBAR TRÁI ===== -->
-    <left>
-        <VBox prefWidth="240" style="-fx-background-color: #345a8a;">
-            <!-- Logo -->
-            <VBox style="-fx-padding: 24 20 20 20; -fx-border-color: rgba(255,255,255,0.1); -fx-border-width: 0 0 1 0;">
-                <Label text="Long Nguyên" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
-                <Label text="Pharma" style="-fx-text-fill: #90cdf4; -fx-font-size: 12px; -fx-font-weight: bold;"/>
-            </VBox>
-
-            <!-- Info nhân viên -->
-            <HBox style="-fx-padding: 16 20; -fx-background-color: rgba(0,0,0,0.15);" spacing="12" alignment="CENTER_LEFT">
-                <Label text="👤" style="-fx-font-size: 20px;"/>
-                <VBox>
-                    <Label fx:id="lblTenNhanVien" text="Đang tải..." style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
-                    <Label fx:id="lblChucVu" text="" style="-fx-text-fill: #90cdf4; -fx-font-size: 11px;"/>
-                </VBox>
-            </HBox>
-
-            <!-- Menu items -->
-            <VBox spacing="0" VBox.vgrow="ALWAYS">
-                <Button fx:id="btnHome" text="🏠  Trang Chủ" onAction="#showTrangChu"
-                        maxWidth="Infinity" style="-fx-background-color: #d08c35; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 16 20; -fx-alignment: CENTER_LEFT; -fx-border-color: rgba(255,255,255,0.1); -fx-border-width: 0 0 1 0; -fx-background-radius: 0; -fx-cursor: hand;"/>
-                <Button text="🛒  Bán Thuốc" onAction="#showBanHang"
-                        maxWidth="Infinity" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 16 20; -fx-alignment: CENTER_LEFT; -fx-border-color: rgba(255,255,255,0.1); -fx-border-width: 0 0 1 0; -fx-background-radius: 0; -fx-cursor: hand;"/>
-                <Button text="🔄  Đổi / Trả"
-                        maxWidth="Infinity" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 16 20; -fx-alignment: CENTER_LEFT; -fx-border-color: rgba(255,255,255,0.1); -fx-border-width: 0 0 1 0; -fx-background-radius: 0; -fx-cursor: hand;"/>
-                <Button text="📦  Kho hàng"
-                        maxWidth="Infinity" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 16 20; -fx-alignment: CENTER_LEFT; -fx-border-color: rgba(255,255,255,0.1); -fx-border-width: 0 0 1 0; -fx-background-radius: 0; -fx-cursor: hand;"/>
-                <Button text="📊  Báo cáo"
-                        maxWidth="Infinity" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 16 20; -fx-alignment: CENTER_LEFT; -fx-border-color: rgba(255,255,255,0.1); -fx-border-width: 0 0 1 0; -fx-background-radius: 0; -fx-cursor: hand;"/>
-                <Button text="👥  Nhân viên"
-                        maxWidth="Infinity" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 16 20; -fx-alignment: CENTER_LEFT; -fx-border-color: rgba(255,255,255,0.1); -fx-border-width: 0 0 1 0; -fx-background-radius: 0; -fx-cursor: hand;"/>
-            </VBox>
-
-            <!-- Đăng xuất -->
-            <Button text="🚪  Đăng Xuất" onAction="#handleDangXuat"
-                    maxWidth="Infinity" style="-fx-background-color: rgba(239,68,68,0.2); -fx-text-fill: #fca5a5; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 16 20; -fx-alignment: CENTER_LEFT; -fx-background-radius: 0; -fx-cursor: hand;"/>
-        </VBox>
-    </left>
-
-    <!-- ===== NỘI DUNG CHÍNH ===== -->
-    <center>
-        <ScrollPane fitToWidth="true" style="-fx-background: #f4f7fa; -fx-background-color: #f4f7fa;">
-            <VBox spacing="24" style="-fx-padding: 32;">
-
-                <!-- Tiêu đề -->
-                <Label text="HỆ THỐNG QUẢN LÝ NHÀ THUỐC LONG NGUYÊN"
-                    style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e293b; -fx-font-style: italic;"/>
-
-                <!-- 3 nút tác vụ nhanh -->
-                <HBox spacing="16">
-                    <!-- Bán thuốc -->
-                    <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: #2563eb; -fx-background-radius: 20; -fx-padding: 28; -fx-cursor: hand;" onMouseClicked="#showBanHang" alignment="CENTER_LEFT">
-                        <Label text="BÁN THUỐC" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 15px;"/>
-                        <Label text="POS Terminal" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 11px;"/>
-                    </VBox>
-                    <!-- Đổi trả -->
-                    <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: #f97316; -fx-background-radius: 20; -fx-padding: 28; -fx-cursor: hand;" alignment="CENTER_LEFT">
-                        <Label text="ĐỔI / TRẢ" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 15px;"/>
-                        <Label text="Hậu mãi" style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 11px;"/>
-                    </VBox>
-                    <!-- Báo cáo -->
-                    <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: #10b981; -fx-background-radius: 20; -fx-padding: 28; -fx-cursor: hand;" onMouseClicked="#toggleBaoCao" alignment="CENTER_LEFT">
-                        <Label text="BÁO CÁO" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 15px;"/>
-                        <Label text="Xem doanh thu" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 11px;"/>
-                    </VBox>
-                </HBox>
-
-                <!-- Stats box (ẩn/hiện) -->
-                <HBox fx:id="statsBox" spacing="16" managed="false" visible="false">
-                    <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 20; -fx-border-radius: 16; -fx-border-color: #e2e8f0;" spacing="4">
-                        <Label text="SỐ HÓA ĐƠN HÔM NAY" style="-fx-text-fill: #94a3b8; -fx-font-size: 10px; -fx-font-weight: bold;"/>
-                        <Label fx:id="lblSoHoaDon" text="..." style="-fx-text-fill: #1e293b; -fx-font-size: 28px; -fx-font-weight: bold;"/>
-                    </VBox>
-                    <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 20; -fx-border-radius: 16; -fx-border-color: #e2e8f0;" spacing="4">
-                        <Label text="DOANH THU HÔM NAY" style="-fx-text-fill: #94a3b8; -fx-font-size: 10px; -fx-font-weight: bold;"/>
-                        <Label fx:id="lblDoanhThu" text="..." style="-fx-text-fill: #10b981; -fx-font-size: 28px; -fx-font-weight: bold;"/>
-                    </VBox>
-                </HBox>
-
-                <!-- Nội dung 2 cột -->
-                <HBox spacing="24" alignment="TOP_LEFT">
-
-                    <!-- Cột trái: Danh mục thuốc -->
-                    <VBox HBox.hgrow="ALWAYS" spacing="12">
-                        <!-- Thanh tìm kiếm -->
-                        <TextField fx:id="txtSearch" promptText="🔍  Tìm tên thuốc, mã hoặc triệu chứng..."
-                                onKeyReleased="#handleSearch"
-                                style="-fx-background-color: white; -fx-background-radius: 50; -fx-border-radius: 50; -fx-border-color: #e2e8f0; -fx-padding: 14 20; -fx-font-size: 13px; -fx-font-weight: bold;"/>
-
-                        <!-- Bảng danh mục -->
-                        <VBox style="-fx-background-color: white; -fx-background-radius: 24; -fx-padding: 24; -fx-border-color: #f1f5f9; -fx-border-radius: 24;" spacing="12">
-                            <Label text="DANH MỤC THUỐC" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-font-style: italic; -fx-text-fill: #1e293b;"/>
-                            <TableView fx:id="tblThuoc" prefHeight="420"
-                                    style="-fx-background-color: transparent; -fx-background-radius: 12; -fx-border-color: #f1f5f9; -fx-border-radius: 12;"
-                                    onMouseClicked="#handleSelectThuoc">
-                                <columns>
-                                    <TableColumn fx:id="colMaThuoc" text="Mã thuốc" prefWidth="110"/>
-                                    <TableColumn fx:id="colTenThuoc" text="Tên thuốc" prefWidth="180"/>
-                                    <TableColumn fx:id="colDangBao" text="Dạng bào chế" prefWidth="120"/>
-                                    <TableColumn fx:id="colTonKho" text="Tồn kho" prefWidth="80"/>
-                                    <TableColumn fx:id="colGiaBan" text="Giá bán" prefWidth="100"/>
-                                    <TableColumn fx:id="colDonVi" text="Đơn vị" prefWidth="80"/>
-                                </columns>
-                                <placeholder>
-                                    <Label text="Đang tải dữ liệu..." style="-fx-text-fill: #94a3b8;"/>
-                                </placeholder>
-                            </TableView>
-                        </VBox>
-                    </VBox>
-
-                    <!-- Cột phải: Cảnh báo + giao dịch -->
-                    <VBox prefWidth="280" spacing="16">
-                        <!-- Sắp hết hạn -->
-                        <VBox style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 20; -fx-border-left-width: 4; -fx-border-color: transparent transparent transparent #ef4444; -fx-border-width: 0 0 0 4;" spacing="8">
-                            <Label text="⚠️  SẮP HẾT HẠN" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #1e293b;"/>
-                            <ListView fx:id="listHetHan" prefHeight="100"
-                                    style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
-                        </VBox>
-
-                        <!-- Sắp hết hàng -->
-                        <VBox style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 20; -fx-border-width: 0 0 0 4; -fx-border-color: transparent transparent transparent #f97316;" spacing="8">
-                            <Label text="📦  SẮP HẾT HÀNG" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #1e293b;"/>
-                            <ListView fx:id="listHetHang" prefHeight="100"
-                                    style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
-                        </VBox>
-
-                        <!-- Giao dịch gần nhất -->
-                        <VBox style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 20; -fx-border-color: #f1f5f9;" spacing="8">
-                            <Label text="GIAO DỊCH GẦN NHẤT" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-font-style: italic; -fx-text-fill: #1e293b;"/>
-                            <ListView fx:id="listGiaoDich" prefHeight="160"
-                                    style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
-                        </VBox>
-                    </VBox>
-                </HBox>
-            </VBox>
-        </ScrollPane>
-    </center>
-
-</BorderPane>
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.GUI_TrangChuController">
+   <children>
+      <Text fx:id="txtXinChao" layoutX="50.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Xin chào: ...">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Text>
+      <Button layoutX="50.0" layoutY="120.0" mnemonicParsing="false" onAction="#handleDangXuat" prefHeight="40.0" prefWidth="120.0" text="Đăng xuất" textFill="RED">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
+      <Text layoutX="50.0" layoutY="220.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Đây là giao diện trang chủ hệ thống!">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Text>
+   </children>
+</AnchorPane>
