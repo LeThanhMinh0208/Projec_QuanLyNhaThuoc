@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="900.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.GUI_TrangChuController">
+   
+   <left>
+      <VBox prefWidth="220.0" style="-fx-background-color: #345a8a;" BorderPane.alignment="CENTER">
+         <children>
+            <Label alignment="CENTER" prefHeight="80.0" prefWidth="220.0" text="LONG NGUYÊN" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="220.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-border-color: rgba(255,255,255,0.1); -fx-border-width: 0 0 1 0;" text="🏠 Trang Chủ">
+               <font><Font size="16.0" /></font>
+            </Button>
+            <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="220.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-border-color: rgba(255,255,255,0.1); -fx-border-width: 0 0 1 0;" text="🛒 Bán Thuốc">
+               <font><Font size="16.0" /></font>
+            </Button>
+            <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="220.0" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-border-color: rgba(255,255,255,0.1); -fx-border-width: 0 0 1 0;" text="📦 Quản Lý Kho">
+               <font><Font size="16.0" /></font>
+            </Button>
+         </children>
+      </VBox>
+   </left>
+
+   <center>
+      <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #f4f7fa;" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="HỆ THỐNG QUẢN LÝ NHÀ THUỐC LONG NGUYÊN" textFill="#2c3e50">
+               <font>
+                  <Font name="System Bold Italic" size="24.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="30.0" />
+               </VBox.margin>
+            </Label>
+
+            <HBox spacing="20.0">
+               <children>
+                  <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-background-radius: 15;" text="🛒 BÁN THUỐC&#10;POS Terminal" textAlignment="CENTER">
+                     <font><Font name="System Bold" size="16.0" /></font>
+                  </Button>
+                  <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #f97316; -fx-text-fill: white; -fx-background-radius: 15;" text="🔄 ĐỔI / TRẢ&#10;Hậu mãi" textAlignment="CENTER">
+                     <font><Font name="System Bold" size="16.0" /></font>
+                  </Button>
+                  <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-background-radius: 15;" text="📊 BÁO CÁO&#10;Thống kê doanh thu" textAlignment="CENTER">
+                     <font><Font name="System Bold" size="16.0" /></font>
+                  </Button>
+               </children>
+            </HBox>
+            
+            <Label fx:id="lblXinChao" text="Đang tải dữ liệu người dùng..." textFill="#7f8c8d">
+               <VBox.margin><Insets top="40.0" /></VBox.margin>
+               <font><Font size="16.0" /></font>
+            </Label>
+         </children>
+         <padding>
+            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+         </padding>
+      </VBox>
+   </center>
+</BorderPane>
