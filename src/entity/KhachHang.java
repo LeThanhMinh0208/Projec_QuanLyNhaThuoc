@@ -5,18 +5,20 @@ import java.util.Objects;
 public class KhachHang {
 
     private String maKhachHang;
-    private String tenKhachHang;
+    private String hoTen;
     private String sdt;
     private String diaChi;
+    private int diemTichLuy;
 
     public KhachHang() {
     }
 
-    public KhachHang(String maKhachHang, String tenKhachHang, String sdt, String diaChi) {
+    public KhachHang(String maKhachHang, String hoTen, String sdt, String diaChi, int diemTichLuy) {
         this.maKhachHang = maKhachHang;
-        this.tenKhachHang = tenKhachHang;
+        this.hoTen = hoTen;
         this.sdt = sdt;
         this.diaChi = diaChi;
+        this.diemTichLuy = diemTichLuy;
     }
 
     public String getMaKhachHang() {
@@ -27,12 +29,12 @@ public class KhachHang {
         this.maKhachHang = maKhachHang;
     }
 
-    public String getTenKhachHang() {
-        return tenKhachHang;
+    public String getHoTen() {
+        return hoTen;
     }
 
-    public void setTenKhachHang(String tenKhachHang) {
-        this.tenKhachHang = tenKhachHang;
+    public void setHoTen(String hoTen) {
+        this.hoTen = hoTen;
     }
 
     public String getSdt() {
@@ -51,13 +53,22 @@ public class KhachHang {
         this.diaChi = diaChi;
     }
 
+    public int getDiemTichLuy() {
+        return diemTichLuy;
+    }
+
+    public void setDiemTichLuy(int diemTichLuy) {
+        this.diemTichLuy = diemTichLuy;
+    }
+
     @Override
     public String toString() {
         return "KhachHang{" +
                 "maKhachHang='" + maKhachHang + '\'' +
-                ", tenKhachHang='" + tenKhachHang + '\'' +
+                ", hoTen='" + hoTen + '\'' +
                 ", sdt='" + sdt + '\'' +
                 ", diaChi='" + diaChi + '\'' +
+                ", diemTichLuy=" + diemTichLuy +
                 '}';
     }
 
