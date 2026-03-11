@@ -90,7 +90,7 @@ public class NhanVien {
 
     public void setChucVu(String CV) {
 
-        String[] danhSach = {"Quản lý", "Nhân viên bán thuốc", "Thu ngân"};
+        String[] danhSach = {"Quản lý", "Nhân viên bán thuốc"};
 
         boolean hopLe = false;
 
@@ -183,3 +183,4 @@ public class NhanVien {
         return Objects.equals(maNhanVien, other.maNhanVien);
     }
 }
+
