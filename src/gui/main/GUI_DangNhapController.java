@@ -1,5 +1,7 @@
 package gui.main;
 
+import entity.NhanVien;
+import dao.DAO_NhanVien;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,17 +13,13 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-import java.sql.*;
-
 public class GUI_DangNhapController {
 
     @FXML private TextField txtTenDangNhap;
     @FXML private PasswordField txtMatKhau;
+    
 
-    // ĐỔI thông tin kết nối cho đúng máy mày nha!
-    private static final String DB_URL  = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyNhaThuoc_LongNguyen;encrypt=true;trustServerCertificate=true;";
-    private static final String DB_USER = "sa";
-    private static final String DB_PASS = "sapassword";
+    private DAO_NhanVien nhanVienDao = new DAO_NhanVien();
 
     @FXML
     void handleDangNhap(ActionEvent event) {
@@ -33,45 +31,36 @@ public class GUI_DangNhapController {
             return;
         }
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS)) {
-            String sql = "SELECT hoTen, chucVu FROM NhanVien WHERE tenDangNhap = ? AND matKhau = ?";
-            PreparedStatement pst = conn.prepareStatement(sql);
-            pst.setString(1, taiKhoan);
-            pst.setString(2, matKhau);
-            ResultSet rs = pst.executeQuery();
+        // 1. Gọi DAO để lấy đối tượng NhanVien 
+        NhanVien nv = nhanVienDao.dangNhap(taiKhoan, matKhau);
 
-            if (rs.next()) {
-                String hoTen  = rs.getString("hoTen");
-                String chucVu = rs.getString("chucVu");
+        // 2. Kiểm tra nếu tìm thấy nhân viên (nv không bị null)
+        if (nv != null) {
+            // Truyền cả đối tượng nv sang Trang Chủ
+            GUI_TrangChuController.setNhanVienDangNhap(nv);
 
-                // Truyền thông tin nhân viên sang màn hình trang chủ
-                GUI_TrangChuController.setNhanVienInfo(hoTen, chucVu);
+            // Đóng cửa sổ đăng nhập
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            currentStage.close();
 
-                // Đóng cửa sổ đăng nhập
-                Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                currentStage.close();
-
-                // Mở trang chủ
+            // Mở trang chủ
+            try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("GUI_TrangChu.fxml"));
                 Parent root = loader.load();
 
                 Stage trangChuStage = new Stage();
-                trangChuStage.setTitle("Long Nguyên Pharma  —  " + chucVu + ": " + hoTen);
+                // Lấy chức vụ và họ tên trực tiếp từ đối tượng nv để đặt tiêu đề
+                trangChuStage.setTitle("Long Nguyên Pharma  —  " + nv.getChucVu() + ": " + nv.getHoTen());
                 trangChuStage.setScene(new Scene(root, 1280, 720));
-                trangChuStage.setMinWidth(1024);
-                trangChuStage.setMinHeight(600);
                 trangChuStage.show();
-
-            } else {
-                showAlert(Alert.AlertType.ERROR, "Đăng nhập thất bại", "Tài khoản hoặc mật khẩu không đúng!");
-                txtMatKhau.clear();
-                txtMatKhau.requestFocus();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Lỗi kết nối",
-                    "Không kết nối được database!\nKiểm tra SQL Server có đang chạy không.\n\nChi tiết: " + e.getMessage());
+        } else {
+            // Nếu nv == null tức là sai tài khoản/mật khẩu
+            showAlert(Alert.AlertType.ERROR, "Đăng nhập thất bại", "Tài khoản hoặc mật khẩu không đúng!");
+            txtMatKhau.clear();
+            txtMatKhau.requestFocus();
         }
     }
 

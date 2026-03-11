@@ -77,7 +77,7 @@
                   
                   <PasswordField fx:id="txtMatKhau" layoutX="60.0" layoutY="235.0" prefHeight="35.0" prefWidth="200.0" promptText="Mật khẩu" styleClass="input-field" />
                   
-                  <Button onAction="#handleDangNhap" layoutX="51.0" layoutY="310.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="200.0" styleClass="login-button" text="ĐĂNG NHẬP">
+                  <Button onAction="#handleDangNhap" defaultButton="true" layoutX="51.0" layoutY="310.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="200.0" styleClass="login-button" text="ĐĂNG NHẬP">
                      <font>
                         <Font size="14.0" />
                      </font>
