@@ -10,39 +10,60 @@ public class KhachHang {
     private String diaChi;
     private int diemTichLuy;
 
+    // Constructor mặc định
     public KhachHang() {
+        this.diemTichLuy = 0;
     }
 
-    public KhachHang(String maKhachHang, String hoTen, String sdt, String diaChi, int diemTichLuy) {
-        this.maKhachHang = maKhachHang;
-        this.hoTen = hoTen;
-        this.sdt = sdt;
-        this.diaChi = diaChi;
-        this.diemTichLuy = diemTichLuy;
+    // Constructor đầy đủ
+    public KhachHang(String maKH, String hoTen, String sdt, String diaChi, int diem) {
+        setMaKhachHang(maKH);
+        setHoTen(hoTen);
+        setSdt(sdt);
+        setDiaChi(diaChi);
+        setDiemTichLuy(diem);
+    }
+
+    // Copy constructor
+    public KhachHang(KhachHang khKhac) {
+        this.maKhachHang = khKhac.maKhachHang;
+        this.hoTen = khKhac.hoTen;
+        this.sdt = khKhac.sdt;
+        this.diaChi = khKhac.diaChi;
+        this.diemTichLuy = khKhac.diemTichLuy;
     }
 
     public String getMaKhachHang() {
         return maKhachHang;
     }
 
-    public void setMaKhachHang(String maKhachHang) {
-        this.maKhachHang = maKhachHang;
+    public void setMaKhachHang(String maKH) {
+        if (maKH == null || !maKH.matches("^KH\\d{3}$")) {
+            throw new IllegalArgumentException("Mã khách hàng phải theo dạng KH001");
+        }
+        this.maKhachHang = maKH;
     }
 
     public String getHoTen() {
         return hoTen;
     }
 
-    public void setHoTen(String hoTen) {
-        this.hoTen = hoTen;
+    public void setHoTen(String HT) {
+        if (HT == null || HT.trim().isEmpty()) {
+            throw new IllegalArgumentException("Họ tên không được để trống");
+        }
+        this.hoTen = HT;
     }
 
     public String getSdt() {
         return sdt;
     }
 
-    public void setSdt(String sdt) {
-        this.sdt = sdt;
+    public void setSdt(String SDT) {
+        if (SDT == null || !SDT.matches("^0\\d{9}$")) {
+            throw new IllegalArgumentException("Số điện thoại không hợp lệ");
+        }
+        this.sdt = SDT;
     }
 
     public String getDiaChi() {
@@ -57,8 +78,19 @@ public class KhachHang {
         return diemTichLuy;
     }
 
-    public void setDiemTichLuy(int diemTichLuy) {
-        this.diemTichLuy = diemTichLuy;
+    public void setDiemTichLuy(int diem) {
+        if (diem < 0) {
+            throw new IllegalArgumentException("Điểm tích lũy không được âm");
+        }
+        this.diemTichLuy = diem;
+    }
+
+    // Cộng điểm sau mỗi hóa đơn
+    public void capNhatDiem(int diemMoi) {
+        if (diemMoi < 0) {
+            throw new IllegalArgumentException("Điểm cộng thêm không hợp lệ");
+        }
+        this.diemTichLuy += diemMoi;
     }
 
     @Override
@@ -80,7 +112,7 @@ public class KhachHang {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (!(obj instanceof KhachHang)) return false;
         KhachHang other = (KhachHang) obj;
         return Objects.equals(maKhachHang, other.maKhachHang);
     }
