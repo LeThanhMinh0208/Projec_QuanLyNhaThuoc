@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class ConnectDB {
     private static ConnectDB instance = new ConnectDB();
-    private Connection con;
+    private static Connection con;
 
     public static ConnectDB getInstance() {
         return instance;
@@ -33,7 +33,7 @@ public class ConnectDB {
         }
     }
 
-    public Connection getConnection() {
+    public static Connection getConnection() {
         return con;
     }
 }

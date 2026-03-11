@@ -1,20 +1,37 @@
 package gui.main;
 
+import dao.DAO_Thuoc;
 import entity.NhanVien;
+import entity.Thuoc;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.text.Text;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
-public class GUI_TrangChuController {
-    
-    private static NhanVien nhanVienDangNhap;
+import java.io.InputStream;
 
-    @FXML private Text txtXinChao;
+public class GUI_TrangChuController {
+
+    @FXML private TableView<Thuoc> tableThuoc;
+    @FXML private TableColumn<Thuoc, String> colMaThuoc, colHinhAnh, colTenThuoc, colTrieuChung, colDVT, colTrangThai;
+    @FXML private TableColumn<Thuoc, Boolean> colKeDon;
+    @FXML private TextField txtTimKiem;
+
+    private DAO_Thuoc daoThuoc = new DAO_Thuoc();
+    private ObservableList<Thuoc> masterData = FXCollections.observableArrayList();
+    private static NhanVien nhanVienDangNhap;
 
     public static void setNhanVienDangNhap(NhanVien nv) {
         nhanVienDangNhap = nv;
@@ -22,28 +39,127 @@ public class GUI_TrangChuController {
 
     @FXML
     public void initialize() {
-        if (txtXinChao != null && nhanVienDangNhap != null) {
-            txtXinChao.setText("Xin chào " + nhanVienDangNhap.getChucVu() + ": " + nhanVienDangNhap.getHoTen());
-        }
+        setupTable();
+        loadDataFromServer();
+        setupSearchLogic();
+    }
+
+    private void setupTable() {
+        // Cấu hình các cột hiển thị cơ bản
+        colMaThuoc.setCellValueFactory(new PropertyValueFactory<>("maThuoc"));
+        colTenThuoc.setCellValueFactory(new PropertyValueFactory<>("tenThuoc"));
+        colTrieuChung.setCellValueFactory(new PropertyValueFactory<>("trieuChung"));
+        colDVT.setCellValueFactory(new PropertyValueFactory<>("donViCoBan"));
+        colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
+
+        // Cấu hình cột Kê Đơn (Có/Không)
+        colKeDon.setCellValueFactory(new PropertyValueFactory<>("canKeDon"));
+        colKeDon.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Boolean item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item ? "Có" : "Không");
+                    setStyle(item ? "-fx-text-fill: #e74c3c; -fx-font-weight: bold;" : "-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+                }
+            }
+        });
+
+        // Cấu hình cột Hình Ảnh
+        colHinhAnh.setCellValueFactory(new PropertyValueFactory<>("hinhAnh"));
+        colHinhAnh.setCellFactory(column -> new TableCell<>() {
+            private final ImageView iv = new ImageView();
+            @Override
+            protected void updateItem(String file, boolean empty) {
+                super.updateItem(file, empty);
+                if (empty || file == null || file.trim().isEmpty()) {
+                    setGraphic(null);
+                } else {
+                    try {
+                        InputStream is = getClass().getResourceAsStream("/resources/images/images_thuoc/" + file.trim());
+                        if (is != null) {
+                            iv.setImage(new Image(is));
+                            iv.setFitWidth(80); iv.setFitHeight(60);
+                            iv.setPreserveRatio(true);
+                            setGraphic(iv); setAlignment(Pos.CENTER);
+                        } else {
+                            setGraphic(new Label("No image"));
+                        }
+                    } catch (Exception e) {
+                        setGraphic(new Label("Error"));
+                    }
+                }
+            }
+        });
+    }
+
+    private void loadDataFromServer() {
+        // Lấy dữ liệu gốc từ database
+        masterData.setAll(daoThuoc.getAllThuoc());
+    }
+
+    private void setupSearchLogic() {
+        // 1. Tạo FilteredList bao quanh masterData
+        FilteredList<Thuoc> filteredData = new FilteredList<>(masterData, p -> true);
+
+        // 2. Lắng nghe thay đổi trên ô TextField Tìm kiếm
+        txtTimKiem.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(thuoc -> {
+                // Nếu không nhập gì, hiện tất cả
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+
+                String filter = newValue.toLowerCase();
+
+                // LỌC THEO TRIỆU CHỨNG (Cột mới thêm)
+                if (thuoc.getTrieuChung() != null && thuoc.getTrieuChung().toLowerCase().contains(filter)) return true;
+
+                // Lọc theo Mã Thuốc
+                if (thuoc.getMaThuoc().toLowerCase().contains(filter)) return true;
+
+                // Lọc theo Tên Thuốc
+                if (thuoc.getTenThuoc().toLowerCase().contains(filter)) return true;
+
+                // Lọc theo Công Dụng
+                if (thuoc.getCongDungTrieuChung().toLowerCase().contains(filter)) return true;
+
+                // Lọc theo Hoạt Chất, Hãng, Nước SX (Dù không hiện trên bảng vẫn lọc được)
+                if (thuoc.getHoatChat() != null && thuoc.getHoatChat().toLowerCase().contains(filter)) return true;
+                if (thuoc.getHangSanXuat() != null && thuoc.getHangSanXuat().toLowerCase().contains(filter)) return true;
+                if (thuoc.getNuocSanXuat() != null && thuoc.getNuocSanXuat().toLowerCase().contains(filter)) return true;
+
+                // Lọc theo Kê đơn (Nhập "có" hoặc "không")
+                String keDonString = thuoc.isCanKeDon() ? "có kê đơn" : "không kê đơn";
+                if (keDonString.contains(filter)) return true;
+
+                return false; // Không khớp tiêu chí nào
+            });
+        });
+
+        // 3. Cho phép bảng vẫn có thể sắp xếp (Sort) dữ liệu sau khi lọc
+        SortedList<Thuoc> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(tableThuoc.comparatorProperty());
+
+        // 4. Đổ dữ liệu đã lọc vào bảng
+        tableThuoc.setItems(sortedData);
     }
 
     @FXML
     void handleDangXuat(ActionEvent event) {
         try {
-            nhanVienDangNhap = null; // Xóa thông tin phiên làm việc
-
-            // Đóng cửa sổ Trang Chủ
+            nhanVienDangNhap = null;
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             currentStage.close();
 
-            // Mở lại form Đăng Nhập
             Parent root = FXMLLoader.load(getClass().getResource("GUI_DangNhap.fxml"));
             Stage loginStage = new Stage();
-            loginStage.setTitle("Hệ thống quản lý nhà thuốc - Đăng nhập");
             loginStage.setScene(new Scene(root));
-            loginStage.setResizable(false);
+            loginStage.setTitle("Đăng nhập");
             loginStage.show();
-            
         } catch (Exception e) {
             e.printStackTrace();
         }

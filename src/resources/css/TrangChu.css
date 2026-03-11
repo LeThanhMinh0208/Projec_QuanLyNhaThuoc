@@ -1,0 +1,251 @@
+/* ========================================
+   BỐ CỤC CHÍNH (LAYOUT & SIDEBAR)
+   ======================================== */
+.main-bg {
+    -fx-background-color: #f4f6fa;
+}
+
+.sidebar {
+    -fx-background-color: #3b5278; /* Xanh Navy */
+}
+
+.sidebar-logo {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: 900;
+    -fx-font-style: italic;
+}
+
+/* Nút Trang Chủ (Nút đơn) */
+.sidebar-btn-active {
+    -fx-background-color: #f4f6fa;
+    -fx-text-fill: #3b5278;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 0 25px;
+    -fx-background-radius: 25px 0 0 25px;
+}
+
+/* ========================================
+   HỆ THỐNG DROPDOWN (TITLED PANE)
+   ======================================== */
+.sidebar-dropdown {
+    -fx-background-color: transparent;
+    -fx-text-fill: #aab8ce;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* Thanh tiêu đề của Dropdown */
+.sidebar-dropdown > .title {
+    -fx-background-color: transparent;
+    -fx-padding: 12 0 12 25;
+    -fx-cursor: hand;
+    -fx-transition: 0.3s;
+}
+
+.sidebar-dropdown > .title:hover {
+    -fx-background-color: #4a6693;
+    -fx-text-fill: white;
+}
+
+/* Ẩn mũi tên mặc định của TitledPane */
+.sidebar-dropdown > .title > .arrow-button {
+    -fx-padding: 0 10 0 0;
+}
+.sidebar-dropdown > .title > .arrow-button > .arrow {
+    -fx-background-color: transparent; /* Làm tàng hình mũi tên */
+}
+
+/* Vùng chứa nút con bên trong khi bung ra */
+.dropdown-content {
+    -fx-background-color: #2d4162; 
+    -fx-padding: 5 0 5 50; 
+}
+
+.sub-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ecf0f1;
+    -fx-font-size: 13px;
+    -fx-font-weight: normal;
+    -fx-padding: 8 0;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.sub-btn:hover {
+    -fx-text-fill: #3498db;
+}
+
+/* ========================================
+   TOP CARDS & SEARCH
+   ======================================== */
+.main-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #1f2937;
+}
+
+.top-card {
+    -fx-background-radius: 15px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
+}
+
+.card-blue   { -fx-background-color: #5a73d8; }
+.card-orange { -fx-background-color: #e99e4c; }
+.card-green  { -fx-background-color: #59b584; }
+
+.card-title {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.search-box {
+    -fx-background-color: white;
+    -fx-background-radius: 25px;
+    -fx-border-color: #e5e7eb;
+}
+
+.search-input {
+    -fx-background-color: transparent;
+    -fx-font-size: 15px;
+}
+
+/* ========================================
+   MODERN TABLEVIEW (PHẲNG & BO GÓC)
+   ======================================== */
+.table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 15px;
+    -fx-border-color: #f1f2f6;
+    -fx-padding: 5;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #2c3e50;
+    -fx-background-radius: 12px 12px 0 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 50px;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-text-transform: uppercase;
+}
+
+.table-row-cell {
+    -fx-cell-size: 85px;
+    -fx-border-color: transparent transparent #f1f2f6 transparent;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #e3f2fd;
+}
+
+/* Ẩn hoàn toàn thanh cuộn của bảng */
+.table-view .scroll-bar:vertical,
+.table-view .scroll-bar:horizontal {
+    -fx-opacity: 0;
+    -fx-padding: -10;
+}
+
+/* Xóa dải trắng sọc sau cột cuối */
+.table-view .virtual-flow .filler {
+    -fx-background-color: transparent;
+}
+
+/* ========================================
+   KHỐI THÔNG BÁO & LOGOUT
+   ======================================== */
+.panel-white {
+    -fx-background-color: white;
+    -fx-background-radius: 15px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 3);
+}
+
+.sidebar-btn-logout {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ff7675;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 0 25px;
+    -fx-cursor: hand;
+    -fx-border-color: rgba(255,255,255,0.1);
+    -fx-border-width: 1px 0 0 0;
+}
+
+.sidebar-btn-logout:hover {
+    -fx-background-color: #c0392b;
+    -fx-text-fill: white;
+}
+/* --- Style cho các nút con bên trong Dropdown --- */
+.sub-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ecf0f1;
+    -fx-font-size: 13px;
+    -fx-font-weight: normal;
+    -fx-padding: 8 0 8 0; /* Trên - Phải - Dưới - Trái */
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+    
+    /* Hiệu ứng chuyển động mượt mà trong JavaFX */
+    -fx-transition: all 0.3s ease-in-out; 
+}
+
+/* Hiệu ứng khi di chuột vào nút con */
+.sub-btn:hover {
+    -fx-text-fill: #3498db;      /* Đổi màu chữ sang xanh neon */
+    -fx-padding: 8 0 8 15;     /* Đẩy chữ sang phải bằng cách tăng padding-left */
+    
+    /* Thêm một vạch nhỏ bên trái để tạo điểm nhấn */
+    -fx-border-color: #3498db;
+    -fx-border-width: 0 0 0 3; /* Chỉ hiện viền bên trái dày 3px */
+}
+
+/* --- Tùy chỉnh vùng chứa Dropdown --- */
+.dropdown-content {
+    -fx-background-color: #2d4162; 
+    -fx-padding: 5 0 5 40; 
+    /* Tạo hiệu ứng đổ bóng nhẹ cho vùng dropdown */
+    -fx-effect: innershadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);
+}
+/* --- Tùy chỉnh vùng chứa các nút con khi bung ra --- */
+.dropdown-content {
+    -fx-background-color: #2d4162; /* Nền xanh đậm hơn sidebar */
+    -fx-padding: 5 0 5 0;          /* Reset padding để background hover tràn lề */
+}
+
+/* --- Trạng thái bình thường của nút con --- */
+.sub-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ecf0f1;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI", Arial; /* Đổi font sang Segoe UI cho hiện đại */
+    -fx-font-weight: normal;
+    -fx-padding: 10 0 10 50;           /* Đẩy chữ vào trong để chừa chỗ cho background */
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+    -fx-pref-width: 250px;             /* Đảm bảo background hover phủ hết chiều ngang */
+}
+
+/* --- HIỆU ỨNG KHI DI CHUỘT VÀO (HOVER) --- */
+.sub-btn:hover {
+    /* 1. Thay đổi Background: Tạo dải màu gradient nhẹ từ trái sang phải */
+    -fx-background-color: linear-gradient(to right, #4a6693, #3b5278);
+    
+    /* 2. Thay đổi Font chữ: Làm chữ đậm lên và sáng hơn */
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    
+    /* 3. Hiệu ứng trượt nhẹ: Tăng padding-left để chữ dịch sang phải */
+    -fx-padding: 10 0 10 60;
+    
+    /* 4. Thêm vạch chỉ thị (Indicator) màu xanh neon ở đầu nút */
+    -fx-border-color: #3498db;
+    -fx-border-width: 0 0 0 5; /* Viền trái dày 5px */
+}
