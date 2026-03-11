@@ -10,82 +10,55 @@ public class NhaCungCap {
     private String diaChi;
     private double congNo;
 
-    // Constructor mặc định
     public NhaCungCap() {
-        this.congNo = 0;
     }
 
-    // Constructor đầy đủ
     public NhaCungCap(String maNhaCungCap, String tenNhaCungCap, String sdt, String diaChi, double congNo) {
-        setMaNhaCungCap(maNhaCungCap);
-        setTenNhaCungCap(tenNhaCungCap);
-        setSdt(sdt);
-        setDiaChi(diaChi);
-        setCongNo(congNo);
+        this.maNhaCungCap = maNhaCungCap;
+        this.tenNhaCungCap = tenNhaCungCap;
+        this.sdt = sdt;
+        this.diaChi = diaChi;
+        this.congNo = congNo;
     }
 
-    // Copy constructor
-    public NhaCungCap(NhaCungCap nccKhac) {
-        this.maNhaCungCap = nccKhac.maNhaCungCap;
-        this.tenNhaCungCap = nccKhac.tenNhaCungCap;
-        this.sdt = nccKhac.sdt;
-        this.diaChi = nccKhac.diaChi;
-        this.congNo = nccKhac.congNo;
-    }
-
-    public String getMaNCC() {
+    public String getMaNhaCungCap() {
         return maNhaCungCap;
     }
 
-    public void setMaNhaCungCap(String maNCC) {
-        if (maNCC == null || maNCC.trim().isEmpty()) {
-            throw new IllegalArgumentException("Mã nhà cung cấp không được rỗng");
-        }
-        this.maNhaCungCap = maNCC;
+    public void setMaNhaCungCap(String maNhaCungCap) {
+        this.maNhaCungCap = maNhaCungCap;
     }
 
-    public String getTenNCC() {
+    public String getTenNhaCungCap() {
         return tenNhaCungCap;
     }
 
-    public void setTenNhaCungCap(String tenNCC) {
-        if (tenNCC == null || tenNCC.trim().isEmpty()) {
-            throw new IllegalArgumentException("Tên nhà cung cấp không được để trống");
-        }
-        this.tenNhaCungCap = tenNCC;
+    public void setTenNhaCungCap(String tenNhaCungCap) {
+        this.tenNhaCungCap = tenNhaCungCap;
     }
 
     public String getSdt() {
         return sdt;
     }
 
-    public void setSdt(String soDienThoai) {
-        if (soDienThoai == null || !soDienThoai.matches("^0\\d{9}$")) {
-            throw new IllegalArgumentException("Số điện thoại không đúng định dạng");
-        }
-        this.sdt = soDienThoai;
+    public void setSdt(String sdt) {
+        this.sdt = sdt;
     }
 
     public String getDiaChi() {
         return diaChi;
     }
 
-    public void setDiaChi(String dc) {
-        if (dc == null || dc.trim().isEmpty()) {
-            throw new IllegalArgumentException("Địa chỉ không được rỗng");
-        }
-        this.diaChi = dc;
+    public void setDiaChi(String diaChi) {
+        this.diaChi = diaChi;
     }
 
     public double getCongNo() {
         return congNo;
     }
 
-    public void setCongNo(double no) {
-        if (no < 0) {
-            throw new IllegalArgumentException("Công nợ không được âm");
-        }
-        this.congNo = no;
+    public void setCongNo(double congNo) {
+        this.congNo = congNo;
     }
 
     @Override
@@ -107,7 +80,7 @@ public class NhaCungCap {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof NhaCungCap)) return false;
+        if (obj == null || getClass() != obj.getClass()) return false;
         NhaCungCap other = (NhaCungCap) obj;
         return Objects.equals(maNhaCungCap, other.maNhaCungCap);
     }
