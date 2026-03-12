@@ -34,6 +34,16 @@ public class ConnectDB {
     }
 
     public static Connection getConnection() {
+        try {
+            if (con == null || con.isClosed()) {
+                String url = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyNhaThuoc_LongNguyen;encrypt=false";
+                String user = "sa";
+                String password = "123456";
+                con = DriverManager.getConnection(url, user, password);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return con;
     }
 }

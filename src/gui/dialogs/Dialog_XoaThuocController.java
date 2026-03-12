@@ -10,19 +10,19 @@ public class Dialog_XoaThuocController {
     @FXML private Label lblTenThuoc;
     @FXML private Button btnHuy;
     
-    private DAO_Thuoc dao = new DAO_Thuoc();
-    private Thuoc thuocXoa;
+    private DAO_Thuoc daoThuoc = new DAO_Thuoc();
+    private Thuoc thuocCanXoa;
 
-    public void setThuocData(Thuoc t) {
-        this.thuocXoa = t;
-        lblTenThuoc.setText(t.getTenThuoc() + " (" + t.getMaThuoc() + ")");
+    public void setThuocData(Thuoc data) {
+        this.thuocCanXoa = data;
+        lblTenThuoc.setText(data.getTenThuoc());
     }
 
-    @FXML void handleXoa() {
-        if(thuocXoa != null) {
-            // Giả sử DAO có hàm xoaThuoc(String ma)
-            // dao.xoaThuoc(thuocXoa.getMaThuoc());
-            handleHuy();
+    @FXML
+    private void handleXoa() {
+        if (daoThuoc.xoaThuoc(thuocCanXoa.getMaThuoc())) {
+            // Thông báo và đóng cửa sổ
+            ((Stage) lblTenThuoc.getScene().getWindow()).close();
         }
     }
 

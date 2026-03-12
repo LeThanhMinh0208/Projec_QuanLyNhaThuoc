@@ -1,35 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefWidth="500.0" spacing="15.0" style="-fx-background-color: white; -fx-padding: 25;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.dialogs.Dialog_SuaThuocController">
-   <children>
-      <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0ea5e9;" text="CẬP NHẬT THUỐC" />
-      <GridPane hgap="15.0" vgap="15.0">
-         <columnConstraints>
-            <ColumnConstraints prefWidth="120.0" />
-            <ColumnConstraints prefWidth="300.0" />
-         </columnConstraints>
-         <children>
-            <Label text="Mã Thuốc:" GridPane.rowIndex="0" />
-            <TextField fx:id="txtMa" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-            
-            <Label text="Tên Thuốc (*):" GridPane.rowIndex="1" />
-            <TextField fx:id="txtTen" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            
-            <Label text="Hoạt Chất:" GridPane.rowIndex="2" />
-            <TextField fx:id="txtHoatChat" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            
-            <Label text="ĐVT:" GridPane.rowIndex="3" />
-            <ComboBox fx:id="cbDVT" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            
-            <Label text="Trạng Thái:" GridPane.rowIndex="4" />
-            <ComboBox fx:id="cbTrangThai" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-         </children>
-      </GridPane>
-      <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-padding: 15 0 0 0;">
-         <Button fx:id="btnHuy" onAction="#handleHuy" style="-fx-background-color: #e2e8f0; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-padding: 8 20;" text="Hủy Bỏ" />
-         <Button onAction="#handleLuu" style="-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20;" text="Lưu Thuốc" />
-      </HBox>
-   </children>
+<VBox prefWidth="900.0" spacing="0.0" styleClass="ds-dialog-root" 
+      stylesheets="@../../resources/css/DanhMuc.css" 
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="gui.dialogs.Dialog_SuaThuocController">
+
+    <children>
+        <HBox styleClass="ds-header-area" alignment="CENTER_LEFT">
+            <children>
+                <Label text="✨ CẬP NHẬT THÔNG TIN THUỐC" styleClass="ds-dialog-title" />
+            </children>
+        </HBox>
+
+        <VBox spacing="20.0">
+            <padding>
+                <Insets top="25" right="35" bottom="25" left="35" />
+            </padding>
+            <children>
+                <HBox spacing="40.0">
+                    <children>
+                        <VBox spacing="15.0" alignment="TOP_CENTER">
+                            <children>
+                                <StackPane prefHeight="230.0" prefWidth="230.0" styleClass="ds-image-frame">
+                                    <children>
+                                        <ImageView fx:id="imgPreview" fitHeight="210.0" fitWidth="210.0" pickOnBounds="true" preserveRatio="true" />
+                                    </children>
+                                </StackPane>
+                                <Button onAction="#handleChonAnh" prefHeight="38.0" prefWidth="180.0" text="📷 Thay đổi hình ảnh" styleClass="ds-btn-cancel" style="-fx-font-weight: bold;" />
+                            </children>
+                        </VBox>
+
+                        <GridPane hgap="15.0" vgap="15.0" HBox.hgrow="ALWAYS">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="100.0" />
+                                <ColumnConstraints hgrow="ALWAYS" />
+                                <ColumnConstraints minWidth="90.0" />
+                                <ColumnConstraints hgrow="ALWAYS" />
+                            </columnConstraints>
+                            <children>
+                                <Label text="Mã Thuốc:" GridPane.rowIndex="0" />
+                                <TextField fx:id="txtMa" editable="false" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                                
+                                <Label text="Tên Thuốc:" GridPane.rowIndex="0" GridPane.columnIndex="2" />
+                                <TextField fx:id="txtTen" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="0" GridPane.columnIndex="3" />
+
+                                <Label text="Danh Mục:" GridPane.rowIndex="1" />
+                                <ComboBox fx:id="cbDanhMuc" maxWidth="Infinity" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                                
+                                <Label text="Trạng Thái:" GridPane.rowIndex="1" GridPane.columnIndex="2" />
+                                <ComboBox fx:id="cbTrangThai" maxWidth="Infinity" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="1" GridPane.columnIndex="3" />
+
+                                <Label text="Hoạt Chất:" GridPane.rowIndex="2" />
+                                <TextField fx:id="txtHoatChat" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="3" />
+                                
+                                <Label text="Hãng SX:" GridPane.rowIndex="3" />
+                                <TextField fx:id="txtHangSX" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                                <Label text="Nước SX:" GridPane.rowIndex="3" GridPane.columnIndex="2" />
+                                <TextField fx:id="txtNuocSX" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="3" GridPane.columnIndex="3" />
+                                
+                                <Label text="Hàm Lượng:" GridPane.rowIndex="4" />
+                                <TextField fx:id="txtHamLuong" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+                                
+                                <Label text="Đơn Vị Tính:" GridPane.rowIndex="4" GridPane.columnIndex="2" />
+                                <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="4" GridPane.columnIndex="3">
+                                    <children>
+                                        <TextField fx:id="txtDonVi" prefHeight="40.0" styleClass="ds-input" HBox.hgrow="ALWAYS" />
+                                        <CheckBox fx:id="chkKeDon" text="Kê đơn" style="-fx-text-fill: #ef4444; -fx-font-weight: bold;" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </GridPane>
+                    </children>
+                </HBox>
+
+                <VBox spacing="12.0">
+                    <children>
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Label text="Công Dụng:" style="-fx-font-weight: bold; -fx-text-fill: #1e40af;" />
+                            <Separator HBox.hgrow="ALWAYS" />
+                        </HBox>
+                        <TextArea fx:id="txtCongDung" prefHeight="70.0" styleClass="ds-input" wrapText="true" />
+                        
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Label text="Triệu Chứng Chỉ Định:" style="-fx-font-weight: bold; -fx-text-fill: #1e40af;" />
+                            <Separator HBox.hgrow="ALWAYS" />
+                        </HBox>
+                        <TextArea fx:id="txtTrieuChung" prefHeight="70.0" styleClass="ds-input" wrapText="true" />
+                    </children>
+                </VBox>
+
+                <HBox alignment="CENTER_RIGHT" spacing="20.0">
+                    <children>
+                        <Button fx:id="btnHuy" onAction="#handleHuy" prefHeight="50.0" prefWidth="160.0" text="Hủy Thao Tác" styleClass="ds-btn-cancel" />
+                        <Button onAction="#handleLuu" prefHeight="50.0" prefWidth="240.0" text="LƯU THAY ĐỔI ✨" styleClass="ds-btn-save" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
 </VBox>

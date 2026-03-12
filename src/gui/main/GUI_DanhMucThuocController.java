@@ -27,9 +27,11 @@ public class GUI_DanhMucThuocController {
     @FXML private TableView<Thuoc> tableThuoc;
     @FXML private ComboBox<String> cbLocDanhMuc;
    
-    // Đã khai báo colDanhMuc
     @FXML private TableColumn<Thuoc, String> colMa, colHinhAnh, colTen, colDanhMuc, colHoatChat, colHangSX, colNuocSX, colCongDung;
     @FXML private TableColumn<Thuoc, Boolean> colKeDon;
+    
+    // 1. ĐÃ THÊM KHAI BÁO CỘT TRẠNG THÁI
+    @FXML private TableColumn<Thuoc, String> colTrangThai;
     
     @FXML private TextField txtTimKiem;
 
@@ -48,14 +50,42 @@ public class GUI_DanhMucThuocController {
         // Cấu hình các cột Text bình thường
         colMa.setCellValueFactory(new PropertyValueFactory<>("maThuoc"));
         colTen.setCellValueFactory(new PropertyValueFactory<>("tenThuoc"));
-        
-        // --- THÊM DÒNG NÀY ĐỂ ĐỔ DỮ LIỆU TÊN DANH MỤC LÊN BẢNG ---
         colDanhMuc.setCellValueFactory(new PropertyValueFactory<>("tenDanhMuc"));
-        
         colHoatChat.setCellValueFactory(new PropertyValueFactory<>("hoatChat"));
         colHangSX.setCellValueFactory(new PropertyValueFactory<>("hangSanXuat"));
         colNuocSX.setCellValueFactory(new PropertyValueFactory<>("nuocSanXuat"));
         colCongDung.setCellValueFactory(new PropertyValueFactory<>("congDung"));
+
+        // 2. CẤU HÌNH CỘT TRẠNG THÁI (Mới thêm)
+        colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
+        colTrangThai.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    switch (item) {
+                        case "DANG_BAN":
+                            setText("Đang kinh doanh");
+                            setStyle("-fx-text-fill: #10b981; -fx-font-weight: bold;"); // Xanh lá
+                            break;
+                        case "HET_HANG":
+                            setText("Hết hàng");
+                            setStyle("-fx-text-fill: #f59e0b; -fx-font-weight: bold;"); // Cam
+                            break;
+                        case "NGUNG_BAN":
+                            setText("Ngừng bán");
+                            setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold;"); // Đỏ
+                            break;
+                        default:
+                            setText(item);
+                            setStyle("");
+                    }
+                }
+            }
+        });
 
         // Cấu hình cột Kê Đơn (True/False -> Có/Không)
         colKeDon.setCellValueFactory(new PropertyValueFactory<>("canKeDon"));
@@ -104,10 +134,8 @@ public class GUI_DanhMucThuocController {
     }
 
     private void loadData() {
-        // 1. Lấy dữ liệu thuốc đưa vào masterData
         masterData.setAll(daoThuoc.getAllThuoc());
         
-        // 2. LẤY DỮ LIỆU DANH MỤC TỪ DATABASE VÀ NẠP VÀO COMBOBOX
         ArrayList<String> dsTenDanhMuc = new ArrayList<>();
         dsTenDanhMuc.add("Tất cả danh mục"); 
         
@@ -118,10 +146,8 @@ public class GUI_DanhMucThuocController {
         cbLocDanhMuc.getItems().setAll(dsTenDanhMuc);
         cbLocDanhMuc.getSelectionModel().selectFirst(); 
 
-        // 3. Khởi tạo bộ lọc
         filteredData = new FilteredList<>(masterData, p -> true);
         
-        // 4. Lắng nghe thay đổi từ CẢ HAI
         txtTimKiem.textProperty().addListener((o, oldV, newV) -> filterData());
         cbLocDanhMuc.valueProperty().addListener((o, oldV, newV) -> filterData());
         
@@ -135,16 +161,12 @@ public class GUI_DanhMucThuocController {
         String danhMucFilter = cbLocDanhMuc.getValue();
 
         filteredData.setPredicate(t -> {
-            // --- ĐIỀU KIỆN 1: LỌC THEO DANH MỤC ---
             if (danhMucFilter != null && !danhMucFilter.equals("Tất cả danh mục")) {
-                
-                // Đã sửa thành getTenDanhMuc() để so sánh chính xác với chuỗi tiếng Việt trên Dropdown
                 if (t.getTenDanhMuc() == null || !t.getTenDanhMuc().equalsIgnoreCase(danhMucFilter)) {
                     return false; 
                 }
             }
 
-            // --- ĐIỀU KIỆN 2: LỌC THEO TỪ KHÓA TÌM KIẾM ---
             if (keyword.isEmpty()) return true;
 
             if (t.getMaThuoc() != null && t.getMaThuoc().toLowerCase().contains(keyword)) return true;
@@ -191,7 +213,7 @@ public class GUI_DanhMucThuocController {
             stage.setTitle(title);
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
-            loadData(); // Cập nhật lại bảng
+            loadData(); 
         } catch (Exception e) { e.printStackTrace(); }
     }
 }

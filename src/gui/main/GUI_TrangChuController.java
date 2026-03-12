@@ -161,7 +161,10 @@ public class GUI_TrangChuController {
     // --- [3] CẬP NHẬT 3: THÊM HÀM XỬ LÝ NÚT BẤM "TRANG CHỦ" ---
     @FXML
     void handleVeTrangChu(ActionEvent event) {
-        // Lắp lại cái ruột trang chủ gốc vào giữa
+
+        loadDataTrangChu(); 
+        
+
         if (noiDungTrangChuGoc != null) {
             mainBorderPane.setCenter(noiDungTrangChuGoc);
         }
@@ -186,23 +189,32 @@ public class GUI_TrangChuController {
 
     @FXML
     void handleMoQuanLyDanhMucThuoc(ActionEvent event) {
-        // Gọi file FXML của trang Danh Mục Thuốc
+       
         switchPage("/gui/main/GUI_DanhMucThuoc.fxml");
     }
 
-    // Hàm cốt lõi để lồng trang
-    private void switchPage(String fxmlPath) {
+
+    public void switchPage(String fxmlPath) {
         try {
-            // Nạp file giao diện con (VD: GUI_DanhMucThuoc.fxml)
-            Parent root = FXMLLoader.load(getClass().getResource(fxmlPath));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent root = loader.load();
             
-            // Lắp giao diện con vào chính giữa của Trang Chủ
-            // Toàn bộ Sidebar bên trái sẽ được giữ nguyên 100%
+     
+            Object controller = loader.getController();
+
+
+            if (controller instanceof GUI_TrangChuController) {
+                ((GUI_TrangChuController) controller).loadDataTrangChu(); 
+            } 
+    
             mainBorderPane.setCenter(root);
             
         } catch (Exception e) {
-            System.err.println("Lỗi nạp file: " + fxmlPath);
+            System.err.println("Lỗi nạp file FXML: " + fxmlPath);
             e.printStackTrace();
         }
+    }
+    public void loadDataTrangChu() {
+        masterData.setAll(daoThuoc.getAllThuoc()); 
     }
 }

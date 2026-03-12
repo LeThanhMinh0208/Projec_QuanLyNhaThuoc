@@ -78,6 +78,7 @@
                   <TableColumn fx:id="colKeDon" prefWidth="80.0" text="Kê Đơn" />
                   <TableColumn fx:id="colNuocSX" prefWidth="100.0" text="Nước SX" />
                   <TableColumn fx:id="colCongDung" prefWidth="180.0" text="Công Dụng" />
+                  <TableColumn fx:id="colTrangThai" prefWidth="120.0" text="Trạng Thái" />
                </columns>
             </TableView>
          </children>

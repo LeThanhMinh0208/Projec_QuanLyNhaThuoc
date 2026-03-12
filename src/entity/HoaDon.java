@@ -1,0 +1,40 @@
+package entity;
+import java.sql.Date;
+
+public class HoaDon {
+    private String maHoaDon;
+    private Date ngayLap;
+    private double thueVAT;
+    private String hinhThucThanhToan; // Enum: TIEN_MAT, CHUYEN_KHOAN, THE
+    private String ghiChu;
+    private NhanVien nhanVien;
+    private KhachHang khachHang;
+
+    public HoaDon() {}
+
+    public HoaDon(String maHoaDon, Date ngayLap, double thueVAT, String hinhThucThanhToan, String ghiChu, NhanVien nhanVien, KhachHang khachHang) {
+        this.maHoaDon = maHoaDon;
+        this.ngayLap = ngayLap;
+        this.thueVAT = thueVAT;
+        this.hinhThucThanhToan = hinhThucThanhToan;
+        this.ghiChu = ghiChu;
+        this.nhanVien = nhanVien;
+        this.khachHang = khachHang;
+    }
+
+    // Getters and Setters
+    public String getMaHoaDon() { return maHoaDon; }
+    public void setMaHoaDon(String maHoaDon) { this.maHoaDon = maHoaDon; }
+    public Date getNgayLap() { return ngayLap; }
+    public void setNgayLap(Date ngayLap) { this.ngayLap = ngayLap; }
+    public double getThueVAT() { return thueVAT; }
+    public void setThueVAT(double thueVAT) { this.thueVAT = thueVAT; }
+    public String getHinhThucThanhToan() { return hinhThucThanhToan; }
+    public void setHinhThucThanhToan(String hinhThucThanhToan) { this.hinhThucThanhToan = hinhThucThanhToan; }
+    public String getGhiChu() { return ghiChu; }
+    public void setGhiChu(String ghiChu) { this.ghiChu = ghiChu; }
+    public NhanVien getNhanVien() { return nhanVien; }
+    public void setNhanVien(NhanVien nhanVien) { this.nhanVien = nhanVien; }
+    public KhachHang getKhachHang() { return khachHang; }
+    public void setKhachHang(KhachHang khachHang) { this.khachHang = khachHang; }
+}
