@@ -1,0 +1,67 @@
+/* ========================================
+   STYLE RIÊNG CHO MÀN HÌNH DANH MỤC THUỐC
+   ======================================== */
+
+/* Dành riêng cho 3 nút Thêm, Cập Nhật, Xóa */
+.btn-action {
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+    -fx-graphic-text-gap: 12px; /* Khoảng cách giữa icon và chữ */
+	-fx-padding: 10px 0px;
+}
+
+/* Dành riêng cho biểu tượng kính lúp ở thanh tìm kiếm */
+.search-icon {
+    -fx-font-size: 20px;
+    -fx-text-fill: #0ea5e9;
+}
+/* ========================================
+   CUSTOM CSS CHO COMBOBOX (NÚT LỌC)
+   ======================================== */
+
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1; /* Màu viền xám nhạt giống thanh tìm kiếm */
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px; /* Bo góc hiện đại */
+    -fx-background-radius: 8px;
+    -fx-padding: 0 5 0 5;
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s;
+}
+
+/* Hiệu ứng khi di chuột vào nút lọc */
+.combo-box:hover {
+    -fx-border-color: #0ea5e9; /* Đổi sang màu xanh dương khi hover */
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.1), 10, 0, 0, 0);
+}
+
+/* Tùy chỉnh danh sách xổ xuống (Popup) */
+.combo-box .list-view {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 15, 0, 0, 5);
+}
+
+/* Tùy chỉnh từng dòng trong danh sách chọn */
+.combo-box .list-cell {
+    -fx-padding: 10px;
+    -fx-font-size: 14px;
+    -fx-text-fill: #475569;
+}
+
+.combo-box .list-cell:hover {
+    -fx-background-color: #f0f9ff;
+    -fx-text-fill: #0ea5e9;
+}
+
+/* Tùy chỉnh mũi tên của ComboBox */
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.combo-box .arrow {
+    -fx-background-color: #64748b; /* Màu mũi tên xám */
+}

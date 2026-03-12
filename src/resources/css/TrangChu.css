@@ -1,251 +1,205 @@
 /* ========================================
-   BỐ CỤC CHÍNH (LAYOUT & SIDEBAR)
+   BIẾN TOÀN CỤC - SKY BLUE THEME
    ======================================== */
+:root {
+    -fx-primary-sky: #0ea5e9;       /* Xanh da trời chính */
+    -fx-secondary-sky: #e0f2fe;    /* Xanh da trời cực nhẹ cho nền */
+    -fx-accent-glow: #38bdf8;      /* Màu xanh lấp lánh */
+    -fx-sidebar-dark: #0c4a6e;     /* Xanh biển đậm cho Sidebar */
+    -fx-white: #ffffff;
+    -fx-glass: rgba(255, 255, 255, 0.1);
+}
+
+/* --- BỐ CỤC CHÍNH --- */
 .main-bg {
-    -fx-background-color: #f4f6fa;
+    -fx-background-color: #f0f9ff; /* Màu nền xanh da trời nhạt */
 }
 
 .sidebar {
-    -fx-background-color: #3b5278; /* Xanh Navy */
+    -fx-background-color: -fx-sidebar-dark;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.3), 15, 0, 0, 0);
 }
 
 .sidebar-logo {
-    -fx-text-fill: white;
-    -fx-font-size: 20px;
+    -fx-text-fill: -fx-white;
+    -fx-font-size: 22px;
     -fx-font-weight: 900;
     -fx-font-style: italic;
+    /* Hiệu ứng tỏa sáng cho Logo */
+    -fx-effect: dropshadow(one-pass-box, -fx-accent-glow, 10, 0.5, 0, 0);
 }
 
-/* Nút Trang Chủ (Nút đơn) */
+/* --- NÚT TRANG CHỦ (ACTIVE) --- */
 .sidebar-btn-active {
-    -fx-background-color: #f4f6fa;
-    -fx-text-fill: #3b5278;
+    -fx-background-color: #f0f9ff;
+    -fx-text-fill: -fx-primary-sky;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-padding: 0 0 0 25px;
-    -fx-background-radius: 25px 0 0 25px;
+    -fx-background-radius: 30px 0 0 30px;
+    -fx-effect: innershadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 2, 2);
 }
 
 /* ========================================
-   HỆ THỐNG DROPDOWN (TITLED PANE)
+   HỆ THỐNG DROPDOWN LẤP LÁNH
    ======================================== */
 .sidebar-dropdown {
     -fx-background-color: transparent;
-    -fx-text-fill: #aab8ce;
-    -fx-font-size: 14px;
+    -fx-text-fill: #bae6fd;
     -fx-font-weight: bold;
 }
 
-/* Thanh tiêu đề của Dropdown */
 .sidebar-dropdown > .title {
     -fx-background-color: transparent;
     -fx-padding: 12 0 12 25;
     -fx-cursor: hand;
-    -fx-transition: 0.3s;
 }
 
 .sidebar-dropdown > .title:hover {
-    -fx-background-color: #4a6693;
+    -fx-background-color: rgba(255, 255, 255, 0.15);
     -fx-text-fill: white;
 }
 
-/* Ẩn mũi tên mặc định của TitledPane */
-.sidebar-dropdown > .title > .arrow-button {
-    -fx-padding: 0 10 0 0;
-}
-.sidebar-dropdown > .title > .arrow-button > .arrow {
-    -fx-background-color: transparent; /* Làm tàng hình mũi tên */
-}
-
-/* Vùng chứa nút con bên trong khi bung ra */
 .dropdown-content {
-    -fx-background-color: #2d4162; 
-    -fx-padding: 5 0 5 50; 
+    -fx-background-color: #075985; /* Xanh đậm hơn chút cho vùng con */
+    -fx-padding: 5 0 5 0;
 }
 
 .sub-btn {
     -fx-background-color: transparent;
-    -fx-text-fill: #ecf0f1;
+    -fx-text-fill: #e0f2fe;
     -fx-font-size: 13px;
-    -fx-font-weight: normal;
-    -fx-padding: 8 0;
-    -fx-cursor: hand;
+    -fx-padding: 10 0 10 50;
+    -fx-pref-width: 250px;
     -fx-alignment: CENTER_LEFT;
 }
 
 .sub-btn:hover {
-    -fx-text-fill: #3498db;
+    /* Hiệu ứng lấp lánh khi di chuột vào nút con */
+    -fx-background-color: linear-gradient(to right, #0ea5e9, transparent);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 0 10 60;
+    -fx-border-color: #7dd3fc;
+    -fx-border-width: 0 0 0 4;
 }
 
 /* ========================================
-   TOP CARDS & SEARCH
+   CARDS & SEARCH (TRANG CHỦ)
    ======================================== */
-.main-title {
-    -fx-font-size: 24px;
-    -fx-font-weight: 900;
-    -fx-text-fill: #1f2937;
-}
+   .main-title {
+       -fx-font-size: 32px;
+       -fx-font-weight: 900;
+       -fx-text-fill: linear-gradient(to bottom, #0ea5e9, #0369a1);
+       -fx-padding: 10 0 20 0;
+       -fx-text-alignment: center;
+       /* Hiệu ứng bóng đổ làm chữ nổi khối lấp lánh */
+       -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.4), 5, 0, 0, 2);
+   }
 
-.top-card {
-    -fx-background-radius: 15px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
-}
+   .top-card {
+       -fx-background-radius: 20px;
+       -fx-cursor: hand;
+       -fx-transition: all 0.3s ease;
+   }
+   .top-card:hover {
+       -fx-translate-y: -5px; /* Bay lên nhẹ khi hover */
+       -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.6), 25, 0, 0, 12);
+   }
+   .card-title {
+       -fx-text-fill: white;
+       -fx-font-size: 20px;
+       -fx-font-weight: 900;
+       -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.3), 3, 0, 0, 1);
+   }
 
-.card-blue   { -fx-background-color: #5a73d8; }
-.card-orange { -fx-background-color: #e99e4c; }
-.card-green  { -fx-background-color: #59b584; }
-
-.card-title {
-    -fx-text-fill: white;
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
-}
+.card-blue   { -fx-background-color: linear-gradient(to bottom right, #0ea5e9, #38bdf8); }
+.card-orange { -fx-background-color: linear-gradient(to bottom right, #f59e0b, #fbbf24); }
+.card-green  { -fx-background-color: linear-gradient(to bottom right, #10b981, #34d399); }
 
 .search-box {
     -fx-background-color: white;
-    -fx-background-radius: 25px;
-    -fx-border-color: #e5e7eb;
+    -fx-background-radius: 40px; /* Bo tròn cực đại */
+    -fx-border-color: linear-gradient(to right, #7dd3fc, #0ea5e9); /* Viền màu Gradient */
+    -fx-border-width: 2px;
+    -fx-border-radius: 40px;
+    -fx-padding: 8 25 8 25;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.2), 15, 0, 0, 5);
+    -fx-transition: all 0.3s ease;
+}
+.search-box:focused-within {
+    -fx-border-color: #38bdf8;
+    -fx-background-color: #f0f9ff;
+    -fx-effect: dropshadow(three-pass-box, #0ea5e9, 15, 0.4, 0, 0); /* Tỏa sáng xanh da trời */
 }
 
 .search-input {
     -fx-background-color: transparent;
-    -fx-font-size: 15px;
+    -fx-font-size: 16px;
+    -fx-text-fill: #0369a1;
+    -fx-prompt-text-fill: #94a3b8;
+    /* Loại bỏ viền mặc định của TextField bên trong */
+    -fx-background-insets: 0;
+    -fx-border-width: 0;
 }
-
 /* ========================================
-   MODERN TABLEVIEW (PHẲNG & BO GÓC)
+   TABLEVIEW HIỆN ĐẠI
    ======================================== */
 .table-view {
     -fx-background-color: white;
-    -fx-background-radius: 15px;
-    -fx-border-color: #f1f2f6;
-    -fx-padding: 5;
+    -fx-background-radius: 20px;
+    -fx-border-color: #e0f2fe;
+    -fx-padding: 10;
 }
 
 .table-view .column-header-background {
-    -fx-background-color: #2c3e50;
-    -fx-background-radius: 12px 12px 0 0;
+    -fx-background-color: #0ea5e9; /* Màu xanh da trời cho Header */
+    -fx-background-radius: 18px 18px 0 0;
 }
 
 .table-view .column-header {
     -fx-background-color: transparent;
-    -fx-size: 50px;
+    -fx-size: 55px;
 }
 
 .table-view .column-header .label {
     -fx-text-fill: white;
-    -fx-font-weight: bold;
+    -fx-font-size: 13px;
     -fx-text-transform: uppercase;
 }
 
 .table-row-cell {
     -fx-cell-size: 85px;
-    -fx-border-color: transparent transparent #f1f2f6 transparent;
+    -fx-border-color: transparent transparent #f0f9ff transparent;
+}
+
+.table-row-cell:filled:hover {
+    -fx-background-color: #f0f9ff;
 }
 
 .table-row-cell:selected {
-    -fx-background-color: #e3f2fd;
+    -fx-background-color: #bae6fd;
+    -fx-text-fill: #0369a1;
 }
 
-/* Ẩn hoàn toàn thanh cuộn của bảng */
-.table-view .scroll-bar:vertical,
-.table-view .scroll-bar:horizontal {
-    -fx-opacity: 0;
-    -fx-padding: -10;
-}
-
-/* Xóa dải trắng sọc sau cột cuối */
-.table-view .virtual-flow .filler {
-    -fx-background-color: transparent;
-}
-
-/* ========================================
-   KHỐI THÔNG BÁO & LOGOUT
-   ======================================== */
+/* --- KHỐI TRẮNG --- */
 .panel-white {
     -fx-background-color: white;
-    -fx-background-radius: 15px;
-    -fx-padding: 20px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 3);
+    -fx-background-radius: 20px;
+    -fx-padding: 25px;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.15), 20, 0, 0, 10);
 }
 
+/* --- LOGOUT --- */
 .sidebar-btn-logout {
     -fx-background-color: transparent;
-    -fx-text-fill: #ff7675;
+    -fx-text-fill: #fecaca;
     -fx-font-weight: bold;
-    -fx-padding: 0 0 0 25px;
-    -fx-cursor: hand;
-    -fx-border-color: rgba(255,255,255,0.1);
-    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 15 0 15 25;
 }
 
 .sidebar-btn-logout:hover {
-    -fx-background-color: #c0392b;
+    -fx-background-color: #ef4444;
     -fx-text-fill: white;
-}
-/* --- Style cho các nút con bên trong Dropdown --- */
-.sub-btn {
-    -fx-background-color: transparent;
-    -fx-text-fill: #ecf0f1;
-    -fx-font-size: 13px;
-    -fx-font-weight: normal;
-    -fx-padding: 8 0 8 0; /* Trên - Phải - Dưới - Trái */
-    -fx-cursor: hand;
-    -fx-alignment: CENTER_LEFT;
-    
-    /* Hiệu ứng chuyển động mượt mà trong JavaFX */
-    -fx-transition: all 0.3s ease-in-out; 
-}
-
-/* Hiệu ứng khi di chuột vào nút con */
-.sub-btn:hover {
-    -fx-text-fill: #3498db;      /* Đổi màu chữ sang xanh neon */
-    -fx-padding: 8 0 8 15;     /* Đẩy chữ sang phải bằng cách tăng padding-left */
-    
-    /* Thêm một vạch nhỏ bên trái để tạo điểm nhấn */
-    -fx-border-color: #3498db;
-    -fx-border-width: 0 0 0 3; /* Chỉ hiện viền bên trái dày 3px */
-}
-
-/* --- Tùy chỉnh vùng chứa Dropdown --- */
-.dropdown-content {
-    -fx-background-color: #2d4162; 
-    -fx-padding: 5 0 5 40; 
-    /* Tạo hiệu ứng đổ bóng nhẹ cho vùng dropdown */
-    -fx-effect: innershadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);
-}
-/* --- Tùy chỉnh vùng chứa các nút con khi bung ra --- */
-.dropdown-content {
-    -fx-background-color: #2d4162; /* Nền xanh đậm hơn sidebar */
-    -fx-padding: 5 0 5 0;          /* Reset padding để background hover tràn lề */
-}
-
-/* --- Trạng thái bình thường của nút con --- */
-.sub-btn {
-    -fx-background-color: transparent;
-    -fx-text-fill: #ecf0f1;
-    -fx-font-size: 13px;
-    -fx-font-family: "Segoe UI", Arial; /* Đổi font sang Segoe UI cho hiện đại */
-    -fx-font-weight: normal;
-    -fx-padding: 10 0 10 50;           /* Đẩy chữ vào trong để chừa chỗ cho background */
-    -fx-cursor: hand;
-    -fx-alignment: CENTER_LEFT;
-    -fx-pref-width: 250px;             /* Đảm bảo background hover phủ hết chiều ngang */
-}
-
-/* --- HIỆU ỨNG KHI DI CHUỘT VÀO (HOVER) --- */
-.sub-btn:hover {
-    /* 1. Thay đổi Background: Tạo dải màu gradient nhẹ từ trái sang phải */
-    -fx-background-color: linear-gradient(to right, #4a6693, #3b5278);
-    
-    /* 2. Thay đổi Font chữ: Làm chữ đậm lên và sáng hơn */
-    -fx-text-fill: #ffffff;
-    -fx-font-weight: bold;
-    
-    /* 3. Hiệu ứng trượt nhẹ: Tăng padding-left để chữ dịch sang phải */
-    -fx-padding: 10 0 10 60;
-    
-    /* 4. Thêm vạch chỉ thị (Indicator) màu xanh neon ở đầu nút */
-    -fx-border-color: #3498db;
-    -fx-border-width: 0 0 0 5; /* Viền trái dày 5px */
+    -fx-background-radius: 0 30 30 0;
 }

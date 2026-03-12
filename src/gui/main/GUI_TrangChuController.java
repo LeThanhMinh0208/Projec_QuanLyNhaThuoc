@@ -19,6 +19,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+import javafx.scene.layout.BorderPane;
 
 import java.io.InputStream;
 
@@ -28,10 +29,14 @@ public class GUI_TrangChuController {
     @FXML private TableColumn<Thuoc, String> colMaThuoc, colHinhAnh, colTenThuoc, colTrieuChung, colDVT, colTrangThai;
     @FXML private TableColumn<Thuoc, Boolean> colKeDon;
     @FXML private TextField txtTimKiem;
+    @FXML private BorderPane mainBorderPane;
 
     private DAO_Thuoc daoThuoc = new DAO_Thuoc();
     private ObservableList<Thuoc> masterData = FXCollections.observableArrayList();
     private static NhanVien nhanVienDangNhap;
+    
+    // --- [1] CẬP NHẬT 1: THÊM BIẾN ĐỂ LƯU GIAO DIỆN GỐC ---
+    private Node noiDungTrangChuGoc; 
 
     public static void setNhanVienDangNhap(NhanVien nv) {
         nhanVienDangNhap = nv;
@@ -42,6 +47,11 @@ public class GUI_TrangChuController {
         setupTable();
         loadDataFromServer();
         setupSearchLogic();
+        
+        // --- [2] CẬP NHẬT 2: LƯU GIAO DIỆN VÀO BIẾN KHI VỪA MỞ PHẦN MỀM ---
+        if (mainBorderPane != null) {
+            noiDungTrangChuGoc = mainBorderPane.getCenter();
+        }
     }
 
     private void setupTable() {
@@ -125,7 +135,7 @@ public class GUI_TrangChuController {
                 if (thuoc.getTenThuoc().toLowerCase().contains(filter)) return true;
 
                 // Lọc theo Công Dụng
-                if (thuoc.getCongDungTrieuChung().toLowerCase().contains(filter)) return true;
+                if (thuoc.getCongDung() != null && thuoc.getCongDung().toLowerCase().contains(filter)) return true;
 
                 // Lọc theo Hoạt Chất, Hãng, Nước SX (Dù không hiện trên bảng vẫn lọc được)
                 if (thuoc.getHoatChat() != null && thuoc.getHoatChat().toLowerCase().contains(filter)) return true;
@@ -148,6 +158,15 @@ public class GUI_TrangChuController {
         tableThuoc.setItems(sortedData);
     }
 
+    // --- [3] CẬP NHẬT 3: THÊM HÀM XỬ LÝ NÚT BẤM "TRANG CHỦ" ---
+    @FXML
+    void handleVeTrangChu(ActionEvent event) {
+        // Lắp lại cái ruột trang chủ gốc vào giữa
+        if (noiDungTrangChuGoc != null) {
+            mainBorderPane.setCenter(noiDungTrangChuGoc);
+        }
+    }
+
     @FXML
     void handleDangXuat(ActionEvent event) {
         try {
@@ -161,6 +180,28 @@ public class GUI_TrangChuController {
             loginStage.setTitle("Đăng nhập");
             loginStage.show();
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void handleMoQuanLyDanhMucThuoc(ActionEvent event) {
+        // Gọi file FXML của trang Danh Mục Thuốc
+        switchPage("/gui/main/GUI_DanhMucThuoc.fxml");
+    }
+
+    // Hàm cốt lõi để lồng trang
+    private void switchPage(String fxmlPath) {
+        try {
+            // Nạp file giao diện con (VD: GUI_DanhMucThuoc.fxml)
+            Parent root = FXMLLoader.load(getClass().getResource(fxmlPath));
+            
+            // Lắp giao diện con vào chính giữa của Trang Chủ
+            // Toàn bộ Sidebar bên trái sẽ được giữ nguyên 100%
+            mainBorderPane.setCenter(root);
+            
+        } catch (Exception e) {
+            System.err.println("Lỗi nạp file: " + fxmlPath);
             e.printStackTrace();
         }
     }

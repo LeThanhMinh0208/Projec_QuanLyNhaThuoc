@@ -8,18 +8,20 @@ public class Thuoc {
     private String hamLuong;
     private String hangSanXuat;
     private String nuocSanXuat;
-    private String congDungTrieuChung;
+    private String congDung;
     private String donViCoBan;
     private String hinhAnh;
     private boolean canKeDon;
     private String trangThai;
     private String trieuChung;
+    private String tenDanhMuc;
+
 
     public Thuoc() {
     }
 
     public Thuoc(String maThuoc, String maDanhMuc, String tenThuoc, String hoatChat, String hamLuong,
-                 String hangSanXuat, String nuocSanXuat, String congDungTrieuChung, String donViCoBan,
+                 String hangSanXuat, String nuocSanXuat, String congDung, String donViCoBan,
                  String hinhAnh, boolean canKeDon, String trangThai) {
         this.maThuoc = maThuoc;
         this.maDanhMuc = maDanhMuc;
@@ -28,11 +30,12 @@ public class Thuoc {
         this.hamLuong = hamLuong;
         this.hangSanXuat = hangSanXuat;
         this.nuocSanXuat = nuocSanXuat;
-        this.congDungTrieuChung = congDungTrieuChung;
+        this.congDung = congDung;
         this.donViCoBan = donViCoBan;
         this.hinhAnh = hinhAnh;
         this.canKeDon = canKeDon;
         this.trangThai = trangThai;
+        
     }
 
     // --- GETTERS & SETTERS ---
@@ -57,8 +60,8 @@ public class Thuoc {
     public String getNuocSanXuat() { return nuocSanXuat; }
     public void setNuocSanXuat(String nuocSanXuat) { this.nuocSanXuat = nuocSanXuat; }
 
-    public String getCongDungTrieuChung() { return congDungTrieuChung; }
-    public void setCongDungTrieuChung(String congDungTrieuChung) { this.congDungTrieuChung = congDungTrieuChung; }
+    public String getCongDung() { return congDung; }
+    public void setCongDung(String congDung) { this.congDung = congDung; }
 
     public String getDonViCoBan() { return donViCoBan; }
     public void setDonViCoBan(String donViCoBan) { this.donViCoBan = donViCoBan; }
@@ -74,4 +77,7 @@ public class Thuoc {
     
     public String getTrieuChung() { return trieuChung; }
     public void setTrieuChung(String trieuChung) { this.trieuChung = trieuChung; }
+    
+    public String getTenDanhMuc() { return tenDanhMuc; }
+    public void setTenDanhMuc(String tenDanhMuc) { this.tenDanhMuc = tenDanhMuc; }
 }

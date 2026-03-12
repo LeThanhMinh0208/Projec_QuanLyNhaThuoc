@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefWidth="500.0" spacing="15.0" style="-fx-background-color: white; -fx-padding: 25;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.dialogs.Dialog_SuaThuocController">
+   <children>
+      <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0ea5e9;" text="CẬP NHẬT THUỐC" />
+      <GridPane hgap="15.0" vgap="15.0">
+         <columnConstraints>
+            <ColumnConstraints prefWidth="120.0" />
+            <ColumnConstraints prefWidth="300.0" />
+         </columnConstraints>
+         <children>
+            <Label text="Mã Thuốc:" GridPane.rowIndex="0" />
+            <TextField fx:id="txtMa" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+            
+            <Label text="Tên Thuốc (*):" GridPane.rowIndex="1" />
+            <TextField fx:id="txtTen" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            
+            <Label text="Hoạt Chất:" GridPane.rowIndex="2" />
+            <TextField fx:id="txtHoatChat" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            
+            <Label text="ĐVT:" GridPane.rowIndex="3" />
+            <ComboBox fx:id="cbDVT" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            
+            <Label text="Trạng Thái:" GridPane.rowIndex="4" />
+            <ComboBox fx:id="cbTrangThai" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+         </children>
+      </GridPane>
+      <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-padding: 15 0 0 0;">
+         <Button fx:id="btnHuy" onAction="#handleHuy" style="-fx-background-color: #e2e8f0; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-padding: 8 20;" text="Hủy Bỏ" />
+         <Button onAction="#handleLuu" style="-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20;" text="Lưu Thuốc" />
+      </HBox>
+   </children>
+</VBox>
