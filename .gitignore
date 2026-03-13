@@ -3,6 +3,7 @@
 *.class
 bin/
 target/
+lib/
 
 # === IDE (Eclipse) ===
 # Chặn các cài đặt cá nhân của người dùng (giao diện, vị trí cửa sổ...)
