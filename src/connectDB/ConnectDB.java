@@ -17,7 +17,7 @@ public class ConnectDB {
             // Thay đổi cấu hình này cho khớp với SQL Server máy bạn
             String url = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyNhaThuoc_LongNguyen;encrypt=true;trustServerCertificate=true;";
             String user = "sa";
-            String password = "123456"; 
+            String password = "sapassword"; 
             
             con = DriverManager.getConnection(url, user, password);
             System.out.println("Kết nối CSDL thành công!");
@@ -38,7 +38,7 @@ public class ConnectDB {
             if (con == null || con.isClosed()) {
                 String url = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyNhaThuoc_LongNguyen;encrypt=false";
                 String user = "sa";
-                String password = "123456";
+                String password = "sapassword";
                 con = DriverManager.getConnection(url, user, password);
             }
         } catch (SQLException e) {
