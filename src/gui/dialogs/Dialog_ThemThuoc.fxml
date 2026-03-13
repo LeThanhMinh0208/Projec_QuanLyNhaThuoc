@@ -68,7 +68,7 @@
                                 <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="3" GridPane.columnIndex="3">
                                     <children>
                                         <TextField fx:id="txtDonVi" prefHeight="40.0" styleClass="ds-input" HBox.hgrow="ALWAYS" />
-                                        <CheckBox fx:id="chkKeDon" text="Kê đơn" style="-fx-text-fill: #ef4444; -fx-font-weight: bold;" />
+                                        <CheckBox fx:id="chkKeDon" text="Có" style="-fx-text-fill: #ef4444; -fx-font-weight: bold;" />
                                     </children>
                                 </HBox>
                             </children>
