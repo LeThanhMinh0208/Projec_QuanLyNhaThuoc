@@ -179,4 +179,65 @@ public class DAO_Thuoc {
             return false;
         }
     }
+
+    public Thuoc getThuocTheoMaHoacTen(String query) {
+        Thuoc thuoc = null;
+        try {
+            Connection con = ConnectDB.getInstance().getConnection();
+            
+            // Truy vấn tìm chính xác mã hoặc tìm gần đúng theo tên
+            String sql = "SELECT TOP 1 * FROM Thuoc WHERE maThuoc = ? OR tenThuoc LIKE ?";
+            
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setString(1, query); // Tìm chính xác mã
+            stmt.setString(2, "%" + query + "%"); // Tìm gần đúng theo tên
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                thuoc = new Thuoc();
+                thuoc.setMaThuoc(rs.getString("maThuoc"));
+                thuoc.setTenThuoc(rs.getString("tenThuoc"));
+                thuoc.setDonViCoBan(rs.getString("donViCoBan"));
+                // Sếp có thể set thêm các thuộc tính khác nếu cần...
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return thuoc;
+    }
+    public ArrayList<Thuoc> getDanhSachGoiY(String query) {
+        ArrayList<Thuoc> list = new ArrayList<>();
+        String sql = "SELECT TOP 10 maThuoc, tenThuoc FROM Thuoc WHERE maThuoc LIKE ? OR tenThuoc LIKE ?";
+        try {
+            Connection con = ConnectDB.getInstance().getConnection();
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setString(1, "%" + query + "%");
+            stmt.setString(2, "%" + query + "%");
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Thuoc t = new Thuoc();
+                t.setMaThuoc(rs.getString("maThuoc"));
+                t.setTenThuoc(rs.getString("tenThuoc"));
+                list.add(t);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
+    }
+    public boolean capNhatGiaNhapMoi(String maThuoc, double giaMoi) {
+        int n = 0;
+        String sql = "UPDATE Thuoc SET GiaNhap = ? WHERE MaThuoc = ?";
+        
+        try (java.sql.Connection con = connectDB.ConnectDB.getInstance().getConnection();
+             java.sql.PreparedStatement stmt = con.prepareStatement(sql)) {
+             
+            stmt.setDouble(1, giaMoi);
+            stmt.setString(2, maThuoc);
+            
+            n = stmt.executeUpdate();
+        } catch (java.sql.SQLException e) {
+            System.err.println("❌ Lỗi khi cập nhật giá nhập mới cho thuốc: " + e.getMessage());
+        }
+        return n > 0;
+    }
 }

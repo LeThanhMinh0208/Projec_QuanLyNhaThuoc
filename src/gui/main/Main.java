@@ -28,7 +28,7 @@ public class Main extends Application {
         }
     }
 
-    // Đóng Database khi tắt phần mềm
+ 
     @Override
     public void stop() throws Exception {
         ConnectDB.getInstance().disconnect();

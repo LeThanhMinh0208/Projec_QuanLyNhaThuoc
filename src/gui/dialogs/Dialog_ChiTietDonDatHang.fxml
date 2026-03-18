@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="700.0" prefWidth="1100.0" spacing="20.0" styleClass="dmk-main-bg" stylesheets="@../../resources/css/QuanLyDonNhapHang.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.dialogs.Dialog_ChiTietDonDatHangController">
+   <padding><Insets bottom="25.0" left="30.0" right="30.0" top="25.0" /></padding>
+   <children>
+      <HBox alignment="CENTER_LEFT">
+         <children>
+            <VBox spacing="5.0">
+               <children>
+                  <Label styleClass="dmk-page-title" text="CHI TIẾT ĐƠN ĐẶT HÀNG" />
+                  <Label fx:id="lblMaDon" text="Mã đơn: DDH001" textFill="#0284c7">
+                     <font><Font name="System Bold" size="18.0" /></font>
+                  </Label>
+               </children>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS" />
+            <VBox alignment="CENTER_RIGHT" spacing="5.0">
+               <children>
+                  <Label fx:id="lblTrangThai" style="-fx-background-color: #fef3c7; -fx-text-fill: #92400e; -fx-padding: 5 15; -fx-background-radius: 15; -fx-font-weight: bold;" text="ĐANG CHỜ" />
+                  <Label fx:id="lblNgayLap" text="Ngày lập: 15/03/2026" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+
+      <GridPane hgap="20.0" styleClass="dmk-card" vgap="10.0">
+        <columnConstraints>
+          <ColumnConstraints prefWidth="120.0" />
+          <ColumnConstraints hgrow="ALWAYS" />
+          <ColumnConstraints prefWidth="120.0" />
+          <ColumnConstraints hgrow="ALWAYS" />
+        </columnConstraints>
+        <children>
+            <Label text="Nhà cung cấp:" GridPane.rowIndex="0" />
+            <Label fx:id="lblNhaCungCap" style="-fx-font-weight: bold;" text="---" GridPane.columnIndex="1" />
+            <Label text="Nhân viên lập:" GridPane.rowIndex="1" />
+            <Label fx:id="lblNhanVien" style="-fx-font-weight: bold;" text="---" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label text="Ngày hẹn giao:" GridPane.columnIndex="2" />
+            <Label fx:id="lblNgayHen" style="-fx-font-weight: bold;" text="---" GridPane.columnIndex="3" />
+            <Label text="Ghi chú:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <Label fx:id="lblGhiChu" text="---" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+        </children>
+         <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+      </GridPane>
+
+      <TableView fx:id="tableChiTiet" styleClass="dmk-table" VBox.vgrow="ALWAYS">
+        <columns>
+          <TableColumn fx:id="colTenThuoc" prefWidth="250.0" text="Tên Thuốc" />
+          <TableColumn fx:id="colDonVi" prefWidth="100.0" text="Đơn Vị" />
+          <TableColumn fx:id="colSoLuongDat" prefWidth="100.0" text="SL Đặt" />
+          <TableColumn fx:id="colSoLuongNhan" prefWidth="100.0" text="SL Nhận" />
+          <TableColumn fx:id="colGiaNhap" prefWidth="130.0" text="Đơn Giá" />
+          <TableColumn fx:id="colThanhTien" prefWidth="150.0" text="Thành Tiền" />
+        </columns>
+      </TableView>
+
+      <HBox alignment="CENTER_RIGHT" spacing="30.0" styleClass="dmk-card">
+         <children>
+            <HBox alignment="CENTER" spacing="10.0">
+               <children>
+                  <Label text="Tổng tiền dự kiến:" style="-fx-font-size: 16px; -fx-text-fill: #64748b;" />
+                  <Label fx:id="lblTongTienDuKien" text="0 VNĐ" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" />
+               </children>
+            </HBox>
+
+            <Separator orientation="VERTICAL" prefHeight="30.0" />
+
+            <HBox alignment="CENTER" spacing="10.0">
+               <children>
+                  <Label text="Tổng tiền thực tế:" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+                  <Label fx:id="lblTongTien" text="0 VNĐ" textFill="#e11d48">
+                     <font><Font name="System Bold" size="24.0" /></font>
+                  </Label>
+               </children>
+            </HBox>
+         </children>
+         <padding><Insets bottom="15.0" left="25.0" right="25.0" top="15.0" /></padding>
+      </HBox>
+
+      <HBox alignment="CENTER">
+         <children>
+         <Button onAction="#handleInDonHang" prefHeight="45.0" prefWidth="150.0" 
+              styleClass="btn-action, btn-sua" text="🖨️ In Đơn Hàng" />
+            <Button onAction="#handleDong" prefHeight="45.0" prefWidth="120.0" styleClass="btn-action, btn-xoa" text="Đóng" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

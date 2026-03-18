@@ -1,0 +1,108 @@
+/* Nền màu xanh xám cực nhạt giống ảnh */
+.dmk-main-bg {
+    -fx-background-color: #f4f8fb;
+}
+
+/* Tiêu đề góc trái */
+.dmk-page-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1b84c4; /* Màu xanh đậm */
+}
+
+/* --- 3 NÚT CHỨC NĂNG TO BẢN --- */
+.btn-action {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-padding: 15px 0;
+    -fx-background-radius: 12px;
+    -fx-cursor: hand;
+}
+.btn-nhap { -fx-background-color: #21c37d; } /* Màu xanh lá nhạt */
+.btn-nhap:hover { -fx-background-color: #1ba066; }
+
+.btn-xuat { -fx-background-color: #2fb9f6; } /* Màu xanh lơ */
+.btn-xuat:hover { -fx-background-color: #259ed4; }
+
+.btn-kiemke { -fx-background-color: #fbb028; } /* Màu vàng cam */
+.btn-kiemke:hover { -fx-background-color: #df9b22; }
+
+/* --- BỘ LỌC VÀ TÌM KIẾM --- */
+.dmk-combo {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-font-size: 14px;
+}
+
+/* Khung tìm kiếm dài, viền xanh nhạt bo tròn giống viên thuốc */
+.dmk-search-wrapper {
+    -fx-background-color: white;
+    -fx-border-color: #2fb9f6; /* Viền xanh y hệt ảnh */
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 30px;
+    -fx-background-radius: 30px;
+}
+
+.dmk-search-field, .dmk-search-field:focused {
+    -fx-background-color: transparent;
+    -fx-font-size: 15px;
+    -fx-text-fill: #475569;
+}
+
+/* --- KHUNG BẢNG MÀU TRẮNG BO GÓC (CARD) --- */
+.dmk-table-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-border-color: #e5e7eb;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5);
+}
+
+/* --- TABLEVIEW STYLE (Sao chép nguyên bản từ ảnh) --- */
+.dmk-table {
+    -fx-background-color: transparent;
+    -fx-font-size: 14px;
+}
+
+/* Ẩn cái viền table xấu xí */
+.dmk-table .box { -fx-background-color: transparent; }
+
+/* Header của bảng màu xanh sáng */
+.dmk-table .column-header-background {
+    -fx-background-color: #1ea0eb; /* Xanh dương chuẩn ảnh */
+    -fx-background-radius: 8px 8px 0 0;
+}
+.dmk-table .column-header {
+    -fx-background-color: transparent;
+}
+.dmk-table .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+}
+
+/* Hàng chẵn/lẻ */
+.dmk-table .table-row-cell:odd { -fx-background-color: white; }
+.dmk-table .table-row-cell:even { -fx-background-color: #fafafa; }
+.dmk-table .table-row-cell:hover { -fx-background-color: #e0f2fe; }
+
+/* Kẻ sọc dọc mờ giữa các cột */
+.dmk-table .table-cell {
+    -fx-border-color: transparent #f0f0f0 transparent transparent;
+    -fx-alignment: center-left;
+    -fx-padding: 5px 10px;
+}
+
+/* --- MÀU NHÃN CẢNH BÁO (Gọn gàng) --- */
+.status-label {
+    -fx-font-weight: bold;
+    -fx-padding: 3px 8px;
+    -fx-background-radius: 5px;
+}
+.status-safe { -fx-text-fill: #16a34a; }
+.status-priority { -fx-text-fill: #ca8a04; }
+.status-promo { -fx-text-fill: #ea580c; }
+.status-stop { -fx-text-fill: #dc2626; }

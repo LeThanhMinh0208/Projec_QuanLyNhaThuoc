@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 
 <VBox prefWidth="900.0" spacing="0.0" styleClass="ds-dialog-root" 
-      stylesheets="@../../resources/css/DanhMuc.css" 
+      stylesheets="@../../resources/css/DanhMucThuoc.css" 
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="gui.dialogs.Dialog_ThemThuocController">
 

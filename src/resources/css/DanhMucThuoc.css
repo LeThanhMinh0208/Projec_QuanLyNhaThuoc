@@ -1,0 +1,90 @@
+/* --- 1. PHẦN CHUNG CHO TRANG DANH MỤC --- */
+.btn-action { -fx-font-weight: bold; -fx-font-size: 18px; -fx-padding: 10 0; -fx-cursor: hand; }
+.search-icon { -fx-font-size: 20px; -fx-text-fill: #0ea5e9; }
+
+.combo-box {
+    -fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 8; 
+    -fx-background-radius: 8; -fx-cursor: hand;
+}
+
+/* --- 2. DIALOG SỬA THUỐC (Hạn chế trắng tinh, màu mè hơn) --- */
+
+/* Nền của Dialog - Dùng màu trắng ngọc trai dịu mắt */
+.ds-dialog-root {
+    -fx-background-color: linear-gradient(to bottom right, #f8fafc, #e2e8f0);
+    -fx-background-radius: 12;
+}
+
+/* Header rực rỡ với hiệu ứng đổ bóng mạnh */
+.ds-header-area {
+    -fx-background-color: linear-gradient(to right, #1d4ed8, #2563eb, #60a5fa);
+    -fx-padding: 25;
+    -fx-background-radius: 12 12 0 0;
+    -fx-effect: dropshadow(three-pass-box, rgba(37, 99, 235, 0.3), 15, 0, 0, 5);
+}
+
+.ds-dialog-title {
+    -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 26px;
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.5), 2, 0, 1, 1);
+}
+
+/* Ô nhập liệu - Màu hơi xanh nhạt để lộng lẫy hơn */
+.ds-input, .ds-input .content {
+    -fx-background-color: #f0f9ff; /* Màu xanh nước biển cực nhạt */
+    -fx-border-color: #bae6fd;
+    -fx-border-radius: 8; -fx-background-radius: 8;
+}
+
+.ds-input:focused {
+    -fx-background-color: white;
+    -fx-border-color: #0ea5e9;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.5), 12, 0, 0, 0);
+}
+
+/* Nút Lưu - Hiệu ứng lấp lánh Sapphire */
+.ds-btn-save {
+    -fx-background-color: linear-gradient(to bottom, #3b82f6, #1d4ed8);
+    -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(29, 78, 216, 0.4), 10, 0, 0, 4);
+    -fx-cursor: hand;
+}
+.ds-btn-save:hover {
+    -fx-background-color: linear-gradient(to bottom, #60a5fa, #2563eb);
+    -fx-scale-x: 1.05; -fx-scale-y: 1.05; /* Phóng to nhẹ khi hover */
+}
+
+/* Nút Hủy - Sang trọng hơn */
+.ds-btn-cancel {
+    -fx-background-color: #ffffff; -fx-border-color: #94a3b8;
+    -fx-text-fill: #475569; -fx-background-radius: 10; -fx-border-radius: 10;
+}
+
+/* Khung ảnh minh họa */
+.ds-image-frame {
+    -fx-background-color: white;
+    -fx-border-color: linear-gradient(to right, #0ea5e9, #f472b6); /* Viền màu lung linh */
+    -fx-border-width: 3; -fx-border-radius: 15; -fx-background-radius: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 20, 0, 0, 10);
+}
+/* Header cho Xóa - Màu đỏ Ruby */
+.ds-header-danger-area {
+    -fx-background-color: linear-gradient(to right, #b91c1c, #ef4444, #f87171);
+    -fx-padding: 20;
+    -fx-background-radius: 12 12 0 0;
+    -fx-effect: dropshadow(three-pass-box, rgba(239, 68, 68, 0.3), 15, 0, 0, 5);
+}
+
+/* Nút Vẫn Xóa - Màu đỏ rực rỡ */
+.ds-btn-danger {
+    -fx-background-color: linear-gradient(to bottom, #ef4444, #b91c1c);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(185, 28, 28, 0.4), 10, 0, 0, 4);
+}
+.ds-btn-danger:hover {
+    -fx-background-color: linear-gradient(to bottom, #f87171, #ef4444);
+    -fx-scale-x: 1.05; -fx-scale-y: 1.05;
+}

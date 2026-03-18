@@ -47,6 +47,7 @@ public class GUI_TrangChuController {
         setupTable();
         loadDataFromServer();
         setupSearchLogic();
+        utils.SceneUtils.init(mainBorderPane);
         
         // --- [2] CẬP NHẬT 2: LƯU GIAO DIỆN VÀO BIẾN KHI VỪA MỞ PHẦN MỀM ---
         if (mainBorderPane != null) {
@@ -189,30 +190,21 @@ public class GUI_TrangChuController {
 
     @FXML
     void handleMoQuanLyDanhMucThuoc(ActionEvent event) {
-       
-        switchPage("/gui/main/GUI_DanhMucThuoc.fxml");
+        utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucThuoc.fxml");
     }
 
+    @FXML
+    void moTrangDanhMucKho(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucKho.fxml");
+    }
 
-    public void switchPage(String fxmlPath) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Parent root = loader.load();
-            
-     
-            Object controller = loader.getController();
-
-
-            if (controller instanceof GUI_TrangChuController) {
-                ((GUI_TrangChuController) controller).loadDataTrangChu(); 
-            } 
-    
-            mainBorderPane.setCenter(root);
-            
-        } catch (Exception e) {
-            System.err.println("Lỗi nạp file FXML: " + fxmlPath);
-            e.printStackTrace();
-        }
+    @FXML
+    void moTrangNhapKho(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_NhapKho.fxml");
+    }
+    @FXML
+    void moQuanLyDonNhapHang(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyDonNhapHang.fxml");
     }
     public void loadDataTrangChu() {
         masterData.setAll(daoThuoc.getAllThuoc()); 

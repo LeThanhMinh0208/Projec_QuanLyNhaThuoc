@@ -1,4 +1,5 @@
 package entity;
+
 import java.sql.Date;
 
 public class LoThuoc {
@@ -7,12 +8,12 @@ public class LoThuoc {
     private Date hanSuDung;
     private int soLuongTon;
     private double giaNhap;
-    private ViTriKho viTriKho; // Đã chuyển sang kiểu Enum
+    private String viTriKho; 
     private Thuoc thuoc;
 
     public LoThuoc() {}
 
-    public LoThuoc(String maLoThuoc, Date ngaySanXuat, Date hanSuDung, int soLuongTon, double giaNhap, ViTriKho viTriKho, Thuoc thuoc) {
+    public LoThuoc(String maLoThuoc, Date ngaySanXuat, Date hanSuDung, int soLuongTon, double giaNhap, String viTriKho, Thuoc thuoc) {
         this.maLoThuoc = maLoThuoc;
         this.ngaySanXuat = ngaySanXuat;
         this.hanSuDung = hanSuDung;
@@ -38,8 +39,8 @@ public class LoThuoc {
     public double getGiaNhap() { return giaNhap; }
     public void setGiaNhap(double giaNhap) { this.giaNhap = giaNhap; }
 
-    public ViTriKho getViTriKho() { return viTriKho; }
-    public void setViTriKho(ViTriKho viTriKho) { this.viTriKho = viTriKho; }
+    public String getViTriKho() { return viTriKho; }
+    public void setViTriKho(String viTriKho) { this.viTriKho = viTriKho; }
 
     public Thuoc getThuoc() { return thuoc; }
     public void setThuoc(Thuoc thuoc) { this.thuoc = thuoc; }

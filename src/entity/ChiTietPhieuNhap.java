@@ -15,7 +15,7 @@ public class ChiTietPhieuNhap {
         this.donGiaNhap = donGiaNhap;
     }
 
-    // Getters and Setters
+  
     public PhieuNhap getPhieuNhap() { return phieuNhap; }
     public void setPhieuNhap(PhieuNhap phieuNhap) { this.phieuNhap = phieuNhap; }
     public Thuoc getThuoc() { return thuoc; }
@@ -24,4 +24,15 @@ public class ChiTietPhieuNhap {
     public void setSoLuong(int soLuong) { this.soLuong = soLuong; }
     public double getDonGiaNhap() { return donGiaNhap; }
     public void setDonGiaNhap(double donGiaNhap) { this.donGiaNhap = donGiaNhap; }
+
+
+    
+
+    public String getTenThuoc() {
+        return (thuoc != null) ? thuoc.getTenThuoc() : "";
+    }
+
+    public double getThanhTien() {
+        return soLuong * donGiaNhap;
+    }
 }

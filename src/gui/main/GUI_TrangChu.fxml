@@ -71,8 +71,9 @@
                <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/warehouse.png" /></ImageView></graphic>
                <content>
                   <VBox styleClass="dropdown-content">
-                     <Button styleClass="sub-btn" text="Danh Mục Kho" />
-                     <Button styleClass="sub-btn" text="Nhập Kho" />
+                     <Button onAction="#moTrangDanhMucKho" styleClass="sub-btn" text="Danh Mục Kho" />
+                     <Button onAction="#moQuanLyDonNhapHang" styleClass="sub-btn" text="Quản Lý Đơn Nhập Hàng" />
+                     <Button onAction="#moTrangNhapKho" styleClass="sub-btn" text="Nhập Kho" />
                      <Button styleClass="sub-btn" text="Xuất Kho" />
                      <Button styleClass="sub-btn" text="Kiểm Kê Kho" />
                      <Button styleClass="sub-btn" text="Giải Quyết Kiểm Kho" />
