@@ -100,8 +100,6 @@ public class DAO_DonNhapHang {
 
     public ArrayList<ChiTietDonNhapHang> getChiTietByMaDon(String maDon) {
         ArrayList<ChiTietDonNhapHang> list = new ArrayList<>();
-        
-        // Bỏ các cột maLo, ngaySanXuat ra khỏi câu lệnh SELECT
         String sql = "SELECT ct.*, t.maThuoc, t.tenThuoc, dv.tenDonVi, dv.tyLeQuyDoi " +
                      "FROM ChiTietDonNhapHang ct " +
                      "JOIN DonViQuyDoi dv ON ct.maQuyDoi = dv.maQuyDoi " +
@@ -113,6 +111,7 @@ public class DAO_DonNhapHang {
              
             pst.setString(1, maDon);
             java.sql.ResultSet rs = pst.executeQuery();
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
             
             while (rs.next()) {
                 ChiTietDonNhapHang ct = new ChiTietDonNhapHang();
@@ -128,15 +127,13 @@ public class DAO_DonNhapHang {
                 dv.setTyLeQuyDoi(rs.getInt("tyLeQuyDoi")); 
                 ct.setDonViQuyDoi(dv);
                 
-                // CHỈ LẤY NHỮNG GÌ BẢNG CHITIETDON CÓ
                 ct.setSoLuongDat(rs.getInt("soLuongDat"));
                 ct.setSoLuongDaNhan(rs.getInt("soLuongDaNhan"));
                 ct.setDonGiaDuKien(rs.getDouble("donGiaDuKien")); 
-                
-                // Gán rỗng để sếp TỰ NHẬP TAY trên giao diện
-                ct.setMaLo("");
-                ct.setNgaySanXuatTemp("");
-                ct.setHanSuDung("");
+             
+                ct.setMaLo(rs.getString("maLo"));
+                if(rs.getDate("ngaySanXuat") != null) ct.setNgaySanXuatTemp(sdf.format(rs.getDate("ngaySanXuat")));
+                if(rs.getDate("hanSuDung") != null) ct.setHanSuDung(sdf.format(rs.getDate("hanSuDung")));
                 
                 list.add(ct);
             }
@@ -170,7 +167,8 @@ public class DAO_DonNhapHang {
                 don.setNgayHenGiao(rs.getDate("NgayHenGiao"));
                 don.setTongTienDuTinh(rs.getDouble("TongTienDuTinh"));
                 don.setTrangThai(rs.getString("TrangThai"));
-                don.setGhiChu(rs.getString("GhiChu"));
+                don.setGhiChu(rs.getString("GhiChu")); // Bảng danh mục sẽ lấy dữ liệu từ đây
+                
                 NhaCungCap ncc = new NhaCungCap(); ncc.setMaNhaCungCap(rs.getString("MaNhaCungCap")); ncc.setTenNhaCungCap(rs.getString("TenNhaCungCap")); don.setNhaCungCap(ncc);
                 NhanVien nv = new NhanVien(); nv.setMaNhanVien(rs.getString("MaNhanVien")); nv.setHoTen(rs.getString("hoTen")); don.setNhanVien(nv);
                 list.add(don);
@@ -180,21 +178,27 @@ public class DAO_DonNhapHang {
     }
 
     public DonNhapHang getDonHangByMa(String maDon) {
-        List<DonNhapHang> list = getDonHangByTrangThai("= '" + maDon + "'"); // Tái sử dụng hàm trên
+        List<DonNhapHang> list = getDonHangByTrangThai("= '" + maDon + "'"); 
         return list.isEmpty() ? null : list.get(0);
     }
 
-    // CẬP NHẬT CẢ GIÁ NHẬP THỰC TẾ
+    // CẬP NHẬT THÔNG TIN THỰC NHẬP (LƯU LẠI MÃ LÔ, NGÀY SX, HSD NHƯ ĐÃ SỬA)
     public boolean capNhatThongTinThucNhap(ChiTietDonNhapHang ct) {
-        // Chỉ Update đúng 2 cột có sẵn trong SQL
-        String sql = "UPDATE ChiTietDonNhapHang SET soLuongDaNhan = ?, donGiaDuKien = ? WHERE maDonNhap = ? AND maQuyDoi = ?";
+        String sql = "UPDATE ChiTietDonNhapHang SET soLuongDaNhan = ?, donGiaDuKien = ?, " +
+                     "maLo = ?, ngaySanXuat = ?, hanSuDung = ? WHERE maDonNhap = ? AND maQuyDoi = ?";
         try (java.sql.Connection con = connectDB.ConnectDB.getInstance().getConnection();
              java.sql.PreparedStatement pst = con.prepareStatement(sql)) {
             
             pst.setInt(1, ct.getSoLuongDaNhan());
             pst.setDouble(2, ct.getDonGiaDuKien()); 
-            pst.setString(3, ct.getDonNhapHang().getMaDonNhap());
-            pst.setString(4, ct.getDonViQuyDoi().getMaQuyDoi());
+            pst.setString(3, ct.getMaLo());
+      
+            java.time.format.DateTimeFormatter dtf = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            pst.setDate(4, java.sql.Date.valueOf(java.time.LocalDate.parse(ct.getNgaySanXuatTemp(), dtf)));
+            pst.setDate(5, java.sql.Date.valueOf(java.time.LocalDate.parse(ct.getHanSuDung(), dtf)));
+            
+            pst.setString(6, ct.getDonNhapHang().getMaDonNhap());
+            pst.setString(7, ct.getDonViQuyDoi().getMaQuyDoi());
             
             return pst.executeUpdate() > 0;
         } catch (Exception e) { 
@@ -203,12 +207,18 @@ public class DAO_DonNhapHang {
         }
     }
 
-    public boolean capNhatTrangThaiVaTien(String maDonNhap, double tongTienThucTe) {
-        String sql = "UPDATE DonNhapHang SET TrangThai = 'DA_NHAP_KHO', tongTienDuTinh = ? WHERE MaDonNhap = ?";
-        try (Connection con = ConnectDB.getInstance().getConnection(); PreparedStatement stmt = con.prepareStatement(sql)) {
+    // ĐÂY CHÍNH LÀ HÀM QUAN TRỌNG ĐỂ CẬP NHẬT LẠI GHI CHÚ
+    public boolean capNhatTrangThaiTienVaGhiChu(String maDonNhap, double tongTienThucTe, String ghiChuMoi) {
+        String sql = "UPDATE DonNhapHang SET TrangThai = 'DA_NHAP_KHO', tongTienDuTinh = ?, ghiChu = ? WHERE MaDonNhap = ?";
+        try (Connection con = ConnectDB.getInstance().getConnection(); 
+             PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setDouble(1, tongTienThucTe);
-            stmt.setString(2, maDonNhap);
+            stmt.setString(2, ghiChuMoi); // Lưu đè ghi chú mới có chứa tên Người giao
+            stmt.setString(3, maDonNhap);
             return stmt.executeUpdate() > 0;
-        } catch (SQLException e) { return false; }
+        } catch (SQLException e) { 
+            e.printStackTrace();
+            return false; 
+        }
     }
 }

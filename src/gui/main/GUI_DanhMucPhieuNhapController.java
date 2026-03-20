@@ -39,7 +39,7 @@ public class GUI_DanhMucPhieuNhapController implements Initializable {
         colMaPhieu.setCellValueFactory(new PropertyValueFactory<>("maDonNhap"));
         colNgayNhap.setCellValueFactory(new PropertyValueFactory<>("ngayLap"));
         colNgayNhap.setCellFactory(c -> new TableCell<>() {
-            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+            java.text.SimpleDateFormat format = new java.text.SimpleDateFormat("dd/MM/yyyy");
             @Override protected void updateItem(java.sql.Date item, boolean empty) {
                 super.updateItem(item, empty);
                 setText((empty || item == null) ? null : format.format(item));
@@ -58,7 +58,28 @@ public class GUI_DanhMucPhieuNhapController implements Initializable {
                 }
             }
         });
+
+        // --- CỘT GHI CHÚ ĐƯỢC FIX WRAP TEXT TẠI ĐÂY ---
         colGhiChu.setCellValueFactory(new PropertyValueFactory<>("ghiChu"));
+        colGhiChu.setCellFactory(column -> {
+            return new TableCell<entity.DonNhapHang, String>() {
+                private final javafx.scene.text.Text text = new javafx.scene.text.Text();
+                {
+                    // Trừ đi 10px để chữ không bị tràn dính lề
+                    text.wrappingWidthProperty().bind(column.widthProperty().subtract(10));
+                }
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setGraphic(null);
+                    } else {
+                        text.setText(item);
+                        setGraphic(text);
+                    }
+                }
+            };
+        });
     }
 
     private void loadData() { listPhieu.setAll(daoDonNhap.getDonHangDaNhap()); tablePhieuNhap.setItems(listPhieu); }

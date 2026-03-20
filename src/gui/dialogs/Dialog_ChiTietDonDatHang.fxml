@@ -62,30 +62,19 @@
          <children>
             <HBox alignment="CENTER" spacing="10.0">
                <children>
-                  <Label text="Tổng tiền dự kiến:" style="-fx-font-size: 16px; -fx-text-fill: #64748b;" />
-                  <Label fx:id="lblTongTienDuKien" text="0 VNĐ" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" />
-               </children>
-            </HBox>
-
-            <Separator orientation="VERTICAL" prefHeight="30.0" />
-
-            <HBox alignment="CENTER" spacing="10.0">
-               <children>
-                  <Label text="Tổng tiền thực tế:" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
-                  <Label fx:id="lblTongTien" text="0 VNĐ" textFill="#e11d48">
-                     <font><Font name="System Bold" size="24.0" /></font>
-                  </Label>
+                  <Label text="Tổng tiền dự kiến:" style="-fx-font-size: 18px; -fx-text-fill: #64748b;" />
+                  <Label fx:id="lblTongTienDuKien" text="0 VNĐ" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #dc2626;" />
                </children>
             </HBox>
          </children>
          <padding><Insets bottom="15.0" left="25.0" right="25.0" top="15.0" /></padding>
       </HBox>
 
-      <HBox alignment="CENTER">
+      <HBox alignment="CENTER" spacing="20.0">
          <children>
          <Button onAction="#handleInDonHang" prefHeight="45.0" prefWidth="150.0" 
               styleClass="btn-action, btn-sua" text="🖨️ In Đơn Hàng" />
-            <Button onAction="#handleDong" prefHeight="45.0" prefWidth="120.0" styleClass="btn-action, btn-xoa" text="Đóng" />
+            <Button onAction="#handleDong" prefHeight="45.0" prefWidth="150.0" styleClass="btn-action, btn-xoa" text="Đóng" />
          </children>
       </HBox>
    </children>

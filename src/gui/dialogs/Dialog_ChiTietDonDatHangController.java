@@ -15,7 +15,8 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class Dialog_ChiTietDonDatHangController {
-    @FXML private Label lblMaDon, lblTrangThai, lblNgayLap, lblNhaCungCap, lblNhanVien, lblNgayHen, lblGhiChu, lblTongTien;
+    // ĐÃ XÓA lblTongTien Ở ĐÂY
+    @FXML private Label lblMaDon, lblTrangThai, lblNgayLap, lblNhaCungCap, lblNhanVien, lblNgayHen, lblGhiChu;
     @FXML private TableView<ChiTietDonNhapHang> tableChiTiet;
     @FXML private TableColumn<ChiTietDonNhapHang, String> colTenThuoc, colDonVi;
     @FXML private TableColumn<ChiTietDonNhapHang, Integer> colSoLuongDat, colSoLuongNhan;
@@ -38,20 +39,16 @@ public class Dialog_ChiTietDonDatHangController {
         String ghiChu = (don.getGhiChu() == null || don.getGhiChu().trim().isEmpty()) ? "Không có" : don.getGhiChu();
         lblGhiChu.setText(ghiChu);
 
-        // 2. Xử lý Badge Trạng thái (Xóa sạch class cũ để tránh trùng lặp khi reuse dialog)
+        // 2. Xử lý Badge Trạng thái
         lblTrangThai.getStyleClass().removeAll("status-badge", "status-waiting", "status-completed");
         lblTrangThai.getStyleClass().add("status-badge");
 
-        if ("HOAN_THANH".equals(don.getTrangThai())) {
+        if ("DA_NHAP_KHO".equals(don.getTrangThai()) || "HOAN_THANH".equals(don.getTrangThai())) {
             lblTrangThai.setText("HOÀN THÀNH");
             lblTrangThai.getStyleClass().add("status-completed");
-            // Nếu đã hoàn thành, cho màu tiền thực tế xanh lên cho khởi sắc
-            lblTongTien.setStyle("-fx-text-fill: #16a34a; -fx-font-weight: bold;"); 
         } else {
             lblTrangThai.setText("ĐANG CHỜ");
             lblTrangThai.getStyleClass().add("status-waiting");
-            // Nếu đang chờ, tiền thực tế để màu đỏ cảnh báo (vì chưa có tiền vào túi)
-            lblTongTien.setStyle("-fx-text-fill: #dc2626; -fx-font-weight: bold;");
         }
 
         // 3. Khởi tạo bảng và nạp dữ liệu
@@ -83,19 +80,15 @@ public class Dialog_ChiTietDonDatHangController {
         tableChiTiet.setItems(FXCollections.observableArrayList(list));
         
         double tongDuKien = 0;
-        double tongThucTe = 0;
 
         for (ChiTietDonNhapHang ct : list) {
             // Tổng dự kiến: Theo số lượng sếp ĐẶT
             tongDuKien += ct.getSoLuongDat() * ct.getDonGiaDuKien();
-            
-            // Tổng thực tế: Theo số lượng sếp NHẬN (Đơn chờ thì mặc định = 0)
-            tongThucTe += ct.getSoLuongDaNhan() * ct.getDonGiaDuKien();
         }
 
         lblTongTienDuKien.setText(String.format("%,.0f VNĐ", tongDuKien));
-        lblTongTien.setText(String.format("%,.0f VNĐ", tongThucTe));
     }
+    
     private TableCell<ChiTietDonNhapHang, Double> formatCurrencyCell() {
         return new TableCell<>() {
             @Override protected void updateItem(Double item, boolean empty) {
@@ -104,6 +97,7 @@ public class Dialog_ChiTietDonDatHangController {
             }
         };
     }
+    
     @FXML
     void handleInDonHang(ActionEvent event) {
         if (currentDon != null) {

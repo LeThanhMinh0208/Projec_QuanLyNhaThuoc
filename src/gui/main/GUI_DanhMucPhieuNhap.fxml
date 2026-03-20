@@ -57,8 +57,8 @@
       </TableView>
       
       <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-padding: 15 0 0 0;">
-         <Button onAction="#handleXemChiTiet" prefHeight="45.0" prefWidth="180.0" styleClass="nk-btn-xacnhan" style="-fx-background-color: #3b82f6;" text="🔍 Xem Chi Tiết Phiếu" />
-         <Button onAction="#handleInPhieu" prefHeight="45.0" prefWidth="150.0" styleClass="nk-btn-xacnhan" text="🖨️ In Lại Phiếu" />
+         <Button onAction="#handleXemChiTiet" prefHeight="45.0" prefWidth="180.0" styleClass="nk-btn-xacnhan" style="-fx-background-color: #3b82f6;" text="🔍 Xem Chi Tiết" />
+         <Button onAction="#handleInPhieu" prefHeight="45.0" prefWidth="150.0" styleClass="nk-btn-xacnhan" text="🖨️ In Phiếu" />
       </HBox>
    </VBox>
 </VBox>

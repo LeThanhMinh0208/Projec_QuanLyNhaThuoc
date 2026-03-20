@@ -21,23 +21,30 @@ public class GUI_NhapKhoController implements Initializable {
     @FXML private TableColumn<ChiTietDonNhapHang, String> colTenThuoc, colDonVi, colMaLo, colNgaySX, colHanDung;
     @FXML private TableColumn<ChiTietDonNhapHang, Integer> colSLDat, colSLNhan;
     @FXML private TableColumn<ChiTietDonNhapHang, Double> colDonGia, colThanhTien;
+    @FXML private TextArea txtGhiChu;
 
     private DAO_DonNhapHang daoDonNhap = new DAO_DonNhapHang();
     private DAO_LoThuoc daoLoThuoc = new DAO_LoThuoc();
-    private DAO_Thuoc daoThuoc = new DAO_Thuoc();
     private ObservableList<ChiTietDonNhapHang> listChiTiet = FXCollections.observableArrayList();
+    
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupTableEditable();
         loadComboBoxDonHang();
     }
-
+    
     public void setDonDatHang(DonNhapHang don) {
         if (don != null) {
             cmbDonDatHang.setValue(don);
             txtNhaCungCap.setText(don.getNhaCungCap().getTenNhaCungCap());
-            listChiTiet.setAll(daoDonNhap.getChiTietByMaDon(don.getMaDonNhap()));
+            
+            // Nạp ghi chú cũ vào, làm trống ô Người giao để sếp nhập mới
+            txtGhiChu.setText(don.getGhiChu() != null ? don.getGhiChu() : "");
+            if (txtNguoiGiao != null) txtNguoiGiao.clear();
+
+            List<ChiTietDonNhapHang> ds = daoDonNhap.getChiTietByMaDon(don.getMaDonNhap());
+            listChiTiet.setAll(ds);
             tableChiTietNhap.setItems(listChiTiet);
             tinhTongTien();
         }
@@ -134,33 +141,6 @@ public class GUI_NhapKhoController implements Initializable {
             }
         });
     }
-    // Helper tạo ô nhập Số lượng & Giá tiền
-    private TableCell<ChiTietDonNhapHang, ?> createNumberCell(boolean isInteger) {
-        return new TableCell<>() {
-            private final TextField txt = new TextField();
-            {
-                txt.textProperty().addListener((obs, oldV, newV) -> {
-                    if (getTableRow() != null && getTableRow().getItem() != null) {
-                        try {
-                            if (isInteger) getTableRow().getItem().setSoLuongDaNhan(newV.isEmpty() ? 0 : Integer.parseInt(newV));
-                            else getTableRow().getItem().setDonGiaDuKien(newV.isEmpty() ? 0 : Double.parseDouble(newV.replace(",", "")));
-                            tinhTongTien();
-                        } catch (Exception e) {}
-                    }
-                });
-                txt.setOnAction(e -> getTableView().refresh());
-            }
-            @Override protected void updateItem(Object item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) setGraphic(null);
-                else {
-                    ChiTietDonNhapHang ct = getTableRow().getItem();
-                    txt.setText(isInteger ? String.valueOf(ct.getSoLuongDaNhan()) : String.format("%.0f", ct.getDonGiaDuKien()));
-                    setGraphic(txt);
-                }
-            }
-        };
-    }
 
     private void setupTextColumn(TableColumn<ChiTietDonNhapHang, String> col, String prop) {
         col.setCellFactory(param -> new TableCell<>() {
@@ -216,13 +196,18 @@ public class GUI_NhapKhoController implements Initializable {
 
                 if (daoLoThuoc.themLoThuoc(lo)) {
                     daoDonNhap.capNhatThongTinThucNhap(ct);
-                    // Cập nhật giá nhập mới nhất cho danh mục Thuốc
-                    daoThuoc.capNhatGiaNhapMoi(ct.getThuoc().getMaThuoc(), lo.getGiaNhap());
+                    // ĐÃ XÓA LỆNH CẬP NHẬT GIÁ VÀO BẢNG THUỐC Ở ĐÂY
                     tongTienThucTe += (ct.getSoLuongDaNhan() * ct.getDonGiaDuKien());
                 }
             }
+            
             // Chốt hóa đơn
-            if (daoDonNhap.capNhatTrangThaiVaTien(don.getMaDonNhap(), tongTienThucTe)) {
+            String tenNguoiGiao = (txtNguoiGiao != null && !txtNguoiGiao.getText().isEmpty()) ? txtNguoiGiao.getText() : "Không có";
+            String ghiChuHienTai = (txtGhiChu != null && !txtGhiChu.getText().isEmpty()) ? txtGhiChu.getText() : "Không có";
+            String ghiChuMoi = "Người giao: " + tenNguoiGiao + " | Ghi chú: " + ghiChuHienTai;
+
+            // Gọi hàm mới cập nhật cả Tiền và Ghi Chú
+            if (daoDonNhap.capNhatTrangThaiTienVaGhiChu(don.getMaDonNhap(), tongTienThucTe, ghiChuMoi)) {
                 new Alert(Alert.AlertType.INFORMATION, "Nhập kho thành công!").showAndWait();
                 utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucPhieuNhap.fxml");
             }
@@ -237,6 +222,7 @@ public class GUI_NhapKhoController implements Initializable {
         cmbDonDatHang.getSelectionModel().clearSelection();
         txtNhaCungCap.clear();
         if(txtNguoiGiao != null) txtNguoiGiao.clear();
+        if(txtGhiChu != null) txtGhiChu.clear();
         listChiTiet.clear();
         lblTongTienThanhToan.setText("0 VNĐ");
         tableChiTietNhap.refresh();

@@ -177,7 +177,7 @@ public class GUI_DanhMucKhoController implements Initializable {
         String tuKhoa = txtTimKiem.getText().toLowerCase().trim();
 
         filteredData.setPredicate(loThuoc -> {
-          
+            // 1. Lọc theo vị trí kho
             String maViTriDB = "";
             if ("Kho Bán Hàng".equals(viTriHienThi)) {
                 maViTriDB = "KHO_BAN_HANG";
@@ -185,15 +185,26 @@ public class GUI_DanhMucKhoController implements Initializable {
                 maViTriDB = "KHO_DU_TRU";
             }
 
-       
             boolean matchViTri = "Tất cả vị trí kho".equals(viTriHienThi) || 
                                  (loThuoc.getViTriKho() != null && loThuoc.getViTriKho().equals(maViTriDB));
 
+            // --- TÍNH TOÁN LẠI TRẠNG THÁI HẠN ĐỂ LỌC ---
+            String trangThaiHan = "";
+            if (loThuoc.getHanSuDung() != null) {
+                long months = ChronoUnit.MONTHS.between(LocalDate.now(), loThuoc.getHanSuDung().toLocalDate());
+                if (months > 12) trangThaiHan = "an toàn";
+                else if (months >= 6) trangThaiHan = "ưu tiên bán";
+                else if (months >= 3) trangThaiHan = "khuyến mãi";
+                else trangThaiHan = "ngưng bán";
+            }
+
+            // 2. Lọc theo từ khóa tìm kiếm (Gộp cả Trạng Thái Hạn vào đây)
             boolean matchTuKhoa = tuKhoa.isEmpty() || 
-                                  loThuoc.getMaLoThuoc().toLowerCase().contains(tuKhoa) ||
-                                  loThuoc.getThuoc().getMaThuoc().toLowerCase().contains(tuKhoa) ||
-                                  loThuoc.getThuoc().getTenThuoc().toLowerCase().contains(tuKhoa);
-                                  
+                                  (loThuoc.getMaLoThuoc() != null && loThuoc.getMaLoThuoc().toLowerCase().contains(tuKhoa)) ||
+                                  (loThuoc.getThuoc().getMaThuoc() != null && loThuoc.getThuoc().getMaThuoc().toLowerCase().contains(tuKhoa)) ||
+                                  (loThuoc.getThuoc().getTenThuoc() != null && loThuoc.getThuoc().getTenThuoc().toLowerCase().contains(tuKhoa)) ||
+                                  trangThaiHan.contains(tuKhoa); // <--- Đã bổ sung tính năng sếp yêu cầu
+
             return matchViTri && matchTuKhoa;
         });
     }
