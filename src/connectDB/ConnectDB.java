@@ -36,7 +36,7 @@ public class ConnectDB {
     public static Connection getConnection() {
         try {
             if (con == null || con.isClosed()) {
-                String url = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyNhaThuoc_LongNguyen;encrypt=false";
+                String url = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyNhaThuoc_LongNguyen;encrypt=true;trustServerCertificate=true;";
                 String user = "sa";
                 String password = "sapassword";
                 con = DriverManager.getConnection(url, user, password);

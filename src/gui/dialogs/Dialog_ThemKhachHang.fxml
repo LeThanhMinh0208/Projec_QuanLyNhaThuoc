@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="0" styleClass="dialog-root" stylesheets="@../../resources/css/BanHang.css" 
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="gui.dialogs.Dialog_ThemKhachHangController">
+      
+    <!-- Header -->
+    <VBox styleClass="dialog-header">
+        <Label fx:id="lblTitle" text="THÊM KHÁCH HÀNG" styleClass="dialog-header-title" />
+    </VBox>
+
+    <!-- Body -->
+    <VBox spacing="15" styleClass="dialog-body" prefWidth="400">
+        
+        <VBox spacing="5">
+            <Label text="Mã Khách Hàng (Tự động):" styleClass="dialog-label" />
+            <TextField fx:id="txtMa" editable="false" styleClass="bh-input" style="-fx-background-color: #e2e8f0;"/>
+        </VBox>
+
+        <VBox spacing="5">
+            <Label text="Họ tên khách hàng:" styleClass="dialog-label" />
+            <TextField fx:id="txtHoTen" styleClass="bh-input" promptText="Nhập họ và tên..." />
+            <Label fx:id="lblErrHoTen" textFill="RED" style="-fx-font-size: 11px;" managed="false" visible="false"/>
+        </VBox>
+
+        <VBox spacing="5">
+            <Label text="Số điện thoại:" styleClass="dialog-label" />
+            <TextField fx:id="txtSdt" styleClass="bh-input" promptText="Nhập số điện thoại..." />
+            <Label fx:id="lblErrSdt" textFill="RED" style="-fx-font-size: 11px;" managed="false" visible="false"/>
+        </VBox>
+        
+        <VBox spacing="5">
+            <Label text="Địa chỉ:" styleClass="dialog-label" />
+            <TextField fx:id="txtDiaChi" styleClass="bh-input" promptText="Nhập địa chỉ..." />
+            <Label fx:id="lblErrDiaChi" textFill="RED" style="-fx-font-size: 11px;" managed="false" visible="false"/>
+        </VBox>
+        
+        <VBox spacing="5">
+            <Label text="Điểm tích lũy:" styleClass="dialog-label" />
+            <TextField fx:id="txtDiem" editable="false" text="0" styleClass="bh-input" style="-fx-background-color: #e2e8f0;"/>
+        </VBox>
+    </VBox>
+
+    <!-- Footer -->
+    <HBox alignment="CENTER_RIGHT" spacing="12" styleClass="dialog-footer">
+        <Button onAction="#handleDong" text="Hủy bỏ" styleClass="dialog-btn-cancel" />
+        <Button onAction="#handleLuu" text="Lưu thông tin" styleClass="dialog-btn-ok" />
+    </HBox>
+</VBox>

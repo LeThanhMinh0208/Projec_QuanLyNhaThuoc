@@ -100,11 +100,11 @@
    .top-card {
        -fx-background-radius: 20px;
        -fx-cursor: hand;
-       -fx-transition: all 0.3s ease;
+       -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.15), 10, 0, 0, 4);
    }
    .top-card:hover {
-       -fx-translate-y: -5px; /* Bay lên nhẹ khi hover */
-       -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.6), 25, 0, 0, 12);
+       -fx-translate-y: -3px; /* Bay lên nhẹ khi hover */
+       -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.5), 20, 0, 0, 8);
    }
    .card-title {
        -fx-text-fill: white;
@@ -174,12 +174,21 @@
 }
 
 .table-row-cell:filled:hover {
-    -fx-background-color: #f0f9ff;
+    -fx-background-color: #e0f2fe;
+    -fx-text-fill: #0369a1;
 }
 
-.table-row-cell:selected {
-    -fx-background-color: #bae6fd;
-    -fx-text-fill: #0369a1;
+.table-row-cell:filled:selected {
+    -fx-background-color: #38bdf8;
+    -fx-text-fill: white;
+    -fx-background-insets: 0;
+    -fx-border-color: #0ea5e9;
+    -fx-border-width: 0 0 0 4;
+}
+
+.table-row-cell:filled:selected:hover {
+    -fx-background-color: #0ea5e9;
+    -fx-text-fill: white;
 }
 
 /* --- KHỐI TRẮNG --- */

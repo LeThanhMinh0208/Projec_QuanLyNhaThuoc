@@ -25,21 +25,30 @@ import java.io.InputStream;
 
 public class GUI_TrangChuController {
 
-    @FXML private TableView<Thuoc> tableThuoc;
-    @FXML private TableColumn<Thuoc, String> colMaThuoc, colHinhAnh, colTenThuoc, colTrieuChung, colDVT, colTrangThai;
-    @FXML private TableColumn<Thuoc, Boolean> colKeDon;
-    @FXML private TextField txtTimKiem;
-    @FXML private BorderPane mainBorderPane;
+    @FXML
+    private TableView<Thuoc> tableThuoc;
+    @FXML
+    private TableColumn<Thuoc, String> colMaThuoc, colHinhAnh, colTenThuoc, colTrieuChung, colDVT, colTrangThai;
+    @FXML
+    private TableColumn<Thuoc, Boolean> colKeDon;
+    @FXML
+    private TextField txtTimKiem;
+    @FXML
+    private BorderPane mainBorderPane;
 
     private DAO_Thuoc daoThuoc = new DAO_Thuoc();
     private ObservableList<Thuoc> masterData = FXCollections.observableArrayList();
     private static NhanVien nhanVienDangNhap;
-    
+
     // --- [1] CẬP NHẬT 1: THÊM BIẾN ĐỂ LƯU GIAO DIỆN GỐC ---
-    private Node noiDungTrangChuGoc; 
+    private Node noiDungTrangChuGoc;
 
     public static void setNhanVienDangNhap(NhanVien nv) {
         nhanVienDangNhap = nv;
+    }
+
+    public static NhanVien getNhanVienDangNhap() {
+        return nhanVienDangNhap;
     }
 
     @FXML
@@ -47,7 +56,7 @@ public class GUI_TrangChuController {
         setupTable();
         loadDataFromServer();
         setupSearchLogic();
-        
+
         // --- [2] CẬP NHẬT 2: LƯU GIAO DIỆN VÀO BIẾN KHI VỪA MỞ PHẦN MỀM ---
         if (mainBorderPane != null) {
             noiDungTrangChuGoc = mainBorderPane.getCenter();
@@ -73,7 +82,8 @@ public class GUI_TrangChuController {
                     setStyle("");
                 } else {
                     setText(item ? "Có" : "Không");
-                    setStyle(item ? "-fx-text-fill: #e74c3c; -fx-font-weight: bold;" : "-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+                    setStyle(item ? "-fx-text-fill: #e74c3c; -fx-font-weight: bold;"
+                            : "-fx-text-fill: #27ae60; -fx-font-weight: bold;");
                 }
             }
         });
@@ -82,6 +92,7 @@ public class GUI_TrangChuController {
         colHinhAnh.setCellValueFactory(new PropertyValueFactory<>("hinhAnh"));
         colHinhAnh.setCellFactory(column -> new TableCell<>() {
             private final ImageView iv = new ImageView();
+
             @Override
             protected void updateItem(String file, boolean empty) {
                 super.updateItem(file, empty);
@@ -89,12 +100,15 @@ public class GUI_TrangChuController {
                     setGraphic(null);
                 } else {
                     try {
-                        InputStream is = getClass().getResourceAsStream("/resources/images/images_thuoc/" + file.trim());
+                        InputStream is = getClass()
+                                .getResourceAsStream("/resources/images/images_thuoc/" + file.trim());
                         if (is != null) {
                             iv.setImage(new Image(is));
-                            iv.setFitWidth(80); iv.setFitHeight(60);
+                            iv.setFitWidth(80);
+                            iv.setFitHeight(60);
                             iv.setPreserveRatio(true);
-                            setGraphic(iv); setAlignment(Pos.CENTER);
+                            setGraphic(iv);
+                            setAlignment(Pos.CENTER);
                         } else {
                             setGraphic(new Label("No image"));
                         }
@@ -126,25 +140,33 @@ public class GUI_TrangChuController {
                 String filter = newValue.toLowerCase();
 
                 // LỌC THEO TRIỆU CHỨNG (Cột mới thêm)
-                if (thuoc.getTrieuChung() != null && thuoc.getTrieuChung().toLowerCase().contains(filter)) return true;
+                if (thuoc.getTrieuChung() != null && thuoc.getTrieuChung().toLowerCase().contains(filter))
+                    return true;
 
                 // Lọc theo Mã Thuốc
-                if (thuoc.getMaThuoc().toLowerCase().contains(filter)) return true;
+                if (thuoc.getMaThuoc().toLowerCase().contains(filter))
+                    return true;
 
                 // Lọc theo Tên Thuốc
-                if (thuoc.getTenThuoc().toLowerCase().contains(filter)) return true;
+                if (thuoc.getTenThuoc().toLowerCase().contains(filter))
+                    return true;
 
                 // Lọc theo Công Dụng
-                if (thuoc.getCongDung() != null && thuoc.getCongDung().toLowerCase().contains(filter)) return true;
+                if (thuoc.getCongDung() != null && thuoc.getCongDung().toLowerCase().contains(filter))
+                    return true;
 
                 // Lọc theo Hoạt Chất, Hãng, Nước SX (Dù không hiện trên bảng vẫn lọc được)
-                if (thuoc.getHoatChat() != null && thuoc.getHoatChat().toLowerCase().contains(filter)) return true;
-                if (thuoc.getHangSanXuat() != null && thuoc.getHangSanXuat().toLowerCase().contains(filter)) return true;
-                if (thuoc.getNuocSanXuat() != null && thuoc.getNuocSanXuat().toLowerCase().contains(filter)) return true;
+                if (thuoc.getHoatChat() != null && thuoc.getHoatChat().toLowerCase().contains(filter))
+                    return true;
+                if (thuoc.getHangSanXuat() != null && thuoc.getHangSanXuat().toLowerCase().contains(filter))
+                    return true;
+                if (thuoc.getNuocSanXuat() != null && thuoc.getNuocSanXuat().toLowerCase().contains(filter))
+                    return true;
 
                 // Lọc theo Kê đơn (Nhập "có" hoặc "không")
                 String keDonString = thuoc.isCanKeDon() ? "có kê đơn" : "không kê đơn";
-                if (keDonString.contains(filter)) return true;
+                if (keDonString.contains(filter))
+                    return true;
 
                 return false; // Không khớp tiêu chí nào
             });
@@ -162,8 +184,7 @@ public class GUI_TrangChuController {
     @FXML
     void handleVeTrangChu(ActionEvent event) {
 
-        loadDataTrangChu(); 
-        
+        loadDataTrangChu();
 
         if (noiDungTrangChuGoc != null) {
             mainBorderPane.setCenter(noiDungTrangChuGoc);
@@ -189,32 +210,47 @@ public class GUI_TrangChuController {
 
     @FXML
     void handleMoQuanLyDanhMucThuoc(ActionEvent event) {
-       
+
         switchPage("/gui/main/GUI_DanhMucThuoc.fxml");
     }
 
+    @FXML
+    void handleMoQuanLyBanHangLapHoaDon(ActionEvent event) {
+        switchPage("/gui/main/GUI_QuanLyBanHang.fxml");
+    }
+
+    @FXML
+    void handleMoBanThuoc(javafx.scene.input.MouseEvent event) {
+        switchPage("/gui/main/GUI_QuanLyBanHang.fxml");
+    }
+
+    @FXML
+    void handleMoQuanLyKhachHang(ActionEvent event) {
+        switchPage("/gui/main/GUI_QuanLyKhachHang.fxml");
+    }
 
     public void switchPage(String fxmlPath) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
-            
-     
+
             Object controller = loader.getController();
 
-
             if (controller instanceof GUI_TrangChuController) {
-                ((GUI_TrangChuController) controller).loadDataTrangChu(); 
-            } 
-    
+                ((GUI_TrangChuController) controller).loadDataTrangChu();
+            } else if (controller instanceof GUI_QuanLyBanHangController) {
+                ((GUI_QuanLyBanHangController) controller).chonTabBanLe();
+            }
+
             mainBorderPane.setCenter(root);
-            
+
         } catch (Exception e) {
             System.err.println("Lỗi nạp file FXML: " + fxmlPath);
             e.printStackTrace();
         }
     }
+
     public void loadDataTrangChu() {
-        masterData.setAll(daoThuoc.getAllThuoc()); 
+        masterData.setAll(daoThuoc.getAllThuoc());
     }
 }

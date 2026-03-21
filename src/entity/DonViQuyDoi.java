@@ -51,5 +51,10 @@ public class DonViQuyDoi {
 	public void setGiaBan(double giaBan) {
 		this.giaBan = giaBan;
 	}
+
+	@Override
+	public String toString() {
+		return tenDonVi == null ? "" : tenDonVi;
+	}
     
 }
