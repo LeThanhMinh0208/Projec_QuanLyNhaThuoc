@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<VBox spacing="0" prefWidth="520.0"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="gui.dialogs.Dialog_DonThuocController">
+   <stylesheets>
+      <URL value="@../../resources/css/DanhMucThuoc.css" />
+   </stylesheets>
+
+   <VBox styleClass="ds-header-area">
+      <Label fx:id="lblTieuDe" styleClass="ds-dialog-title" text="THEM DON THUOC MOI" />
+   </VBox>
+
+   <VBox spacing="14.0">
+      <padding><Insets bottom="25.0" left="25.0" right="25.0" top="20.0" /></padding>
+      <children>
+
+         <HBox spacing="16.0">
+            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+               <Label text="Ma Don Thuoc *" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
+               <TextField fx:id="txtMaDon" styleClass="ds-input" prefHeight="40.0"
+                          promptText="VD: DT260226001" maxWidth="Infinity" />
+            </VBox>
+            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+               <Label text="Ma Hoa Don" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
+               <TextField fx:id="txtMaHoaDon" styleClass="ds-input" prefHeight="40.0"
+                          promptText="VD: HD001" maxWidth="Infinity" />
+            </VBox>
+         </HBox>
+
+         <VBox spacing="5.0">
+            <Label text="Ten Bac Si *" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
+            <TextField fx:id="txtBacSi" styleClass="ds-input" prefHeight="40.0"
+                       promptText="VD: BS. Nguyen Van A" maxWidth="Infinity" />
+         </VBox>
+
+         <VBox spacing="5.0">
+            <Label text="Chan Doan" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
+            <TextArea fx:id="txtChanDoan" styleClass="ds-input"
+                      prefHeight="75.0" wrapText="true"
+                      promptText="Nhap chan doan cua bac si..." />
+         </VBox>
+
+         <VBox spacing="5.0">
+            <Label text="Thong Tin Benh Nhan *" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
+            <TextArea fx:id="txtBenhNhan" styleClass="ds-input"
+                      prefHeight="75.0" wrapText="true"
+                      promptText="Ho ten, tuoi, dia chi benh nhan..." />
+         </VBox>
+
+         <VBox spacing="5.0">
+            <Label text="Hinh Anh Don" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+               <TextField fx:id="txtHinhAnh" styleClass="ds-input"
+                          promptText="Duong dan anh..." prefHeight="40.0" HBox.hgrow="ALWAYS" />
+               <Button onAction="#handleChonAnh" text="Chon"
+                       prefHeight="40.0" styleClass="ds-btn-cancel"
+                       style="-fx-cursor:hand;" />
+            </HBox>
+         </VBox>
+
+         <HBox spacing="12.0" alignment="CENTER_RIGHT">
+            <padding><Insets top="8.0" /></padding>
+            <Button onAction="#handleHuy" text="Huy"
+                    prefHeight="42.0" prefWidth="110.0" styleClass="ds-btn-cancel" />
+            <Button fx:id="btnLuu" onAction="#handleLuu" text="Luu"
+                    prefHeight="42.0" prefWidth="140.0" styleClass="ds-btn-save" />
+         </HBox>
+
+      </children>
+   </VBox>
+</VBox>

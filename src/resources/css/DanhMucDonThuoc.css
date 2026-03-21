@@ -1,0 +1,177 @@
+/* ================================================
+   DANH MỤC ĐƠN THUỐC - CSS
+   Tông màu chủ: Tím/Indigo để phân biệt với Thuốc
+   ================================================ */
+
+/* --- 1. TIÊU ĐỀ TRANG --- */
+.main-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #3730a3;
+    -fx-effect: dropshadow(one-pass-box, rgba(55,48,163,0.2), 4, 0, 0, 2);
+}
+
+/* --- 2. NÚT HÀNH ĐỘNG (Thêm / Sửa / Xoá) --- */
+.btn-action {
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-padding: 10 0;
+    -fx-cursor: hand;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 8, 0, 0, 3);
+}
+.btn-action:hover {
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+/* Nút Thêm - Xanh lá */
+.card-green {
+    -fx-background-color: linear-gradient(to bottom right, #16a34a, #15803d);
+}
+.card-green:hover {
+    -fx-background-color: linear-gradient(to bottom right, #22c55e, #16a34a);
+}
+
+/* Nút Sửa - Xanh dương */
+.card-blue {
+    -fx-background-color: linear-gradient(to bottom right, #2563eb, #1d4ed8);
+}
+.card-blue:hover {
+    -fx-background-color: linear-gradient(to bottom right, #3b82f6, #2563eb);
+}
+
+/* Nút Xoá - Cam */
+.card-orange {
+    -fx-background-color: linear-gradient(to bottom right, #ea580c, #c2410c);
+}
+.card-orange:hover {
+    -fx-background-color: linear-gradient(to bottom right, #f97316, #ea580c);
+}
+
+/* --- 3. THANH TÌM KIẾM --- */
+.search-box {
+    -fx-background-color: white;
+    -fx-border-color: #c7d2fe;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 0 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(99,102,241,0.1), 8, 0, 0, 2);
+}
+
+.search-icon {
+    -fx-font-size: 18px;
+    -fx-text-fill: #6366f1;
+    -fx-padding: 0 8 0 0;
+}
+
+.search-input {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1e1b4b;
+    -fx-prompt-text-fill: #a5b4fc;
+}
+
+/* --- 4. COMBOBOX LỌC BÁC SĨ --- */
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #c7d2fe;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+    -fx-padding: 4 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(99,102,241,0.1), 6, 0, 0, 2);
+}
+.combo-box:hover {
+    -fx-border-color: #6366f1;
+}
+.combo-box .list-cell {
+    -fx-text-fill: #3730a3;
+}
+
+/* --- 5. PANEL TRẮNG CHỨA TABLE --- */
+.panel-white {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-border-color: #e0e7ff;
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(three-pass-box, rgba(99,102,241,0.1), 16, 0, 0, 6);
+    -fx-padding: 16;
+}
+
+/* --- 6. TABLE VIEW --- */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-table-cell-border-color: #e0e7ff;
+}
+
+/* Header cột */
+.table-view .column-header-background {
+    -fx-background-color: linear-gradient(to right, #4338ca, #6366f1);
+    -fx-background-radius: 8 8 0 0;
+}
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-padding: 12 8;
+}
+
+/* Dòng chẵn/lẻ xen kẽ */
+.table-row-cell:even {
+    -fx-background-color: #f5f3ff;
+}
+.table-row-cell:odd {
+    -fx-background-color: white;
+}
+
+/* Hover dòng */
+.table-row-cell:hover {
+    -fx-background-color: #e0e7ff;
+    -fx-cursor: hand;
+}
+
+/* Dòng được chọn */
+.table-row-cell:selected {
+    -fx-background-color: linear-gradient(to right, #6366f1, #818cf8);
+}
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+/* Cell chữ */
+.table-cell {
+    -fx-font-size: 13px;
+    -fx-text-fill: #1e1b4b;
+    -fx-padding: 8 10;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Ẩn scrollbar ngang xấu */
+.table-view .virtual-flow .scroll-bar:horizontal {
+    -fx-opacity: 0.4;
+}
+.table-view .virtual-flow .scroll-bar:vertical {
+    -fx-opacity: 0.4;
+}
+
+/* --- 7. SCROLLBAR DỌC --- */
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #a5b4fc;
+    -fx-background-radius: 6;
+}
+.scroll-bar:vertical .track {
+    -fx-background-color: #e0e7ff;
+}
+
+/* --- 8. PLACEHOLDER KHI BẢNG TRỐNG --- */
+.table-view .placeholder .label {
+    -fx-font-size: 15px;
+    -fx-text-fill: #a5b4fc;
+    -fx-font-style: italic;
+}
