@@ -1,0 +1,205 @@
+/* --- PHONG CÁCH TỔNG THỂ (MODERN & CLEAN) --- */
+.root {
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/* Màu nền trang chính (Xám nhạt dịu mắt) */
+.dmk-main-bg {
+    -fx-background-color: #f1f5f9;
+}
+
+/* Tiêu đề trang chính */
+.xk-page-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b; /* Xám đen đậm */
+    -fx-padding: 0 0 10 0;
+}
+
+/* Card chứa nội dung (Trắng, Bo góc, Đổ bóng nhẹ) */
+.xk-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 15, 0, 0, 5);
+    -fx-padding: 25px;
+}
+
+/* Tiêu đề phụ trong Card */
+.xk-section-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+/* --- 3 NÚT CHỨC NĂNG (TAB) - PHỐI MÀU PASTEL HIỆN ĐẠI --- */
+.xk-tab-btn {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-cursor: hand;
+    -fx-padding: 15px 25px;
+    -fx-transition: all 0.3s ease; /* Hiệu ứng mượt */
+}
+
+/* Hiệu ứng di chuột vào Tab (Sáng lên nhẹ) */
+.xk-tab-btn:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 8, 0, 0, 3);
+}
+
+/* MÀU SẾP CHỌN (Tông dịu) */
+.xk-tab-chuyen { -fx-background-color: #10b981; } /* Xanh Lá Emerald */
+.xk-tab-tra { -fx-background-color: #3b82f6; }    /* Xanh Dương Blue */
+.xk-tab-huy { -fx-background-color: #f59e0b; }    /* Vàng Amber */
+
+/* --- NÚT LẬP PHIẾU (MÀU TÍM INDIGO NỔI BẬT) --- */
+.xk-btn-action {
+    -fx-background-color: #6366f1; /* Tím Indigo */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-cursor: hand;
+    -fx-padding: 12px 20px;
+}
+.xk-btn-action:hover {
+    -fx-background-color: #4f46e5; /* Tím đậm hơn khi hover */
+}
+
+/* --- THANH TÌM KIẾM & INPUT --- */
+.xk-filter-bar {
+    -fx-background-color: #f8fafc;
+    -fx-padding: 20px;
+    -fx-background-radius: 10px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+}
+
+.xk-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #64748b; /* Xám xanh */
+    -fx-font-size: 13px;
+}
+
+.xk-input {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 14px;
+}
+.xk-input:focused {
+    -fx-border-color: #6366f1; /* Viền tím khi focus */
+    -fx-border-width: 2px;
+}
+
+/* Nút làm mới */
+.xk-btn-refresh {
+    -fx-background-color: #94a3b8; /* Xám slate */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+}
+.xk-btn-refresh:hover {
+    -fx-background-color: #64748b;
+}
+
+/* --- BẢNG TABLEVIEW (MODERN LOOK) --- */
+.xk-table {
+    -fx-background-color: transparent;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-font-size: 14px;
+}
+.xk-table .column-header {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: transparent transparent #e2e8f0 transparent;
+    -fx-padding: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}
+.xk-table .table-row-cell {
+    -fx-cell-size: 45px;
+}
+.xk-table .table-row-cell:odd {
+    -fx-background-color: white;
+}
+.xk-table .table-row-cell:even {
+    -fx-background-color: #fbfcfe;
+}
+.xk-table .table-row-cell:selected {
+    -fx-background-color: #e0f2fe; /* Xanh dương cực nhạt khi chọn */
+    -fx-text-fill: black;
+}
+/* Nút "Xem" trong bảng */
+.xk-btn-xem {
+    -fx-background-color: #0ea5e9; /* Xanh cyan */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+}
+
+/* --- CSS CHO DIALOG (MODERN POPUP) --- */
+.xk-dialog-bg {
+    -fx-background-color: white;
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 30, 0, 0, 10);
+}
+.xk-dialog-header {
+    -fx-background-color: #f8fafc;
+    -fx-padding: 20px 25px;
+    -fx-border-color: transparent transparent #e2e8f0 transparent;
+    -fx-border-width: 1px;
+    -fx-background-radius: 15px 15px 0 0;
+}
+.xk-dialog-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e3a8a; /* Xanh đậm */
+}
+/* Label ảo diệu trên Dialog */
+.xk-badge {
+    -fx-padding: 6px 14px;
+    -fx-background-radius: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+}
+/* --- DIALOG COLORFUL HIỆN ĐẠI --- */
+.dialog-header-bg {
+    -fx-background-color: linear-gradient(to right, #1e40af, #3b82f6); /* Gradient Xanh dương */
+    -fx-padding: 20px;
+    -fx-background-radius: 10px 10px 0 0;
+}
+.dialog-title-text {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+.badge-chuyen { -fx-background-color: #10b981; -fx-text-fill: white; -fx-padding: 5 15; -fx-background-radius: 20; -fx-font-weight: bold; }
+.badge-tra { -fx-background-color: #f59e0b; -fx-text-fill: white; -fx-padding: 5 15; -fx-background-radius: 20; -fx-font-weight: bold; }
+.badge-huy { -fx-background-color: #ef4444; -fx-text-fill: white; -fx-padding: 5 15; -fx-background-radius: 20; -fx-font-weight: bold; }
+
+.form-label { -fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-size: 14px; }
+.combo-box, .text-field { -fx-font-size: 14px; -fx-background-radius: 5px; -fx-border-radius: 5px; }
+
+/* Bảng hiển thị FEFO */
+.table-fefo { -fx-font-size: 14px; -fx-border-color: #cbd5e1; }
+.table-fefo .column-header { -fx-background-color: #e2e8f0; -fx-font-weight: bold; }
+
+/* Nút bấm */
+.btn-save { -fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-cursor: hand; }
+.btn-save:hover { -fx-background-color: #059669; }
+.btn-cancel { -fx-background-color: #94a3b8; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-cursor: hand; }
+.btn-cancel:hover { -fx-background-color: #64748b; }

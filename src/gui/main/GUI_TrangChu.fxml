@@ -46,6 +46,7 @@
             </TitledPane>
 
             <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Quản Lý Đơn Thuốc">
+<<<<<<< HEAD
    <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/icon_donthuoc.png" /></ImageView></graphic>
    <content>
       <VBox styleClass="dropdown-content">
@@ -54,6 +55,16 @@
       </VBox>
    </content>
 </TitledPane>
+=======
+               <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/icon_donthuoc.png" /></ImageView></graphic>
+               <content>
+                  <VBox styleClass="dropdown-content">
+                     <Button styleClass="sub-btn" text="Danh Mục Đơn Thuốc " />
+                     <Button styleClass="sub-btn" text="Tái Lập Đơn Thuốc" />
+                  </VBox>
+               </content>
+            </TitledPane>
+>>>>>>> main
 
             <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Quản Lý Thuốc">
                <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/thuoc.png" /></ImageView></graphic>
@@ -74,7 +85,11 @@
                      <Button onAction="#moTrangDanhMucKho" styleClass="sub-btn" text="Danh Mục Kho" />
                      <Button onAction="#moQuanLyDonNhapHang" styleClass="sub-btn" text="Quản Lý Đơn Nhập Hàng" />
                      <Button onAction="#moTrangNhapKho" styleClass="sub-btn" text="Nhập Kho" />
+<<<<<<< HEAD
                      <Button styleClass="sub-btn" text="Xuất Kho" />
+=======
+                     <Button onAction="#moTrangXuatKho" styleClass="sub-btn" text="Xuất Kho" />
+>>>>>>> main
                      <Button styleClass="sub-btn" text="Kiểm Kê Kho" />
                      <Button styleClass="sub-btn" text="Giải Quyết Kiểm Kho" />
                   </VBox>

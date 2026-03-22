@@ -1,0 +1,232 @@
+/* ========================================
+   BIẾN TOÀN CỤC - SKY BLUE THEME
+   ======================================== */
+:root {
+    -fx-primary-sky: #0ea5e9;       /* Xanh da trời chính */
+    -fx-secondary-sky: #e0f2fe;    /* Xanh da trời cực nhẹ cho nền */
+    -fx-accent-glow: #38bdf8;      /* Màu xanh lấp lánh */
+    -fx-sidebar-dark: #0c4a6e;     /* Xanh biển đậm cho Sidebar */
+    -fx-white: #ffffff;
+    -fx-glass: rgba(255, 255, 255, 0.1);
+}
+
+/* --- BỐ CỤC CHÍNH --- */
+.main-bg {
+    -fx-background-color: #f0f9ff; /* Màu nền xanh da trời nhạt */
+}
+
+.sidebar {
+    -fx-background-color: -fx-sidebar-dark;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.3), 15, 0, 0, 0);
+}
+
+.sidebar-logo {
+    -fx-text-fill: -fx-white;
+    -fx-font-size: 22px;
+    -fx-font-weight: 900;
+    -fx-font-style: italic;
+    /* Hiệu ứng tỏa sáng cho Logo */
+    -fx-effect: dropshadow(one-pass-box, -fx-accent-glow, 10, 0.5, 0, 0);
+}
+
+/* --- NÚT TRANG CHỦ (ACTIVE) --- */
+.sidebar-btn-active {
+    -fx-background-color: #f0f9ff;
+    -fx-text-fill: -fx-primary-sky;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 0 25px;
+    -fx-background-radius: 30px 0 0 30px;
+    -fx-effect: innershadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 2, 2);
+}
+
+/* ========================================
+   HỆ THỐNG DROPDOWN LẤP LÁNH
+   ======================================== */
+.sidebar-dropdown {
+    -fx-background-color: transparent;
+    -fx-text-fill: #bae6fd;
+    -fx-font-weight: bold;
+}
+
+.sidebar-dropdown > .title {
+    -fx-background-color: transparent;
+    -fx-padding: 12 0 12 25;
+    -fx-cursor: hand;
+}
+
+.sidebar-dropdown > .title:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-text-fill: white;
+}
+
+.dropdown-content {
+    -fx-background-color: #075985; /* Xanh đậm hơn chút cho vùng con */
+    -fx-padding: 5 0 5 0;
+}
+
+.sub-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e0f2fe;
+    -fx-font-size: 13px;
+    -fx-padding: 10 0 10 50;
+    -fx-pref-width: 250px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.sub-btn:hover {
+    /* Hiệu ứng lấp lánh khi di chuột vào nút con */
+    -fx-background-color: linear-gradient(to right, #0ea5e9, transparent);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 0 10 60;
+    -fx-border-color: #7dd3fc;
+    -fx-border-width: 0 0 0 4;
+}
+
+/* ========================================
+   CARDS & SEARCH (TRANG CHỦ)
+   ======================================== */
+   .main-title {
+       -fx-font-size: 32px;
+       -fx-font-weight: 900;
+       -fx-text-fill: linear-gradient(to bottom, #0ea5e9, #0369a1);
+       -fx-padding: 10 0 20 0;
+       -fx-text-alignment: center;
+       /* Hiệu ứng bóng đổ làm chữ nổi khối lấp lánh */
+       -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.4), 5, 0, 0, 2);
+   }
+
+   .top-card {
+       -fx-background-radius: 20px;
+       -fx-cursor: hand;
+       -fx-transition: all 0.3s ease;
+   }
+   .top-card:hover {
+       -fx-translate-y: -5px; /* Bay lên nhẹ khi hover */
+       -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.6), 25, 0, 0, 12);
+   }
+   .card-title {
+       -fx-text-fill: white;
+       -fx-font-size: 20px;
+       -fx-font-weight: 900;
+       -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.3), 3, 0, 0, 1);
+   }
+
+.card-blue   { -fx-background-color: linear-gradient(to bottom right, #0ea5e9, #38bdf8); }
+.card-orange { -fx-background-color: linear-gradient(to bottom right, #f59e0b, #fbbf24); }
+.card-green  { -fx-background-color: linear-gradient(to bottom right, #10b981, #34d399); }
+
+.search-box {
+    -fx-background-color: white;
+    -fx-background-radius: 40px; /* Bo tròn cực đại */
+    -fx-border-color: linear-gradient(to right, #7dd3fc, #0ea5e9); /* Viền màu Gradient */
+    -fx-border-width: 2px;
+    -fx-border-radius: 40px;
+    -fx-padding: 8 25 8 25;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.2), 15, 0, 0, 5);
+    -fx-transition: all 0.3s ease;
+}
+.search-box:focused-within {
+    -fx-border-color: #38bdf8;
+    -fx-background-color: #f0f9ff;
+    -fx-effect: dropshadow(three-pass-box, #0ea5e9, 15, 0.4, 0, 0); /* Tỏa sáng xanh da trời */
+}
+
+.search-input {
+    -fx-background-color: transparent;
+    -fx-font-size: 16px;
+    -fx-text-fill: #0369a1;
+    -fx-prompt-text-fill: #94a3b8;
+    /* Loại bỏ viền mặc định của TextField bên trong */
+    -fx-background-insets: 0;
+    -fx-border-width: 0;
+}
+/* ========================================
+   TABLEVIEW HIỆN ĐẠI
+   ======================================== */
+.table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 20px;
+    -fx-border-color: #e0f2fe;
+    -fx-padding: 10;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #0ea5e9; /* Màu xanh da trời cho Header */
+    -fx-background-radius: 18px 18px 0 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 55px;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-text-transform: uppercase;
+}
+
+.table-row-cell {
+    -fx-cell-size: 85px;
+    -fx-border-color: transparent transparent #f0f9ff transparent;
+}
+
+.table-row-cell:filled:hover {
+    -fx-background-color: #f0f9ff;
+}
+
+/* --- FIX LỖI CHỮ MỜ & LÀM NỔI BẬT DÒNG ĐƯỢC CHỌN --- */
+
+/* 1. Đổi nền dòng được chọn thành màu Xanh Sky rực rỡ */
+.table-view .table-row-cell:selected {
+    -fx-background-color: #0ea5e9; 
+    -fx-background-insets: 0;
+}
+
+/* 2. Ép tất cả chữ trên dòng thành Trắng tinh + In đậm */
+.table-view .table-row-cell:selected .table-cell {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+/* 3. Bắt luôn các thẻ ẩn (như Text bẻ dòng, Label Kê đơn) thành Trắng */
+.table-view .table-row-cell:selected .text,
+.table-view .table-row-cell:selected .label {
+    -fx-fill: white;
+    -fx-text-fill: white;
+}
+
+/* --- TẮT BÓNG MA MÀU XÁM KHI CLICK BỎ CHỌN (FOCUS) --- */
+.table-view:focused {
+    -fx-background-color: transparent;
+}
+.table-view .table-row-cell:focused {
+    -fx-background-insets: 0;
+}
+.table-view .table-cell:focused {
+    -fx-background-color: transparent;
+}
+
+/* --- KHỐI TRẮNG --- */
+.panel-white {
+    -fx-background-color: white;
+    -fx-background-radius: 20px;
+    -fx-padding: 25px;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.15), 20, 0, 0, 10);
+}
+
+/* --- LOGOUT --- */
+.sidebar-btn-logout {
+    -fx-background-color: transparent;
+    -fx-text-fill: #fecaca;
+    -fx-font-weight: bold;
+    -fx-padding: 15 0 15 25;
+}
+
+.sidebar-btn-logout:hover {
+    -fx-background-color: #ef4444;
+    -fx-text-fill: white;
+    -fx-background-radius: 0 30 30 0;
+}

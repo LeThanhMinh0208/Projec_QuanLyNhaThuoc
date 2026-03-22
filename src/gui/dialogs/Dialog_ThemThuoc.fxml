@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefWidth="900.0" spacing="0.0" styleClass="ds-dialog-root" 
+      stylesheets="@../../resources/css/DanhMucThuoc.css" 
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="gui.dialogs.Dialog_ThemThuocController">
+
+    <children>
+        <HBox styleClass="ds-header-area" alignment="CENTER_LEFT">
+            <children>
+                <Label text="✨ THÊM MỚI THUỐC VÀO HỆ THỐNG" styleClass="ds-dialog-title" />
+            </children>
+        </HBox>
+
+        <VBox spacing="25.0">
+            <padding>
+                <Insets top="30" right="35" bottom="30" left="35" />
+            </padding>
+            <children>
+                <HBox spacing="40.0">
+                    <children>
+                        <VBox spacing="15.0" alignment="TOP_CENTER">
+                            <children>
+                                <StackPane prefHeight="230.0" prefWidth="230.0" styleClass="ds-image-frame">
+                                    <children>
+                                        <ImageView fx:id="imgPreview" fitHeight="210.0" fitWidth="210.0" pickOnBounds="true" preserveRatio="true" />
+                                    </children>
+                                </StackPane>
+                                <Button onAction="#handleChonAnh" prefHeight="38.0" prefWidth="180.0" text="📷 Chọn Ảnh Thuốc" styleClass="ds-btn-cancel" style="-fx-font-weight: bold;" />
+                            </children>
+                        </VBox>
+
+              <GridPane hgap="15.0" vgap="20.0" HBox.hgrow="ALWAYS">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="100.0" />
+                                <ColumnConstraints hgrow="ALWAYS" />
+                                <ColumnConstraints minWidth="90.0" />
+                                <ColumnConstraints hgrow="ALWAYS" />
+                            </columnConstraints>
+                            <children>
+                                <Label text="Mã Thuốc:" GridPane.rowIndex="0" />
+                                <TextField fx:id="txtMa" disable="true" prefHeight="40.0" promptText="Mã tự động" styleClass="ds-input, ds-input-readonly" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                                
+                                <Label text="Tên Thuốc:" GridPane.rowIndex="0" GridPane.columnIndex="2" />
+                                <TextField fx:id="txtTen" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="0" GridPane.columnIndex="3" />
+
+                                <Label text="Danh Mục:" GridPane.rowIndex="1" />
+                                <ComboBox fx:id="cbDanhMuc" maxWidth="Infinity" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                                
+                                <Label text="Hoạt Chất:" GridPane.rowIndex="1" GridPane.columnIndex="2" />
+                                <TextField fx:id="txtHoatChat" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="1" GridPane.columnIndex="3" />
+
+                                <Label text="Hãng SX:" GridPane.rowIndex="2" />
+                                <TextField fx:id="txtHangSX" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                                
+                                <Label text="Nước SX:" GridPane.rowIndex="2" GridPane.columnIndex="2" />
+                                <TextField fx:id="txtNuocSX" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="2" GridPane.columnIndex="3" />
+
+                                <Label text="Hàm Lượng:" GridPane.rowIndex="3" />
+                                <TextField fx:id="txtHamLuong" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+                                <Label text="Đơn Vị:" GridPane.rowIndex="3" GridPane.columnIndex="2" />
+                                <ComboBox fx:id="cbDonVi" maxWidth="Infinity" prefHeight="40.0" promptText="-- Chọn --" styleClass="ds-input" GridPane.rowIndex="3" GridPane.columnIndex="3" />
+
+                                <Label text="Phân Loại:" GridPane.rowIndex="4" />
+                                <CheckBox fx:id="chkKeDon" text="Thuốc Kê Đơn" style="-fx-text-fill: #ef4444; -fx-font-weight: bold;" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+                            </children>
+                        </GridPane>
+                    </children>
+                </HBox>
+
+                <VBox spacing="12.0">
+                    <children>
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Label text="Công Dụng:" style="-fx-font-weight: bold; -fx-text-fill: #1e40af;" />
+                            <Separator HBox.hgrow="ALWAYS" />
+                        </HBox>
+                        <TextArea fx:id="txtCongDung" prefHeight="70.0" styleClass="ds-input" wrapText="true" />
+                        
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Label text="Triệu Chứng Chỉ Định:" style="-fx-font-weight: bold; -fx-text-fill: #1e40af;" />
+                            <Separator HBox.hgrow="ALWAYS" />
+                        </HBox>
+                        <TextArea fx:id="txtTrieuChung" prefHeight="70.0" styleClass="ds-input" wrapText="true" />
+                    </children>
+                </VBox>
+
+                <HBox alignment="CENTER_RIGHT" spacing="20.0">
+                    <children>
+                        <Button onAction="#handleHuy" prefHeight="50.0" prefWidth="160.0" text="Hủy Thao Tác" styleClass="ds-btn-cancel" />
+                        <Button onAction="#handleLuu" prefHeight="50.0" prefWidth="240.0" text="LƯU THUỐC MỚI ✨" styleClass="ds-btn-save" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</VBox>

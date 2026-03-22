@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="550.0" prefWidth="950.0" spacing="15.0" style="-fx-background-color: white; -fx-border-color: #1e3a8a; -fx-border-width: 2;" stylesheets="@../../resources/css/NhapKho.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.dialogs.Dialog_ChiTietPhieuNhapController">
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
+   
+   <HBox alignment="CENTER_LEFT" spacing="10.0">
+      <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e3a8a;" text="CHI TIẾT THỰC NHẬP - MÃ PHIẾU: " />
+      <Label fx:id="lblMaPhieu" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #be123c;" text="DDHXXX" />
+   </HBox>
+
+   <TableView fx:id="tableChiTiet" VBox.vgrow="ALWAYS">
+     <columns>
+       <TableColumn fx:id="colTenThuoc" prefWidth="200.0" text="Tên Thuốc" />
+       <TableColumn fx:id="colDonVi" prefWidth="80.0" text="Đơn Vị" />
+       <TableColumn fx:id="colMaLo" prefWidth="100.0" text="Mã Lô" />
+       <TableColumn fx:id="colSLNhan" prefWidth="80.0" text="SL Nhận" />
+       <TableColumn fx:id="colGiaNhap" prefWidth="120.0" text="Giá Nhập" />
+       <TableColumn fx:id="colNgaySX" prefWidth="110.0" text="Ngày SX" />
+       <TableColumn fx:id="colHanDung" prefWidth="110.0" text="Hạn Dùng" />
+     </columns>
+      <columnResizePolicy>
+         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+      </columnResizePolicy>
+   </TableView>
+
+   <HBox alignment="CENTER_RIGHT" spacing="15.0">
+      <Button onAction="#handleInPhieuTuDialog" prefHeight="40.0" prefWidth="130.0" style="-fx-background-color: #059669; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="🖨️ In Phiếu Nhập" />
+      <Button onAction="#handleDong" prefHeight="40.0" prefWidth="100.0" styleClass="nk-btn-huy" text="Đóng" />
+   </HBox>
+</VBox>

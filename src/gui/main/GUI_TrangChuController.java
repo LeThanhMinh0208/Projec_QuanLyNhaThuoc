@@ -61,20 +61,64 @@ public class GUI_TrangChuController {
         colTenThuoc.setCellValueFactory(new PropertyValueFactory<>("tenThuoc"));
         colTrieuChung.setCellValueFactory(new PropertyValueFactory<>("trieuChung"));
         colDVT.setCellValueFactory(new PropertyValueFactory<>("donViCoBan"));
+<<<<<<< HEAD
         colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
 
         // Cấu hình cột Kê Đơn (Có/Không)
+=======
+     // --- 1. CỘT KÊ ĐƠN (Gán tên Class màu sắc) ---
+>>>>>>> main
         colKeDon.setCellValueFactory(new PropertyValueFactory<>("canKeDon"));
         colKeDon.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Boolean item, boolean empty) {
                 super.updateItem(item, empty);
+<<<<<<< HEAD
                 if (empty || item == null) {
                     setText(null);
                     setStyle("");
                 } else {
                     setText(item ? "Có" : "Không");
                     setStyle(item ? "-fx-text-fill: #e74c3c; -fx-font-weight: bold;" : "-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+=======
+                // Quét sạch class màu cũ trước khi gán màu mới (tránh bị dính màu)
+                getStyleClass().removeAll("text-do", "text-xanh-la");
+                
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item ? "Có" : "Không");
+                    // Gán tên class màu
+                    getStyleClass().add(item ? "text-do" : "text-xanh-la");
+                }
+            }
+        });
+
+        // --- 2. CỘT TRẠNG THÁI (Dịch ngôn ngữ & Gán tên Class) ---
+        colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
+        colTrangThai.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                // Quét sạch class màu cũ 
+                getStyleClass().removeAll("text-xanh-bien", "text-vang-cam", "text-do");
+
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    if ("DANG_BAN".equals(item)) {
+                        setText("Đang Bán");
+                        getStyleClass().add("text-xanh-bien");
+                    } else if ("HET_HANG".equals(item)) {
+                        setText("Hết Hàng");
+                        getStyleClass().add("text-vang-cam");
+                    } else if ("NGUNG_BAN".equals(item)) {
+                        setText("Ngừng Bán");
+                        getStyleClass().add("text-do");
+                    } else {
+                        setText(item);
+                    }
+>>>>>>> main
                 }
             }
         });
@@ -105,6 +149,26 @@ public class GUI_TrangChuController {
                 }
             }
         });
+<<<<<<< HEAD
+=======
+     // --- LOGIC CLICK CHUỘT THÔNG MINH (TOGGLE SELECTION & XÓA FOCUS) ---
+        tableThuoc.setRowFactory(tv -> {
+            TableRow<Thuoc> row = new TableRow<>();
+            row.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
+                // Nếu click 1 lần vào dòng có dữ liệu và dòng đó đang được chọn
+                if (event.getClickCount() == 1 && (!row.isEmpty()) && row.isSelected()) {
+                    // 1. Nhả chọn
+                    tv.getSelectionModel().clearSelection();
+                    // 2. Xóa bóng ma Focus màu xám
+                    tv.getFocusModel().focus(-1); 
+                    tableThuoc.getParent().requestFocus(); 
+                    // 3. Hủy sự kiện để JavaFX không tự động chọn lại
+                    event.consume(); 
+                }
+            });
+            return row;
+        });
+>>>>>>> main
     }
 
     private void loadDataFromServer() {
@@ -192,10 +256,14 @@ public class GUI_TrangChuController {
     void handleMoQuanLyDanhMucThuoc(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucThuoc.fxml");
     }
+<<<<<<< HEAD
     @FXML
     void handleMoQuanLyDonThuoc(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucDonThuoc.fxml");
     }
+=======
+
+>>>>>>> main
     @FXML
     void moTrangDanhMucKho(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucKho.fxml");
@@ -206,6 +274,13 @@ public class GUI_TrangChuController {
         utils.SceneUtils.switchPage("/gui/main/GUI_NhapKho.fxml");
     }
     @FXML
+<<<<<<< HEAD
+=======
+    void moTrangXuatKho(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_XuatKho.fxml");
+    }
+    @FXML
+>>>>>>> main
     void moQuanLyDonNhapHang(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyDonNhapHang.fxml");
     }
