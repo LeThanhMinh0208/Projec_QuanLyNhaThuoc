@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefWidth="900.0" spacing="0.0" styleClass="ds-dialog-root" stylesheets="@../../resources/css/DanhMucNhaCungCap.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.dialogs.Dialog_SuaNhaCungCapController">
+<VBox prefWidth="900.0" spacing="0.0" styleClass="ds-dialog-root" stylesheets="@../../resources/css/DanhMucThuoc.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.dialogs.Dialog_SuaNhaCungCapController">
 
     <children>
         <HBox alignment="CENTER_LEFT" styleClass="ds-header-area">
@@ -46,12 +46,12 @@
                                 <Label text="Số Điện Thoại:" GridPane.rowIndex="1" />
                                 
                                 <Label text="Địa Chỉ:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                                <ComboBox fx:id="cbDiachi" maxWidth="Infinity" prefHeight="40.0" styleClass="ds-input" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                <TextField fx:id="txtDiaChi" prefHeight="40.0" styleClass="ds-input" GridPane.columnIndex="3" GridPane.rowIndex="1" />
 
                                 <Label text="Công Nợ:" GridPane.rowIndex="2" />
-                                <TextField fx:id="txtCongno" prefHeight="40.0" styleClass="ds-input" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                <TextField fx:id="txtCongNo" prefHeight="40.0" styleClass="ds-input" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                 <HBox alignment="CENTER_LEFT" spacing="10" GridPane.columnIndex="3" GridPane.rowIndex="4" />
-                        <TextField fx:id="txtMa1" editable="false" prefHeight="40.0" styleClass="ds-input" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                <TextField fx:id="txtSdt" prefHeight="40.0" styleClass="ds-input" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                             </children>
                      <rowConstraints>
                         <RowConstraints />

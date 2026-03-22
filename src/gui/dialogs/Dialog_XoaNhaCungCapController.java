@@ -39,32 +39,19 @@ public class Dialog_XoaNhaCungCapController {
             return;
         }
 
-        // Xác nhận lần cuối (tăng an toàn)
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Xác nhận xóa");
-        confirm.setHeaderText("Xóa nhà cung cấp");
-        confirm.setContentText("Bạn có chắc chắn muốn xóa nhà cung cấp '" + 
-                               nhaCungCapCanXoa.getTenNhaCungCap() + 
-                               "' (Mã: " + nhaCungCapCanXoa.getMaNhaCungCap() + ") không?\n" +
-                               "Hành động này không thể hoàn tác!");
-        
-        confirm.showAndWait().ifPresent(response -> {
-            if (response == javafx.scene.control.ButtonType.OK) {
-                // Thực hiện xóa
-                boolean xoaThanhCong = daoNCC.xoaNhaCungCap(nhaCungCapCanXoa.getMaNhaCungCap());
+        // Thực hiện xóa
+        boolean xoaThanhCong = daoNCC.xoaNhaCungCap(nhaCungCapCanXoa.getMaNhaCungCap());
 
-                if (xoaThanhCong) {
-                    new Alert(Alert.AlertType.INFORMATION, 
-                              "Đã xóa nhà cung cấp thành công!").show();
-                } else {
-                    new Alert(Alert.AlertType.ERROR, 
-                              "Không thể xóa nhà cung cấp!\n" +
-                              "Có thể NCC này đang được sử dụng trong đơn nhập hàng hoặc dữ liệu khác.").show();
-                }
-                
-                closeDialog();
-            }
-        });
+        if (xoaThanhCong) {
+            new Alert(Alert.AlertType.INFORMATION, 
+                      "Đã xóa nhà cung cấp thành công!").show();
+        } else {
+            new Alert(Alert.AlertType.ERROR, 
+                      "Không thể xóa nhà cung cấp!\n" +
+                      "Có thể NCC này đang được sử dụng trong đơn nhập hàng hoặc dữ liệu khác.").show();
+        }
+        
+        closeDialog();
     }
 
     /**

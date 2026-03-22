@@ -38,8 +38,8 @@ public class Dialog_ThemNhaCungCapController {
         }
 
         // Validate SĐT (cơ bản)
-        if (!sdt.matches("\\d{9,11}")) {
-            new Alert(Alert.AlertType.ERROR, "Số điện thoại phải là 9-11 chữ số!").show();
+        if (!sdt.matches("^0\\d{9}$")) {
+            new Alert(Alert.AlertType.ERROR, "Số điện thoại phải là 10 chữ số và bắt đầu bằng 0!").show();
             return;
         }
 

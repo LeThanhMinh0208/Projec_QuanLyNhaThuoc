@@ -189,6 +189,7 @@
 .table-row-cell:filled:selected:hover {
     -fx-background-color: #0ea5e9;
     -fx-text-fill: white;
+}
 /* --- FIX LỖI CHỮ MỜ & LÀM NỔI BẬT DÒNG ĐƯỢC CHỌN --- */
 
 /* 1. Đổi nền dòng được chọn thành màu Xanh Sky rực rỡ */
