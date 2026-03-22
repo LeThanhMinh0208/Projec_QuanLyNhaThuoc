@@ -129,7 +129,68 @@
                      </TitledPane>
                   </VBox>
                </content>
-            </ScrollPane>
+            </TitledPane>
+            
+              <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Quản Lý Kho">
+               <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/warehouse.png" /></ImageView></graphic>
+               <content>
+                  <VBox styleClass="dropdown-content">
+                     <Button onAction="#moTrangDanhMucKho" styleClass="sub-btn" text="Danh Mục Kho" />
+                     <Button onAction="#moQuanLyDonNhapHang" styleClass="sub-btn" text="Quản Lý Đơn Nhập Hàng" />
+                     <Button onAction="#moTrangNhapKho" styleClass="sub-btn" text="Nhập Kho" />
+                     <Button onAction="#moTrangXuatKho" styleClass="sub-btn" text="Xuất Kho" />
+                     <Button styleClass="sub-btn" text="Kiểm Kê Kho" />
+                     <Button styleClass="sub-btn" text="Giải Quyết Kiểm Kho" />
+                  </VBox>
+               </content>
+            </TitledPane>
+            
+                <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Quản Lý Khách Hàng">
+               <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/customer.png" /></ImageView></graphic>
+               <content>
+                  <VBox styleClass="dropdown-content">
+                     <Button styleClass="sub-btn" text="Danh Mục Khách Hàng" />
+                     <Button styleClass="sub-btn" text="Lịch Sử Giao Dịch" />
+                  </VBox>
+               </content>
+            </TitledPane>
+            
+                <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Quản Lý Nhà Cung Cấp">
+               <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/supplier.png" /></ImageView></graphic>
+               <content>
+                  <VBox styleClass="dropdown-content">
+                     <Button styleClass="sub-btn" text="Danh Mục Nhà Cung Cấp" />
+                     <Button styleClass="sub-btn" text="Quản Lý Công Nợ" />
+                     <Button styleClass="sub-btn" text="Nhật Ký Nhập Hàng" />
+                     <Button styleClass="sub-btn" text="Quản Lý Đổi Trả Hàng" />
+                  </VBox>
+               </content>
+            </TitledPane>
+            
+                <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Quản Lý Người Dùng">
+               <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/users.png" /></ImageView></graphic>
+               <content>
+                  <VBox styleClass="dropdown-content">
+                     <Button styleClass="sub-btn" text="Danh Mục Người Dùng" />
+                     <Button styleClass="sub-btn" text="Phân Quyền Người Dùng" />
+                     <Button styleClass="sub-btn" text="Quản Lý Ca Làm Việc" />
+                     <Button styleClass="sub-btn" text="Nhật Ký Hoạt Động" />
+                     <Button styleClass="sub-btn" text="Đổi mật khẩu" />
+                  </VBox>
+               </content>
+            </TitledPane>
+            
+                <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Báo Cáo Thống Kê">
+               <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/baocao.png" /></ImageView></graphic>
+               <content>
+                  <VBox styleClass="dropdown-content">
+                     <Button styleClass="sub-btn" text="Thống Kê Doanh Thu" />
+                     <Button styleClass="sub-btn" text="Thống Kê Hàng Hóa" />
+                     <Button styleClass="sub-btn" text="Thống Kê Tồn Kho" />
+                  </VBox>
+               </content>
+            </TitledPane>
+            <Region VBox.vgrow="ALWAYS" />
             <Button fx:id="btnDangXuat" onAction="#handleDangXuat" alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="50.0" prefWidth="250.0" styleClass="sidebar-btn-logout" text="Đăng Xuất">
                <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/ic_logout.png" /></ImageView></graphic>
                <VBox.margin><Insets bottom="20.0" /></VBox.margin>

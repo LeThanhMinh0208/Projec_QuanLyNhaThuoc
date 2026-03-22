@@ -1,7 +1,7 @@
 package entity;
 
 public class DonViQuyDoi {
-	private String maQuyDoi;
+    private String maQuyDoi;
     private String maThuoc;
     private String tenDonVi;
     private int tyLeQuyDoi;
@@ -56,5 +56,4 @@ public class DonViQuyDoi {
 	public String toString() {
 		return tenDonVi == null ? "" : tenDonVi;
 	}
-    
 }

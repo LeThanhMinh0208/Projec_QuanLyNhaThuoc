@@ -10,7 +10,7 @@
    
    <stylesheets>
       <URL value="@../../resources/css/TrangChu.css" />
-      <URL value="@../../resources/css/DanhMuc.css" />
+      <URL value="@../../resources/css/DanhMucThuoc.css" />
    </stylesheets>
    
    <padding><Insets bottom="30.0" left="40.0" right="40.0" top="30.0" /></padding>

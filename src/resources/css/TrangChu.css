@@ -189,7 +189,37 @@
 .table-row-cell:filled:selected:hover {
     -fx-background-color: #0ea5e9;
     -fx-text-fill: white;
+/* --- FIX LỖI CHỮ MỜ & LÀM NỔI BẬT DÒNG ĐƯỢC CHỌN --- */
+
+/* 1. Đổi nền dòng được chọn thành màu Xanh Sky rực rỡ */
+/* .table-view .table-row-cell:selected {
+    -fx-background-color: #0ea5e9; 
+    -fx-background-insets: 0;
+} */
+
+/* 2. Ép tất cả chữ trên dòng thành Trắng tinh + In đậm */
+/* .table-view .table-row-cell:selected .table-cell {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+} */
+
+/* 3. Bắt luôn các thẻ ẩn (như Text bẻ dòng, Label Kê đơn) thành Trắng */
+/* .table-view .table-row-cell:selected .text,
+.table-view .table-row-cell:selected .label {
+    -fx-fill: white;
+    -fx-text-fill: white;
+} */
+
+/* --- TẮT BÓNG MA MÀU XÁM KHI CLICK BỎ CHỌN (FOCUS) --- */
+/* .table-view:focused {
+    -fx-background-color: transparent;
 }
+.table-view .table-row-cell:focused {
+    -fx-background-insets: 0;
+}
+.table-view .table-cell:focused {
+    -fx-background-color: transparent;
+} */
 
 /* --- KHỐI TRẮNG --- */
 .panel-white {

@@ -1,0 +1,139 @@
+/* =========================================================
+   1. NỀN TẢNG (Giữ tông sáng nhưng sạch hơn)
+   ========================================================= */
+.dmk-main-bg { 
+    -fx-background-color: #f1f5f9; /* Xám xanh cực nhạt, sang hơn trắng tinh */
+}
+
+.dmk-page-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0369a1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+/* Card trắng nổi khối mạnh mẽ hơn */
+.dmk-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 15, 0, 0, 8);
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0.5px;
+}
+
+/* =========================================================
+   2. BẢNG BIỂU (Lộng lẫy, không còn màu xám bạc)
+   ========================================================= */
+.dmk-table {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+}
+
+.dmk-table .column-header-background {
+    /* Header xanh dương sâu thẳm lấp lánh */
+    -fx-background-color: linear-gradient(to right, #0284c7, #0369a1);
+    -fx-background-radius: 12px 12px 0 0;
+}
+
+.dmk-table .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 45px;
+}
+
+.dmk-table .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-text-transform: uppercase;
+}
+
+/* Hover dòng bảng màu xanh Neon nhạt */
+.dmk-table .table-row-cell:hover {
+    -fx-background-color: #e0f2fe;
+}
+
+/* =========================================================
+   3. NÚT BẤM (Tuyệt đối không dùng màu trắng xám)
+   ========================================================= */
+.btn-action {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10px;
+    -fx-cursor: hand;
+    -fx-transition: 0.2s;
+}
+
+/* Nút Chốt Đơn / Xác Nhận: Xanh lục bảo Gradient */
+.btn-nhap, .btn-them {
+    -fx-background-color: linear-gradient(to bottom, #10b981, #059669);
+    -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.4), 10, 0, 0, 4);
+}
+.btn-nhap:hover, .btn-them:hover {
+    -fx-background-color: linear-gradient(to bottom, #34d399, #10b981);
+    -fx-scale-x: 1.05; -fx-scale-y: 1.05;
+}
+
+/* Nút Sửa / Chi Tiết: Xanh Royal rực rỡ */
+.btn-sua, .btn-detail {
+    -fx-background-color: linear-gradient(to bottom, #3b82f6, #2563eb);
+    -fx-effect: dropshadow(three-pass-box, rgba(59, 130, 246, 0.4), 10, 0, 0, 4);
+}
+
+/* Nút Hủy / Đóng: Đỏ rực rỡ (thay cho màu bạc cũ) */
+.btn-xoa {
+    -fx-background-color: linear-gradient(to bottom, #f43f5e, #e11d48);
+    -fx-effect: dropshadow(three-pass-box, rgba(225, 29, 72, 0.3), 10, 0, 0, 4);
+}
+.btn-xoa:hover {
+    -fx-background-color: #fb7185;
+}
+
+/* =========================================================
+   4. TỔNG TIỀN (Làm cho lấp lánh)
+   ========================================================= */
+#lblTongTien {
+    -fx-text-fill: #e11d48;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(225, 29, 72, 0.2), 10, 0, 0, 0);
+}
+
+#lblTongTienDuKien {
+    -fx-text-fill: #0369a1;
+    -fx-font-weight: bold;
+}
+
+/* Ô tìm kiếm bo tròn hiện đại */
+.dmk-search-wrapper {
+    -fx-background-color: white;
+    -fx-border-color: #0284c7;
+    -fx-border-width: 2px;
+    -fx-border-radius: 30px;
+    -fx-background-radius: 30px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 15 0 15;
+    -fx-transition: 0.3s;
+}
+
+/* Ô nhập liệu bên trong - Fix lỗi bị lòi khung trắng */
+.dmk-search-field {
+    -fx-background-color: transparent; /* Quan trọng nhất: Xóa nền trắng */
+    -fx-border-color: transparent;     /* Xóa viền mặc định */
+    -fx-background-insets: 0;          /* Xóa bóng mờ bên trong */
+    -fx-font-size: 15px;
+    -fx-text-fill: #1e293b;
+    -fx-prompt-text-fill: #94a3b8;
+    -fx-padding: 10 0 10 5;            /* Căn chỉnh khoảng cách chữ */
+}
+
+/* Khi click vào thì TextField không được hiện viền xanh mặc định */
+.dmk-search-field:focused {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-insets: 0;
+}
+
+/* Hiệu ứng khi sếp click vào cả cụm tìm kiếm */
+.dmk-search-wrapper:focused-within {
+    -fx-border-color: #0ea5e9;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.3), 10, 0, 0, 0);
+}

@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 
 <VBox prefWidth="900.0" spacing="0.0" styleClass="ds-dialog-root" 
-      stylesheets="@../../resources/css/DanhMuc.css" 
+      stylesheets="@../../resources/css/DanhMucThuoc.css" 
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="gui.dialogs.Dialog_ThemThuocController">
 
@@ -35,7 +35,7 @@
                             </children>
                         </VBox>
 
-                        <GridPane hgap="15.0" vgap="20.0" HBox.hgrow="ALWAYS">
+              <GridPane hgap="15.0" vgap="20.0" HBox.hgrow="ALWAYS">
                             <columnConstraints>
                                 <ColumnConstraints minWidth="100.0" />
                                 <ColumnConstraints hgrow="ALWAYS" />
@@ -65,12 +65,10 @@
                                 <TextField fx:id="txtHamLuong" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="3" GridPane.columnIndex="1" />
 
                                 <Label text="Đơn Vị:" GridPane.rowIndex="3" GridPane.columnIndex="2" />
-                                <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="3" GridPane.columnIndex="3">
-                                    <children>
-                                        <TextField fx:id="txtDonVi" prefHeight="40.0" styleClass="ds-input" HBox.hgrow="ALWAYS" />
-                                        <CheckBox fx:id="chkKeDon" text="Có" style="-fx-text-fill: #ef4444; -fx-font-weight: bold;" />
-                                    </children>
-                                </HBox>
+                                <ComboBox fx:id="cbDonVi" maxWidth="Infinity" prefHeight="40.0" promptText="-- Chọn --" styleClass="ds-input" GridPane.rowIndex="3" GridPane.columnIndex="3" />
+
+                                <Label text="Phân Loại:" GridPane.rowIndex="4" />
+                                <CheckBox fx:id="chkKeDon" text="Thuốc Kê Đơn" style="-fx-text-fill: #ef4444; -fx-font-weight: bold;" GridPane.rowIndex="4" GridPane.columnIndex="1" />
                             </children>
                         </GridPane>
                     </children>
