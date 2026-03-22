@@ -319,4 +319,8 @@ public class GUI_TrangChuController {
     public void loadDataTrangChu() {
         masterData.setAll(daoThuoc.getAllThuoc());
     }
+    @FXML
+    void handleMoQuanLyDanhMucNhaCungCap(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucNhaCungCap.fxml");
+    }
 }

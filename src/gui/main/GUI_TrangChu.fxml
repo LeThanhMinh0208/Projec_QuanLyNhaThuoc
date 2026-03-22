@@ -97,7 +97,7 @@
                         <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/supplier.png" /></ImageView></graphic>
                         <content>
                            <VBox styleClass="dropdown-content">
-                              <Button styleClass="sub-btn" text="Danh Mục Nhà Cung Cấp" />
+                              <Button onAction="#handleMoQuanLyDanhMucNhaCungCap" styleClass="sub-btn" text="Danh Mục Nhà Cung Cấp" />
                               <Button styleClass="sub-btn" text="Quản Lý Công Nợ" />
                               <Button styleClass="sub-btn" text="Nhật Ký Nhập Hàng" />
                               <Button styleClass="sub-btn" text="Quản Lý Đổi Trả Hàng" />
