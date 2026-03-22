@@ -11,15 +11,19 @@
    <stylesheets>
       <URL value="@../../resources/css/TrangChu.css" />
       <URL value="@../../resources/css/DanhMucThuoc.css" />
+      <URL value="@../../resources/css/BanHang.css" />
    </stylesheets>
    
    <padding><Insets bottom="30.0" left="40.0" right="40.0" top="30.0" /></padding>
    <children>
-      <Label styleClass="main-title" text="QUẢN LÝ DANH MỤC THUỐC" />
+      <!-- Header -->
+      <HBox alignment="CENTER_LEFT" spacing="20">
+          <Label styleClass="main-title" text="QUẢN LÝ DANH MỤC THUỐC" />
+      </HBox>
       
       <HBox spacing="20.0">
          <children>
-            <Button maxWidth="Infinity" onAction="#handleThem" prefHeight="70.0" styleClass="top-card, card-green, btn-action" text="Thêm Thuốc Mới" textFill="WHITE" HBox.hgrow="ALWAYS">
+            <Button maxWidth="Infinity" minWidth="0.0" onAction="#handleThem" prefHeight="70.0" styleClass="top-card, card-green, btn-action" text="Thêm Thuốc Mới" textFill="WHITE" HBox.hgrow="ALWAYS">
                <graphic>
                   <ImageView fitHeight="34.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -29,7 +33,7 @@
                </graphic>
             </Button>
             
-            <Button maxWidth="Infinity" onAction="#handleSua" prefHeight="70.0" styleClass="top-card, card-blue, btn-action" text="Cập Nhật Thuốc" textFill="WHITE" HBox.hgrow="ALWAYS">
+            <Button maxWidth="Infinity" minWidth="0.0" onAction="#handleSua" prefHeight="70.0" styleClass="top-card, card-blue, btn-action" text="Cập Nhật Thuốc" textFill="WHITE" HBox.hgrow="ALWAYS">
                <graphic>
                   <ImageView fitHeight="34.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -39,7 +43,7 @@
                </graphic>
             </Button>
             
-            <Button maxWidth="Infinity" onAction="#handleXoa" prefHeight="70.0" styleClass="top-card, card-orange, btn-action" text="Xóa Thuốc" textFill="WHITE" HBox.hgrow="ALWAYS">
+            <Button maxWidth="Infinity" minWidth="0.0" onAction="#handleXoa" prefHeight="70.0" styleClass="top-card, card-orange, btn-action" text="Xóa Thuốc" textFill="WHITE" HBox.hgrow="ALWAYS">
                <graphic>
                   <ImageView fitHeight="34.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -51,14 +55,13 @@
          </children>
       </HBox>
 
-  <HBox alignment="CENTER_LEFT" spacing="20.0">
+      <HBox alignment="CENTER_LEFT" spacing="20.0">
          <children>
-            <ComboBox fx:id="cbLocDanhMuc" prefHeight="45.0" prefWidth="250.0" promptText="Tất cả danh mục" />
-
             <HBox alignment="CENTER_LEFT" prefHeight="45.0" styleClass="search-box" HBox.hgrow="ALWAYS">
                <children>
                   <Label styleClass="search-icon" text="🔍" />
-                  <TextField fx:id="txtTimKiem" prefHeight="45.0" promptText="Tìm kiếm nhanh thuốc theo mã, tên, hoạt chất..." styleClass="search-input" HBox.hgrow="ALWAYS" />
+                  <TextField fx:id="txtTimKiem" prefHeight="45.0" promptText="Tìm theo tên, hoạt chất..." styleClass="search-input" HBox.hgrow="ALWAYS" />
+                  <Button text="Làm mới" onAction="#handleRefresh" styleClass="bh-btn-secondary" prefHeight="32" style="-fx-margin: 0 5 0 0;"/>
                </children>
             </HBox>
          </children>

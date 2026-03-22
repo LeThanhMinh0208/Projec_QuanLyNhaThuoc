@@ -24,7 +24,7 @@ import java.util.ArrayList;
 public class GUI_DanhMucNhaCungCapController {
 
     @FXML private TableView<NhaCungCap> tableNhaCungCap;
-    @FXML private ComboBox<String> cbLocDanhMuc;  
+    // @FXML private ComboBox<String> cbLocDanhMuc;  // Bỏ ô lọc theo yêu cầu người dùng
 
     @FXML private TableColumn<NhaCungCap, String> colMa, colTen, colSdt, colDiaChi;
     @FXML private TableColumn<NhaCungCap, Double> colCongNo;
@@ -73,18 +73,11 @@ public class GUI_DanhMucNhaCungCapController {
     }
 
     private void loadData() {
-        masterData.setAll(daoNhaCungCap.getAllNhaCungCap());  // Giả sử DAO có method này
-
-        // ComboBox lọc (hiện tại chỉ "Tất cả", có thể mở rộng sau)
-        ArrayList<String> dsLoc = new ArrayList<>();
-        dsLoc.add("Tất cả nhà cung cấp");
-        cbLocDanhMuc.getItems().setAll(dsLoc);
-        cbLocDanhMuc.getSelectionModel().selectFirst();
+        masterData.setAll(daoNhaCungCap.getAllNhaCungCap()); 
 
         filteredData = new FilteredList<>(masterData, p -> true);
 
         txtTimKiem.textProperty().addListener((obs, oldVal, newVal) -> filterData());
-        cbLocDanhMuc.valueProperty().addListener((obs, oldVal, newVal) -> filterData());
 
         SortedList<NhaCungCap> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(tableNhaCungCap.comparatorProperty());
@@ -93,14 +86,8 @@ public class GUI_DanhMucNhaCungCapController {
 
     private void filterData() {
         String keyword = txtTimKiem.getText() == null ? "" : txtTimKiem.getText().toLowerCase().trim();
-        String locValue = cbLocDanhMuc.getValue();
 
         filteredData.setPredicate(ncc -> {
-            // Nếu có lọc theo nhóm/khu vực sau này thì thêm logic ở đây
-            if (locValue != null && !locValue.equals("Tất cả nhà cung cấp")) {
-                // Ví dụ: return ncc.getKhuVuc().equalsIgnoreCase(locValue);
-            }
-
             if (keyword.isEmpty()) return true;
 
             if (ncc.getMaNhaCungCap() != null && ncc.getMaNhaCungCap().toLowerCase().contains(keyword)) return true;
@@ -112,6 +99,13 @@ public class GUI_DanhMucNhaCungCapController {
             String congNoStr = df.format(ncc.getCongNo()).toLowerCase();
             return congNoStr.contains(keyword);
         });
+    }
+
+    @FXML
+    void handleRefresh() {
+        txtTimKiem.clear();
+        tableNhaCungCap.getSelectionModel().clearSelection();
+        loadData();
     }
 
     @FXML

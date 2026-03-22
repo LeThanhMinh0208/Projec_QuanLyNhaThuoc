@@ -25,7 +25,7 @@
     <!-- Action Buttons -->
     <HBox spacing="20.0">
          <children>
-            <Button maxWidth="Infinity" onAction="#handleThem" prefHeight="70.0" styleClass="top-card, card-green, btn-action" text="Thêm Khách Hàng" textFill="WHITE" HBox.hgrow="ALWAYS">
+            <Button maxWidth="Infinity" minWidth="0.0" onAction="#handleThem" prefHeight="70.0" styleClass="top-card, card-green, btn-action" text="Thêm Khách Hàng" textFill="WHITE" HBox.hgrow="ALWAYS">
                <graphic>
                   <ImageView fitHeight="34.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -35,7 +35,7 @@
                </graphic>
             </Button>
             
-            <Button maxWidth="Infinity" onAction="#handleSua" prefHeight="70.0" styleClass="top-card, card-blue, btn-action" text="Cập Nhật Khách Hàng" textFill="WHITE" HBox.hgrow="ALWAYS">
+            <Button maxWidth="Infinity" minWidth="0.0" onAction="#handleSua" prefHeight="70.0" styleClass="top-card, card-blue, btn-action" text="Cập Nhật Khách Hàng" textFill="WHITE" HBox.hgrow="ALWAYS">
                <graphic>
                   <ImageView fitHeight="34.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -45,7 +45,7 @@
                </graphic>
             </Button>
             
-            <Button maxWidth="Infinity" onAction="#handleXoa" prefHeight="70.0" styleClass="top-card, card-orange, btn-action" text="Xóa Khách Hàng" textFill="WHITE" HBox.hgrow="ALWAYS">
+            <Button maxWidth="Infinity" minWidth="0.0" onAction="#handleXoa" prefHeight="70.0" styleClass="top-card, card-orange, btn-action" text="Xóa Khách Hàng" textFill="WHITE" HBox.hgrow="ALWAYS">
                <graphic>
                   <ImageView fitHeight="34.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true">
                      <image>
