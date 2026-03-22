@@ -106,3 +106,33 @@
 .status-priority { -fx-text-fill: #ca8a04; }
 .status-promo { -fx-text-fill: #ea580c; }
 .status-stop { -fx-text-fill: #dc2626; }
+/* --- ÉP MÀU XANH SKY RỰC RỠ CHO DÒNG ĐƯỢC CHỌN (ĐỒNG BỘ TRANG CHỦ) --- */
+
+.dmk-table .table-row-cell:selected {
+    -fx-background-color: #0ea5e9 !important; 
+    -fx-background-insets: 0;
+}
+
+/* Ép tất cả chữ thành màu trắng tinh để nổi bật trên nền xanh */
+.dmk-table .table-row-cell:selected .table-cell {
+    -fx-text-fill: white !important;
+    -fx-font-weight: bold !important;
+}
+
+/* Ép luôn các thẻ Label (Trạng thái hạn) và số lượng màu xanh lá thành Trắng hết */
+.dmk-table .table-row-cell:selected .label,
+.dmk-table .table-row-cell:selected .text {
+    -fx-text-fill: white !important;
+    -fx-fill: white !important;
+}
+
+/* --- TẮT BÓNG MA MÀU XÁM KHI CLICK BỎ CHỌN (FOCUS) --- */
+.dmk-table:focused {
+    -fx-background-color: transparent;
+}
+.dmk-table .table-row-cell:focused {
+    -fx-background-insets: 0;
+}
+.dmk-table .table-cell:focused {
+    -fx-background-color: transparent;
+}

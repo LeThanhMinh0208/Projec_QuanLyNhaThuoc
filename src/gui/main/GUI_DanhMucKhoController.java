@@ -18,7 +18,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import utils.DateFormatter;
 
-
+import java.io.File;
 import java.net.URL;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -52,7 +52,6 @@ public class GUI_DanhMucKhoController implements Initializable {
     }
 
     private void setupComboBox() {
-  
         cmbViTriKho.setItems(FXCollections.observableArrayList(
             "Tất cả vị trí kho", 
             "Kho Bán Hàng", 
@@ -60,12 +59,22 @@ public class GUI_DanhMucKhoController implements Initializable {
         ));
         cmbViTriKho.getSelectionModel().selectFirst();
     }
+
+    // --- HÀM LOAD ẢNH BỌC THÉP CHỐNG SẬP APP ---
+    private Image loadImage(String tenFile) {
+        if (tenFile == null || tenFile.trim().isEmpty()) return null;
+        try {
+            // Thử load từ thư mục resources
+            String path = "/resources/images/images_thuoc/" + tenFile.trim();
+            URL url = getClass().getResource(path);
+            if (url != null) return new Image(url.toExternalForm(), 45, 45, true, true);
+        } catch (Exception e) {}
+        return null;
+    }
+
     private void setupTableColumns() {
         colMaLo.setCellValueFactory(new PropertyValueFactory<>("maLoThuoc"));
-  
-      
 
-        // 2. Cấu hình hiển thị cho cột Ngày Hết Hạn
         colNgayHetHan.setCellValueFactory(new PropertyValueFactory<>("hanSuDung"));
         colNgayHetHan.setCellFactory(column -> new TableCell<>() {
             @Override
@@ -78,6 +87,7 @@ public class GUI_DanhMucKhoController implements Initializable {
                 }
             }
         });
+        
         colViTriKho.setCellValueFactory(cell -> {
             String maDB = cell.getValue().getViTriKho();
             String tenHienThi = maDB; 
@@ -90,69 +100,112 @@ public class GUI_DanhMucKhoController implements Initializable {
             
             return new SimpleStringProperty(tenHienThi);
         });
+        
         colSoLuong.setCellValueFactory(new PropertyValueFactory<>("soLuongTon"));
-        // Lấy dữ liệu từ đối tượng Thuoc
+        
         colMaThuoc.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getThuoc().getMaThuoc()));
         colTenThuoc.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getThuoc().getTenThuoc()));
 
-        // Xử lý Hình Ảnh
+        // --- ĐÃ FIX CỘT HÌNH ẢNH DÙNG HÀM BỌC THÉP ---
         colHinhAnh.setCellFactory(param -> new TableCell<>() {
             private final ImageView imageView = new ImageView();
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) { setGraphic(null); } 
-                else {
+                if (empty) { 
+                    setGraphic(null); 
+                } else {
                     LoThuoc lo = getTableView().getItems().get(getIndex());
                     String tenFileAnh = lo.getThuoc().getHinhAnh();
-                    try {
-                       
-                        String path = "/resources/images/images_thuoc/" + tenFileAnh;
-                        Image img = new Image(getClass().getResourceAsStream(path));
+                    
+                    Image img = loadImage(tenFileAnh);
+                    if (img != null) {
                         imageView.setImage(img);
-                        imageView.setFitWidth(45);
-                        imageView.setFitHeight(45);
                         setGraphic(imageView);
                         setAlignment(Pos.CENTER);
-                    } catch (Exception e) {
-                        setText("Lỗi Ảnh"); // Nếu không tìm thấy file ảnh
+                    } else {
+                        Label lblError = new Label("Trống");
+                        lblError.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 11px;");
+                        setGraphic(lblError);
+                        setAlignment(Pos.CENTER);
                     }
                 }
             }
         });
 
-        // Xử lý Cảnh Báo Hạn Sử Dụng
+     // --- VŨ KHÍ TỐI THƯỢNG: FIX DỨT ĐIỂM MẤT MÀU CỘT CẢNH BÁO ---
         colCanhBao.setCellValueFactory(new PropertyValueFactory<>("hanSuDung"));
-        colCanhBao.setCellFactory(param -> new TableCell<>() {
+        colCanhBao.setCellFactory(column -> new TableCell<>() {
+            
             @Override
             protected void updateItem(Date hanSuDung, boolean empty) {
                 super.updateItem(hanSuDung, empty);
-                if (empty || hanSuDung == null) { setGraphic(null); } 
-                else {
+                updateAppearance(hanSuDung, empty, isSelected());
+            }
+
+            // Bắt sự kiện ngay khoảnh khắc sếp Click hoặc Bỏ Click
+            @Override
+            public void updateSelected(boolean selected) {
+                super.updateSelected(selected);
+                updateAppearance(getItem(), isEmpty(), selected);
+            }
+
+            // Hàm bơm màu trực tiếp, JavaFX không thể cãi được
+            private void updateAppearance(Date hanSuDung, boolean empty, boolean selected) {
+                setAlignment(Pos.CENTER);
+
+                if (empty || hanSuDung == null) {
+                    setText(null);
+                    setStyle(""); 
+                } else {
                     LocalDate expiredDate = hanSuDung.toLocalDate();
                     long months = ChronoUnit.MONTHS.between(LocalDate.now(), expiredDate);
-                    
-                    Label lblStatus = new Label();
-                    lblStatus.getStyleClass().add("status-label");
 
+                    String textHienThi = "";
+                    String mauChu = "";
+
+                    // Định vị ngôn ngữ và màu sắc
                     if (months > 12) {
-                        lblStatus.setText("An Toàn");
-                        lblStatus.getStyleClass().add("status-safe");
+                        textHienThi = "An Toàn";
+                        mauChu = "-fx-text-fill: #16a34a;"; // Xanh lá
                     } else if (months >= 6) {
-                        lblStatus.setText("Ưu Tiên Bán");
-                        lblStatus.getStyleClass().add("status-priority");
+                        textHienThi = "Ưu Tiên Bán";
+                        mauChu = "-fx-text-fill: #ca8a04;"; // Vàng
                     } else if (months >= 3) {
-                        lblStatus.setText("Khuyến Mãi");
-                        lblStatus.getStyleClass().add("status-promo");
+                        textHienThi = "Khuyến Mãi";
+                        mauChu = "-fx-text-fill: #ea580c;"; // Cam
                     } else {
-                        lblStatus.setText("Ngưng Bán");
-                        lblStatus.getStyleClass().add("status-stop");
+                        textHienThi = "Ngưng Bán";
+                        mauChu = "-fx-text-fill: #dc2626;"; // Đỏ
                     }
-                    HBox box = new HBox(lblStatus);
-                    box.setAlignment(Pos.CENTER);
-                    setGraphic(box);
+
+                    setText(textHienThi);
+
+                    // Bơm màu bằng vũ lực
+                    if (selected) {
+                        setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
+                    } else {
+                        setStyle(mauChu + " -fx-font-weight: bold;");
+                    }
                 }
             }
+        });
+
+   
+        tableKho.setRowFactory(tv -> {
+            TableRow<LoThuoc> row = new TableRow<>();
+            row.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
+                if (event.getClickCount() == 1 && (!row.isEmpty()) && row.isSelected()) {
+  
+                    tv.getSelectionModel().clearSelection();
+
+                    tv.getFocusModel().focus(-1); 
+                    tableKho.getParent().requestFocus(); 
+                    
+                    event.consume(); 
+                }
+            });
+            return row;
         });
     }
 
@@ -203,7 +256,7 @@ public class GUI_DanhMucKhoController implements Initializable {
                                   (loThuoc.getMaLoThuoc() != null && loThuoc.getMaLoThuoc().toLowerCase().contains(tuKhoa)) ||
                                   (loThuoc.getThuoc().getMaThuoc() != null && loThuoc.getThuoc().getMaThuoc().toLowerCase().contains(tuKhoa)) ||
                                   (loThuoc.getThuoc().getTenThuoc() != null && loThuoc.getThuoc().getTenThuoc().toLowerCase().contains(tuKhoa)) ||
-                                  trangThaiHan.contains(tuKhoa); // <--- Đã bổ sung tính năng sếp yêu cầu
+                                  trangThaiHan.contains(tuKhoa);
 
             return matchViTri && matchTuKhoa;
         });

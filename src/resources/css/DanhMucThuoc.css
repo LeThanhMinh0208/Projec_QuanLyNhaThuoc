@@ -88,3 +88,41 @@
     -fx-background-color: linear-gradient(to bottom, #f87171, #ef4444);
     -fx-scale-x: 1.05; -fx-scale-y: 1.05;
 }
+/* --- LÀM NỔI BẬT DÒNG ĐƯỢC CHỌN (SANG TRỌNG & RÕ RÀNG) --- */
+
+/* 1. Đổi nền dòng được chọn thành màu Xanh Dương Đậm (Royal Blue) */
+.table-view .table-row-cell:selected {
+    -fx-background-color: #2563eb; 
+    -fx-background-insets: 0;
+}
+
+/* --- ÉP MÀU XANH SKY RỰC RỠ CHO DÒNG ĐƯỢC CHỌN (CHUẨN ẢNH SẾP GỬI) --- */
+
+.table-view .table-row-cell:selected {
+    /* Ép đúng mã màu xanh của thanh Header */
+    -fx-background-color: #0ea5e9 !important; 
+    -fx-background-insets: 0;
+}
+
+/* Ép tất cả chữ thành màu trắng tinh để nổi bật trên nền xanh */
+.table-view .table-row-cell:selected .table-cell {
+    -fx-text-fill: white !important;
+    -fx-font-weight: bold !important;
+}
+
+/* Bắt luôn cả các thẻ nhãn (Label) bên trong các cột như Kê Đơn, Trạng Thái hóa Trắng */
+.table-view .table-row-cell:selected .label,
+.table-view .table-row-cell:selected .text {
+    -fx-text-fill: white !important;
+    -fx-fill: white !important;
+}
+
+/* 3. Bắt luôn cả thẻ Text (của cột Ghi chú tự xuống dòng) thành Trắng */
+.table-view .table-row-cell:selected .text {
+    -fx-fill: white;
+}
+
+/* 4. Đổi màu chữ các cột đặc biệt (nếu sếp có dùng setStyle trong Java) để khỏi bị chói */
+.table-view .table-row-cell:selected .label {
+    -fx-text-fill: white;
+}

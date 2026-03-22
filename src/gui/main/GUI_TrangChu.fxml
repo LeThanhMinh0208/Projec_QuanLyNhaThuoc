@@ -74,7 +74,7 @@
                      <Button onAction="#moTrangDanhMucKho" styleClass="sub-btn" text="Danh Mục Kho" />
                      <Button onAction="#moQuanLyDonNhapHang" styleClass="sub-btn" text="Quản Lý Đơn Nhập Hàng" />
                      <Button onAction="#moTrangNhapKho" styleClass="sub-btn" text="Nhập Kho" />
-                     <Button styleClass="sub-btn" text="Xuất Kho" />
+                     <Button onAction="#moTrangXuatKho" styleClass="sub-btn" text="Xuất Kho" />
                      <Button styleClass="sub-btn" text="Kiểm Kê Kho" />
                      <Button styleClass="sub-btn" text="Giải Quyết Kiểm Kho" />
                   </VBox>

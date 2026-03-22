@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="600.0" prefWidth="900.0" spacing="15.0" styleClass="xk-dialog-bg" stylesheets="@../../resources/css/XuatKho.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.dialogs.Dialog_ChiTietPhieuXuatController">
+   <HBox alignment="CENTER_LEFT" styleClass="xk-dialog-header">
+      <Label fx:id="lblTieuDe" styleClass="xk-dialog-title" text="CHI TIẾT PHIẾU: PX001" />
+      <Region HBox.hgrow="ALWAYS" />
+      <Label fx:id="lblLoaiPhieu" styleClass="xk-badge" text="CHUYỂN KHO" />
+   </HBox>
+
+   <GridPane hgap="20.0" vgap="10.0" style="-fx-padding: 10 20;">
+      <columnConstraints>
+         <ColumnConstraints prefWidth="120.0" />
+         <ColumnConstraints hgrow="ALWAYS" />
+      </columnConstraints>
+      <children>
+         <Label styleClass="xk-label" text="Ngày Lập:" />
+         <Label fx:id="lblNgayLap" text="---" style="-fx-font-weight: bold;" GridPane.columnIndex="1" />
+         <Label fx:id="lblDacThu" styleClass="xk-label" text="Thông tin:" GridPane.rowIndex="1" />
+         <Label fx:id="lblGiaTriDacThu" text="---" style="-fx-font-weight: bold;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+         <Label styleClass="xk-label" text="Ghi Chú:" GridPane.rowIndex="2" />
+         <Label fx:id="lblGhiChu" text="---" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      </children>
+   </GridPane>
+
+   <TableView fx:id="tableChiTiet" styleClass="xk-table" VBox.vgrow="ALWAYS">
+      <columns>
+         <TableColumn fx:id="colTenThuoc" prefWidth="250.0" text="Tên Thuốc" />
+         <TableColumn fx:id="colMaLo" prefWidth="150.0" text="Mã Lô" />
+         <TableColumn fx:id="colSLXuat" prefWidth="120.0" text="Số Lượng Xuất" />
+      </columns>
+   </TableView>
+
+   <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-padding: 10 20 20 20;">
+      <Button onAction="#handleInPhieu" prefHeight="40.0" prefWidth="150.0" styleClass="xk-btn-action" text="🖨️ IN PHIẾU" />
+      <Button onAction="#handleDong" prefHeight="40.0" prefWidth="100.0" styleClass="xk-btn-refresh" text="Đóng" />
+   </HBox>
+</VBox>

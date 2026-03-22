@@ -53,51 +53,40 @@ public class GUI_DanhMucThuocController {
         colNuocSX.setCellValueFactory(new PropertyValueFactory<>("nuocSanXuat"));
         colCongDung.setCellValueFactory(new PropertyValueFactory<>("congDung"));
 
-        // 1. Logic Render Trạng Thái (Giữ nguyên logic của bạn)
+        // 1. CỘT TRẠNG THÁI (Đã cạo trọc màu, chỉ dịch ngôn ngữ)
         colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
         colTrangThai.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
-                    setText(null); setStyle("");
+                    setText(null);
                 } else {
                     switch (item) {
-                        case "DANG_BAN":
-                            setText("Đang kinh doanh");
-                            setStyle("-fx-text-fill: #10b981; -fx-font-weight: bold;");
-                            break;
-                        case "HET_HANG":
-                            setText("Hết hàng");
-                            setStyle("-fx-text-fill: #f59e0b; -fx-font-weight: bold;");
-                            break;
-                        case "NGUNG_BAN":
-                            setText("Ngừng bán");
-                            setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold;");
-                            break;
-                        default:
-                            setText(item); setStyle("");
+                        case "DANG_BAN": setText("Đang kinh doanh"); break;
+                        case "HET_HANG": setText("Hết hàng"); break;
+                        case "NGUNG_BAN": setText("Ngừng bán"); break;
+                        default: setText(item);
                     }
                 }
             }
         });
 
-        // 2. Logic Render Cột Kê Đơn
+        // 2. CỘT KÊ ĐƠN (Đã cạo trọc màu)
         colKeDon.setCellValueFactory(new PropertyValueFactory<>("canKeDon"));
         colKeDon.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Boolean item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
-                    setText(null); setStyle("");
+                    setText(null);
                 } else {
                     setText(item ? "Có" : "Không");
-                    setStyle(item ? "-fx-text-fill: #ef4444; -fx-font-weight: bold;" : "-fx-text-fill: #10b981; -fx-font-weight: bold;");
                 }
             }
         });
 
-        // 3. Logic Render Hình Ảnh
+        // 3. CỘT HÌNH ẢNH (Giữ nguyên)
         colHinhAnh.setCellValueFactory(new PropertyValueFactory<>("hinhAnh"));
         colHinhAnh.setCellFactory(column -> new TableCell<>() {
             private final ImageView iv = new ImageView();
@@ -122,6 +111,30 @@ public class GUI_DanhMucThuocController {
                     }
                 }
             }
+        });
+
+        // --- 4. LOGIC CLICK CHUỘT THÔNG MINH (GIỐNG Y CHANG TRANG CHỦ) ---
+        tableThuoc.setRowFactory(tv -> {
+            TableRow<Thuoc> row = new TableRow<>();
+            
+            // Lắng nghe sự kiện click 1 lần (Toggle Selection & Xóa bóng ma Focus)
+            row.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
+                if (event.getClickCount() == 1 && (!row.isEmpty()) && row.isSelected()) {
+                    tv.getSelectionModel().clearSelection();
+                    tv.getFocusModel().focus(-1); 
+                    tableThuoc.getParent().requestFocus(); 
+                    event.consume(); 
+                }
+            });
+
+            // Lắng nghe sự kiện Double Click (Mở form Sửa)
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    checkAndOpenDialog("/gui/dialogs/Dialog_SuaThuoc.fxml", "Sửa Thuốc");
+                }
+            });
+            
+            return row;
         });
     }
 

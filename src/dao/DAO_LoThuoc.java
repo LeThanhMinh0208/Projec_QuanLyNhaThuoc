@@ -72,4 +72,26 @@ public class DAO_LoThuoc {
             return false;
         }
     }
+
+    public java.util.List<entity.LoThuoc> getLoThuocTheoFEFO(String maThuoc, String viTriKho) {
+        java.util.List<entity.LoThuoc> list = new java.util.ArrayList<>();
+       
+        String sql = "SELECT * FROM LoThuoc WHERE maThuoc = ? AND viTriKho = ? AND soLuongTon > 0 ORDER BY hanSuDung ASC";
+        try (java.sql.Connection con = connectDB.ConnectDB.getInstance().getConnection();
+             java.sql.PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, maThuoc);
+            pst.setString(2, viTriKho);
+            java.sql.ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                entity.LoThuoc lo = new entity.LoThuoc();
+                lo.setMaLoThuoc(rs.getString("maLoThuoc"));
+                lo.setSoLuongTon(rs.getInt("soLuongTon"));
+                lo.setHanSuDung(rs.getDate("hanSuDung"));
+                lo.setNgaySanXuat(rs.getDate("ngaySanXuat"));
+                lo.setViTriKho(rs.getString("viTriKho"));
+                list.add(lo);
+            }
+        } catch (java.sql.SQLException e) { e.printStackTrace(); }
+        return list;
+    }
 }
