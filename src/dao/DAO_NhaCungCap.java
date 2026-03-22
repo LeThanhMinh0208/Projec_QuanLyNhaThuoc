@@ -150,4 +150,28 @@ public class DAO_NhaCungCap {
             }
         }
     }
+
+    public boolean existsByTenNhaCungCap(String ten) {
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            con = ConnectDB.getConnection();
+            String sql = "SELECT 1 FROM NhaCungCap WHERE LOWER(tenNhaCungCap) = ?";
+            pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, ten.toLowerCase());
+            rs = pstmt.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

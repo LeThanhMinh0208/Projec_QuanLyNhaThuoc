@@ -3,13 +3,13 @@ package gui.dialogs;
 import entity.KhachHang;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class Dialog_ThemKhachHangController {
 
-    @FXML private Label lblTitle;
     @FXML private TextField txtMa;
     @FXML private TextField txtHoTen;
     @FXML private TextField txtSdt;
@@ -20,25 +20,11 @@ public class Dialog_ThemKhachHangController {
     @FXML private Label lblErrSdt;
     @FXML private Label lblErrDiaChi;
 
-    private KhachHang khachHang;     // Holds existing KH if edit mode
     private KhachHang resultKhachHang; // Result passed back
-    private boolean isEditMode = false;
 
-    public void setKhachHang(KhachHang khachHang, String nextIdSeq) {
-        this.khachHang = khachHang;
-        if (khachHang != null) {
-            isEditMode = true;
-            lblTitle.setText("SỬA THÔNG TIN KHÁCH HÀNG");
-            txtMa.setText(khachHang.getMaKhachHang());
-            txtHoTen.setText(khachHang.getHoTen());
-            txtSdt.setText(khachHang.getSdt());
-            txtDiaChi.setText(khachHang.getDiaChi());
-            txtDiem.setText(String.valueOf(khachHang.getDiemTichLuy()));
-        } else {
-            isEditMode = false;
-            lblTitle.setText("THÊM KHÁCH HÀNG MỚI");
-            txtMa.setText(nextIdSeq);
-        }
+    public void setMaKhachHang(String nextIdSeq) {
+        txtMa.setText(nextIdSeq);
+        txtDiem.setText("0");
     }
 
     public void setSdt(String sdt) {
@@ -55,12 +41,20 @@ public class Dialog_ThemKhachHangController {
     void handleLuu(ActionEvent event) {
         boolean valid = true;
         
-        String ten = txtHoTen.getText().trim();
-        String sdt = txtSdt.getText().trim();
-        String diaChi = txtDiaChi.getText().trim();
+        String ten = txtHoTen.getText();
+        String sdt = txtSdt.getText();
+        String diaChi = txtDiaChi.getText();
+        
+        ten = utils.ValidationUtils.capitalizeName(ten);
+        sdt = utils.ValidationUtils.normalizeString(sdt);
+        diaChi = utils.ValidationUtils.normalizeString(diaChi);
 
-        if (ten.isEmpty()) {
-            lblErrHoTen.setText("Họ tên không được để trống!");
+        txtHoTen.setText(ten);
+        txtSdt.setText(sdt);
+        txtDiaChi.setText(diaChi);
+
+        if (!utils.ValidationUtils.isValidTenKhachHang(ten)) {
+            lblErrHoTen.setText("Họ tên phải từ 2-100 ký tự và chứa ít nhất 1 chữ cái!");
             lblErrHoTen.setVisible(true);
             lblErrHoTen.setManaged(true);
             valid = false;
@@ -69,13 +63,8 @@ public class Dialog_ThemKhachHangController {
             lblErrHoTen.setManaged(false);
         }
 
-        if (sdt.isEmpty()) {
-            lblErrSdt.setText("SĐT không được để trống!");
-            lblErrSdt.setVisible(true);
-            lblErrSdt.setManaged(true);
-            valid = false;
-        } else if (!sdt.matches("^0\\d{9}$")) {
-            lblErrSdt.setText("SĐT phải 10 số và bắt đầu bằng số 0!");
+        if (!utils.ValidationUtils.isValidSdt(sdt)) {
+            lblErrSdt.setText("Số điện thoại phải gồm 10 số và bắt đầu bằng số 0!");
             lblErrSdt.setVisible(true);
             lblErrSdt.setManaged(true);
             valid = false;
@@ -83,8 +72,8 @@ public class Dialog_ThemKhachHangController {
             // Kiểm tra trùng SĐT
             dao.DAO_KhachHang daoKh = new dao.DAO_KhachHang();
             KhachHang existingKh = daoKh.getBySdt(sdt);
-            if (existingKh != null && (!isEditMode || !existingKh.getMaKhachHang().equals(khachHang.getMaKhachHang()))) {
-                lblErrSdt.setText("SĐT này đã tồn tại trong hệ thống!");
+            if (existingKh != null) {
+                lblErrSdt.setText("Số điện thoại này đã tồn tại trong hệ thống!");
                 lblErrSdt.setVisible(true);
                 lblErrSdt.setManaged(true);
                 valid = false;
@@ -94,8 +83,8 @@ public class Dialog_ThemKhachHangController {
             }
         }
         
-        if (diaChi.isEmpty()) {
-            lblErrDiaChi.setText("Địa chỉ không được để trống!");
+        if (!utils.ValidationUtils.isValidDiaChi(diaChi)) {
+            lblErrDiaChi.setText("Địa chỉ phải từ 2-255 ký tự và chứa ít nhất 1 chữ cái hoặc số!");
             lblErrDiaChi.setVisible(true);
             lblErrDiaChi.setManaged(true);
             valid = false;
@@ -105,18 +94,19 @@ public class Dialog_ThemKhachHangController {
         }
 
         if (!valid) {
+            new Alert(Alert.AlertType.ERROR, "Dữ liệu nhập không hợp lệ! Vui lòng kiểm tra lại các ô bị bôi đỏ bên dưới.").show();
             Stage stage = (Stage) txtMa.getScene().getWindow();
             stage.sizeToScene();
             return;
         }
 
-        if (isEditMode) {
-            khachHang.setHoTen(ten);
-            khachHang.setSdt(sdt);
-            khachHang.setDiaChi(diaChi);
-            this.resultKhachHang = khachHang;
+        dao.DAO_KhachHang daoKh = new dao.DAO_KhachHang();
+        KhachHang newKh = new KhachHang(txtMa.getText(), ten, sdt, diaChi, 0);
+        if (daoKh.themKhachHang(newKh)) {
+            new Alert(Alert.AlertType.INFORMATION, "Thêm khách hàng thành công!").show();
+            this.resultKhachHang = newKh;
         } else {
-            this.resultKhachHang = new KhachHang(txtMa.getText(), ten, sdt, diaChi, 0);
+            new Alert(Alert.AlertType.ERROR, "Thất bại khi thêm vào cơ sở dữ liệu!").show();
         }
         
         closeDialog();

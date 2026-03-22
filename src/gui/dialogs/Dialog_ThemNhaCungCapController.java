@@ -27,19 +27,33 @@ public class Dialog_ThemNhaCungCapController {
 
     @FXML
     private void handleLuu() {
-        String ten = txtTen.getText().trim();
-        String sdt = txtSdt.getText().trim();
-        String diaChi = txtDiaChi.getText().trim();
-        String congNoStr = txtCongNo.getText().trim();
+        String ten = txtTen.getText();
+        String sdt = txtSdt.getText();
+        String diaChi = txtDiaChi.getText();
+        String congNoStr = txtCongNo.getText();
 
-        if (ten.isEmpty() || sdt.isEmpty() || diaChi.isEmpty()) {
-            new Alert(Alert.AlertType.ERROR, "Vui lòng nhập đầy đủ: Tên NCC, SĐT và Địa chỉ!").show();
+        ten = utils.ValidationUtils.normalizeString(ten);
+        sdt = utils.ValidationUtils.normalizeString(sdt);
+        diaChi = utils.ValidationUtils.normalizeString(diaChi);
+        congNoStr = utils.ValidationUtils.normalizeString(congNoStr);
+        
+        txtTen.setText(ten);
+        txtSdt.setText(sdt);
+        txtDiaChi.setText(diaChi);
+        txtCongNo.setText(congNoStr);
+
+        StringBuilder err = new StringBuilder();
+        if (!utils.ValidationUtils.isValidTenNhaCungCap(ten)) err.append("- Tên nhà cung cấp phải từ 2-150 ký tự và chứa ít nhất 1 chữ cái.\n");
+        if (!utils.ValidationUtils.isValidSdt(sdt)) err.append("- Số điện thoại phải gồm 10 số và bắt đầu bằng số 0.\n");
+        if (!utils.ValidationUtils.isValidDiaChi(diaChi)) err.append("- Địa chỉ phải từ 2-255 ký tự và chứa ít nhất 1 chữ cái hoặc số.\n");
+        
+        if (err.length() > 0) {
+            new Alert(Alert.AlertType.ERROR, "Dữ liệu nhập không hợp lệ:\n" + err.toString()).show();
             return;
         }
 
-        // Validate SĐT (cơ bản)
-        if (!sdt.matches("^0\\d{9}$")) {
-            new Alert(Alert.AlertType.ERROR, "Số điện thoại phải là 10 chữ số và bắt đầu bằng 0!").show();
+        if (daoNCC.existsByTenNhaCungCap(ten)) {
+            new Alert(Alert.AlertType.ERROR, "Tên nhà cung cấp này đã tồn tại trong hệ thống!").show();
             return;
         }
 

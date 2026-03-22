@@ -2,7 +2,7 @@ package gui.main;
 
 import dao.DAO_KhachHang;
 import entity.KhachHang;
-import gui.dialogs.Dialog_ThemKhachHangController;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -18,11 +18,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
-import java.io.IOException;
+import javafx.stage.Stage;
+
+
+
 
 public class GUI_QuanLyKhachHangController {
 
@@ -104,76 +104,53 @@ public class GUI_QuanLyKhachHangController {
 
     @FXML
     void handleThem(ActionEvent event) {
-        openKhachHangDialog(null);
+        openDialog("/gui/dialogs/Dialog_ThemKhachHang.fxml", "Thêm Khách Hàng Mới", null);
     }
 
     @FXML
     void handleSua(ActionEvent event) {
-        KhachHang selected = tableKhachHang.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showAlert(Alert.AlertType.WARNING, "Chưa Chọn", "Vui lòng chọn khách hàng cần sửa trên bảng!");
-            return;
-        }
-        openKhachHangDialog(selected);
+        checkAndOpenDialog("/gui/dialogs/Dialog_SuaKhachHang.fxml", "Cập Nhật Thông Tin Khách Hàng");
     }
 
     @FXML
     void handleXoa(ActionEvent event) {
-        KhachHang selected = tableKhachHang.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showAlert(Alert.AlertType.WARNING, "Chưa Chọn", "Vui lòng chọn khách hàng cần xóa trên bảng!");
-            return;
-        }
-
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Bạn có chắc chắn muốn xóa khách hàng " + selected.getHoTen() + "?", ButtonType.YES, ButtonType.NO);
-        confirm.showAndWait();
-        if (confirm.getResult() == ButtonType.YES) {
-            if (daoKhachHang.xoaKhachHang(selected.getMaKhachHang())) {
-                loadData();
-                showAlert(Alert.AlertType.INFORMATION, "Thành công", "Xóa khách hàng thành công!");
-            } else {
-                showAlert(Alert.AlertType.ERROR, "Thất bại", "Khách hàng này có dữ liệu hóa đơn giao dịch, không thể xóa!");
-            }
-        }
+        checkAndOpenDialog("/gui/dialogs/Dialog_XoaKhachHang.fxml", "Xác Nhận Xóa Khách Hàng");
     }
 
-    private void openKhachHangDialog(KhachHang khachHang) {
+    private void checkAndOpenDialog(String path, String title) {
+        KhachHang selected = tableKhachHang.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng chọn một khách hàng trong bảng!");
+            return;
+        }
+        openDialog(path, title, selected);
+    }
+
+    private void openDialog(String path, String title, KhachHang data) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ThemKhachHang.fxml"));
-            Scene scene = new Scene(loader.load());
-            
-            Dialog_ThemKhachHangController controller = loader.getController();
-            controller.setKhachHang(khachHang, (khachHang == null) ? phatSinhMaKH() : null);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
+            javafx.scene.Parent root = loader.load();
 
-            Stage dialogStage = new Stage();
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.initStyle(StageStyle.UTILITY);
-            dialogStage.setTitle(khachHang == null ? "Thêm Khách Hàng Mới" : "Sửa Thông Tin Khách Hàng");
-            dialogStage.setScene(scene);
-            dialogStage.showAndWait();
+            Object ctrl = loader.getController();
 
-            KhachHang result = controller.getResultKhachHang();
-            if (result != null) {
-                if (khachHang == null) {
-                    if (daoKhachHang.themKhachHang(result)) {
-                        loadData();
-                        showAlert(Alert.AlertType.INFORMATION, "Thành công", "Thêm khách hàng mới thành công!");
-                    } else {
-                        showAlert(Alert.AlertType.ERROR, "Thất bại", "Lỗi CSDL khi thêm khách hàng!");
-                    }
-                } else {
-                    if (daoKhachHang.capNhatKhachHang(result)) {
-                        // tableKhachHang.refresh() is handled smoothly by replacing list
-                        loadData(); 
-                        showAlert(Alert.AlertType.INFORMATION, "Thành công", "Cập nhật thông tin thành công!");
-                    } else {
-                        showAlert(Alert.AlertType.ERROR, "Thất bại", "Lỗi CSDL khi cập nhật!");
-                    }
-                }
+            if (ctrl instanceof gui.dialogs.Dialog_ThemKhachHangController) {
+                ((gui.dialogs.Dialog_ThemKhachHangController) ctrl).setMaKhachHang(phatSinhMaKH());
+            } else if (ctrl instanceof gui.dialogs.Dialog_SuaKhachHangController && data != null) {
+                ((gui.dialogs.Dialog_SuaKhachHangController) ctrl).setKhachHangData(data);
+            } else if (ctrl instanceof gui.dialogs.Dialog_XoaKhachHangController && data != null) {
+                ((gui.dialogs.Dialog_XoaKhachHangController) ctrl).setKhachHangData(data);
             }
-        } catch (IOException e) {
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle(title);
+            stage.setResizable(false);
+            stage.showAndWait();
+
+            loadData();
+        } catch (java.io.IOException e) {
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Lỗi Giao Diện", "Không thể mở hộp thoại nhập liệu!");
+            showAlert(Alert.AlertType.ERROR, "Lỗi Giao Diện", "Không thể mở hộp thoại: " + e.getMessage());
         }
     }
 

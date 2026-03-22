@@ -1,54 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox spacing="0" styleClass="dialog-root" stylesheets="@../../resources/css/BanHang.css" 
-      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+<VBox prefWidth="900.0" spacing="0.0" styleClass="ds-dialog-root" 
+      stylesheets="@../../resources/css/DanhMucThuoc.css" 
+      xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="gui.dialogs.Dialog_ThemKhachHangController">
-      
-    <!-- Header -->
-    <VBox styleClass="dialog-header">
-        <Label fx:id="lblTitle" text="THÊM KHÁCH HÀNG" styleClass="dialog-header-title" />
-    </VBox>
 
-    <!-- Body -->
-    <VBox spacing="15" styleClass="dialog-body" prefWidth="400">
-        
-        <VBox spacing="5">
-            <Label text="Mã Khách Hàng (Tự động):" styleClass="dialog-label" />
-            <TextField fx:id="txtMa" editable="false" styleClass="bh-input" style="-fx-background-color: #e2e8f0;"/>
-        </VBox>
+    <children>
+        <HBox alignment="CENTER_LEFT" styleClass="ds-header-area">
+            <children>
+                <Label styleClass="ds-dialog-title" text="✨ THÊM KHÁCH HÀNG MỚI VÀO HỆ THỐNG " />
+            </children>
+        </HBox>
 
-        <VBox spacing="5">
-            <Label text="Họ tên khách hàng:" styleClass="dialog-label" />
-            <TextField fx:id="txtHoTen" styleClass="bh-input" promptText="Nhập họ và tên..." />
-            <Label fx:id="lblErrHoTen" textFill="RED" style="-fx-font-size: 11px;" managed="false" visible="false"/>
-        </VBox>
+        <VBox spacing="25.0">
+            <padding>
+                <Insets bottom="30.0" left="35.0" right="35.0" top="30.0" />
+            </padding>
+            <children>
+                <HBox spacing="40.0">
+                    <children>
+                        <VBox alignment="TOP_CENTER" spacing="15.0" />
 
-        <VBox spacing="5">
-            <Label text="Số điện thoại:" styleClass="dialog-label" />
-            <TextField fx:id="txtSdt" styleClass="bh-input" promptText="Nhập số điện thoại..." />
-            <Label fx:id="lblErrSdt" textFill="RED" style="-fx-font-size: 11px;" managed="false" visible="false"/>
-        </VBox>
-        
-        <VBox spacing="5">
-            <Label text="Địa chỉ:" styleClass="dialog-label" />
-            <TextField fx:id="txtDiaChi" styleClass="bh-input" promptText="Nhập địa chỉ..." />
-            <Label fx:id="lblErrDiaChi" textFill="RED" style="-fx-font-size: 11px;" managed="false" visible="false"/>
-        </VBox>
-        
-        <VBox spacing="5">
-            <Label text="Điểm tích lũy:" styleClass="dialog-label" />
-            <TextField fx:id="txtDiem" editable="false" text="0" styleClass="bh-input" style="-fx-background-color: #e2e8f0;"/>
-        </VBox>
-    </VBox>
+                        <GridPane hgap="15.0" vgap="20.0" HBox.hgrow="ALWAYS">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="120.0" />
+                                <ColumnConstraints hgrow="ALWAYS" />
+                                <ColumnConstraints minWidth="130.0" />
+                                <ColumnConstraints hgrow="ALWAYS" />
+                            </columnConstraints>
+                            <children>
+                                <Label text="Mã Khách Hàng:" GridPane.rowIndex="0" />
+                                <TextField fx:id="txtMa" disable="true" prefHeight="40.0" promptText="Mã tự động" 
+                                           styleClass="ds-input, ds-input-readonly" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-    <!-- Footer -->
-    <HBox alignment="CENTER_RIGHT" spacing="12" styleClass="dialog-footer">
-        <Button onAction="#handleDong" text="Hủy bỏ" styleClass="dialog-btn-cancel" />
-        <Button onAction="#handleLuu" text="Lưu thông tin" styleClass="dialog-btn-ok" />
-    </HBox>
+                                <Label text="Họ Tên Khách Hàng:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                                <VBox GridPane.columnIndex="3" GridPane.rowIndex="0">
+                                    <TextField fx:id="txtHoTen" prefHeight="40.0" promptText="Nhập họ và tên" styleClass="ds-input" />
+                                    <Label fx:id="lblErrHoTen" textFill="RED" style="-fx-font-size: 11px;" managed="false" visible="false" wrapText="true" maxWidth="300.0"/>
+                                </VBox>
+
+                                <Label text="Số Điện Thoại:" GridPane.rowIndex="1" />
+                                <VBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <TextField fx:id="txtSdt" prefHeight="40.0" promptText="Nhập số điện thoại" styleClass="ds-input" />
+                                    <Label fx:id="lblErrSdt" textFill="RED" style="-fx-font-size: 11px;" managed="false" visible="false" wrapText="true" maxWidth="300.0"/>
+                                </VBox>
+
+                                <Label text="Địa Chỉ:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                <VBox GridPane.columnIndex="3" GridPane.rowIndex="1">
+                                    <TextField fx:id="txtDiaChi" prefHeight="40.0" promptText="Nhập địa chỉ đầy đủ" styleClass="ds-input" />
+                                    <Label fx:id="lblErrDiaChi" textFill="RED" style="-fx-font-size: 11px;" managed="false" visible="false" wrapText="true" maxWidth="300.0"/>
+                                </VBox>
+
+                                <Label text="Điểm Tích Lũy:" GridPane.rowIndex="2" />
+                                <TextField fx:id="txtDiem" disable="true" text="0" prefHeight="40.0" 
+                                           styleClass="ds-input, ds-input-readonly" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                            </children>
+                            <rowConstraints>
+                                <RowConstraints />
+                                <RowConstraints />
+                                <RowConstraints />
+                            </rowConstraints>
+                        </GridPane>
+                    </children>
+                </HBox>
+
+                <HBox alignment="CENTER_RIGHT" spacing="20.0">
+                    <children>
+                        <Button onAction="#handleDong" prefHeight="50.0" prefWidth="160.0" 
+                                styleClass="ds-btn-cancel" text="Hủy Thao Tác" />
+                        <Button onAction="#handleLuu" prefHeight="50.0" prefWidth="250.0" 
+                                styleClass="ds-btn-save" text="LƯU KHÁCH HÀNG MỚI ✨" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
 </VBox>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefWidth="550.0" spacing="0.0" styleClass="ds-dialog-root" stylesheets="@../../resources/css/DanhMucThuoc.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.dialogs.Dialog_XoaKhachHangController">
+
+    <children>
+        <HBox alignment="CENTER_LEFT" styleClass="ds-header-danger-area">
+            <children>
+                <Label styleClass="ds-dialog-title" text="⚠ XÁC NHẬN XÓA KHÁCH HÀNG" />
+            </children>
+        </HBox>
+
+        <VBox alignment="CENTER" spacing="25.0">
+            <padding>
+                <Insets bottom="30" left="30" right="30" top="35" />
+            </padding>
+            <children>
+                
+                <Label style="-fx-font-size: 19px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="Bạn có chắc chắn muốn xóa khách hàng này?" />
+                
+                <VBox alignment="CENTER" spacing="8" style="-fx-background-color: #fef2f2; -fx-padding: 20; -fx-background-radius: 12; -fx-border-color: #fee2e2; -fx-border-radius: 12; -fx-border-width: 2;">
+                    <children>
+                        <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 13px;" text="Tên khách hàng đã chọn:" />
+                        <Label fx:id="lblTenKhachHang" style="-fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-font-size: 20px;" text="[Tên khách hàng]" textAlignment="CENTER" wrapText="true" />
+                    </children>
+                </VBox>
+
+                <Label style="-fx-text-fill: #64748b; -fx-font-style: italic; -fx-font-size: 13px;" text="Hành động này không thể hoàn tác trong tương lai!" />
+
+                <HBox alignment="CENTER" spacing="20.0">
+                    <children>
+                        <Button fx:id="btnHuy" onAction="#handleHuy" prefHeight="48.0" prefWidth="150.0" style="-fx-font-weight: bold;" styleClass="ds-btn-cancel" text="Quay Lại" />
+                        <Button onAction="#handleXoa" prefHeight="48.0" prefWidth="180.0" styleClass="ds-btn-danger" text="VẪN XÓA 🔥" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</VBox>

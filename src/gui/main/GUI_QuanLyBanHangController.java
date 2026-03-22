@@ -314,7 +314,7 @@ public class GUI_QuanLyBanHangController {
                         }
                     }
                     String nextIdSeq = String.format("KH%03d", max + 1);
-                    controller.setKhachHang(null, nextIdSeq);
+                    controller.setMaKhachHang(nextIdSeq);
                     controller.setSdt(sdt);
                     
                     Stage dialogStage = new Stage();
@@ -646,7 +646,7 @@ public class GUI_QuanLyBanHangController {
                             } catch (Exception e) {}
                         }
                     }
-                    controller.setKhachHang(null, String.format("KH%03d", max + 1));
+                    controller.setMaKhachHang(String.format("KH%03d", max + 1));
                     controller.setSdt(sdt);
                     Stage stg = new Stage();
                     stg.initModality(Modality.APPLICATION_MODAL);
