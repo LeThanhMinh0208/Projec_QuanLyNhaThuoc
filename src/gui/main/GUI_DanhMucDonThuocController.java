@@ -35,14 +35,13 @@ public class GUI_DanhMucDonThuocController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        colMaDon.setCellValueFactory(new PropertyValueFactory<>("maDonThuoc"));       
+        colMaDon.setCellValueFactory(new PropertyValueFactory<>("maDonThuoc"));
         colBacSi.setCellValueFactory(new PropertyValueFactory<>("tenBacSi"));
         colChanDoan.setCellValueFactory(new PropertyValueFactory<>("chanDoan"));
         colBenhNhan.setCellValueFactory(new PropertyValueFactory<>("thongTinBenhNhan"));
         colHinhAnh.setCellValueFactory(new PropertyValueFactory<>("hinhAnhDon"));
         colMaHoaDon.setCellValueFactory(new PropertyValueFactory<>("maHoaDon"));
-        cbLocDanhMuc.setItems(FXCollections.observableArrayList(dao.getDanhSachBacSi()));
-        cbLocDanhMuc.getSelectionModel().selectFirst();
+
         cbLocDanhMuc.setOnAction(e -> locTheoBacSi());
 
         txtTimKiem.textProperty().addListener((obs, oldVal, newVal) -> {
@@ -53,21 +52,60 @@ public class GUI_DanhMucDonThuocController implements Initializable {
             }
         });
 
+        // Double click mở form Cập Nhật
+        tableThuoc.setRowFactory(tv -> {
+            TableRow<DonThuoc> row = new TableRow<>();
+
+            row.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
+                if (event.getClickCount() == 1 && (!row.isEmpty()) && row.isSelected()) {
+                    tv.getSelectionModel().clearSelection();
+                    tv.getFocusModel().focus(-1);
+                    tableThuoc.getParent().requestFocus();
+                    event.consume();
+                }
+            });
+
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    handleSua();
+                }
+            });
+
+            return row;
+        });
+
         taiDuLieu();
     }
 
     private void taiDuLieu() {
+        // Lưu lại bác sĩ đang chọn
+        String bacSiDangChon = cbLocDanhMuc.getValue();
+
+        // Reload combobox
+        cbLocDanhMuc.setOnAction(null); // tắt listener tạm để tránh trigger
+        cbLocDanhMuc.setItems(FXCollections.observableArrayList(dao.getDanhSachBacSi()));
+
+        // Giữ lại lựa chọn cũ nếu còn tồn tại, không thì chọn "Tất cả bác sĩ"
+        if (bacSiDangChon != null && cbLocDanhMuc.getItems().contains(bacSiDangChon)) {
+            cbLocDanhMuc.setValue(bacSiDangChon);
+        } else {
+            cbLocDanhMuc.getSelectionModel().selectFirst();
+        }
+        cbLocDanhMuc.setOnAction(e -> locTheoBacSi()); // bật lại listener
+
+        // Reload table
         danhSach.setAll(dao.getAll());
         tableThuoc.setItems(danhSach);
     }
 
     private void locTheoBacSi() {
         String selected = cbLocDanhMuc.getValue();
-        if (selected == null || selected.equals("Tất cả bác sĩ")) taiDuLieu();
-        else {
-            danhSach.setAll(dao.timKiem(selected));
-            tableThuoc.setItems(danhSach);
+        if (selected == null || selected.equals("Tất cả bác sĩ")) {
+            danhSach.setAll(dao.getAll());
+        } else {
+            danhSach.setAll(dao.locTheoBacSi(selected)); // dùng method mới lọc chính xác
         }
+        tableThuoc.setItems(danhSach);
     }
 
     @FXML
@@ -99,7 +137,7 @@ public class GUI_DanhMucDonThuocController implements Initializable {
         confirm.showAndWait().ifPresent(btn -> {
             if (btn == ButtonType.YES) {
                 if (dao.xoa(selected.getMaDonThuoc())) {
-                    danhSach.remove(selected);
+                    taiDuLieu(); // reload luôn cả combobox
                     new Alert(Alert.AlertType.INFORMATION, "Xóa thành công!", ButtonType.OK).showAndWait();
                 } else {
                     showWarn("Xóa thất bại!");
@@ -114,7 +152,7 @@ public class GUI_DanhMucDonThuocController implements Initializable {
                 getClass().getResource("/gui/dialogs/Dialog_DonThuoc.fxml"));
             Parent root = loader.load();
             Dialog_DonThuocController ctrl = loader.getController();
-            ctrl.setOnSuccess(this::taiDuLieu);
+            ctrl.setOnSuccess(this::taiDuLieu); // callback reload cả combobox lẫn table
             if (donThuocSua != null) ctrl.setDonThuocSua(donThuocSua);
 
             Stage stage = new Stage();

@@ -19,7 +19,23 @@ public class DAO_DanhMucDonThuoc {
             rs.getString("thongTinBenhNhan")
         );
     }
-
+    public ArrayList<DonThuoc> locTheoBacSi(String tenBacSi) {
+        ArrayList<DonThuoc> list = new ArrayList<>();
+        String sql = "SELECT * FROM DonThuoc WHERE tenBacSi = ?"; // dùng = thay vì LIKE
+        Connection con = ConnectDB.getConnection();
+        try {
+            try (PreparedStatement pst = con.prepareStatement(sql)) {
+                pst.setString(1, tenBacSi);
+                try (ResultSet rs = pst.executeQuery()) {
+                    while (rs.next()) list.add(mapRow(rs));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi locTheoBacSi: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
+    }
     public String taoMaMoi() throws Exception {
         String sql = "SELECT MAX(maDonThuoc) FROM DonThuoc";
         Connection con = ConnectDB.getConnection();

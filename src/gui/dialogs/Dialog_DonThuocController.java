@@ -28,12 +28,13 @@ public class Dialog_DonThuocController {
     public void setDonThuocSua(DonThuoc dt) {
         this.donThuocSua = dt;
         if (dt != null) {
-            // Chế độ SỬA: điền sẵn dữ liệu vào form
             lblTieuDe.setText("SỬA ĐƠN THUỐC");
             txtMaDon.setText(dt.getMaDonThuoc());
             txtMaDon.setEditable(false);
             txtMaDon.setStyle("-fx-background-color: #e0e0e0;");
             txtMaHoaDon.setText(dt.getMaHoaDon());
+            txtMaHoaDon.setEditable(false); // 🔒 Khóa không cho sửa
+            txtMaHoaDon.setStyle("-fx-background-color: #e0e0e0;");
             txtBacSi.setText(dt.getTenBacSi());
             txtChanDoan.setText(dt.getChanDoan());
             txtBenhNhan.setText(dt.getThongTinBenhNhan());
@@ -58,27 +59,38 @@ public class Dialog_DonThuocController {
 
     @FXML
     private void handleLuu() {
-        // Ràng buộc 1: Mã đơn thuốc
-        if (txtMaDon.getText().trim().isEmpty()) {
-            showAlert("❌ Mã đơn thuốc không được để trống!"); return;
-        }
+        StringBuilder loi = new StringBuilder();
 
-        // Ràng buộc 2: Tên bác sĩ
-        if (txtBacSi.getText().trim().isEmpty()) {
-            showAlert("❌ Tên bác sĩ không được để trống!"); return;
-        }
+        if (txtMaDon.getText().trim().isEmpty())
+            loi.append("❌ Mã đơn thuốc không được để trống!\n");
 
-        // Ràng buộc 3: Thông tin bệnh nhân
-        if (txtBenhNhan.getText().trim().isEmpty()) {
-            showAlert("❌ Thông tin bệnh nhân không được để trống!"); return;
-        }
+        if (txtBacSi.getText().trim().isEmpty())
+            loi.append("❌ Tên bác sĩ không được để trống!\n");
 
-        // Ràng buộc 4: Mã hóa đơn phải tồn tại trong DB
+        if (txtChanDoan.getText().trim().isEmpty())
+            loi.append("❌ Chẩn đoán không được để trống!\n");
+
+        if (txtBenhNhan.getText().trim().isEmpty())
+            loi.append("❌ Thông tin bệnh nhân không được để trống!\n");
+
         String maHoaDon = txtMaHoaDon.getText().trim();
-        if (!maHoaDon.isEmpty() && !dao.kiemTraMaHoaDonTonTai(maHoaDon)) {
-            showAlert("❌ Mã hóa đơn '" + maHoaDon + "' không tồn tại trong hệ thống!\n"
-                    + "👉 Vui lòng kiểm tra lại mã hóa đơn trong danh sách Hóa Đơn."); 
+        if (donThuocSua == null) {
+            if (maHoaDon.isEmpty()) {
+                loi.append("❌ Mã hóa đơn không được để trống!\n");
+            } else if (!dao.kiemTraMaHoaDonTonTai(maHoaDon)) {
+                loi.append("❌ Mã hóa đơn '" + maHoaDon + "' không tồn tại trong hệ thống!\n");
+            }
+        }
+
+        // Nếu có lỗi thì hiện tất cả 1 lần
+        if (loi.length() > 0) {
+            showAlert(loi.toString());
             return;
+        }
+
+        // Chế độ SỬA: dùng lại mã hóa đơn gốc
+        if (donThuocSua != null) {
+            maHoaDon = donThuocSua.getMaHoaDon();
         }
 
         try {
@@ -96,17 +108,13 @@ public class Dialog_DonThuocController {
                 if (onSuccess != null) onSuccess.run();
                 ((Stage) txtMaDon.getScene().getWindow()).close();
             } else {
-                showAlert("❌ Lưu thất bại!\n"
-                        + "👉 Kiểm tra lại:\n"
-                        + "   • Mã hóa đơn có tồn tại không?\n"
-                        + "   • Kết nối database có ổn không?");
+                showAlert("❌ Lưu thất bại!\n👉 Kiểm tra lại kết nối database.");
             }
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("❌ Lỗi hệ thống: " + e.getMessage());
         }
     }
-
     @FXML
     private void handleHuy() {
         ((Stage) txtMaDon.getScene().getWindow()).close();

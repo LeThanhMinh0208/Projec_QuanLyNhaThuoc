@@ -13,7 +13,7 @@
    </stylesheets>
 
    <VBox styleClass="ds-header-area">
-      <Label fx:id="lblTieuDe" styleClass="ds-dialog-title" text="THIÊM ĐƠN THUỐC MỚI" />
+      <Label fx:id="lblTieuDe" styleClass="ds-dialog-title" text="THÊM ĐƠN THUỐC MỚI" />
    </VBox>
 
    <VBox spacing="14.0">
@@ -22,7 +22,7 @@
 
          <HBox spacing="16.0">
             <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-               <Label text="Mã Đơn Thuốc *" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
+               <Label text="Mã Đơn Thuốc " style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
                <TextField fx:id="txtMaDon" styleClass="ds-input" prefHeight="40.0"
                           promptText="VD: DT260226001" maxWidth="Infinity" />
             </VBox>
@@ -34,7 +34,7 @@
          </HBox>
 
          <VBox spacing="5.0">
-            <Label text="Têm Bác Sĩ *" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
+            <Label text="Têm Bác Sĩ " style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
             <TextField fx:id="txtBacSi" styleClass="ds-input" prefHeight="40.0"
                        promptText="VD: BS. Nguyễn Văn A" maxWidth="Infinity" />
          </VBox>
@@ -47,7 +47,7 @@
          </VBox>
 
          <VBox spacing="5.0">
-            <Label text="Thông Tin Bệnh Nhân *" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
+            <Label text="Thông Tin Bệnh Nhân " style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
             <TextArea fx:id="txtBenhNhan" styleClass="ds-input"
                       prefHeight="75.0" wrapText="true"
                       promptText="Họ tên, tuổi, địa chỉ bệnh nhân..." />
@@ -58,7 +58,7 @@
             <HBox spacing="10.0" alignment="CENTER_LEFT">
                <TextField fx:id="txtHinhAnh" styleClass="ds-input"
                           promptText="Đường dẫn ảnh..." prefHeight="40.0" HBox.hgrow="ALWAYS" />
-               <Button onAction="#handleChonAnh" text="Chon"
+               <Button onAction="#handleChonAnh" text="Chọn"
                        prefHeight="40.0" styleClass="ds-btn-cancel"
                        style="-fx-cursor:hand;" />
             </HBox>
@@ -66,9 +66,9 @@
 
          <HBox spacing="12.0" alignment="CENTER_RIGHT">
             <padding><Insets top="8.0" /></padding>
-            <Button onAction="#handleHuy" text="Huy"
+            <Button onAction="#handleHuy" text="Hủy"
                     prefHeight="42.0" prefWidth="110.0" styleClass="ds-btn-cancel" />
-            <Button fx:id="btnLuu" onAction="#handleLuu" text="Luu"
+            <Button fx:id="btnLuu" onAction="#handleLuu" text="Lưu"
                     prefHeight="42.0" prefWidth="140.0" styleClass="ds-btn-save" />
          </HBox>
 
