@@ -20,7 +20,6 @@ public class DAO_DanhMucDonThuoc {
         );
     }
 
-    // Hàm tạo mã mới tự động
     public String taoMaMoi() throws Exception {
         String sql = "SELECT MAX(maDonThuoc) FROM DonThuoc";
         Connection con = ConnectDB.getConnection();
@@ -147,5 +146,22 @@ public class DAO_DanhMucDonThuoc {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public boolean kiemTraMaHoaDonTonTai(String maHoaDon) {
+        String sql = "SELECT COUNT(*) FROM HoaDon WHERE maHoaDon = ?";
+        Connection con = ConnectDB.getConnection();
+        try {
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, maHoaDon);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) return rs.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi kiemTraMaHoaDonTonTai: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
     }
 }

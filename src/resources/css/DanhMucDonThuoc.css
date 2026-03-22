@@ -1,23 +1,15 @@
 /* ================================================
    DANH MỤC ĐƠN THUỐC - CSS
-   Tông màu chủ: Tím/Indigo để phân biệt với Thuốc
+   Giống y hệt DanhMucThuoc
    ================================================ */
 
-/* --- 1. TIÊU ĐỀ TRANG --- */
-.main-title {
-    -fx-font-size: 28px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #3730a3;
-    -fx-effect: dropshadow(one-pass-box, rgba(55,48,163,0.2), 4, 0, 0, 2);
-}
-
-/* --- 2. NÚT HÀNH ĐỘNG (Thêm / Sửa / Xoá) --- */
+/* --- NÚT HÀNH ĐỘNG --- */
 .btn-action {
     -fx-font-weight: bold;
-    -fx-font-size: 16px;
+    -fx-font-size: 18px;
     -fx-padding: 10 0;
     -fx-cursor: hand;
-    -fx-background-radius: 12;
+    -fx-background-radius: 20px;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 8, 0, 0, 3);
 }
 .btn-action:hover {
@@ -25,43 +17,40 @@
     -fx-scale-y: 1.03;
 }
 
-/* Nút Thêm - Xanh lá */
 .card-green {
-    -fx-background-color: linear-gradient(to bottom right, #16a34a, #15803d);
+    -fx-background-color: linear-gradient(to bottom right, #10b981, #34d399);
 }
 .card-green:hover {
-    -fx-background-color: linear-gradient(to bottom right, #22c55e, #16a34a);
+    -fx-background-color: linear-gradient(to bottom right, #34d399, #10b981);
 }
 
-/* Nút Sửa - Xanh dương */
 .card-blue {
-    -fx-background-color: linear-gradient(to bottom right, #2563eb, #1d4ed8);
+    -fx-background-color: linear-gradient(to bottom right, #0ea5e9, #38bdf8);
 }
 .card-blue:hover {
-    -fx-background-color: linear-gradient(to bottom right, #3b82f6, #2563eb);
+    -fx-background-color: linear-gradient(to bottom right, #38bdf8, #0ea5e9);
 }
 
-/* Nút Xoá - Cam */
 .card-orange {
-    -fx-background-color: linear-gradient(to bottom right, #ea580c, #c2410c);
+    -fx-background-color: linear-gradient(to bottom right, #f59e0b, #fbbf24);
 }
 .card-orange:hover {
-    -fx-background-color: linear-gradient(to bottom right, #f97316, #ea580c);
+    -fx-background-color: linear-gradient(to bottom right, #fbbf24, #f59e0b);
 }
 
-/* --- 3. THANH TÌM KIẾM --- */
+/* --- THANH TÌM KIẾM --- */
 .search-box {
     -fx-background-color: white;
-    -fx-border-color: #c7d2fe;
+    -fx-border-color: #bae6fd;
     -fx-border-radius: 10;
     -fx-background-radius: 10;
     -fx-padding: 0 12;
-    -fx-effect: dropshadow(three-pass-box, rgba(99,102,241,0.1), 8, 0, 0, 2);
+    -fx-effect: dropshadow(three-pass-box, rgba(14,165,233,0.1), 8, 0, 0, 2);
 }
 
 .search-icon {
-    -fx-font-size: 18px;
-    -fx-text-fill: #6366f1;
+    -fx-font-size: 20px;
+    -fx-text-fill: #0ea5e9;
     -fx-padding: 0 8 0 0;
 }
 
@@ -69,109 +58,23 @@
     -fx-background-color: transparent;
     -fx-border-color: transparent;
     -fx-font-size: 14px;
-    -fx-text-fill: #1e1b4b;
-    -fx-prompt-text-fill: #a5b4fc;
+    -fx-text-fill: #0c4a6e;
+    -fx-prompt-text-fill: #7dd3fc;
 }
 
-/* --- 4. COMBOBOX LỌC BÁC SĨ --- */
+/* --- COMBOBOX --- */
 .combo-box {
     -fx-background-color: white;
-    -fx-border-color: #c7d2fe;
-    -fx-border-radius: 10;
-    -fx-background-radius: 10;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
     -fx-cursor: hand;
     -fx-font-size: 14px;
     -fx-padding: 4 8;
-    -fx-effect: dropshadow(three-pass-box, rgba(99,102,241,0.1), 6, 0, 0, 2);
 }
 .combo-box:hover {
-    -fx-border-color: #6366f1;
+    -fx-border-color: #0ea5e9;
 }
 .combo-box .list-cell {
-    -fx-text-fill: #3730a3;
-}
-
-/* --- 5. PANEL TRẮNG CHỨA TABLE --- */
-.panel-white {
-    -fx-background-color: white;
-    -fx-background-radius: 14;
-    -fx-border-radius: 14;
-    -fx-border-color: #e0e7ff;
-    -fx-border-width: 1.5;
-    -fx-effect: dropshadow(three-pass-box, rgba(99,102,241,0.1), 16, 0, 0, 6);
-    -fx-padding: 16;
-}
-
-/* --- 6. TABLE VIEW --- */
-.table-view {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
-    -fx-table-cell-border-color: #e0e7ff;
-}
-
-/* Header cột */
-.table-view .column-header-background {
-    -fx-background-color: linear-gradient(to right, #4338ca, #6366f1);
-    -fx-background-radius: 8 8 0 0;
-}
-.table-view .column-header .label {
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-font-size: 13px;
-    -fx-padding: 12 8;
-}
-
-/* Dòng chẵn/lẻ xen kẽ */
-.table-row-cell:even {
-    -fx-background-color: #f5f3ff;
-}
-.table-row-cell:odd {
-    -fx-background-color: white;
-}
-
-/* Hover dòng */
-.table-row-cell:hover {
-    -fx-background-color: #e0e7ff;
-    -fx-cursor: hand;
-}
-
-/* Dòng được chọn */
-.table-row-cell:selected {
-    -fx-background-color: linear-gradient(to right, #6366f1, #818cf8);
-}
-.table-row-cell:selected .table-cell {
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-}
-
-/* Cell chữ */
-.table-cell {
-    -fx-font-size: 13px;
-    -fx-text-fill: #1e1b4b;
-    -fx-padding: 8 10;
-    -fx-alignment: CENTER_LEFT;
-}
-
-/* Ẩn scrollbar ngang xấu */
-.table-view .virtual-flow .scroll-bar:horizontal {
-    -fx-opacity: 0.4;
-}
-.table-view .virtual-flow .scroll-bar:vertical {
-    -fx-opacity: 0.4;
-}
-
-/* --- 7. SCROLLBAR DỌC --- */
-.scroll-bar:vertical .thumb {
-    -fx-background-color: #a5b4fc;
-    -fx-background-radius: 6;
-}
-.scroll-bar:vertical .track {
-    -fx-background-color: #e0e7ff;
-}
-
-/* --- 8. PLACEHOLDER KHI BẢNG TRỐNG --- */
-.table-view .placeholder .label {
-    -fx-font-size: 15px;
-    -fx-text-fill: #a5b4fc;
-    -fx-font-style: italic;
+    -fx-text-fill: #0369a1;
 }

@@ -13,7 +13,7 @@
    </stylesheets>
 
    <VBox styleClass="ds-header-area">
-      <Label fx:id="lblTieuDe" styleClass="ds-dialog-title" text="THEM DON THUOC MOI" />
+      <Label fx:id="lblTieuDe" styleClass="ds-dialog-title" text="THIÊM ĐƠN THUỐC MỚI" />
    </VBox>
 
    <VBox spacing="14.0">
@@ -22,42 +22,42 @@
 
          <HBox spacing="16.0">
             <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-               <Label text="Ma Don Thuoc *" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
+               <Label text="Mã Đơn Thuốc *" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
                <TextField fx:id="txtMaDon" styleClass="ds-input" prefHeight="40.0"
                           promptText="VD: DT260226001" maxWidth="Infinity" />
             </VBox>
             <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-               <Label text="Ma Hoa Don" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
+               <Label text="Mã Hóa Đơn" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
                <TextField fx:id="txtMaHoaDon" styleClass="ds-input" prefHeight="40.0"
                           promptText="VD: HD001" maxWidth="Infinity" />
             </VBox>
          </HBox>
 
          <VBox spacing="5.0">
-            <Label text="Ten Bac Si *" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
+            <Label text="Têm Bác Sĩ *" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
             <TextField fx:id="txtBacSi" styleClass="ds-input" prefHeight="40.0"
-                       promptText="VD: BS. Nguyen Van A" maxWidth="Infinity" />
+                       promptText="VD: BS. Nguyễn Văn A" maxWidth="Infinity" />
          </VBox>
 
          <VBox spacing="5.0">
-            <Label text="Chan Doan" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
+            <Label text="Chẩn Đoán" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
             <TextArea fx:id="txtChanDoan" styleClass="ds-input"
                       prefHeight="75.0" wrapText="true"
-                      promptText="Nhap chan doan cua bac si..." />
+                      promptText="Nhập chuẩn đoán của bác sĩ..." />
          </VBox>
 
          <VBox spacing="5.0">
-            <Label text="Thong Tin Benh Nhan *" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
+            <Label text="Thông Tin Bệnh Nhân *" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
             <TextArea fx:id="txtBenhNhan" styleClass="ds-input"
                       prefHeight="75.0" wrapText="true"
-                      promptText="Ho ten, tuoi, dia chi benh nhan..." />
+                      promptText="Họ tên, tuổi, địa chỉ bệnh nhân..." />
          </VBox>
 
          <VBox spacing="5.0">
-            <Label text="Hinh Anh Don" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
+            <Label text="Hình Ảnh Đơn" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
             <HBox spacing="10.0" alignment="CENTER_LEFT">
                <TextField fx:id="txtHinhAnh" styleClass="ds-input"
-                          promptText="Duong dan anh..." prefHeight="40.0" HBox.hgrow="ALWAYS" />
+                          promptText="Đường dẫn ảnh..." prefHeight="40.0" HBox.hgrow="ALWAYS" />
                <Button onAction="#handleChonAnh" text="Chon"
                        prefHeight="40.0" styleClass="ds-btn-cancel"
                        style="-fx-cursor:hand;" />

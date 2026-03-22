@@ -58,18 +58,30 @@ public class Dialog_DonThuocController {
 
     @FXML
     private void handleLuu() {
+        // Ràng buộc 1: Mã đơn thuốc
         if (txtMaDon.getText().trim().isEmpty()) {
-            showAlert("Mã đơn thuốc không được để trống!"); return;
+            showAlert("❌ Mã đơn thuốc không được để trống!"); return;
         }
+
+        // Ràng buộc 2: Tên bác sĩ
         if (txtBacSi.getText().trim().isEmpty()) {
-            showAlert("Tên bác sĩ không được để trống!"); return;
+            showAlert("❌ Tên bác sĩ không được để trống!"); return;
         }
+
+        // Ràng buộc 3: Thông tin bệnh nhân
         if (txtBenhNhan.getText().trim().isEmpty()) {
-            showAlert("Thông tin bệnh nhân không được để trống!"); return;
+            showAlert("❌ Thông tin bệnh nhân không được để trống!"); return;
+        }
+
+        // Ràng buộc 4: Mã hóa đơn phải tồn tại trong DB
+        String maHoaDon = txtMaHoaDon.getText().trim();
+        if (!maHoaDon.isEmpty() && !dao.kiemTraMaHoaDonTonTai(maHoaDon)) {
+            showAlert("❌ Mã hóa đơn '" + maHoaDon + "' không tồn tại trong hệ thống!\n"
+                    + "👉 Vui lòng kiểm tra lại mã hóa đơn trong danh sách Hóa Đơn."); 
+            return;
         }
 
         try {
-            String maHoaDon = txtMaHoaDon.getText().trim();
             DonThuoc dt = new DonThuoc(
                 txtMaDon.getText().trim(),
                 maHoaDon.isEmpty() ? null : maHoaDon,
@@ -84,11 +96,14 @@ public class Dialog_DonThuocController {
                 if (onSuccess != null) onSuccess.run();
                 ((Stage) txtMaDon.getScene().getWindow()).close();
             } else {
-                showAlert("Lưu thất bại! Kiểm tra lại dữ liệu.");
+                showAlert("❌ Lưu thất bại!\n"
+                        + "👉 Kiểm tra lại:\n"
+                        + "   • Mã hóa đơn có tồn tại không?\n"
+                        + "   • Kết nối database có ổn không?");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Lỗi: " + e.getMessage());
+            showAlert("❌ Lỗi hệ thống: " + e.getMessage());
         }
     }
 
