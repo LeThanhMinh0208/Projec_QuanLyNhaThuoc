@@ -70,7 +70,8 @@ public class GUI_TrangChuController {
         colTenThuoc.setCellValueFactory(new PropertyValueFactory<>("tenThuoc"));
         colTrieuChung.setCellValueFactory(new PropertyValueFactory<>("trieuChung"));
         colDVT.setCellValueFactory(new PropertyValueFactory<>("donViCoBan"));
-     // --- 1. CỘT KÊ ĐƠN (Gán tên Class màu sắc) ---
+        
+        // --- 1. CỘT KÊ ĐƠN (Gán tên Class màu sắc) ---
         colKeDon.setCellValueFactory(new PropertyValueFactory<>("canKeDon"));
         colKeDon.setCellFactory(column -> new TableCell<>() {
             @Override
@@ -83,8 +84,6 @@ public class GUI_TrangChuController {
                     setText(null);
                 } else {
                     setText(item ? "Có" : "Không");
-                    setStyle(item ? "-fx-text-fill: #e74c3c; -fx-font-weight: bold;"
-                            : "-fx-text-fill: #27ae60; -fx-font-weight: bold;");
                     // Gán tên class màu
                     getStyleClass().add(item ? "text-do" : "text-xanh-la");
                 }
@@ -149,7 +148,8 @@ public class GUI_TrangChuController {
                 }
             }
         });
-     // --- LOGIC CLICK CHUỘT THÔNG MINH (TOGGLE SELECTION & XÓA FOCUS) ---
+        
+        // --- LOGIC CLICK CHUỘT THÔNG MINH (TOGGLE SELECTION & XÓA FOCUS) ---
         tableThuoc.setRowFactory(tv -> {
             TableRow<Thuoc> row = new TableRow<>();
             row.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
@@ -231,9 +231,7 @@ public class GUI_TrangChuController {
     // --- [3] CẬP NHẬT 3: THÊM HÀM XỬ LÝ NÚT BẤM "TRANG CHỦ" ---
     @FXML
     void handleVeTrangChu(ActionEvent event) {
-
         loadDataTrangChu();
-
         if (noiDungTrangChuGoc != null) {
             mainBorderPane.setCenter(noiDungTrangChuGoc);
         }
@@ -258,8 +256,7 @@ public class GUI_TrangChuController {
 
     @FXML
     void handleMoQuanLyDanhMucThuoc(ActionEvent event) {
-
-        switchPage("/gui/main/GUI_DanhMucThuoc.fxml");
+        utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucThuoc.fxml");
     }
 
     @FXML
@@ -277,6 +274,27 @@ public class GUI_TrangChuController {
         switchPage("/gui/main/GUI_QuanLyKhachHang.fxml");
     }
 
+    @FXML
+    void moTrangDanhMucKho(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucKho.fxml");
+    }
+
+    @FXML
+    void moTrangNhapKho(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_NhapKho.fxml");
+    }
+    
+    @FXML
+    void moTrangXuatKho(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_XuatKho.fxml");
+    }
+    
+    @FXML
+    void moQuanLyDonNhapHang(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyDonNhapHang.fxml");
+    }
+
+    // Hàm switchPage custom dành riêng cho những view cần ép kiểu Controller
     public void switchPage(String fxmlPath) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
@@ -296,25 +314,6 @@ public class GUI_TrangChuController {
             System.err.println("Lỗi nạp file FXML: " + fxmlPath);
             e.printStackTrace();
         }
-        utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucThuoc.fxml");
-    }
-
-    @FXML
-    void moTrangDanhMucKho(ActionEvent event) {
-        utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucKho.fxml");
-    }
-
-    @FXML
-    void moTrangNhapKho(ActionEvent event) {
-        utils.SceneUtils.switchPage("/gui/main/GUI_NhapKho.fxml");
-    }
-    @FXML
-    void moTrangXuatKho(ActionEvent event) {
-        utils.SceneUtils.switchPage("/gui/main/GUI_XuatKho.fxml");
-    }
-    @FXML
-    void moQuanLyDonNhapHang(ActionEvent event) {
-        utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyDonNhapHang.fxml");
     }
 
     public void loadDataTrangChu() {

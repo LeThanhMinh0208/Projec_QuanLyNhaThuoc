@@ -2,11 +2,12 @@ package dao;
 
 import connectDB.ConnectDB;
 import entity.DonViQuyDoi;
-import entity.Thuoc;
 
-import java.sql.Connection;
+
+import java.sql.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class DAO_DonViQuyDoi {
@@ -24,19 +25,7 @@ public class DAO_DonViQuyDoi {
                 String tenDonVi = rs.getString("tenDonVi");
                 int tyLeQuyDoi = rs.getInt("tyLeQuyDoi");
                 double giaBan = rs.getDouble("giaBan");
-                ds.add(new DonViQuyDoi(maQuyDoi, maT, tenDonVi, tyLeQuyDoi, giaBan));
-//                DonViQuyDoi dv = new DonViQuyDoi();
-//                dv.setMaQuyDoi(rs.getString("maQuyDoi"));
-//                
-//                Thuoc t = new Thuoc();
-//                t.setMaThuoc(rs.getString("maThuoc"));
-//                dv.setThuoc(t);
-//                
-//                dv.setTenDonVi(rs.getString("tenDonVi"));
-//                dv.setTyLeQuyDoi(rs.getInt("tyLeQuyDoi"));
-//                dv.setGiaBan(rs.getDouble("giaBan"));
-//                
-//                list.add(dv);
+                list.add(new DonViQuyDoi(maQuyDoi, maT, tenDonVi, tyLeQuyDoi, giaBan));
             }
         } catch (Exception e) {
             e.printStackTrace();

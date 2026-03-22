@@ -4,9 +4,11 @@ import connectDB.ConnectDB;
 import entity.LoThuoc;
 import entity.Thuoc;
 
+import java.sql.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class DAO_LoThuoc {
@@ -118,7 +120,7 @@ public class DAO_LoThuoc {
                 lo.setSoLuongTon(rs.getInt("soLuongTon"));
                 lo.setGiaNhap(rs.getDouble("giaNhap"));
                 String viTri = rs.getString("viTriKho");
-                lo.setViTriKho(viTri != null ? ViTriKho.valueOf(viTri) : null);
+                lo.setViTriKho(viTri);
 
                 Thuoc t = new Thuoc();
                 t.setMaThuoc(rs.getString("maThuoc"));
