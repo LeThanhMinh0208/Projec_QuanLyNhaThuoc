@@ -5,11 +5,10 @@ module QuanLyNhaThuoc_LongNguyen {
     requires java.sql;
     requires com.microsoft.sqlserver.jdbc;
     requires java.desktop;
-    
 
-    requires itextpdf; 
+    requires com.github.librepdf.openpdf;
 
-    opens service to itextpdf;
+    opens service to com.github.librepdf.openpdf;
 
     opens gui.main to javafx.fxml;
     opens gui.dialogs to javafx.fxml;

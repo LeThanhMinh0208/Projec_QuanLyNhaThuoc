@@ -46,25 +46,14 @@
             </TitledPane>
 
             <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Quản Lý Đơn Thuốc">
-<<<<<<< HEAD
-   <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/icon_donthuoc.png" /></ImageView></graphic>
-   <content>
-      <VBox styleClass="dropdown-content">
-         <Button onAction="#handleMoQuanLyDonThuoc" styleClass="sub-btn" text="Danh Mục Đơn Thuốc" />
-         <Button styleClass="sub-btn" text="Tái Lập Đơn Thuốc" />
-      </VBox>
-   </content>
-</TitledPane>
-=======
                <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/icon_donthuoc.png" /></ImageView></graphic>
                <content>
                   <VBox styleClass="dropdown-content">
-                     <Button styleClass="sub-btn" text="Danh Mục Đơn Thuốc " />
+                     <Button onAction="#handleMoQuanLyDonThuoc" styleClass="sub-btn" text="Danh Mục Đơn Thuốc" />
                      <Button styleClass="sub-btn" text="Tái Lập Đơn Thuốc" />
                   </VBox>
                </content>
             </TitledPane>
->>>>>>> main
 
             <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Quản Lý Thuốc">
                <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/thuoc.png" /></ImageView></graphic>
@@ -73,30 +62,25 @@
                      <Button onAction="#handleMoQuanLyDanhMucThuoc" styleClass="sub-btn" text="Danh Mục Thuốc" />
                      <Button styleClass="sub-btn" text="Theo Dõi Hạn Sử Dụng" />
                      <Button styleClass="sub-btn" text="Quản Lý Lô Thuốc" />
-                     
                   </VBox>
                </content>
             </TitledPane>
-            
-              <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Quản Lý Kho">
+
+            <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Quản Lý Kho">
                <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/warehouse.png" /></ImageView></graphic>
                <content>
                   <VBox styleClass="dropdown-content">
                      <Button onAction="#moTrangDanhMucKho" styleClass="sub-btn" text="Danh Mục Kho" />
                      <Button onAction="#moQuanLyDonNhapHang" styleClass="sub-btn" text="Quản Lý Đơn Nhập Hàng" />
                      <Button onAction="#moTrangNhapKho" styleClass="sub-btn" text="Nhập Kho" />
-<<<<<<< HEAD
-                     <Button styleClass="sub-btn" text="Xuất Kho" />
-=======
                      <Button onAction="#moTrangXuatKho" styleClass="sub-btn" text="Xuất Kho" />
->>>>>>> main
                      <Button styleClass="sub-btn" text="Kiểm Kê Kho" />
                      <Button styleClass="sub-btn" text="Giải Quyết Kiểm Kho" />
                   </VBox>
                </content>
             </TitledPane>
-            
-                <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Quản Lý Khách Hàng">
+
+            <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Quản Lý Khách Hàng">
                <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/customer.png" /></ImageView></graphic>
                <content>
                   <VBox styleClass="dropdown-content">
@@ -105,8 +89,8 @@
                   </VBox>
                </content>
             </TitledPane>
-            
-                <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Quản Lý Nhà Cung Cấp">
+
+            <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Quản Lý Nhà Cung Cấp">
                <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/supplier.png" /></ImageView></graphic>
                <content>
                   <VBox styleClass="dropdown-content">
@@ -117,8 +101,8 @@
                   </VBox>
                </content>
             </TitledPane>
-            
-                <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Quản Lý Người Dùng">
+
+            <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Quản Lý Người Dùng">
                <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/users.png" /></ImageView></graphic>
                <content>
                   <VBox styleClass="dropdown-content">
@@ -130,8 +114,8 @@
                   </VBox>
                </content>
             </TitledPane>
-            
-                <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Báo Cáo Thống Kê">
+
+            <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Báo Cáo Thống Kê">
                <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/baocao.png" /></ImageView></graphic>
                <content>
                   <VBox styleClass="dropdown-content">
@@ -141,6 +125,7 @@
                   </VBox>
                </content>
             </TitledPane>
+
             <Region VBox.vgrow="ALWAYS" />
             <Button fx:id="btnDangXuat" onAction="#handleDangXuat" alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="50.0" prefWidth="250.0" styleClass="sidebar-btn-logout" text="Đăng Xuất">
                <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/ic_logout.png" /></ImageView></graphic>
@@ -155,7 +140,7 @@
             <VBox spacing="20.0" styleClass="main-bg">
                <padding><Insets bottom="30.0" left="40.0" right="40.0" top="30.0" /></padding>
                <children>
-          <Label maxWidth="Infinity" alignment="CENTER" styleClass="main-title" text="HỆ THỐNG QUẢN LÝ NHÀ THUỐC LONG NGUYÊN" />
+                  <Label maxWidth="Infinity" alignment="CENTER" styleClass="main-title" text="HỆ THỐNG QUẢN LÝ NHÀ THUỐC LONG NGUYÊN" />
                   <HBox spacing="25.0">
                      <children>
                         <AnchorPane prefHeight="80.0" prefWidth="380.0" styleClass="top-card, card-blue" HBox.hgrow="ALWAYS">
