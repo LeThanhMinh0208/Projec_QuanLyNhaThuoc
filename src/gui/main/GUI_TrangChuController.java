@@ -56,12 +56,8 @@ public class GUI_TrangChuController {
         setupTable();
         loadDataFromServer();
         setupSearchLogic();
-<<<<<<< HEAD
-
-=======
         utils.SceneUtils.init(mainBorderPane);
         
->>>>>>> 5031fb0a3eceb1a2014672a118f07f3573912989
         // --- [2] CẬP NHẬT 2: LƯU GIAO DIỆN VÀO BIẾN KHI VỪA MỞ PHẦN MỀM ---
         if (mainBorderPane != null) {
             noiDungTrangChuGoc = mainBorderPane.getCenter();
