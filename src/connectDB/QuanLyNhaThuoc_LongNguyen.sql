@@ -95,27 +95,59 @@ CREATE TABLE LoThuoc (
     soLuongTon INT DEFAULT 0, -- Lưu theo Đơn vị cơ bản (Viên)
     giaNhap DECIMAL(18,2),
 
-    
     viTriKho VARCHAR(50) DEFAULT 'KHO_BAN_HANG',
 
-    FOREIGN KEY (maThuoc) REFERENCES Thuoc(maThuoc) ON DELETE CASCADE
-,
+    FOREIGN KEY (maThuoc) REFERENCES Thuoc(maThuoc) ON DELETE CASCADE,
     CONSTRAINT CHK_ViTriKho CHECK (viTriKho IN ('KHO_BAN_HANG', 'KHO_DU_TRU'))
 );
 
 -- ========================================================
--- 3. TẠO BẢNG NGHIỆP VỤ: NHẬP HÀNG
+-- 3. TẠO BẢNG NGHIỆP VỤ: ĐẶT HÀNG (MỚI THÊM)
+-- ========================================================
+
+-- Bảng Phiếu Đặt Hàng (Header)
+CREATE TABLE PhieuDatHang (
+    maPhieuDatHang VARCHAR(20) PRIMARY KEY,
+    maNhaCungCap VARCHAR(20) NOT NULL,
+    maNhanVien VARCHAR(20) NOT NULL,
+    ngayDat DATETIME DEFAULT GETDATE(),
+    ngayGiaoDuKien DATETIME,
+    trangThaiDH VARCHAR(50) DEFAULT 'CHO_DUYET',
+
+    FOREIGN KEY (maNhaCungCap) REFERENCES NhaCungCap(maNhaCungCap),
+    FOREIGN KEY (maNhanVien) REFERENCES NhanVien(maNhanVien),
+    -- Ràng buộc check cho Enum TrangThaiDH
+    CONSTRAINT CHK_TrangThaiDH CHECK (trangThaiDH IN ('CHO_DUYET', 'DA_GUI_NCC', 'GIAO_MOT_PHAN', 'HOAN_THANH', 'DA_HUY'))
+);
+
+-- Bảng Chi Tiết Phiếu Đặt Hàng (Detail)
+CREATE TABLE ChiTietPhieuDatHang (
+    maPhieuDatHang VARCHAR(20) NOT NULL,
+    maQuyDoi VARCHAR(20) NOT NULL,
+    soLuong INT NOT NULL, 
+    donGiaDuKien DECIMAL(18,2) NOT NULL,
+
+    -- Khóa chính kép cho chi tiết
+    PRIMARY KEY (maPhieuDatHang, maQuyDoi),
+    FOREIGN KEY (maPhieuDatHang) REFERENCES PhieuDatHang(maPhieuDatHang) ON DELETE CASCADE,
+    FOREIGN KEY (maQuyDoi) REFERENCES DonViQuyDoi(maQuyDoi)
+);
+
+-- ========================================================
+-- 4. TẠO BẢNG NGHIỆP VỤ: NHẬP HÀNG
 -- ========================================================
 
 -- Bảng Phiếu Nhập (Header)
 CREATE TABLE PhieuNhap (
     maPhieuNhap VARCHAR(20) PRIMARY KEY,
+    maPhieuDatHang VARCHAR(20), -- Tuỳ chọn móc sang Phiếu đặt hàng nếu cần thiết (Optional)
     maNhaCungCap VARCHAR(20) NOT NULL,
     maNhanVien VARCHAR(20) NOT NULL,
     ngayNhap DATETIME DEFAULT GETDATE(),
     
     FOREIGN KEY (maNhaCungCap) REFERENCES NhaCungCap(maNhaCungCap),
-    FOREIGN KEY (maNhanVien) REFERENCES NhanVien(maNhanVien)
+    FOREIGN KEY (maNhanVien) REFERENCES NhanVien(maNhanVien),
+    FOREIGN KEY (maPhieuDatHang) REFERENCES PhieuDatHang(maPhieuDatHang)
 );
 
 -- Bảng Chi Tiết Phiếu Nhập (Detail)
@@ -126,7 +158,6 @@ CREATE TABLE ChiTietPhieuNhap (
     soLuong INT NOT NULL,
     donGiaNhap DECIMAL(18,2) NOT NULL,
 
-    -- Khóa chính kép để 1 phiếu có thể nhập nhiều thuốc khác nhau
     PRIMARY KEY (maPhieuNhap, maQuyDoi, maLoThuoc),
     FOREIGN KEY (maPhieuNhap) REFERENCES PhieuNhap(maPhieuNhap) ON DELETE CASCADE,
     FOREIGN KEY (maQuyDoi) REFERENCES DonViQuyDoi(maQuyDoi),
@@ -134,29 +165,28 @@ CREATE TABLE ChiTietPhieuNhap (
 );
 
 -- ========================================================
--- 4. TẠO BẢNG NGHIỆP VỤ: BÁN HÀNG
+-- 5. TẠO BẢNG NGHIỆP VỤ: BÁN HÀNG
 -- ========================================================
 
 -- Bảng Hóa Đơn (Header)
 CREATE TABLE HoaDon (
     maHoaDon VARCHAR(20) PRIMARY KEY,
-    maKhachHang VARCHAR(20), -- Cho phép NULL nếu khách vãng lai không tích điểm
+    maKhachHang VARCHAR(20), 
     maNhanVien VARCHAR(20) NOT NULL,
     ngayLap DATETIME DEFAULT GETDATE(),
-    thueVAT DECIMAL(5,2) DEFAULT 0, -- Vd: 8.00 cho 8%
+    thueVAT DECIMAL(5,2) DEFAULT 0, 
     hinhThucThanhToan VARCHAR(20) DEFAULT 'TIEN_MAT',
     ghiChu NVARCHAR(255),
 
     FOREIGN KEY (maKhachHang) REFERENCES KhachHang(maKhachHang),
     FOREIGN KEY (maNhanVien) REFERENCES NhanVien(maNhanVien),
-    -- Ràng buộc check cho Enum HinhThucThanhToan
     CONSTRAINT CHK_ThanhToan CHECK (hinhThucThanhToan IN ('TIEN_MAT', 'CHUYEN_KHOAN', 'THE'))
 );
 
--- Bảng Đơn Thuốc (Nếu mua theo đơn Bác sĩ - Quan hệ 1-1 với Hóa Đơn)
+-- Bảng Đơn Thuốc
 CREATE TABLE DonThuoc (
     maDonThuoc VARCHAR(20) PRIMARY KEY,
-    maHoaDon VARCHAR(20) UNIQUE NOT NULL, -- Đảm bảo 1 HĐ chỉ có max 1 Đơn thuốc
+    maHoaDon VARCHAR(20) UNIQUE NOT NULL, 
     tenBacSi NVARCHAR(100),
     chanDoan NVARCHAR(255),
     hinhAnhDon VARCHAR(255),
@@ -171,7 +201,7 @@ CREATE TABLE ChiTietHoaDon (
     maQuyDoi VARCHAR(20) NOT NULL,
     maLoThuoc VARCHAR(20) NOT NULL,
     soLuong INT NOT NULL,
-    donGia DECIMAL(18,2) NOT NULL, -- Chốt giá tại thời điểm bán
+    donGia DECIMAL(18,2) NOT NULL, 
 
     PRIMARY KEY (maHoaDon, maQuyDoi, maLoThuoc),
     FOREIGN KEY (maHoaDon) REFERENCES HoaDon(maHoaDon) ON DELETE CASCADE,
@@ -180,13 +210,13 @@ CREATE TABLE ChiTietHoaDon (
 );
 
 -- ========================================================
--- 5. TẠO BẢNG NGHIỆP VỤ: ĐỔI TRẢ
+-- 6. TẠO BẢNG NGHIỆP VỤ: ĐỔI TRẢ
 -- ========================================================
 
 -- Bảng Phiếu Đổi Trả (Header)
 CREATE TABLE PhieuDoiTra (
     maPhieuDoiTra VARCHAR(20) PRIMARY KEY,
-    maHoaDon VARCHAR(20) NOT NULL, -- Đổi trả dựa trên bill nào
+    maHoaDon VARCHAR(20) NOT NULL, 
     maNhanVien VARCHAR(20) NOT NULL,
     ngayDoiTra DATETIME DEFAULT GETDATE(),
     lyDo NVARCHAR(255),
@@ -195,7 +225,6 @@ CREATE TABLE PhieuDoiTra (
 
     FOREIGN KEY (maHoaDon) REFERENCES HoaDon(maHoaDon),
     FOREIGN KEY (maNhanVien) REFERENCES NhanVien(maNhanVien),
-    -- Ràng buộc check cho Enum HinhThucDoiTra
     CONSTRAINT CHK_HinhThucXuLy CHECK (hinhThucXuLy IN ('HOAN_TIEN', 'DOI_SAN_PHAM'))
 );
 
@@ -203,17 +232,18 @@ CREATE TABLE PhieuDoiTra (
 CREATE TABLE ChiTietDoiTra (
     maPhieuDoiTra VARCHAR(20) NOT NULL,
     maQuyDoi VARCHAR(20) NOT NULL,
-    maLoThuoc VARCHAR(20) NOT NULL, -- Biết trả lại vào Lô nào
+    maLoThuoc VARCHAR(20) NOT NULL, 
     soLuong INT NOT NULL,
-    tinhTrang NVARCHAR(100), -- Vd: Còn nguyên seal, Rách hộp...
+    tinhTrang NVARCHAR(100), 
 
     PRIMARY KEY (maPhieuDoiTra, maQuyDoi, maLoThuoc),
     FOREIGN KEY (maPhieuDoiTra) REFERENCES PhieuDoiTra(maPhieuDoiTra) ON DELETE CASCADE,
     FOREIGN KEY (maQuyDoi) REFERENCES DonViQuyDoi(maQuyDoi),
     FOREIGN KEY (maLoThuoc) REFERENCES LoThuoc(maLoThuoc)
 );
+
 GO
-PRINT N'Đã tạo xong Database QuanLyNhaThuoc_LongNguyen xịn xò con bò cho sếp!';
+PRINT N'Đã tạo xong Database QuanLyNhaThuoc_LongNguyen xịn xò con bò cho sếp! Có update Đặt Hàng nha!';
 GO
 
 -- ==========================================
@@ -643,3 +673,13 @@ INSERT INTO ChiTietDoiTra (maPhieuDoiTra, maQuyDoi, maLoThuoc, soLuong, tinhTran
 ('PDT0002', 'QD02541', 'LO02541', 1, N'Thuốc còn nguyên seal');
 GO
 
+INSERT INTO PhieuDatHang (maPhieuDatHang, maNhaCungCap, maNhanVien, ngayDat, ngayGiaoDuKien, trangThaiDH) VALUES
+('PDH0001', 'NCC0391', 'NV001', '2026-03-20', '2026-03-25', 'DA_GUI_NCC'),
+('PDH0002', 'NCC0055', 'NV002', '2026-03-21', '2026-03-26', 'CHO_DUYET');
+GO
+
+INSERT INTO ChiTietPhieuDatHang (maPhieuDatHang, maQuyDoi, soLuong, donGiaDuKien) VALUES
+('PDH0001', 'QD01435', 150, 200000),
+('PDH0001', 'QD00931', 100, 250000),
+('PDH0002', 'QD01179', 200, 19500);
+GO

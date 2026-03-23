@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefWidth="720.0" prefHeight="520.0" spacing="12.0"
+      stylesheets="@../../resources/css/TrangChu.css"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="gui.dialogs.Dialog_ChonThuocController">
+
+    <padding>
+        <Insets top="15" right="15" bottom="15" left="15" />
+    </padding>
+
+    <children>
+        <Label text="CHỌN THUỐC" styleClass="section-title" />
+
+        <HBox alignment="CENTER_LEFT" prefHeight="45.0" styleClass="search-box">
+            <children>
+                <Label styleClass="search-icon" text="🔍" />
+                <TextField fx:id="txtTim" prefHeight="45.0" promptText="Tìm theo mã, tên, triệu chứng, công dụng..." styleClass="search-input" HBox.hgrow="ALWAYS" />
+            </children>
+        </HBox>
+
+        <TableView fx:id="tblThuoc" styleClass="table-view" VBox.vgrow="ALWAYS">
+            <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+            <columns>
+                <TableColumn fx:id="colMa" prefWidth="90.0" text="Mã" />
+                <TableColumn fx:id="colTen" prefWidth="250.0" text="Tên thuốc" />
+                <TableColumn fx:id="colTrieuChung" prefWidth="260.0" text="Triệu chứng" />
+                <TableColumn fx:id="colKeDon" prefWidth="90.0" text="Kê đơn" />
+            </columns>
+        </TableView>
+
+        <HBox spacing="10.0" alignment="CENTER_RIGHT">
+            <children>
+                <Button text="Hủy" onAction="#handleHuy" prefWidth="90.0" />
+                <Button text="Chọn" onAction="#handleChon" prefWidth="110.0" />
+            </children>
+        </HBox>
+    </children>
+</VBox>
+

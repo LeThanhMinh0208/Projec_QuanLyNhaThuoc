@@ -1,0 +1,560 @@
+/* ============================================================
+   BANHANG.CSS - Giao diện bán hàng chuyên nghiệp - Light Theme
+   ============================================================ */
+
+.bh-root {
+    -fx-background-color: transparent;
+}
+
+.bh-page-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #0f172a;
+}
+
+/* TAB PANE */
+.bh-tab-pane>.tab-header-area>.headers-region>.tab {
+    -fx-background-color: #e2e8f0;
+    -fx-padding: 12 28;
+    -fx-background-radius: 10 10 0 0;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+}
+
+.bh-tab-pane>.tab-header-area>.headers-region>.tab:selected {
+    -fx-background-color: #0ea5e9;
+}
+
+.bh-tab-pane>.tab-header-area>.headers-region>.tab>.tab-container>.tab-label {
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+}
+
+.bh-tab-pane>.tab-header-area>.headers-region>.tab:selected>.tab-container>.tab-label {
+    -fx-text-fill: white;
+}
+
+.bh-tab-pane>.tab-header-area {
+    -fx-background-color: transparent;
+}
+
+.bh-tab-pane>.tab-content-area {
+    -fx-background-color: transparent;
+}
+
+/* PANEL */
+.bh-panel {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-padding: 18 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.07), 12, 0, 0, 4);
+}
+
+.bh-section-title {
+    -fx-font-size: 11px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #94a3b8;
+    -fx-padding: 0 0 8 0;
+}
+
+/* SEARCH */
+.bh-search-box {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 12;
+    -fx-padding: 4 16;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 3);
+}
+
+.bh-search-box:focused-within {
+    -fx-border-color: #38bdf8;
+}
+
+.bh-search-icon {
+    -fx-font-size: 18px;
+    -fx-text-fill: #94a3b8;
+}
+
+.bh-search-input {
+    -fx-background-color: transparent;
+    -fx-font-size: 15px;
+    -fx-text-fill: #1e293b;
+    -fx-prompt-text-fill: #cbd5e1;
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+}
+
+/* ─── DRUG TABLE (bảng chọn thuốc - nền trắng) ──────────── */
+.bh-drug-table {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.bh-drug-table .column-header-background {
+    -fx-background-color: #0ea5e9;
+    -fx-background-radius: 10 10 0 0;
+}
+
+.bh-drug-table .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 44px;
+}
+
+.bh-drug-table .column-header .label {
+    -fx-text-fill: #bfdbfe;
+    -fx-font-size: 12px;
+    -fx-font-weight: 900;
+}
+
+.bh-drug-table .table-row-cell {
+    -fx-cell-size: 50px;
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #f1f5f9 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-cursor: hand;
+}
+
+.bh-drug-table .table-row-cell .label {
+    -fx-text-fill: #1e293b;
+}
+
+.bh-drug-table .table-row-cell .text {
+    -fx-fill: #1e293b;
+}
+
+.bh-drug-table .table-row-cell:filled:even {
+    -fx-background-color: #fafafa;
+}
+
+.bh-drug-table .table-row-cell:filled:odd {
+    -fx-background-color: white;
+}
+
+/* ✅ Hover rõ ràng */
+.bh-drug-table .table-row-cell:filled:hover {
+    -fx-background-color: #dbeafe;
+}
+
+.bh-drug-table .table-row-cell:filled:even:hover {
+    -fx-background-color: #dbeafe;
+}
+
+/* ✅ Selected - nền xanh đậm, chữ trắng rõ */
+.bh-drug-table .table-row-cell:filled:selected {
+    -fx-background-color: #0ea5e9;
+    -fx-background-insets: 0;
+}
+
+.bh-drug-table .table-row-cell:filled:selected:hover {
+    -fx-background-color: #0369a1;
+}
+
+.bh-drug-table .table-row-cell:filled:selected .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.bh-drug-table .table-row-cell:filled:selected .text {
+    -fx-fill: white;
+}
+
+.bh-drug-table .table-row-cell:selected {
+    -fx-background-color: #0ea5e9;
+}
+
+.bh-drug-table .table-row-cell:selected .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.bh-drug-table .table-row-cell:selected:hover {
+    -fx-background-color: #0369a1;
+}
+
+/* ─── CART TABLE (giỏ hàng - LIGHT, không đen) ──────────── */
+.bh-cart-table {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.bh-cart-table .column-header-background {
+    -fx-background-color: #0ea5e9;
+    -fx-background-radius: 0;
+}
+
+.bh-cart-table .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 40px;
+}
+
+.bh-cart-table .column-header .label {
+    -fx-text-fill: #bfdbfe;
+    -fx-font-size: 11px;
+    -fx-font-weight: 900;
+}
+
+/* ✅ Nền trắng/xanh rất nhạt thay vì đen */
+.bh-cart-table .table-row-cell {
+    -fx-cell-size: 48px;
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #eff6ff transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.bh-cart-table .table-row-cell .label {
+    -fx-text-fill: #1e293b;
+}
+
+.bh-cart-table .table-row-cell .text {
+    -fx-fill: #1e293b;
+}
+
+.bh-cart-table .table-row-cell:filled:even {
+    -fx-background-color: #f8faff;
+}
+
+.bh-cart-table .table-row-cell:filled:odd {
+    -fx-background-color: white;
+}
+
+.bh-cart-table .table-row-cell:filled:hover {
+    -fx-background-color: #dbeafe;
+}
+
+.bh-cart-table .table-row-cell:selected {
+    -fx-background-color: #0ea5e9;
+}
+
+.bh-cart-table .table-row-cell:filled:selected:hover {
+    -fx-background-color: #0369a1;
+}
+
+.bh-cart-table .table-row-cell:selected .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.bh-cart-table .table-row-cell:selected .text {
+    -fx-fill: white;
+}
+
+.bh-cart-table .table-row-cell:empty {
+    -fx-background-color: white;
+}
+
+.bh-cart-table .placeholder .label {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 13px;
+}
+
+/* ─── BUTTONS ────────────────────────────────────────────── */
+.bh-btn-primary {
+    -fx-background-color: linear-gradient(to bottom, #38bdf8, #0ea5e9);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-padding: 10 18;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.35), 8, 0, 0, 3);
+}
+
+.bh-btn-primary:hover {
+    -fx-background-color: linear-gradient(to bottom, #7dd3fc, #38bdf8);
+}
+
+.bh-btn-primary:pressed {
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+.bh-btn-success {
+    -fx-background-color: linear-gradient(to bottom, #10b981, #059669);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-padding: 14 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(5, 150, 105, 0.4), 10, 0, 0, 4);
+}
+
+.bh-btn-success:hover {
+    -fx-background-color: linear-gradient(to bottom, #34d399, #10b981);
+}
+
+.bh-btn-success:pressed {
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+.bh-btn-danger {
+    -fx-background-color: linear-gradient(to bottom, #ef4444, #dc2626);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-padding: 7 14;
+}
+
+.bh-btn-danger:hover {
+    -fx-background-color: linear-gradient(to bottom, #f87171, #ef4444);
+}
+
+.bh-btn-danger:pressed {
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+.bh-btn-secondary {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-padding: 8 16;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10;
+    -fx-border-width: 1.5;
+}
+
+.bh-btn-secondary:hover {
+    -fx-background-color: #e2e8f0;
+}
+
+.bh-btn-secondary:pressed {
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+.bh-btn-remove {
+    -fx-background-color: rgba(239, 68, 68, 0.12);
+    -fx-text-fill: #ef4444;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-padding: 3 9;
+    -fx-border-color: transparent;
+}
+
+.bh-btn-remove:hover {
+    -fx-background-color: #ef4444;
+    -fx-text-fill: white;
+}
+
+/* ─── INPUT ──────────────────────────────────────────────── */
+.bh-input {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-border-width: 1.5;
+    -fx-font-size: 14px;
+    -fx-padding: 8 14;
+}
+
+.bh-input:focused {
+    -fx-background-color: white;
+    -fx-border-color: #2563eb;
+    -fx-effect: dropshadow(three-pass-box, rgba(37, 99, 235, 0.2), 8, 0, 0, 0);
+}
+
+.bh-combo {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-border-width: 1.5;
+    -fx-cursor: hand;
+}
+
+/* ─── MONEY & LABELS ─────────────────────────────────────── */
+.bh-money-total {
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #059669;
+}
+
+.bh-customer-name {
+    -fx-font-size: 13px;
+    -fx-text-fill: #1d4ed8;
+    -fx-font-weight: bold;
+}
+
+.bh-badge-kedon {
+    -fx-text-fill: #ef4444;
+    -fx-font-weight: bold;
+}
+
+.bh-badge-ok {
+    -fx-text-fill: #10b981;
+    -fx-font-weight: bold;
+}
+
+/* ─── CART WRAPPER (thay thế nền đen inline) ─────────────── */
+.bh-cart-wrapper {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-border-color: #dbeafe;
+    -fx-border-width: 2;
+    -fx-border-radius: 16;
+    -fx-effect: dropshadow(three-pass-box, rgba(29, 78, 216, 0.12), 12, 0, 0, 4);
+}
+
+.bh-cart-title-bar {
+    -fx-background-color: linear-gradient(to right, #0ea5e9, #0284c7);
+    -fx-background-radius: 14 14 0 0;
+    -fx-padding: 12 18;
+}
+
+.bh-cart-title-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #bfdbfe;
+}
+
+/* ─── DIALOG ─────────────────────────────────────────────── */
+.dialog-root {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+}
+
+.dialog-header {
+    -fx-background-color: linear-gradient(to right, #0ea5e9, #0284c7);
+    -fx-background-radius: 16 16 0 0;
+    -fx-padding: 20 25;
+}
+
+.dialog-header-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: 900;
+    -fx-text-fill: white;
+}
+
+.dialog-header-sub {
+    -fx-font-size: 13px;
+    -fx-text-fill: #bfdbfe;
+}
+
+.dialog-body {
+    -fx-background-color: white;
+    -fx-padding: 20 25 10 25;
+}
+
+.dialog-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+    -fx-font-weight: bold;
+}
+
+.dialog-combo {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-border-width: 1.5;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.dialog-ton-label {
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #0ea5e9;
+}
+
+.dialog-ton-unit {
+    -fx-font-size: 13px;
+    -fx-text-fill: #94a3b8;
+}
+
+.dialog-warn {
+    -fx-font-size: 13px;
+    -fx-text-fill: #ef4444;
+    -fx-font-weight: bold;
+}
+
+.dialog-footer {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 0 0 16 16;
+    -fx-padding: 14 25;
+    -fx-border-color: #e2e8f0 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.dialog-btn-ok {
+    -fx-background-color: linear-gradient(to bottom, #38bdf8, #0ea5e9);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-padding: 12 30;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.35), 8, 0, 0, 3);
+}
+
+.dialog-btn-ok:hover {
+    -fx-background-color: linear-gradient(to bottom, #7dd3fc, #38bdf8);
+}
+
+.dialog-btn-ok:pressed {
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+.dialog-btn-cancel {
+    -fx-background-color: white;
+    -fx-text-fill: #64748b;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-padding: 12 20;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10;
+    -fx-border-width: 1.5;
+}
+
+.dialog-btn-cancel:hover {
+    -fx-background-color: #f1f5f9;
+}
+
+/* ─── SPINNER ─────────────────────────────────────────────── */
+.spinner {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-border-width: 1.5;
+}
+
+.spinner .text-field {
+    -fx-background-color: transparent;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+    -fx-alignment: center;
+}
+
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-background-color: #e2e8f0;
+    -fx-cursor: hand;
+}
+
+.spinner .increment-arrow-button:hover,
+.spinner .decrement-arrow-button:hover {
+    -fx-background-color: #0ea5e9;
+}
+
+.spinner .increment-arrow-button:hover .increment-arrow,
+.spinner .decrement-arrow-button:hover .decrement-arrow {
+    -fx-background-color: white;
+}

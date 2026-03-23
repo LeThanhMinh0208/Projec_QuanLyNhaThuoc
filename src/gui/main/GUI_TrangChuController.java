@@ -24,11 +24,16 @@ import java.io.InputStream;
 
 public class GUI_TrangChuController {
 
-    @FXML private TableView<Thuoc> tableThuoc;
-    @FXML private TableColumn<Thuoc, String> colMaThuoc, colHinhAnh, colTenThuoc, colTrieuChung, colDVT, colTrangThai;
-    @FXML private TableColumn<Thuoc, Boolean> colKeDon;
-    @FXML private TextField txtTimKiem;
-    @FXML private BorderPane mainBorderPane;
+    @FXML
+    private TableView<Thuoc> tableThuoc;
+    @FXML
+    private TableColumn<Thuoc, String> colMaThuoc, colHinhAnh, colTenThuoc, colTrieuChung, colDVT, colTrangThai;
+    @FXML
+    private TableColumn<Thuoc, Boolean> colKeDon;
+    @FXML
+    private TextField txtTimKiem;
+    @FXML
+    private BorderPane mainBorderPane;
 
     private DAO_Thuoc daoThuoc = new DAO_Thuoc();
     private ObservableList<Thuoc> masterData = FXCollections.observableArrayList();
@@ -37,6 +42,10 @@ public class GUI_TrangChuController {
 
     public static void setNhanVienDangNhap(NhanVien nv) {
         nhanVienDangNhap = nv;
+    }
+
+    public static NhanVien getNhanVienDangNhap() {
+        return nhanVienDangNhap;
     }
 
     @FXML
@@ -56,7 +65,6 @@ public class GUI_TrangChuController {
         colTrieuChung.setCellValueFactory(new PropertyValueFactory<>("trieuChung"));
         colDVT.setCellValueFactory(new PropertyValueFactory<>("donViCoBan"));
 
-        // Cột Kê Đơn
         colKeDon.setCellValueFactory(new PropertyValueFactory<>("canKeDon"));
         colKeDon.setCellFactory(column -> new TableCell<>() {
             @Override
@@ -72,7 +80,6 @@ public class GUI_TrangChuController {
             }
         });
 
-        // Cột Trạng Thái
         colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
         colTrangThai.setCellFactory(column -> new TableCell<>() {
             @Override
@@ -98,7 +105,6 @@ public class GUI_TrangChuController {
             }
         });
 
-        // Cột Hình Ảnh
         colHinhAnh.setCellValueFactory(new PropertyValueFactory<>("hinhAnh"));
         colHinhAnh.setCellFactory(column -> new TableCell<>() {
             private final ImageView iv = new ImageView();
@@ -112,9 +118,11 @@ public class GUI_TrangChuController {
                         InputStream is = getClass().getResourceAsStream("/resources/images/images_thuoc/" + file.trim());
                         if (is != null) {
                             iv.setImage(new Image(is));
-                            iv.setFitWidth(80); iv.setFitHeight(60);
+                            iv.setFitWidth(80);
+                            iv.setFitHeight(60);
                             iv.setPreserveRatio(true);
-                            setGraphic(iv); setAlignment(Pos.CENTER);
+                            setGraphic(iv);
+                            setAlignment(Pos.CENTER);
                         } else {
                             setGraphic(new Label("No image"));
                         }
@@ -125,7 +133,6 @@ public class GUI_TrangChuController {
             }
         });
 
-        // Toggle selection khi click vào dòng đang chọn
         tableThuoc.setRowFactory(tv -> {
             TableRow<Thuoc> row = new TableRow<>();
             row.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
@@ -150,6 +157,7 @@ public class GUI_TrangChuController {
             filteredData.setPredicate(thuoc -> {
                 if (newValue == null || newValue.isEmpty()) return true;
                 String filter = newValue.toLowerCase();
+
                 if (thuoc.getTrieuChung() != null && thuoc.getTrieuChung().toLowerCase().contains(filter)) return true;
                 if (thuoc.getMaThuoc().toLowerCase().contains(filter)) return true;
                 if (thuoc.getTenThuoc().toLowerCase().contains(filter)) return true;
@@ -157,9 +165,9 @@ public class GUI_TrangChuController {
                 if (thuoc.getHoatChat() != null && thuoc.getHoatChat().toLowerCase().contains(filter)) return true;
                 if (thuoc.getHangSanXuat() != null && thuoc.getHangSanXuat().toLowerCase().contains(filter)) return true;
                 if (thuoc.getNuocSanXuat() != null && thuoc.getNuocSanXuat().toLowerCase().contains(filter)) return true;
+                
                 String keDonString = thuoc.isCanKeDon() ? "có kê đơn" : "không kê đơn";
-                if (keDonString.contains(filter)) return true;
-                return false;
+                return keDonString.contains(filter);
             });
         });
         SortedList<Thuoc> sortedData = new SortedList<>(filteredData);
@@ -202,6 +210,21 @@ public class GUI_TrangChuController {
     }
 
     @FXML
+    void handleMoQuanLyBanHangLapHoaDon(ActionEvent event) {
+        switchPage("/gui/main/GUI_QuanLyBanHang.fxml");
+    }
+
+    @FXML
+    void handleMoBanThuoc(javafx.scene.input.MouseEvent event) {
+        switchPage("/gui/main/GUI_QuanLyBanHang.fxml");
+    }
+
+    @FXML
+    void handleMoQuanLyKhachHang(ActionEvent event) {
+        switchPage("/gui/main/GUI_QuanLyKhachHang.fxml");
+    }
+
+    @FXML
     void moTrangDanhMucKho(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucKho.fxml");
     }
@@ -219,6 +242,29 @@ public class GUI_TrangChuController {
     @FXML
     void moQuanLyDonNhapHang(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyDonNhapHang.fxml");
+    }
+
+    @FXML
+    void handleMoQuanLyDanhMucNhaCungCap(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucNhaCungCap.fxml");
+    }
+
+    public void switchPage(String fxmlPath) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent root = loader.load();
+            Object controller = loader.getController();
+
+            if (controller instanceof GUI_TrangChuController) {
+                ((GUI_TrangChuController) controller).loadDataTrangChu();
+            } else if (controller instanceof GUI_QuanLyBanHangController) {
+                ((GUI_QuanLyBanHangController) controller).chonTabBanLe();
+            }
+            mainBorderPane.setCenter(root);
+        } catch (Exception e) {
+            System.err.println("Lỗi nạp file FXML: " + fxmlPath);
+            e.printStackTrace();
+        }
     }
 
     public void loadDataTrangChu() {

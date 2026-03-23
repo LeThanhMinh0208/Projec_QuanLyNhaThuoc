@@ -25,7 +25,7 @@ import java.util.ArrayList;
 
 public class GUI_DanhMucThuocController {
     @FXML private TableView<Thuoc> tableThuoc;
-    @FXML private ComboBox<String> cbLocDanhMuc;
+    // @FXML private ComboBox<String> cbLocDanhMuc; // Bỏ theo yêu cầu người dùng
     
     @FXML private TableColumn<Thuoc, String> colMa, colHinhAnh, colTen, colDanhMuc, colHoatChat, colHangSX, colNuocSX, colCongDung, colTrangThai;
     @FXML private TableColumn<Thuoc, Boolean> colKeDon;
@@ -141,18 +141,8 @@ public class GUI_DanhMucThuocController {
     private void loadData() {
         masterData.setAll(daoThuoc.getAllThuoc());
         
-        ArrayList<String> dsTenDanhMuc = new ArrayList<>();
-        dsTenDanhMuc.add("Tất cả danh mục"); 
-        for (entity.DanhMucThuoc dm : daoDanhMuc.getAllDanhMuc()) {
-            dsTenDanhMuc.add(dm.getTenDanhMuc());
-        }
-        
-        cbLocDanhMuc.getItems().setAll(dsTenDanhMuc);
-        cbLocDanhMuc.getSelectionModel().selectFirst(); 
-
         filteredData = new FilteredList<>(masterData, p -> true);
         txtTimKiem.textProperty().addListener((o, oldV, newV) -> filterData());
-        cbLocDanhMuc.valueProperty().addListener((o, oldV, newV) -> filterData());
         
         SortedList<Thuoc> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(tableThuoc.comparatorProperty());
@@ -161,13 +151,8 @@ public class GUI_DanhMucThuocController {
 
     private void filterData() {
         String keyword = txtTimKiem.getText() == null ? "" : txtTimKiem.getText().toLowerCase();
-        String danhMucFilter = cbLocDanhMuc.getValue();
 
         filteredData.setPredicate(t -> {
-            if (danhMucFilter != null && !danhMucFilter.equals("Tất cả danh mục")) {
-                if (t.getTenDanhMuc() == null || !t.getTenDanhMuc().equalsIgnoreCase(danhMucFilter)) return false;
-            }
-
             if (keyword.isEmpty()) return true;
 
             if (t.getMaThuoc() != null && t.getMaThuoc().toLowerCase().contains(keyword)) return true;
@@ -184,6 +169,13 @@ public class GUI_DanhMucThuocController {
     @FXML void handleThem() { openDialog("/gui/dialogs/Dialog_ThemThuoc.fxml", "Thêm Thuốc Mới", null); }
     @FXML void handleSua() { checkAndOpenDialog("/gui/dialogs/Dialog_SuaThuoc.fxml", "Sửa Thuốc"); }
     @FXML void handleXoa() { checkAndOpenDialog("/gui/dialogs/Dialog_XoaThuoc.fxml", "Xóa Thuốc"); }
+
+    @FXML
+    void handleRefresh() {
+        txtTimKiem.clear();
+        tableThuoc.getSelectionModel().clearSelection();
+        loadData();
+    }
 
     private void checkAndOpenDialog(String path, String title) {
         Thuoc selected = tableThuoc.getSelectionModel().getSelectedItem();

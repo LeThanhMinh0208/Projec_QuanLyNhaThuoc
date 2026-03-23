@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="0" styleClass="dialog-root" stylesheets="@../../resources/css/BanHang.css" 
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="gui.dialogs.Dialog_ThemDonThuocController">
+      
+    <VBox styleClass="dialog-header">
+        <Label fx:id="lblTitle" text="THÊM THÔNG TIN ĐƠN THUỐC" styleClass="dialog-header-title" />
+    </VBox>
+
+    <VBox spacing="15" styleClass="dialog-body" prefWidth="400">
+        <VBox spacing="5">
+            <Label text="Mã đơn thuốc (Tự động):" styleClass="dialog-label" />
+            <TextField fx:id="txtMaDon" editable="false" styleClass="bh-input" style="-fx-background-color: #e2e8f0;"/>
+        </VBox>
+
+        <VBox spacing="5">
+            <Label text="Tên bác sĩ kê đơn:" styleClass="dialog-label" />
+            <TextField fx:id="txtTenBacSi" styleClass="bh-input" promptText="Nhập tên bác sĩ..." />
+            <Label fx:id="lblErrBacSi" textFill="RED" style="-fx-font-size: 11px;" managed="false" visible="false"/>
+        </VBox>
+
+        <VBox spacing="5">
+            <Label text="Thông tin bệnh nhân:" styleClass="dialog-label" />
+            <TextField fx:id="txtBenhNhan" styleClass="bh-input" promptText="Độ tuổi, cân nặng, giới tính..." />
+            <Label fx:id="lblErrBenhNhan" textFill="RED" style="-fx-font-size: 11px;" managed="false" visible="false"/>
+        </VBox>
+        
+        <VBox spacing="5">
+            <Label text="Chẩn đoán bệnh:" styleClass="dialog-label" />
+            <TextField fx:id="txtChanDoan" styleClass="bh-input" promptText="Nhập chẩn đoán..." />
+        </VBox>
+    </VBox>
+
+    <HBox alignment="CENTER_RIGHT" spacing="12" styleClass="dialog-footer">
+        <Button onAction="#handleDong" text="Hủy bỏ" styleClass="dialog-btn-cancel" />
+        <Button onAction="#handleLuu" text="Lưu thông tin" styleClass="dialog-btn-ok" />
+    </HBox>
+</VBox>

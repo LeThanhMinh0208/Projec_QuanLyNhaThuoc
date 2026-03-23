@@ -1,11 +1,6 @@
-/* --- 1. PHẦN CHUNG CHO TRANG DANH MỤC --- */
-.btn-action { -fx-font-weight: bold; -fx-font-size: 18px; -fx-padding: 10 0; -fx-cursor: hand; }
-.search-icon { -fx-font-size: 20px; -fx-text-fill: #0ea5e9; }
+/* --- 1. PHẦN CHUNG CHO TRANG DANH MỤC (Inherited from TrangChu.css) --- */
 
-.combo-box {
-    -fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 8; 
-    -fx-background-radius: 8; -fx-cursor: hand;
-}
+
 
 /* --- 2. DIALOG SỬA THUỐC (Hạn chế trắng tinh, màu mè hơn) --- */
 

@@ -116,38 +116,74 @@ public class Dialog_SuaThuocController {
         if (trangThaiSelected == null || trangThaiSelected.trim().isEmpty()) { setLoi(cbTrangThai, "Chưa chọn Trạng Thái!"); hopLe = false; }
 
         String donViSelected = cbDonVi.getValue();
-        if (donViSelected == null || donViSelected.trim().isEmpty()) { setLoi(cbDonVi, "Chưa chọn Đơn Vị!"); hopLe = false; }
+        if (donViSelected == null || donViSelected.trim().isEmpty()) { setLoi(cbDonVi, "Vui lòng chọn đơn vị tính!"); hopLe = false; }
 
-        String tenThuoc = txtTen.getText().trim();
-        if (tenThuoc.isEmpty()) { setLoi(txtTen, "Không được để trống!"); hopLe = false; }
-        else if (tenThuoc.length() > 100) { setLoi(txtTen, "Tối đa 100 ký tự!"); hopLe = false; }
+        String tenThuoc = txtTen.getText();
+        tenThuoc = utils.ValidationUtils.capitalizeName(tenThuoc);
+        txtTen.setText(tenThuoc);
 
-        String hoatChat = txtHoatChat.getText().trim();
-        if (hoatChat.isEmpty()) { setLoi(txtHoatChat, "Không được để trống!"); hopLe = false; }
-        else if (hoatChat.length() > 100) { setLoi(txtHoatChat, "Tối đa 100 ký tự!"); hopLe = false; }
+        if (!utils.ValidationUtils.isValidTenThuoc(tenThuoc)) {
+            setLoi(txtTen, "Tên thuốc phải từ 2-150 ký tự và chứa ít nhất 1 chữ cái!");
+            hopLe = false;
+        } else if (!txtMa.getText().isEmpty()) {
+            Thuoc currThuoc = daoThuoc.getThuocByMa(txtMa.getText());
+            if (currThuoc != null && !currThuoc.getTenThuoc().equalsIgnoreCase(tenThuoc) && daoThuoc.existsByTenThuoc(tenThuoc)) {
+                setLoi(txtTen, "Tên thuốc này đã tồn tại trong hệ thống!");
+                hopLe = false;
+            }
+        }
 
-        String hangSX = txtHangSX.getText().trim();
-        if (hangSX.isEmpty()) { setLoi(txtHangSX, "Không được để trống!"); hopLe = false; }
-        else if (hangSX.length() > 100) { setLoi(txtHangSX, "Tối đa 100 ký tự!"); hopLe = false; }
+        String hoatChat = txtHoatChat.getText();
+        hoatChat = utils.ValidationUtils.normalizeString(hoatChat);
+        txtHoatChat.setText(hoatChat);
 
-        String nuocSX = txtNuocSX.getText().trim();
-        if (nuocSX.isEmpty()) { setLoi(txtNuocSX, "Không được để trống!"); hopLe = false; }
-        else if (nuocSX.length() > 100) { setLoi(txtNuocSX, "Tối đa 100 ký tự!"); hopLe = false; }
+        if (!utils.ValidationUtils.isSoftValidText(hoatChat)) { setLoi(txtHoatChat, "Hoạt chất phải từ 2-255 ký tự và chứa ít nhất 1 chữ/số!"); hopLe = false; }
 
-        String hamLuong = txtHamLuong.getText().trim();
-        if (hamLuong.isEmpty()) { setLoi(txtHamLuong, "Không được để trống!"); hopLe = false; }
-        else if (hamLuong.length() > 100) { setLoi(txtHamLuong, "Tối đa 100 ký tự!"); hopLe = false; }
+        String hangSX = txtHangSX.getText();
+        hangSX = utils.ValidationUtils.capitalizeName(hangSX);
+        txtHangSX.setText(hangSX);
 
-        String congDung = txtCongDung.getText().trim();
-        if (congDung.isEmpty()) { setLoi(txtCongDung, "Không được để trống!"); hopLe = false; }
-        else if (congDung.length() > 500) { setLoi(txtCongDung, "Tối đa 500 ký tự!"); hopLe = false; }
+        if (!utils.ValidationUtils.isValidHangSanXuat(hangSX)) { setLoi(txtHangSX, "Hãng sản xuất phải từ 2-100 ký tự và chứa ít nhất 1 chữ cái!"); hopLe = false; }
 
-        String trieuChung = txtTrieuChung.getText().trim();
-        if (trieuChung.isEmpty()) { setLoi(txtTrieuChung, "Không được để trống!"); hopLe = false; }
-        else if (trieuChung.length() > 500) { setLoi(txtTrieuChung, "Tối đa 500 ký tự!"); hopLe = false; }
+        String nuocSX = txtNuocSX.getText();
+        nuocSX = utils.ValidationUtils.capitalizeName(nuocSX);
+        txtNuocSX.setText(nuocSX);
 
+        if (!utils.ValidationUtils.isValidHangSanXuat(nuocSX)) { setLoi(txtNuocSX, "Nước sản xuất phải từ 2-100 ký tự và chứa ít nhất 1 chữ cái!"); hopLe = false; }
+
+        String hamLuong = txtHamLuong.getText();
+        hamLuong = utils.ValidationUtils.normalizeString(hamLuong);
+        txtHamLuong.setText(hamLuong);
+
+        if (!utils.ValidationUtils.isSoftValidText(hamLuong)) { setLoi(txtHamLuong, "Hàm lượng phải từ 2-255 ký tự và chứa ít nhất 1 chữ/số!"); hopLe = false; }
+
+        String congDung = txtCongDung.getText();
+        congDung = utils.ValidationUtils.normalizeString(congDung);
+        txtCongDung.setText(congDung);
+        if (!utils.ValidationUtils.isSoftValidText(congDung)) { setLoi(txtCongDung, "Công dụng phải từ 2-255 ký tự và chứa ít nhất 1 chữ/số!"); hopLe = false; }
+
+        String trieuChung = txtTrieuChung.getText();
+        trieuChung = utils.ValidationUtils.normalizeString(trieuChung);
+        txtTrieuChung.setText(trieuChung);
+        if (!utils.ValidationUtils.isSoftValidText(trieuChung)) { setLoi(txtTrieuChung, "Triệu chứng phải từ 2-255 ký tự và chứa ít nhất 1 chữ/số!"); hopLe = false; }
+
+        // Nếu có bất kỳ ô nào vi phạm -> Dừng lại và hiện Alert cảnh báo
         if (!hopLe) {
-            new Alert(Alert.AlertType.WARNING, "Dữ liệu chưa hợp lệ! Vui lòng kiểm tra các ô bị bôi đỏ.").show();
+            StringBuilder errorMsg = new StringBuilder("Số liệu chỉnh sửa không hợp lệ:\n");
+            
+            if (!utils.ValidationUtils.isValidTenThuoc(tenThuoc)) errorMsg.append("- Tên thuốc không hợp lệ.\n");
+            else if (!txtMa.getText().isEmpty()) {
+                Thuoc currThuoc = daoThuoc.getThuocByMa(txtMa.getText());
+                if (currThuoc != null && !currThuoc.getTenThuoc().equalsIgnoreCase(tenThuoc) && daoThuoc.existsByTenThuoc(tenThuoc)) {
+                    errorMsg.append("- Tên thuốc mới đã bị trùng với tên thuốc khác trong hệ thống.\n");
+                }
+            }
+            
+            if (tenDMSelected == null || tenDMSelected.trim().isEmpty()) errorMsg.append("- Chưa chọn danh mục.\n");
+            if (donViSelected == null || donViSelected.trim().isEmpty()) errorMsg.append("- Chưa chọn đơn vị tính.\n");
+
+            errorMsg.append("\nVui lòng kiểm tra lại các ô bị bôi đỏ!");
+            new Alert(Alert.AlertType.ERROR, errorMsg.toString()).show();
             return;
         }
 

@@ -12,12 +12,16 @@ public class ConnectDB {
     }
     
     public void connect() {
-        try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver"); // THÊM DÒNG NÀY
-            String url = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyNhaThuoc_LongNguyen;encrypt=true;trustServerCertificate=true;";
-            String user = "sa";
-            String password = "sapassword"; 
-            con = DriverManager.getConnection(url, user, password);
+    	 try {
+             if (con == null || con.isClosed()) {
+
+                 Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver"); // THÊM DÒNG NÀY
+
+                 String url = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyNhaThuoc_LongNguyen;encrypt=true;trustServerCertificate=true;";
+                 String user = "sa";
+                 String password = "sapassword";
+                 con = DriverManager.getConnection(url, user, password);
+             }
             System.out.println("Kết nối CSDL thành công!");
         } catch (SQLException e) {
             System.out.println("Lỗi kết nối CSDL: " + e.getMessage());
@@ -36,7 +40,9 @@ public class ConnectDB {
     public static Connection getConnection() {
         try {
             if (con == null || con.isClosed()) {
+
                 Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver"); // THÊM DÒNG NÀY
+
                 String url = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyNhaThuoc_LongNguyen;encrypt=true;trustServerCertificate=true;";
                 String user = "sa";
                 String password = "sapassword";

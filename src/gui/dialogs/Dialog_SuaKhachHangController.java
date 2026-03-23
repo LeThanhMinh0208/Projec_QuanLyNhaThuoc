@@ -1,0 +1,81 @@
+package gui.dialogs;
+
+import dao.DAO_KhachHang;
+import entity.KhachHang;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+
+public class Dialog_SuaKhachHangController {
+
+    @FXML private TextField txtMa;
+    @FXML private TextField txtHoTen;
+    @FXML private TextField txtSdt;
+    @FXML private TextField txtDiaChi;
+    @FXML private TextField txtDiem;
+    @FXML private Button btnHuy;
+
+    private DAO_KhachHang daoKhachHang = new DAO_KhachHang();
+    private KhachHang khachHang;
+
+    public void setKhachHangData(KhachHang kh) {
+        this.khachHang = kh;
+        if (kh != null) {
+            txtMa.setText(kh.getMaKhachHang());
+            txtHoTen.setText(kh.getHoTen());
+            txtSdt.setText(kh.getSdt());
+            txtDiaChi.setText(kh.getDiaChi());
+            txtDiem.setText(String.valueOf(kh.getDiemTichLuy()));
+        }
+    }
+
+    @FXML
+    private void handleLuu() {
+        String ten = txtHoTen.getText();
+        String sdt = txtSdt.getText();
+        String diaChi = txtDiaChi.getText();
+        
+        ten = utils.ValidationUtils.capitalizeName(ten);
+        sdt = utils.ValidationUtils.normalizeString(sdt);
+        diaChi = utils.ValidationUtils.normalizeString(diaChi);
+
+        txtHoTen.setText(ten);
+        txtSdt.setText(sdt);
+        txtDiaChi.setText(diaChi);
+
+        StringBuilder err = new StringBuilder();
+        if (!utils.ValidationUtils.isValidTenKhachHang(ten)) err.append("- Họ tên phải từ 2-100 ký tự và chứa ít nhất 1 chữ cái.\n");
+        if (!utils.ValidationUtils.isValidSdt(sdt)) err.append("- Số điện thoại phải gồm 10 số và bắt đầu bằng số 0.\n");
+        if (!utils.ValidationUtils.isValidDiaChi(diaChi)) err.append("- Địa chỉ phải từ 2-255 ký tự và chứa ít nhất 1 chữ cái hoặc số.\n");
+        
+        if (err.length() > 0) {
+            new Alert(Alert.AlertType.ERROR, "Dữ liệu nhập không hợp lệ:\n" + err.toString()).show();
+            return;
+        }
+        
+        KhachHang existingKh = daoKhachHang.getBySdt(sdt);
+        if (existingKh != null && !existingKh.getMaKhachHang().equals(khachHang.getMaKhachHang())) {
+            new Alert(Alert.AlertType.ERROR, "Số điện thoại này đã tồn tại trong hệ thống!").show();
+            return;
+        }
+
+        khachHang.setHoTen(ten);
+        khachHang.setSdt(sdt);
+        khachHang.setDiaChi(diaChi);
+
+        if (daoKhachHang.capNhatKhachHang(khachHang)) {
+            new Alert(Alert.AlertType.INFORMATION, "Cập nhật thông tin khách hàng thành công!").show();
+            handleHuy();
+        } else {
+            new Alert(Alert.AlertType.ERROR, "Cập nhật thất bại! Vui lòng kiểm tra dữ liệu.").show();
+        }
+    }
+
+    @FXML
+    private void handleHuy() {
+        Stage stage = (Stage) btnHuy.getScene().getWindow();
+        stage.close();
+    }
+}

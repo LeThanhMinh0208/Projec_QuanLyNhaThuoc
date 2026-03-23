@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+
+<VBox prefWidth="560.0" spacing="0" stylesheets="@../../resources/css/BanHang.css"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="gui.dialogs.Dialog_ChonSoLuongDonViController">
+
+    <children>
+        <!-- ── HEADER ── -->
+        <HBox styleClass="dialog-header" spacing="15" alignment="CENTER_LEFT">
+            <children>
+                <VBox alignment="CENTER" style="-fx-background-color: white; -fx-padding: 5; -fx-background-radius: 8;">
+                    <children>
+                        <ImageView fx:id="imgThuoc" fitHeight="70" fitWidth="70" preserveRatio="true"/>
+                    </children>
+                </VBox>
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="Chọn đơn vị &amp; số lượng" styleClass="dialog-header-title"/>
+                        <Label fx:id="lblTenThuoc" text="" styleClass="dialog-header-sub" wrapText="true" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+
+        <!-- ── BODY ── -->
+        <VBox styleClass="dialog-body" spacing="16">
+            <children>
+                <!-- Đơn vị -->
+                <VBox spacing="6">
+                    <children>
+                        <Label text="Đơn vị bán" styleClass="dialog-label"/>
+                        <ComboBox fx:id="cbDonVi" prefHeight="42" maxWidth="Infinity"
+                                  styleClass="dialog-combo"/>
+                    </children>
+                </VBox>
+
+                <!-- Số lượng -->
+                <VBox spacing="6">
+                    <children>
+                        <Label text="Số lượng" styleClass="dialog-label"/>
+                        <Spinner fx:id="spSoLuong" prefHeight="52" maxWidth="Infinity"
+                                 editable="true"/>
+                    </children>
+                </VBox>
+
+                <!-- Tồn kho -->
+                <HBox alignment="CENTER" spacing="0"
+                      style="-fx-background-color: #f0f9ff; -fx-background-radius: 12; -fx-padding: 14 20;">
+                    <children>
+                        <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Tồn khả dụng" styleClass="dialog-label"/>
+                                <HBox alignment="CENTER" spacing="6">
+                                    <children>
+                                        <Label fx:id="lblTon" text="0" styleClass="dialog-ton-label"/>
+                                        <Label text="đơn vị" styleClass="dialog-ton-unit"/>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <!-- Cảnh báo -->
+                <Label fx:id="lblCanhBao" text="" styleClass="dialog-warn" wrapText="true"/>
+            </children>
+        </VBox>
+
+        <!-- ── FOOTER ── -->
+        <HBox styleClass="dialog-footer" spacing="10" alignment="CENTER_RIGHT">
+            <children>
+                <Button text="Hủy" onAction="#handleHuy" styleClass="dialog-btn-cancel" prefWidth="100" prefHeight="44"/>
+                <Button text="Thêm vào giỏ" onAction="#handleDongY" styleClass="dialog-btn-ok" prefWidth="160" prefHeight="44"/>
+            </children>
+        </HBox>
+    </children>
+</VBox>

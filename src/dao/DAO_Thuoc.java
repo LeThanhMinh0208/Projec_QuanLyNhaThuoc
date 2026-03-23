@@ -240,4 +240,18 @@ public class DAO_Thuoc {
         }
         return n > 0;
     }
+
+    public boolean existsByTenThuoc(String ten) {
+        Connection con = ConnectDB.getConnection();
+        String sql = "SELECT 1 FROM Thuoc WHERE LOWER(tenThuoc) = ?";
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setString(1, ten.toLowerCase());
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
