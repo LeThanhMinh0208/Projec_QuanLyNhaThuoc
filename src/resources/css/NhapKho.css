@@ -1,148 +1,235 @@
-/* =========================================================
-   GIAO DIỆN LẬP PHIẾU NHẬP KHO (NhapKho.css)
-   ========================================================= */
-
-/* 1. Nền chính của trang */
-.dmk-main-bg {
-    -fx-background-color: #f1f5f9;
+/* ========================================================
+   GLOBAL & BACKGROUND (Nền xanh xám cực dịu mát)
+   ======================================================== */
+.nk-main-bg {
+    -fx-background-color: #f0f4f8; 
 }
 
-/* 2. Tiêu đề trang */
+/* TIÊU ĐỀ NỔI BẬT 3D */
 .nk-page-title {
-    -fx-font-size: 32px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #1e3a8a;
+    -fx-font-size: 34px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #0277bd; 
+    -fx-effect: dropshadow(gaussian, rgba(2, 119, 189, 0.25), 5, 0.3, 2, 2);
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
 }
 
-/* 3. Khung (Card) chứa thông tin bên trái và bảng bên phải */
+/* Tiêu đề nhỏ (Label Header) */
+.label-header {
+    -fx-font-size: 18px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #0284c7;
+    -fx-effect: dropshadow(one-pass-box, rgba(255,255,255,0.8), 2, 0, 1, 1);
+}
+
+/* Khung chứa bảng dữ liệu (Card mượt mà) */
 .nk-card {
-    -fx-background-color: white;
+    -fx-background-color: #ffffff;
     -fx-background-radius: 12px;
-    -fx-border-color: #bbf7d0;
-    -fx-border-radius: 12px;
-    -fx-border-width: 2px;
-    -fx-padding: 25px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 20, 0, 0, 8);
 }
 
-/* 4. Tiêu đề của từng Card */
-.nk-card-title {
-    -fx-font-size: 22px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #0f766e;
+/* ========================================================
+   TABS ĐIỀU HƯỚNG (Kiểu công tắc gạt cực ngầu)
+   ======================================================== */
+.tab-container {
+    -fx-background-color: #e2e8f0;
+    -fx-background-radius: 25px;
+    -fx-padding: 5px;
+    -fx-effect: innershadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
 }
 
-/* 5. Label tiêu đề các ô nhập liệu */
-.nk-label {
-    -fx-font-weight: bold;
-    -fx-font-size: 15px;
-    -fx-text-fill: #334155;
-}
-
-/* 6. Form nhập liệu thông thường (Có viền mỏng) */
-.nk-input, .nk-combo, .nk-combo .text-field, .date-picker > .text-field {
-    -fx-background-color: white;
-    -fx-border-color: #cbd5e1;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
-    -fx-padding: 8px;
-    -fx-font-size: 15px;
-}
-
-/* Hiệu ứng khi focus vào ô nhập */
-.nk-input:focused, .nk-combo:focused, .date-picker:focused-within {
-    -fx-border-color: #0ea5e9;
-    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.2), 5, 0, 0, 0);
-}
-
-/* 7. Form nhập liệu chỉ đọc (Màu xám) */
-.nk-input-readonly {
-    -fx-background-color: #f1f5f9;
-    -fx-border-color: #cbd5e1;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
-    -fx-padding: 8px;
-    -fx-font-size: 15px;
+.tab-toggle-button {
+    -fx-background-color: transparent;
     -fx-text-fill: #64748b;
     -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 10px 25px;
+    -fx-background-radius: 20px;
+    -fx-cursor: hand;
 }
 
-/* 8. Bảng chi tiết (TableView) */
-.nk-table {
-    -fx-font-size: 14px;
-    -fx-border-color: transparent;
-}
-.nk-table .column-header-background {
-    -fx-background-color: #0284c7; /* Header màu xanh dương */
-}
-.nk-table .column-header .label {
+.tab-toggle-button:selected {
+    -fx-background-color: linear-gradient(to right, #0ea5e9, #0284c7);
     -fx-text-fill: white;
-    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box, rgba(2, 132, 199, 0.4), 10, 0, 0, 3);
 }
 
-/* Các Ô nhập liệu (TextField) nhúng BÊN TRONG BẢNG (Màu xanh mint nhẹ) */
-.nk-table-input {
-    -fx-border-color: #10b981;
-    -fx-background-color: #f0fdf4;
-    -fx-alignment: center;
+/* ========================================================
+   KHUNG NHẬP LIỆU (KÍNH MỜ GLASSMORPHISM)
+   ======================================================== */
+.box-nhap-lieu {
+    -fx-background-color: linear-gradient(to bottom right, #ffffff, #f8fafc);
+    -fx-border-color: #e0f2fe;
+    -fx-border-width: 2px;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.15), 20, 0, 0, 8);
+}
+
+.input-label-title {
+    -fx-font-weight: 900;
+    -fx-text-fill: #3b82f6; 
+    -fx-font-size: 13px;
+    -fx-padding: 0 0 5px 0; 
+}
+
+/* Ô Textfield, ComboBox, DatePicker */
+.input-field {
+    -fx-background-color: #f0f9ff; 
+    -fx-border-color: #bae6fd;
+    -fx-border-radius: 8px; 
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 10px;
     -fx-font-size: 14px;
 }
 
-/* 9. Nhãn Tổng tiền */
-.nk-tongtien-label {
-    -fx-font-size: 16px;
-    -fx-text-fill: #64748b;
-}
-.nk-tongtien-value {
-    -fx-font-size: 30px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #be123c;
+.input-field:focused {
+    -fx-background-color: white;
+    -fx-border-color: #0ea5e9;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.5), 12, 0, 0, 0);
 }
 
-/* 10. Nút Hành Động */
-.nk-btn-huy {
-    -fx-background-color: white;
-    -fx-border-color: #ef4444;
+/* Ô Read-only (Đọc không sửa) */
+.input-field-readonly {
+    -fx-background-color: #e2e8f0;
+    -fx-border-color: #cbd5e1;
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
-    -fx-border-width: 2px;
-    -fx-text-fill: #ef4444;
-    -fx-font-weight: bold;
-    -fx-font-size: 16px;
-    -fx-cursor: hand;
-}
-.nk-btn-huy:hover {
-    -fx-background-color: #fee2e2;
-}
-
-.nk-btn-xacnhan {
-    -fx-background-color: #059669;
-    -fx-background-radius: 8px;
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-font-size: 16px;
-    -fx-cursor: hand;
-}
-.nk-btn-xacnhan:hover {
-    -fx-background-color: #047857;
-}
-/* Style cho bộ nút Tab */
-.nk-tab-btn {
-    -fx-background-color: #e2e8f0;
+    -fx-padding: 8px 10px;
     -fx-text-fill: #475569;
     -fx-font-weight: bold;
-    -fx-font-size: 14px;
-    -fx-padding: 10 20;
-    -fx-background-radius: 20; /* Bo tròn kiểu viên thuốc */
-    -fx-cursor: hand;
+}
+
+/* ========================================================
+   BẢNG DỮ LIỆU (TABLE VIEW)
+   ======================================================== */
+.nk-table {
+    -fx-background-color: transparent;
     -fx-border-color: transparent;
+    -fx-padding: 5px;
 }
 
-.nk-tab-btn:hover {
+.nk-table .column-header-background {
+    -fx-background-color: linear-gradient(to right, #38bdf8, #0284c7);
+    -fx-background-radius: 10px 10px 0 0;
+}
+
+.nk-table .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 50px; 
+    -fx-border-width: 0 1px 0 0;
+    -fx-border-color: rgba(255, 255, 255, 0.2); 
+}
+
+.nk-table .column-header:last-visible { -fx-border-width: 0; }
+
+.nk-table .column-header .label {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: 800;
+    -fx-font-size: 14px;
+    -fx-alignment: center;
+}
+
+.nk-table .table-row-cell {
+    -fx-background-color: #ffffff;
+    -fx-cell-size: 60px; 
+    -fx-border-width: 0 0 1px 0;
+    -fx-border-color: #f1f5f9; 
+}
+
+.nk-table .table-row-cell:odd { -fx-background-color: #f8fafc; }
+
+.nk-table .table-row-cell:hover { -fx-background-color: #e0f2fe; }
+
+.nk-table .table-cell {
+    -fx-font-size: 14px;
+    -fx-text-fill: #334155; 
+    -fx-alignment: center-left;
+    -fx-padding: 0 10px;
+}
+
+/* Ép màu Xanh cho dòng được chọn (Như mẫu sếp gửi) */
+.nk-table .table-row-cell:selected {
+    -fx-background-color: #0ea5e9 !important; 
+    -fx-background-insets: 0;
+}
+
+.nk-table .table-row-cell:selected .table-cell,
+.nk-table .table-row-cell:selected .label,
+.nk-table .table-row-cell:selected .text {
+    -fx-text-fill: white !important;
+    -fx-fill: white !important;
+    -fx-font-weight: bold !important;
+}
+
+/* Thanh cuộn (Scrollbar) */
+.nk-table .scroll-bar:vertical, .nk-table .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+.nk-table .scroll-bar:vertical .thumb, .nk-table .scroll-bar:horizontal .thumb {
     -fx-background-color: #cbd5e1;
+    -fx-background-radius: 8px;
 }
 
-/* Màu cho Tab đang đứng (Active) */
-.nk-tab-active {
-    -fx-background-color: #1e3a8a; /* Màu xanh đậm trùng màu tiêu đề */
+/* ========================================================
+   THANH TÌM KIẾM
+   ======================================================== */
+.nk-search-wrapper {
+    -fx-background-color: #f0f9ff;
+    -fx-background-radius: 25px; 
+    -fx-border-color: #bae6fd; 
+    -fx-border-radius: 25px; 
+    -fx-padding: 0 15 0 15;
+}
+.nk-search-wrapper:focused-within {
+    -fx-background-color: white;
+    -fx-border-color: #0ea5e9;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.5), 12, 0, 0, 0);
+}
+.nk-search-field {
+    -fx-background-color: transparent; 
+    -fx-font-size: 14px;
+}
+
+/* ========================================================
+   HỆ THỐNG NÚT BẤM (BUTTONS) & TỔNG TIỀN
+   ======================================================== */
+.btn-success {
+    -fx-background-color: linear-gradient(to bottom, #3b82f6, #1d4ed8);
     -fx-text-fill: white;
+    -fx-font-weight: 900;
+    -fx-background-radius: 10px;
+    -fx-cursor: hand;
+    -fx-font-size: 15px;
+    -fx-effect: dropshadow(three-pass-box, rgba(29, 78, 216, 0.4), 10, 0, 0, 4);
+}
+.btn-success:hover {
+    -fx-background-color: linear-gradient(to bottom, #60a5fa, #2563eb);
+}
+
+.btn-cancel {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #475569;
+    -fx-font-weight: 900;
+    -fx-background-radius: 10px;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 10px;
+    -fx-cursor: hand;
+    -fx-font-size: 15px;
+}
+.btn-cancel:hover {
+    -fx-background-color: #f8fafc;
+    -fx-text-fill: #0f172a;
+    -fx-border-color: #94a3b8;
+}
+
+.text-total-price {
+    -fx-text-fill: linear-gradient(to right, #ef4444, #b91c1c);
+    -fx-font-weight: 900;
+    -fx-font-size: 26px;
+    -fx-effect: dropshadow(gaussian, rgba(239, 68, 68, 0.3), 8, 0, 2, 2);
 }

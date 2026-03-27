@@ -1,42 +1,30 @@
 package entity;
-import java.sql.Date;
+
+import java.sql.Timestamp;
 
 public class PhieuNhap {
     private String maPhieuNhap;
-    private Date ngayNhap;
+    private DonDatHang donDatHang; 
     private NhaCungCap nhaCungCap;
     private NhanVien nhanVien;
-    // --- THÊM 2 CỘT NÀY ĐỂ HIỂN THỊ LÊN BẢNG ---
-    private double tongTien; 
-    private String trangThai;
+    private Timestamp ngayNhap;
+    
+    // Thêm trường phụ để tính tổng tiền trên UI
+    private double tongTien;
 
     public PhieuNhap() {}
-
-    public PhieuNhap(String maPhieuNhap, Date ngayNhap, NhaCungCap nhaCungCap, NhanVien nhanVien) {
-        this.maPhieuNhap = maPhieuNhap;
-        this.ngayNhap = ngayNhap;
-        this.nhaCungCap = nhaCungCap;
-        this.nhanVien = nhanVien;
-    }
 
     // Getters and Setters
     public String getMaPhieuNhap() { return maPhieuNhap; }
     public void setMaPhieuNhap(String maPhieuNhap) { this.maPhieuNhap = maPhieuNhap; }
-    
-    public Date getNgayNhap() { return ngayNhap; }
-    public void setNgayNhap(Date ngayNhap) { this.ngayNhap = ngayNhap; }
-    
+    public DonDatHang getDonDatHang() { return donDatHang; }
+    public void setDonDatHang(DonDatHang donDatHang) { this.donDatHang = donDatHang; }
     public NhaCungCap getNhaCungCap() { return nhaCungCap; }
     public void setNhaCungCap(NhaCungCap nhaCungCap) { this.nhaCungCap = nhaCungCap; }
-    
     public NhanVien getNhanVien() { return nhanVien; }
     public void setNhanVien(NhanVien nhanVien) { this.nhanVien = nhanVien; }
-
+    public Timestamp getNgayNhap() { return ngayNhap; }
+    public void setNgayNhap(Timestamp ngayNhap) { this.ngayNhap = ngayNhap; }
     public double getTongTien() { return tongTien; }
     public void setTongTien(double tongTien) { this.tongTien = tongTien; }
-
-    public String getTrangThai() { return trangThai; }
-    public void setTrangThai(String trangThai) { this.trangThai = trangThai; }
-    
-    
 }

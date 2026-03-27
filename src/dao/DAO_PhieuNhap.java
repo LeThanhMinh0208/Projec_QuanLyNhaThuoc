@@ -1,114 +1,255 @@
 package dao;
 
 import connectDB.ConnectDB;
-import entity.PhieuNhap;
-import entity.NhaCungCap;
+import entity.ChiTietDonDatHang;
+import entity.DonDatHang;
 import entity.NhanVien;
+import entity.NhaCungCap;
+import entity.PhieuNhap;
+
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DAO_PhieuNhap {
-    public ArrayList<PhieuNhap> getAllPhieuNhap() {
-        ArrayList<PhieuNhap> list = new ArrayList<>();
-        try {
-            Connection con = ConnectDB.getInstance().getConnection();
-            
-          
-            String sql = "SELECT p.*, ncc.tenNhaCungCap, nv.hoTen, " +
-                         "(SELECT SUM(soLuong * donGiaNhap) FROM ChiTietPhieuNhap WHERE maPhieuNhap = p.maPhieuNhap) as TongTien " +
-                         "FROM PhieuNhap p " +
-                         "JOIN NhaCungCap ncc ON p.maNhaCungCap = ncc.maNhaCungCap " +
-                         "JOIN NhanVien nv ON p.maNhanVien = nv.maNhanVien";
-            
-            PreparedStatement stmt = con.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
-            
-            while (rs.next()) {
-                // Khởi tạo đối tượng phụ
-                NhaCungCap ncc = new NhaCungCap();
-                ncc.setMaNhaCungCap(rs.getString("maNhaCungCap"));
-                ncc.setTenNhaCungCap(rs.getString("tenNhaCungCap"));
-                
-                NhanVien nv = new NhanVien();
-                nv.setMaNhanVien(rs.getString("maNhanVien"));
-                nv.setHoTen(rs.getString("hoTen"));
-                
-                // Khởi tạo PhieuNhap
-                PhieuNhap pn = new PhieuNhap();
-                pn.setMaPhieuNhap(rs.getString("maPhieuNhap"));
-                pn.setNgayNhap(rs.getDate("ngayNhap"));
-                pn.setNhaCungCap(ncc);
-                pn.setNhanVien(nv);
-                
-                // Lưu tạm tổng tiền vào một thuộc tính phụ hoặc xử lý hiển thị
-                // Giả sử trong Entity PhieuNhap bạn có field tongTien (double)
-                // pn.setTongTien(rs.getDouble("TongTien")); 
-                
-                // Vì DB bạn không có cột TrangThai, ta giả lập logic hoặc mặc định
-                // pn.setTrangThai("Đã thanh toán"); 
 
-                list.add(pn);
+    private String getMaPhieuNhapMoi(Connection con) throws SQLException {
+        String ma = "PN001";
+        try (Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT MAX(maPhieuNhap) FROM PhieuNhap")) {
+            if (rs.next() && rs.getString(1) != null) {
+                int so = Integer.parseInt(rs.getString(1).substring(2)) + 1;
+                ma = String.format("PN%03d", so);
+            }
+        }
+        return ma;
+    }
+
+    private String getMaDonMoi(Connection con) throws SQLException {
+        String ma = "DDH001";
+        try (Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT MAX(maDonDatHang) FROM DonDatHang")) {
+            if (rs.next() && rs.getString(1) != null) {
+                int so = Integer.parseInt(rs.getString(1).substring(3)) + 1;
+                ma = String.format("DDH%03d", so);
+            }
+        }
+        return ma;
+    }
+
+    public boolean luuPhieuNhapVaCapNhatDon(PhieuNhap phieuNhap, List<ChiTietDonDatHang> listChiTietNhan, DonDatHang donGoc, int soNgayHen) {
+        Connection con = null;
+        try {
+            con = ConnectDB.getInstance().getConnection();
+            
+            if (con == null || con.isClosed()) {
+                ConnectDB.getInstance().connect(); 
+                con = ConnectDB.getInstance().getConnection();
+            }
+
+            con.setAutoCommit(false); 
+
+            if (phieuNhap.getMaPhieuNhap() == null || phieuNhap.getMaPhieuNhap().isEmpty()) {
+                phieuNhap.setMaPhieuNhap(getMaPhieuNhapMoi(con)); 
+            }
+
+            String sqlInsertPhieuNhap = "INSERT INTO PhieuNhap (maPhieuNhap, maDonDatHang, maNhaCungCap, maNhanVien, ngayNhap) VALUES (?, ?, ?, ?, GETDATE())";
+            try (PreparedStatement pstPhieuNhap = con.prepareStatement(sqlInsertPhieuNhap)) {
+                pstPhieuNhap.setString(1, phieuNhap.getMaPhieuNhap());
+                pstPhieuNhap.setString(2, phieuNhap.getDonDatHang().getMaDonDatHang());
+                pstPhieuNhap.setString(3, phieuNhap.getNhaCungCap().getMaNhaCungCap());
+                pstPhieuNhap.setString(4, phieuNhap.getNhanVien().getMaNhanVien());
+                pstPhieuNhap.executeUpdate();
+            }
+
+            String sqlInsertLoThuoc = "INSERT INTO LoThuoc (maLoThuoc, maThuoc, ngaySanXuat, hanSuDung, soLuongTon, giaNhap, viTriKho) VALUES (?, ?, ?, ?, ?, ?, 'KHO_DU_TRU')";
+            String sqlInsertChiTietPN = "INSERT INTO ChiTietPhieuNhap (maPhieuNhap, maQuyDoi, maLoThuoc, soLuong, donGiaNhap) VALUES (?, ?, ?, ?, ?)";
+            String sqlUpdateChiTietDon = "UPDATE ChiTietDonDatHang SET soLuongDaNhan = soLuongDaNhan + ?, donGiaDuKien = ?, maLo = ?, ngaySanXuat = ?, hanSuDung = ? WHERE maDonDatHang = ? AND maQuyDoi = ?";
+
+            boolean isGiaoThieu = false;
+            double tongTienThieu = 0;
+
+            try (PreparedStatement pstLoThuoc = con.prepareStatement(sqlInsertLoThuoc);
+                 PreparedStatement pstChiTietPN = con.prepareStatement(sqlInsertChiTietPN);
+                 PreparedStatement pstUpdateCTDon = con.prepareStatement(sqlUpdateChiTietDon)) {
+
+                for (ChiTietDonDatHang ct : listChiTietNhan) {
+                    if (ct.getSoLuongDaNhan() > 0) {
+                        
+                        pstLoThuoc.setString(1, ct.getMaLo());
+                        pstLoThuoc.setString(2, ct.getThuoc().getMaThuoc());
+                        
+                        Date ngaySX = Date.valueOf(ChuyenDoiNgay(ct.getNgaySanXuatTemp()));
+                        Date hanSD = Date.valueOf(ChuyenDoiNgay(ct.getHanSuDung()));
+                        
+                        pstLoThuoc.setDate(3, ngaySX);
+                        pstLoThuoc.setDate(4, hanSD);
+                        pstLoThuoc.setInt(5, ct.getSoLuongDaNhan()); 
+                        pstLoThuoc.setDouble(6, ct.getDonGiaDuKien()); 
+                        pstLoThuoc.executeUpdate();
+
+                        pstChiTietPN.setString(1, phieuNhap.getMaPhieuNhap());
+                        pstChiTietPN.setString(2, ct.getDonViQuyDoi().getMaQuyDoi());
+                        pstChiTietPN.setString(3, ct.getMaLo());
+                        pstChiTietPN.setInt(4, ct.getSoLuongDaNhan());
+                        pstChiTietPN.setDouble(5, ct.getDonGiaDuKien());
+                        pstChiTietPN.executeUpdate();
+
+                        pstUpdateCTDon.setInt(1, ct.getSoLuongDaNhan()); 
+                        pstUpdateCTDon.setDouble(2, ct.getDonGiaDuKien()); 
+                        pstUpdateCTDon.setString(3, ct.getMaLo());
+                        pstUpdateCTDon.setDate(4, Date.valueOf(ChuyenDoiNgay(ct.getNgaySanXuatTemp())));
+                        pstUpdateCTDon.setDate(5, Date.valueOf(ChuyenDoiNgay(ct.getHanSuDung())));
+                        pstUpdateCTDon.setString(6, donGoc.getMaDonDatHang());
+                        pstUpdateCTDon.setString(7, ct.getDonViQuyDoi().getMaQuyDoi());
+                        
+                        pstUpdateCTDon.executeUpdate();
+                    }
+                    
+                    int slThieu = ct.getSoLuongDat() - ct.getSoLuongDaNhan();
+                    if (slThieu > 0) {
+                        isGiaoThieu = true;
+                        tongTienThieu += slThieu * ct.getDonGiaDuKien();
+                    }
+                }
+            }
+
+            if (isGiaoThieu && soNgayHen > 0) {
+                try (PreparedStatement pstUpdateOld = con.prepareStatement("UPDATE DonDatHang SET trangThai = 'GIAO_MOT_PHAN' WHERE maDonDatHang = ?")) {
+                    pstUpdateOld.setString(1, donGoc.getMaDonDatHang());
+                    pstUpdateOld.executeUpdate();
+                }
+
+                String maDonMoi = getMaDonMoi(con);
+                String sqlInsertNewDon = "INSERT INTO DonDatHang (maDonDatHang, maNhaCungCap, maNhanVien, ngayDat, ngayGiaoDuKien, tongTienDuTinh, trangThai, ghiChu) " +
+                                         "VALUES (?, ?, ?, GETDATE(), DATEADD(day, ?, GETDATE()), ?, 'CHO_GIAO', ?)";
+                try (PreparedStatement pstInsertNew = con.prepareStatement(sqlInsertNewDon)) {
+                    pstInsertNew.setString(1, maDonMoi);
+                    pstInsertNew.setString(2, donGoc.getNhaCungCap().getMaNhaCungCap());
+                    pstInsertNew.setString(3, donGoc.getNhanVien().getMaNhanVien());
+                    pstInsertNew.setInt(4, soNgayHen); 
+                    pstInsertNew.setDouble(5, tongTienThieu);
+                    pstInsertNew.setString(6, "Đơn tách tự động từ phần giao thiếu của đơn: " + donGoc.getMaDonDatHang());
+                    pstInsertNew.executeUpdate();
+                }
+
+                String sqlInsertNewCT = "INSERT INTO ChiTietDonDatHang (maDonDatHang, maQuyDoi, soLuongDat, soLuongDaNhan, donGiaDuKien) VALUES (?, ?, ?, 0, ?)";
+                try (PreparedStatement pstInsertCT = con.prepareStatement(sqlInsertNewCT)) {
+                    for (ChiTietDonDatHang ct : listChiTietNhan) {
+                        int slThieu = ct.getSoLuongDat() - ct.getSoLuongDaNhan();
+                        if (slThieu > 0) {
+                            pstInsertCT.setString(1, maDonMoi);
+                            pstInsertCT.setString(2, ct.getDonViQuyDoi().getMaQuyDoi());
+                            pstInsertCT.setInt(3, slThieu);
+                            pstInsertCT.setDouble(4, ct.getDonGiaDuKien());
+                            pstInsertCT.addBatch();
+                        }
+                    }
+                    pstInsertCT.executeBatch();
+                }
+            } else {
+                try (PreparedStatement pstTrangThai = con.prepareStatement("UPDATE DonDatHang SET trangThai = 'GIAO_DU' WHERE maDonDatHang = ?")) {
+                    pstTrangThai.setString(1, donGoc.getMaDonDatHang());
+                    pstTrangThai.executeUpdate();
+                }
+            }
+            con.commit(); 
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            try { 
+                if (con != null && !con.isClosed()) {
+                    con.rollback(); 
+                }
+            } catch (SQLException ex) { ex.printStackTrace(); }
+            return false;
+        } finally {
+            try { 
+                if (con != null && !con.isClosed()) {
+                    con.setAutoCommit(true); 
+                }
+            } catch (SQLException e) { e.printStackTrace(); }
+        }
+    }
+
+    private String ChuyenDoiNgay(String dateStr) {
+        if (dateStr == null || dateStr.isEmpty()) return "2099-12-31"; 
+        try {
+            String[] parts = dateStr.split("/");
+            if (parts.length == 3) {
+                return parts[2] + "-" + parts[1] + "-" + parts[0];
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return dateStr;
+    }
+
+    public boolean kiemTraMaLoTonTai(String maLo) {
+        boolean tonTai = false;
+        String sql = "SELECT maLoThuoc FROM LoThuoc WHERE maLoThuoc = ?";
+        try (Connection con = ConnectDB.getInstance().getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, maLo);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                tonTai = true; 
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return list;
+        return tonTai;
     }
-    public boolean capNhatTrangThai(String maPhieu, String trangThaiMoi) {
-        String sql = "UPDATE PhieuNhap SET trangThai = ? WHERE maPhieuNhap = ?";
+
+ // =========================================================================
+    // Lấy Danh Sách Phiếu Nhập hiển thị lên Tab 2
+    // =========================================================================
+    public List<PhieuNhap> getAllPhieuNhap(String tuKhoa) {
+        List<PhieuNhap> ds = new ArrayList<>();
+        
+        // ĐÃ SỬA SQL: Dùng cột "hoTen" của bảng NhanVien thay vì "tenNhanVien"
+        String sql = "SELECT pn.maPhieuNhap, pn.ngayNhap, " +
+                     "ncc.maNhaCungCap, ncc.tenNhaCungCap, " +
+                     "nv.maNhanVien, nv.hoTen, " +
+                     "COALESCE(SUM(ctpn.soLuong * ctpn.donGiaNhap), 0) AS tongTien " +
+                     "FROM PhieuNhap pn " +
+                     "JOIN NhaCungCap ncc ON pn.maNhaCungCap = ncc.maNhaCungCap " +
+                     "JOIN NhanVien nv ON pn.maNhanVien = nv.maNhanVien " +
+                     "LEFT JOIN ChiTietPhieuNhap ctpn ON pn.maPhieuNhap = ctpn.maPhieuNhap " +
+                     "WHERE pn.maPhieuNhap LIKE ? OR ncc.tenNhaCungCap LIKE ? " +
+                     "GROUP BY pn.maPhieuNhap, pn.ngayNhap, ncc.maNhaCungCap, ncc.tenNhaCungCap, nv.maNhanVien, nv.hoTen " +
+                     "ORDER BY pn.ngayNhap DESC";
+
         try (Connection con = ConnectDB.getInstance().getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
-            pst.setString(1, trangThaiMoi);
-            pst.setString(2, maPhieu);
-            return pst.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-    public boolean xoaPhieuNhap(String maPhieuNhap) {
-        Connection con = ConnectDB.getInstance().getConnection();
-        PreparedStatement pstChiTiet = null;
-        PreparedStatement pstPhieu = null;
-
-        try {
-            // 1. Tắt chế độ AutoCommit để bắt đầu Transaction
-            con.setAutoCommit(false);
-
-            // 2. Xóa các dòng con trong bảng ChiTietPhieuNhap trước (Ràng buộc khóa ngoại)
-            String sqlChiTiet = "DELETE FROM ChiTietPhieuNhap WHERE maPhieuNhap = ?";
-            pstChiTiet = con.prepareStatement(sqlChiTiet);
-            pstChiTiet.setString(1, maPhieuNhap);
-            pstChiTiet.executeUpdate();
-
-            // 3. Xóa dòng cha trong bảng PhieuNhap
-            String sqlPhieu = "DELETE FROM PhieuNhap WHERE maPhieuNhap = ?";
-            pstPhieu = con.prepareStatement(sqlPhieu);
-            pstPhieu.setString(1, maPhieuNhap);
-            int rowsAffected = pstPhieu.executeUpdate();
-
-            // 4. Nếu mọi thứ ổn, xác nhận thay đổi vào DB
-            con.commit();
-            return rowsAffected > 0;
-
-        } catch (SQLException e) {
-            // 5. Nếu có bất kỳ lỗi nào, khôi phục lại dữ liệu ban đầu
-            try {
-                if (con != null) con.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+            
+            String searchPattern = "%" + (tuKhoa == null ? "" : tuKhoa) + "%";
+            pst.setString(1, searchPattern);
+            pst.setString(2, searchPattern);
+            
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                PhieuNhap pn = new PhieuNhap();
+                pn.setMaPhieuNhap(rs.getString("maPhieuNhap"));
+                pn.setNgayNhap(rs.getTimestamp("ngayNhap"));
+                
+                entity.NhaCungCap ncc = new entity.NhaCungCap();
+                ncc.setMaNhaCungCap(rs.getString("maNhaCungCap"));
+                ncc.setTenNhaCungCap(rs.getString("tenNhaCungCap"));
+                pn.setNhaCungCap(ncc);
+                
+                entity.NhanVien nv = new entity.NhanVien();
+                nv.setMaNhanVien(rs.getString("maNhanVien"));
+                // Lấy ra bằng tên cột hoTen
+                nv.setHoTen(rs.getString("hoTen"));
+                pn.setNhanVien(nv);
+                
+                pn.setTongTien(rs.getDouble("tongTien"));
+                
+                ds.add(pn);
             }
+        } catch (Exception e) {
             e.printStackTrace();
-            return false;
-        } finally {
-            // 6. Luôn mở lại AutoCommit và đóng Statement
-            try {
-                if (con != null) con.setAutoCommit(true);
-                if (pstChiTiet != null) pstChiTiet.close();
-                if (pstPhieu != null) pstPhieu.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
+        return ds;
     }
 }

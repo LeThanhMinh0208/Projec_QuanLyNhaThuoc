@@ -18,12 +18,15 @@ public class DAO_DonViQuyDoi {
             pst.setString(1, maThuoc);
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
-                list.add(new DonViQuyDoi(
-                        rs.getString("maQuyDoi"),
-                        rs.getString("maThuoc"),
-                        rs.getString("tenDonVi"),
-                        rs.getInt("tyLeQuyDoi")
-                ));
+                String maQuyDoi = rs.getString("maQuyDoi");
+                String maT = rs.getString("maThuoc");
+                String tenDonVi = rs.getString("tenDonVi");
+                int tyLeQuyDoi = rs.getInt("tyLeQuyDoi");
+                
+                // FIX LỖI: Bảng CSDL không có cột giaBan, gán mặc định = 0
+                double giaBan = 0.0; 
+                
+                list.add(new DonViQuyDoi(maQuyDoi, maT, tenDonVi, tyLeQuyDoi, giaBan));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -33,9 +36,8 @@ public class DAO_DonViQuyDoi {
 
     /** Lấy 1 đơn vị theo maQuyDoi */
     public DonViQuyDoi getByMaQuyDoi(String maQuyDoi) {
-        String sql = "SELECT maQuyDoi, maThuoc, tenDonVi, tyLeQuyDoi "
-                   + "FROM DonViQuyDoi WHERE maQuyDoi = ?";
-        try (Connection con = ConnectDB.getConnection();
+        String sql = "SELECT * FROM DonViQuyDoi WHERE maQuyDoi = ?";
+        try (Connection con = ConnectDB.getConnection(); 
              PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setString(1, maQuyDoi);
             ResultSet rs = pst.executeQuery();
@@ -44,7 +46,8 @@ public class DAO_DonViQuyDoi {
                         rs.getString("maQuyDoi"),
                         rs.getString("maThuoc"),
                         rs.getString("tenDonVi"),
-                        rs.getInt("tyLeQuyDoi")
+                        rs.getInt("tyLeQuyDoi"),
+                        0.0 // FIX LỖI TƯƠNG TỰ
                 );
             }
         } catch (SQLException e) {

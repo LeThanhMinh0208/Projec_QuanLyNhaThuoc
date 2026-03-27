@@ -240,8 +240,8 @@ public class GUI_TrangChuController {
     }
 
     @FXML
-    void moQuanLyDonNhapHang(ActionEvent event) {
-        utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyDonNhapHang.fxml");
+    void moQuanLyDonDatHang(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyDonDatHang.fxml");
     }
 
     @FXML

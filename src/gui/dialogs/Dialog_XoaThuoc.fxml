@@ -1,79 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<<<<<<< HEAD
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import java.net.URL?>
-
-<VBox styleClass="ds-dialog-root" spacing="0" prefWidth="500.0"
-      xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="gui.main.GUI_DialogDonThuocController">
-   <stylesheets>
-      <URL value="@../../resources/css/DanhMucThuoc.css" />
-   </stylesheets>
-
-   <VBox styleClass="ds-header-area">
-      <Label fx:id="lblTieuDe" styleClass="ds-dialog-title" text="THÊM ĐƠN THUỐC MỚI" />
-   </VBox>
-
-   <VBox spacing="14.0">
-      <padding><Insets bottom="25.0" left="25.0" right="25.0" top="20.0" /></padding>
-      <children>
-
-         <!-- Mã Đơn -->
-         <VBox spacing="5.0">
-            <Label text="Mã Đơn Thuốc *" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
-            <TextField fx:id="txtMaDon" styleClass="ds-input" prefHeight="40.0"
-                       promptText="VD: DT260226001" />
-         </VBox>
-
-         <!-- Tên Bác Sĩ -->
-         <VBox spacing="5.0">
-            <Label text="Tên Bác Sĩ *" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
-            <TextField fx:id="txtBacSi" styleClass="ds-input" prefHeight="40.0"
-                       promptText="VD: BS. Nguyễn Văn A" />
-         </VBox>
-
-         <!-- Chẩn Đoán -->
-         <VBox spacing="5.0">
-            <Label text="Chẩn Đoán" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
-            <TextArea fx:id="txtChanDoan" styleClass="ds-input"
-                      prefHeight="75.0" wrapText="true"
-                      promptText="Nhập chẩn đoán của bác sĩ..." />
-         </VBox>
-
-         <!-- Thông Tin Bệnh Nhân -->
-         <VBox spacing="5.0">
-            <Label text="Thông Tin Bệnh Nhân *" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
-            <TextArea fx:id="txtBenhNhan" styleClass="ds-input"
-                      prefHeight="75.0" wrapText="true"
-                      promptText="Họ tên, tuổi, địa chỉ bệnh nhân..." />
-         </VBox>
-
-         <!-- Hình Ảnh -->
-         <VBox spacing="5.0">
-            <Label text="Hình Ảnh Đơn" style="-fx-font-weight:bold;-fx-text-fill:#1e40af;" />
-            <HBox spacing="10.0" alignment="CENTER_LEFT">
-               <TextField fx:id="txtHinhAnh" styleClass="ds-input"
-                          promptText="Đường dẫn ảnh..." prefHeight="40.0" HBox.hgrow="ALWAYS" />
-               <Button onAction="#handleChonAnh" text="📁 Chọn"
-                       prefHeight="40.0" styleClass="ds-btn-cancel"
-                       style="-fx-cursor:hand;" />
-            </HBox>
-         </VBox>
-
-         <!-- Buttons -->
-         <HBox spacing="12.0" alignment="CENTER_RIGHT">
-            <padding><Insets top="8.0" /></padding>
-            <Button onAction="#handleHuy" text="✕  Huỷ"
-                    prefHeight="42.0" prefWidth="110.0" styleClass="ds-btn-cancel" />
-            <Button fx:id="btnLuu" onAction="#handleLuu" text="💾  Lưu"
-                    prefHeight="42.0" prefWidth="140.0" styleClass="ds-btn-save" />
-         </HBox>
-      </children>
-   </VBox>
-=======
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
@@ -126,5 +51,4 @@
             </children>
         </VBox>
     </children>
->>>>>>> main
 </VBox>

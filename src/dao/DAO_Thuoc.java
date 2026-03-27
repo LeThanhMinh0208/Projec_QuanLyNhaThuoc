@@ -254,4 +254,23 @@ public class DAO_Thuoc {
             return false;
         }
     }
+ // Lấy giá nhập gần nhất của thuốc từ bảng LoThuoc (Lô mới nhất)
+    public double getGiaNhapGanNhat(String maThuoc) {
+        double giaNhap = 0.0;
+        // Dùng TOP 1 và ORDER BY DESC để lấy lô mới nhất
+        String sql = "SELECT TOP 1 giaNhap FROM LoThuoc WHERE maThuoc = ? ORDER BY maLoThuoc DESC";
+        try (java.sql.Connection con = connectDB.ConnectDB.getInstance().getConnection();
+             java.sql.PreparedStatement pst = con.prepareStatement(sql)) {
+            
+            pst.setString(1, maThuoc);
+            java.sql.ResultSet rs = pst.executeQuery();
+            
+            if (rs.next()) {
+                giaNhap = rs.getDouble("giaNhap");
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Lỗi khi lấy Giá Nhập gần nhất từ Lô Thuốc: " + e.getMessage());
+        }
+        return giaNhap;
+    }
 }
