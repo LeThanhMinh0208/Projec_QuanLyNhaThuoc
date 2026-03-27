@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox prefWidth="900.0" spacing="0.0"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="gui.dialogs.Dialog_ChiTietBangGiaController">
+
+    <stylesheets>
+        <URL value="@../../resources/css/TrangChu.css" />
+        <URL value="@../../resources/css/BanHang.css" />
+        <URL value="@../../resources/css/BangGia.css" />
+    </stylesheets>
+
+    <!-- Header -->
+    <HBox styleClass="dialog-header" alignment="CENTER_LEFT" spacing="12.0">
+        <Label fx:id="lblHeaderTitle" text="Chi Tiết Bảng Giá" styleClass="dialog-header-title" />
+    </HBox>
+
+    <!-- Body -->
+    <VBox spacing="16.0" styleClass="dialog-body">
+        <padding><Insets top="16" bottom="8" left="20" right="20" /></padding>
+
+        <!-- Info block (read-only) -->
+        <HBox spacing="24.0" alignment="CENTER_LEFT"
+              style="-fx-background-color:#f8fafc; -fx-padding:12 16; -fx-background-radius:8;">
+            <VBox spacing="4">
+                <Label text="Mã Bảng Giá" style="-fx-text-fill:#94a3b8; -fx-font-size:11px;"/>
+                <Label fx:id="lblMa" text="---" style="-fx-font-weight:bold; -fx-font-size:13px;"/>
+            </VBox>
+            <VBox spacing="4">
+                <Label text="Loại" style="-fx-text-fill:#94a3b8; -fx-font-size:11px;"/>
+                <Label fx:id="lblLoai" text="---" style="-fx-font-weight:bold; -fx-font-size:13px;"/>
+            </VBox>
+            <VBox spacing="4">
+                <Label text="Ngày Bắt Đầu" style="-fx-text-fill:#94a3b8; -fx-font-size:11px;"/>
+                <Label fx:id="lblNgayBatDau" text="---" style="-fx-font-size:13px;"/>
+            </VBox>
+            <VBox spacing="4">
+                <Label text="Trạng Thái" style="-fx-text-fill:#94a3b8; -fx-font-size:11px;"/>
+                <Label fx:id="lblTrangThai" text="---" style="-fx-font-size:13px; -fx-font-weight:bold;"/>
+            </VBox>
+        </HBox>
+
+        <!-- Editable fields -->
+        <HBox spacing="12.0" alignment="CENTER_LEFT">
+            <Label text="Tên bảng giá *" minWidth="130" style="-fx-text-fill:#374151; -fx-font-weight:bold;"/>
+            <TextField fx:id="txtTen" styleClass="bg-form-input" HBox.hgrow="ALWAYS"/>
+        </HBox>
+
+        <HBox spacing="12.0" alignment="CENTER_LEFT">
+            <Label text="Ngày kết thúc" minWidth="130" style="-fx-text-fill:#374151; -fx-font-weight:bold;"/>
+            <DatePicker fx:id="dpNgayKetThuc" prefWidth="200.0" styleClass="bg-form-datepicker"/>
+            <Label fx:id="lblNgayKTHint" text="" style="-fx-text-fill:#94a3b8; -fx-font-size:12px;"/>
+        </HBox>
+
+        <HBox spacing="12.0" alignment="TOP_LEFT">
+            <Label text="Mô tả" minWidth="130" style="-fx-text-fill:#374151; -fx-font-weight:bold;"/>
+            <TextArea fx:id="txtMoTa" prefHeight="60.0" wrapText="true"
+                      styleClass="bg-form-textarea" HBox.hgrow="ALWAYS"/>
+        </HBox>
+
+        <!-- Separator -->
+        <Separator/>
+
+        <!-- Table header -->
+        <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <Label text="DANH SÁCH THUỐC TRONG BẢNG GIÁ"
+                   style="-fx-font-weight:bold; -fx-font-size:13px;" HBox.hgrow="ALWAYS"/>
+            <Button text="+ Thêm thuốc" onAction="#handleThemThuoc"
+                    styleClass="bh-btn-primary" prefHeight="34"/>
+        </HBox>
+
+        <!-- Chi tiết bảng giá table -->
+        <TableView fx:id="tableChiTiet" prefHeight="320.0" styleClass="bg-detail-table">
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+            <placeholder>
+                <Label text="Chưa có thuốc nào trong bảng giá này" style="-fx-text-fill:#94a3b8;"/>
+            </placeholder>
+            <columns>
+                <TableColumn fx:id="colTenThuoc"  text="Tên Thuốc"     prefWidth="260"/>
+                <TableColumn fx:id="colDonVi"     text="Đơn Vị"        prefWidth="110"/>
+                <TableColumn fx:id="colTyLe"      text="Tỷ Lệ"         prefWidth="70"/>
+                <TableColumn fx:id="colGiaBan"    text="Giá (VNĐ)"     prefWidth="130"/>
+                <TableColumn fx:id="colHanhDong"  text="Hành Động"     prefWidth="160"/>
+            </columns>
+        </TableView>
+    </VBox>
+
+    <!-- Footer -->
+    <HBox styleClass="dialog-footer" alignment="CENTER_RIGHT" spacing="12.0">
+        <Button text="Đóng" onAction="#handleDong" styleClass="dialog-btn-cancel"
+                prefWidth="100" prefHeight="40"/>
+        <Button text="💾 Lưu Thay Đổi" onAction="#handleLuu" styleClass="dialog-btn-ok"
+                prefWidth="160" prefHeight="40"/>
+    </HBox>
+</VBox>

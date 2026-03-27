@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox prefWidth="650.0" spacing="0.0"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="gui.dialogs.Dialog_ThemThuocVaoBangGiaController">
+
+    <stylesheets>
+        <URL value="@../../resources/css/TrangChu.css" />
+        <URL value="@../../resources/css/BanHang.css" />
+        <URL value="@../../resources/css/BangGia.css" />
+    </stylesheets>
+
+    <!-- Header -->
+    <HBox styleClass="dialog-header" alignment="CENTER_LEFT" spacing="12.0">
+        <Label text="Thêm Thuốc Vào Bảng Giá" styleClass="dialog-header-title" />
+    </HBox>
+
+    <!-- Body -->
+    <VBox spacing="14.0" styleClass="dialog-body">
+        <padding><Insets top="16" bottom="8" left="20" right="20" /></padding>
+
+        <!-- Search -->
+        <HBox alignment="CENTER_LEFT" prefHeight="40.0" styleClass="bh-search-box">
+            <Label styleClass="bh-search-icon" text="🔍" />
+            <TextField fx:id="txtTimKiem" promptText="Tìm theo tên thuốc..."
+                       styleClass="bh-search-input" HBox.hgrow="ALWAYS" />
+        </HBox>
+
+        <Label text="Chọn thuốc và nhập giá cho từng đơn vị (giá > 0 mới được thêm):"
+               style="-fx-text-fill:#64748b; -fx-font-size:12px;" />
+
+        <!-- Table -->
+        <TableView fx:id="tableChonThuoc" prefHeight="380.0" styleClass="bg-detail-table">
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+            <placeholder>
+                <Label text="Tất cả thuốc đã có trong bảng giá" style="-fx-text-fill:#94a3b8;" />
+            </placeholder>
+            <columns>
+                <TableColumn fx:id="colChonThuoc"  text="Tên Thuốc" prefWidth="250" />
+                <TableColumn fx:id="colChonDonVi"  text="Đơn Vị"   prefWidth="120" />
+                <TableColumn fx:id="colChonGia"    text="Giá Bán (VNĐ)" prefWidth="180" />
+            </columns>
+        </TableView>
+    </VBox>
+
+    <!-- Footer -->
+    <HBox styleClass="dialog-footer" alignment="CENTER_RIGHT" spacing="12.0">
+        <Button text="Hủy" onAction="#handleHuy" styleClass="dialog-btn-cancel"
+                prefWidth="110" prefHeight="40" />
+        <Button text="Lưu" onAction="#handleLuu" styleClass="dialog-btn-ok"
+                prefWidth="130" prefHeight="40" />
+    </HBox>
+</VBox>

@@ -89,19 +89,22 @@ public class GUI_QuanLyBanHangController {
     private double thueVatLe = 0;
 
     public class CartItem {
-        public Thuoc thuoc;
+        public Thuoc     thuoc;
         public DonViQuyDoi donVi;
-        public int soLuong;
-        public double donGia;
-        public double thanhTien;
-        public List<LoThuoc> loThuocDuocChon = new ArrayList<>();
+        public int       soLuong;
+        public double    donGia;
+        public double    thanhTien;
+        public String    maBangGia;   // mã bảng giá đang áp dụng
+        public String    maLoThuoc;   // lô FEFO được chọn khi thêm
+        public java.sql.Date hanSuDung; // HSD của lô FEFO
 
-        public CartItem(Thuoc thuoc, DonViQuyDoi donVi, int soLuong) {
-            this.thuoc = thuoc;
-            this.donVi = donVi;
-            this.soLuong = soLuong;
-            this.donGia = donVi.getGiaBan();
-            this.thanhTien = this.soLuong * this.donGia;
+        public CartItem(Thuoc thuoc, DonViQuyDoi donVi, int soLuong, double donGia, String maBangGia) {
+            this.thuoc      = thuoc;
+            this.donVi      = donVi;
+            this.soLuong    = soLuong;
+            this.donGia     = donGia;
+            this.maBangGia  = maBangGia;
+            this.thanhTien  = soLuong * donGia;
         }
     }
 
@@ -186,7 +189,11 @@ public class GUI_QuanLyBanHangController {
         colCartSoLuong.setCellValueFactory(cd -> new SimpleIntegerProperty(cd.getValue().soLuong).asObject());
         colCartDonGia.setCellValueFactory(cd -> new SimpleStringProperty(String.format("%,.0f ₫", cd.getValue().donGia)));
         colCartThanhTien.setCellValueFactory(cd -> new SimpleStringProperty(String.format("%,.0f ₫", cd.getValue().thanhTien)));
-        colCartHanSuDung.setCellValueFactory(cd -> new SimpleStringProperty("Tự động (Lô cũ)"));
+        colCartHanSuDung.setCellValueFactory(cd -> {
+            CartItem it = cd.getValue();
+            if (it.hanSuDung != null) return new SimpleStringProperty(it.hanSuDung.toLocalDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            return new SimpleStringProperty("FEFO");
+        });
         
         colCartXoa.setCellFactory(column -> new TableCell<CartItem, Void>() {
             private final Button btn = new Button("✕");
@@ -207,7 +214,14 @@ public class GUI_QuanLyBanHangController {
     }
 
     private void loadDataThuocLe() {
-        masterDataLe.setAll(daoThuoc.getAllThuoc());
+        List<Thuoc> allThuoc = daoThuoc.getAllThuoc();
+        List<Thuoc> filtered = new ArrayList<>();
+        for (Thuoc t : allThuoc) {
+            if ("DANG_BAN".equals(t.getTrangThai())) {
+                filtered.add(t);
+            }
+        }
+        masterDataLe.setAll(filtered);
         tblThuocLe.setItems(masterDataLe);
     }
 
@@ -258,22 +272,35 @@ public class GUI_QuanLyBanHangController {
             stage.setTitle("Chọn Số Lượng");
             stage.showAndWait();
 
-            DonViQuyDoi dv = controller.getDonViChon();
-            int sl = controller.getSoLuongChon();
+            DonViQuyDoi dv  = controller.getDonViChon();
+            int  sl         = controller.getSoLuongChon();
+            double donGia   = controller.getDonGiaChon();
+            String maBangGia = controller.getMaBangGiaChon();
 
-            if (dv != null && sl > 0) {
-                // Kiem tra thuoc da co trong gio chua, neu co thi cong don
+            if (dv != null && sl > 0 && maBangGia != null) {
+                // Kiểm tra thuốc + đơn vị đã có trong giỏ → cộng dồn
                 boolean found = false;
                 for (CartItem item : cartDataLe) {
-                    if (item.thuoc.getMaThuoc().equals(selectedThuoc.getMaThuoc()) && item.donVi.getMaQuyDoi().equals(dv.getMaQuyDoi())) {
-                        item.soLuong += sl;
-                        item.thanhTien = item.soLuong * item.donGia;
+                    if (item.thuoc.getMaThuoc().equals(selectedThuoc.getMaThuoc())
+                            && item.donVi.getMaQuyDoi().equals(dv.getMaQuyDoi())) {
+                        item.soLuong   += sl;
+                        item.thanhTien  = item.soLuong * item.donGia;
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
-                    cartDataLe.add(new CartItem(selectedThuoc, dv, sl));
+                    // Lấy lô FEFO ngay khi thêm để hiển thị HSD
+                    CartItem ci = new CartItem(selectedThuoc, dv, sl, donGia, maBangGia);
+                    String maLo = daoLoThuoc.getLoFEFO(selectedThuoc.getMaThuoc());
+                    if (maLo != null) {
+                        ci.maLoThuoc = maLo;
+                        // Lấy HSD để hiển thị
+                        daoLoThuoc.getLoThuocBanDuocByMaThuoc(selectedThuoc.getMaThuoc()).stream()
+                            .filter(l -> l.getMaLoThuoc().equals(maLo)).findFirst()
+                            .ifPresent(l -> ci.hanSuDung = l.getHanSuDung());
+                    }
+                    cartDataLe.add(ci);
                 }
                 tblGioHangLe.refresh();
                 tinhTongTienLe();
@@ -388,38 +415,25 @@ public class GUI_QuanLyBanHangController {
         HoaDon hd = new HoaDon(maHD, java.sql.Date.valueOf(LocalDate.now()), 0.08, 
                 dbHinhThuc, "", user, currentKhachHang);
         
-        // Tao danh sach ChiTietHoaDon va Tru Kho
+        // Tạo danh sách ChiTietHoaDon – mỗi sản phẩm 1 lô FEFO (strict)
         List<ChiTietHoaDon> dsCT = new ArrayList<>();
         for (CartItem item : cartDataLe) {
-            int tongQuyDoi = item.soLuong * item.donVi.getTyLeQuyDoi();
-            List<LoThuoc> loThuocs = daoLoThuoc.getLoThuocBanDuocByMaThuoc(item.thuoc.getMaThuoc());
-            
-            int remaining = tongQuyDoi;
-            for (LoThuoc lo : loThuocs) {
-                if (remaining <= 0) break;
-                if (lo.getSoLuongTon() == 0) continue;
-                
-                int deduct = Math.min(remaining, lo.getSoLuongTon());
-                remaining -= deduct;
-                
-                // Ti le QĐ, so luong cho ChiTietHoaDon nay la deduct / tyLeQuyDoi -> Nhưng nếu không chia hết thì sao?
-                // Chúng ta cứ giữ đúng Số Lượng và Đơn Giá của DonViQuyDoi cho ChiTietHoaDon chính. Đối với việc trừ kho, DAO_HoaDon làm theo soLuong.
-                // Do đó để hóa đơn đẹp, ta không chia nhỏ ChiTietHoaDon theo lô mà truyền lô đầu tiên vào là đại diện hoặc sửa DB.
-                // Để đơn giản (MVP), ta sẽ tạo 1 ChiTiet cho lô đầu tiên đủ hoặc tạo nhiều chi tiết:
-                ChiTietHoaDon ct = new ChiTietHoaDon();
-                ct.setMaLoThuoc(lo.getMaLoThuoc());
-                ct.setMaQuyDoi(item.donVi.getMaQuyDoi());
-                // Chúng ta dùng "Tỉ lệ" quy đổi để tính số lượng theo đơn vị: (Gần đúng nếu rớt lô lẻ)
-                double slGhiHD = (double) deduct / item.donVi.getTyLeQuyDoi();
-                ct.setSoLuong((int) Math.ceil(slGhiHD));
-                ct.setDonGia(item.donGia);
-                ct.setSoLuongTruKho(deduct); // Exact amount deducted!
-                dsCT.add(ct);
-            }
-            if (remaining > 0) {
-                showAlert(AlertType.ERROR, "Lỗi", "Không đủ tồn kho cho thuốc: " + item.thuoc.getTenThuoc());
+            String maLo = item.maLoThuoc != null ? item.maLoThuoc
+                        : daoLoThuoc.getLoFEFO(item.thuoc.getMaThuoc());
+            if (maLo == null) {
+                showAlert(AlertType.ERROR, "Lỗi tồn kho",
+                    "Không tìm thấy lô hàng hợp lệ (còn hàng, chưa hết hạn) cho: " + item.thuoc.getTenThuoc());
                 return;
             }
+            int soLuongCoBan = item.soLuong * item.donVi.getTyLeQuyDoi();
+            ChiTietHoaDon ct = new ChiTietHoaDon();
+            ct.setMaBangGia(item.maBangGia);
+            ct.setMaQuyDoi(item.donVi.getMaQuyDoi());
+            ct.setMaLoThuoc(maLo);
+            ct.setSoLuong(item.soLuong);
+            ct.setDonGia(item.donGia);
+            ct.setSoLuongTruKho(soLuongCoBan);
+            dsCT.add(ct);
         }
         
         // Lưu Hóa Đơn (Phần DAO_HoaDon hiện đang deduct bằng soLuong, nên sẽ lỗi logic tỷ lệ quy đổi nếu ta không sửa DAO_HoaDon)
@@ -703,15 +717,25 @@ public class GUI_QuanLyBanHangController {
                 int sl = controller2.getSoLuongChon();
                 DonViQuyDoi dv = controller2.getDonViChon();
                 
-                if (sl > 0 && dv != null) {
+                if (sl > 0 && dv != null && controller2.getMaBangGiaChon() != null) {
                     CartItem existing = cartDataDon.stream()
-                        .filter(i -> i.thuoc.getMaThuoc().equals(selectedThuoc.getMaThuoc()) && i.donVi.getMaQuyDoi().equals(dv.getMaQuyDoi()))
+                        .filter(i -> i.thuoc.getMaThuoc().equals(selectedThuoc.getMaThuoc())
+                                  && i.donVi.getMaQuyDoi().equals(dv.getMaQuyDoi()))
                         .findFirst().orElse(null);
                     if (existing != null) {
-                        existing.soLuong += sl;
-                        existing.thanhTien = existing.soLuong * existing.donGia;
+                        existing.soLuong   += sl;
+                        existing.thanhTien  = existing.soLuong * existing.donGia;
                     } else {
-                        cartDataDon.add(new CartItem(selectedThuoc, dv, sl));
+                        CartItem ci = new CartItem(selectedThuoc, dv, sl,
+                                controller2.getDonGiaChon(), controller2.getMaBangGiaChon());
+                        String maLo = daoLoThuoc.getLoFEFO(selectedThuoc.getMaThuoc());
+                        if (maLo != null) {
+                            ci.maLoThuoc = maLo;
+                            daoLoThuoc.getLoThuocBanDuocByMaThuoc(selectedThuoc.getMaThuoc()).stream()
+                                .filter(l -> l.getMaLoThuoc().equals(maLo)).findFirst()
+                                .ifPresent(l -> ci.hanSuDung = l.getHanSuDung());
+                        }
+                        cartDataDon.add(ci);
                     }
                     tblGioHangDon.refresh();
                     tinhTongTienDon();
@@ -753,28 +777,22 @@ public class GUI_QuanLyBanHangController {
         
         List<ChiTietHoaDon> dsCT = new ArrayList<>();
         for (CartItem item : cartDataDon) {
-            int tongQuyDoi = item.soLuong * item.donVi.getTyLeQuyDoi();
-            List<LoThuoc> loThuocs = daoLoThuoc.getLoThuocBanDuocByMaThuoc(item.thuoc.getMaThuoc());
-            int remaining = tongQuyDoi;
-            for (LoThuoc lo : loThuocs) {
-                if (remaining <= 0) break;
-                if (lo.getSoLuongTon() == 0) continue;
-                int deduct = Math.min(remaining, lo.getSoLuongTon());
-                remaining -= deduct;
-                
-                ChiTietHoaDon ct = new ChiTietHoaDon();
-                ct.setMaLoThuoc(lo.getMaLoThuoc());
-                ct.setMaQuyDoi(item.donVi.getMaQuyDoi());
-                double slGhiHD = (double) deduct / item.donVi.getTyLeQuyDoi();
-                ct.setSoLuong((int) Math.ceil(slGhiHD));
-                ct.setDonGia(item.donGia);
-                ct.setSoLuongTruKho(deduct); // Exact amount deducted!
-                dsCT.add(ct);
-            }
-            if (remaining > 0) {
-                showAlert(AlertType.ERROR, "Lỗi Tồn Kho", "Không đủ tồn kho cho thuốc: " + item.thuoc.getTenThuoc());
+            String maLo = item.maLoThuoc != null ? item.maLoThuoc
+                        : daoLoThuoc.getLoFEFO(item.thuoc.getMaThuoc());
+            if (maLo == null) {
+                showAlert(AlertType.ERROR, "Lỗi tồn kho",
+                    "Không tìm thấy lô hàng hợp lệ cho: " + item.thuoc.getTenThuoc());
                 return;
             }
+            int soLuongCoBan = item.soLuong * item.donVi.getTyLeQuyDoi();
+            ChiTietHoaDon ct = new ChiTietHoaDon();
+            ct.setMaBangGia(item.maBangGia);
+            ct.setMaQuyDoi(item.donVi.getMaQuyDoi());
+            ct.setMaLoThuoc(maLo);
+            ct.setSoLuong(item.soLuong);
+            ct.setDonGia(item.donGia);
+            ct.setSoLuongTruKho(soLuongCoBan);
+            dsCT.add(ct);
         }
         
         boolean ok = daoHoaDon.thanhToan(hd, dsCT);

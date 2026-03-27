@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox prefWidth="800" prefHeight="600" spacing="16"
+      style="-fx-background-color:#f8fafc; -fx-padding:24;"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="gui.dialogs.Dialog_ChiTietHoaDonController">
+
+    <stylesheets>
+        <URL value="@../../resources/css/TrangChu.css" />
+        <URL value="@../../resources/css/BanHang.css" />
+    </stylesheets>
+
+    <!-- HEADER INFO -->
+    <VBox styleClass="bh-panel" spacing="10">
+        <Label text="THÔNG TIN HÓA ĐƠN" styleClass="bh-section-title" />
+        <GridPane hgap="20" vgap="8">
+            <columnConstraints>
+                <ColumnConstraints prefWidth="130" />
+                <ColumnConstraints hgrow="ALWAYS" />
+                <ColumnConstraints prefWidth="130" />
+                <ColumnConstraints hgrow="ALWAYS" />
+            </columnConstraints>
+            <Label text="Mã hóa đơn:"      style="-fx-text-fill:#64748b;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <Label fx:id="lblMaHD"          style="-fx-font-weight:bold;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <Label text="Ngày lập:"         style="-fx-text-fill:#64748b;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+            <Label fx:id="lblNgayLap"                                      GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+            <Label text="Nhân viên:"        style="-fx-text-fill:#64748b;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <Label fx:id="lblNhanVien"                                     GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            <Label text="Hình thức TT:"     style="-fx-text-fill:#64748b;" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+            <Label fx:id="lblHinhThuc"                                     GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+
+            <Label text="Khách hàng:"       style="-fx-text-fill:#64748b;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <Label fx:id="lblKhachHang"                                    GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            <Label text="VAT:"              style="-fx-text-fill:#64748b;" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+            <Label fx:id="lblVAT"                                          GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+
+            <Label text="Ghi chú:"          style="-fx-text-fill:#64748b;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <Label fx:id="lblGhiChu"        wrapText="true"                GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+        </GridPane>
+    </VBox>
+
+    <!-- BẢNG CHI TIẾT SẢN PHẨM -->
+    <VBox styleClass="bh-panel" VBox.vgrow="ALWAYS" spacing="8">
+        <Label text="CHI TIẾT SẢN PHẨM" styleClass="bh-section-title" />
+        <TableView fx:id="tableChiTiet" VBox.vgrow="ALWAYS" minHeight="200">
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+            <columns>
+                <TableColumn fx:id="colSTT"       text="STT"        prefWidth="45" />
+                <TableColumn fx:id="colTenThuoc"  text="Tên Thuốc"  prefWidth="200" />
+                <TableColumn fx:id="colDonVi"     text="Đơn Vị"     prefWidth="80" />
+                <TableColumn fx:id="colLoThuoc"   text="Lô"         prefWidth="80" />
+                <TableColumn fx:id="colHSD"       text="HSD"        prefWidth="100" />
+                <TableColumn fx:id="colSoLuong"   text="SL"         prefWidth="55" />
+                <TableColumn fx:id="colDonGia"    text="Đơn Giá"    prefWidth="110" />
+                <TableColumn fx:id="colThanhTien" text="Thành Tiền" prefWidth="120" />
+            </columns>
+        </TableView>
+    </VBox>
+
+    <!-- TỔNG TIỀN -->
+    <VBox styleClass="bh-panel" spacing="8" VBox.vgrow="NEVER">
+        <HBox alignment="CENTER_LEFT">
+            <Label text="Tạm tính:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblTamTinh" style="-fx-font-size:14px;" />
+        </HBox>
+        <HBox alignment="CENTER_LEFT">
+            <Label text="VAT:" style="-fx-text-fill:#94a3b8; -fx-font-size:13px;" HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblVATTien" style="-fx-text-fill:#94a3b8; -fx-font-size:13px;" />
+        </HBox>
+        <Separator />
+        <HBox alignment="CENTER_LEFT">
+            <Label text="TỔNG THANH TOÁN:" style="-fx-font-size:15px; -fx-font-weight:900;" HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblTong" style="-fx-font-size:18px; -fx-font-weight:bold; -fx-text-fill:#16a34a;" />
+        </HBox>
+    </VBox>
+
+    <!-- NÚT -->
+    <HBox spacing="12" alignment="CENTER_RIGHT" VBox.vgrow="NEVER">
+        <Button text="🖨 In Hóa Đơn (Chưa implement)" onAction="#handleIn"
+                styleClass="bh-btn-secondary" prefHeight="40" prefWidth="220" />
+        <Button text="Đóng" onAction="#handleDong"
+                styleClass="bh-btn-primary" prefHeight="40" prefWidth="100" />
+    </HBox>
+</VBox>

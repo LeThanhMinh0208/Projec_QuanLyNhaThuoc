@@ -133,4 +133,27 @@ public class DAO_LoThuoc {
         }
         return ds;
     }
+
+    /**
+     * FEFO nghiêm ngặt: lấy 1 lô duy nhất phù hợp nhất để bán
+     * (KHO_BAN_HANG, còn tồn, chưa hết hạn, hạn gần nhất)
+     * Trả về maLoThuoc hoặc null nếu không có lô phù hợp.
+     */
+    public String getLoFEFO(String maThuoc) {
+        String sql = "SELECT TOP 1 maLoThuoc FROM LoThuoc " +
+                     "WHERE maThuoc = ? " +
+                     "  AND soLuongTon > 0 " +
+                     "  AND viTriKho = 'KHO_BAN_HANG' " +
+                     "  AND hanSuDung > CAST(GETDATE() AS DATE) " +
+                     "ORDER BY hanSuDung ASC";
+        try (Connection con = ConnectDB.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, maThuoc);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) return rs.getString("maLoThuoc");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

@@ -67,8 +67,18 @@
                     </children>
                 </HBox>
 
-                <!-- Cảnh báo -->
+                <!-- Cảnh báo số lượng -->
                 <Label fx:id="lblCanhBao" text="" styleClass="dialog-warn" wrapText="true"/>
+
+                <!-- Giá bán (tự động từ bảng giá) -->
+                <HBox alignment="CENTER_LEFT" spacing="10"
+                      style="-fx-background-color: #f0fdf4; -fx-background-radius: 10; -fx-padding: 10 16;">
+                    <children>
+                        <Label text="🏷 Đơn giá:" style="-fx-text-fill: #374151; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label fx:id="lblDonGia" text="—" HBox.hgrow="ALWAYS"
+                               style="-fx-text-fill: #6b7280; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                    </children>
+                </HBox>
             </children>
         </VBox>
 
@@ -76,7 +86,7 @@
         <HBox styleClass="dialog-footer" spacing="10" alignment="CENTER_RIGHT">
             <children>
                 <Button text="Hủy" onAction="#handleHuy" styleClass="dialog-btn-cancel" prefWidth="100" prefHeight="44"/>
-                <Button text="Thêm vào giỏ" onAction="#handleDongY" styleClass="dialog-btn-ok" prefWidth="160" prefHeight="44"/>
+                <Button fx:id="btnDongY" text="Thêm vào giỏ" onAction="#handleDongY" styleClass="dialog-btn-ok" prefWidth="160" prefHeight="44"/>
             </children>
         </HBox>
     </children>

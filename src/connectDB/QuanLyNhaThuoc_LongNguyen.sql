@@ -11,10 +11,8 @@ USE QuanLyNhaThuoc_LongNguyen;
 GO
 
 -- ========================================================
--- 1. TẠO CÁC BẢNG ĐỘC LẬP (KHÔNG CÓ KHÓA NGOẠI)
+-- 1. TẠO CÁC BẢNG ĐỘC LẬP
 -- ========================================================
-
--- Bảng Nhà Cung Cấp
 CREATE TABLE NhaCungCap (
     maNhaCungCap VARCHAR(20) PRIMARY KEY,
     tenNhaCungCap NVARCHAR(100) NOT NULL,
@@ -23,7 +21,6 @@ CREATE TABLE NhaCungCap (
     congNo DECIMAL(18,2) DEFAULT 0
 );
 
--- Bảng Khách Hàng
 CREATE TABLE KhachHang (
     maKhachHang VARCHAR(20) PRIMARY KEY,
     hoTen NVARCHAR(100) NOT NULL,
@@ -32,7 +29,6 @@ CREATE TABLE KhachHang (
     diemTichLuy INT DEFAULT 0
 );
 
--- Bảng Nhân Viên
 CREATE TABLE NhanVien (
     maNhanVien VARCHAR(20) PRIMARY KEY,
     tenDangNhap VARCHAR(50) UNIQUE NOT NULL,
@@ -43,7 +39,6 @@ CREATE TABLE NhanVien (
     sdt VARCHAR(15)
 );
 
--- Bảng Danh Mục Thuốc
 CREATE TABLE DanhMucThuoc (
     maDanhMuc VARCHAR(20) PRIMARY KEY,
     tenDanhMuc NVARCHAR(100) NOT NULL,
@@ -51,10 +46,8 @@ CREATE TABLE DanhMucThuoc (
 );
 
 -- ========================================================
--- 2. TẠO BẢNG THUỐC & CHI TIẾT SẢN PHẨM (CÓ KHÓA NGOẠI)
+-- 2. TẠO BẢNG THUỐC, TỒN KHO & BẢNG GIÁ
 -- ========================================================
-
--- Bảng Thuốc (Header)
 CREATE TABLE Thuoc (
     maThuoc VARCHAR(20) PRIMARY KEY,
     maDanhMuc VARCHAR(20) NOT NULL,
@@ -65,17 +58,15 @@ CREATE TABLE Thuoc (
     nuocSanXuat NVARCHAR(50),
     congDung NVARCHAR(255),
     trieuChung NVARCHAR(255),
-    donViCoBan NVARCHAR(20) NOT NULL, -- Vd: Viên, Gói...
+    donViCoBan NVARCHAR(20) NOT NULL, 
     hinhAnh VARCHAR(255),
-    canKeDon BIT DEFAULT 0, -- 0: Không cần, 1: Cần kê đơn
+    canKeDon BIT DEFAULT 0, 
     trangThai VARCHAR(20) DEFAULT 'DANG_BAN', 
     
     FOREIGN KEY (maDanhMuc) REFERENCES DanhMucThuoc(maDanhMuc),
-    -- Ràng buộc check cho Enum TrangThaiThuoc
     CONSTRAINT CHK_TrangThai CHECK (trangThai IN ('DANG_BAN', 'NGUNG_BAN', 'HET_HANG'))
 );
 
--- Bảng Đơn Vị Quy Đổi (Detail Giá & Đóng gói)
 CREATE TABLE DonViQuyDoi (
     maQuyDoi VARCHAR(20) PRIMARY KEY,
     maThuoc VARCHAR(20) NOT NULL,
@@ -85,27 +76,29 @@ CREATE TABLE DonViQuyDoi (
     FOREIGN KEY (maThuoc) REFERENCES Thuoc(maThuoc) ON DELETE CASCADE
 );
 
--- Bảng Lô Thuốc (Quản lý tồn kho FEFO)
 CREATE TABLE LoThuoc (
     maLoThuoc VARCHAR(20) PRIMARY KEY,
     maThuoc VARCHAR(20) NOT NULL,
     ngaySanXuat DATE,
     hanSuDung DATE NOT NULL,
-    soLuongTon INT DEFAULT 0, -- Lưu theo Đơn vị cơ bản (Viên)
+    soLuongTon INT DEFAULT 0, 
     giaNhap DECIMAL(18,2),
-
     viTriKho VARCHAR(50) DEFAULT 'KHO_BAN_HANG',
 
     FOREIGN KEY (maThuoc) REFERENCES Thuoc(maThuoc) ON DELETE CASCADE,
-    CONSTRAINT CHK_ViTriKho CHECK (viTriKho IN ('KHO_BAN_HANG', 'KHO_DU_TRU'))
+    CONSTRAINT CHK_ViTriKho CHECK (viTriKho IN ('KHO_BAN_HANG', 'KHO_DU_TRU')),
+    CONSTRAINT CHK_LoThuoc_SoLuong_Gia CHECK (soLuongTon >= 0 AND (giaNhap IS NULL OR giaNhap > 0))
 );
 
 CREATE TABLE BangGia (
     maBangGia VARCHAR(20) PRIMARY KEY,
+    tenBangGia NVARCHAR(100) NOT NULL, 
+    loaiBangGia VARCHAR(20) NOT NULL,  
     ngayBatDau DATE NOT NULL,
     ngayKetThuc DATE NULL,
     moTa NVARCHAR(255),
-    trangThai BIT DEFAULT 1
+    trangThai BIT DEFAULT 1,
+    CONSTRAINT CHK_LoaiBangGia CHECK (loaiBangGia IN ('DEFAULT', 'PROMO'))
 );
 
 CREATE TABLE ChiTietBangGia (
@@ -119,45 +112,36 @@ CREATE TABLE ChiTietBangGia (
 );
 
 -- ========================================================
--- 3. TẠO BẢNG NGHIỆP VỤ: ĐẶT HÀNG (MỚI THÊM)
+-- 3. TẠO BẢNG NGHIỆP VỤ: ĐẶT & NHẬP HÀNG
 -- ========================================================
-
--- Bảng Phiếu Đặt Hàng (Header)
 CREATE TABLE PhieuDatHang (
     maPhieuDatHang VARCHAR(20) PRIMARY KEY,
     maNhaCungCap VARCHAR(20) NOT NULL,
     maNhanVien VARCHAR(20) NOT NULL,
     ngayDat DATETIME DEFAULT GETDATE(),
     ngayGiaoDuKien DATETIME,
-    trangThaiDH VARCHAR(50) DEFAULT 'CHO_DUYET',
+    trangThaiDH VARCHAR(50) DEFAULT 'DA_GUI_NCC',
 
     FOREIGN KEY (maNhaCungCap) REFERENCES NhaCungCap(maNhaCungCap),
     FOREIGN KEY (maNhanVien) REFERENCES NhanVien(maNhanVien),
-    -- Ràng buộc check cho Enum TrangThaiDH
-    CONSTRAINT CHK_TrangThaiDH CHECK (trangThaiDH IN ('CHO_DUYET', 'DA_GUI_NCC', 'GIAO_MOT_PHAN', 'HOAN_THANH', 'DA_HUY'))
+    CONSTRAINT CHK_TrangThaiDH CHECK (trangThaiDH IN ('DA_GUI_NCC', 'GIAO_MOT_PHAN', 'HOAN_THANH', 'DA_HUY'))
 );
 
--- Bảng Chi Tiết Phiếu Đặt Hàng (Detail)
 CREATE TABLE ChiTietPhieuDatHang (
     maPhieuDatHang VARCHAR(20) NOT NULL,
     maQuyDoi VARCHAR(20) NOT NULL,
     soLuong INT NOT NULL, 
     donGiaDuKien DECIMAL(18,2) NOT NULL,
 
-    -- Khóa chính kép cho chi tiết
     PRIMARY KEY (maPhieuDatHang, maQuyDoi),
     FOREIGN KEY (maPhieuDatHang) REFERENCES PhieuDatHang(maPhieuDatHang) ON DELETE CASCADE,
-    FOREIGN KEY (maQuyDoi) REFERENCES DonViQuyDoi(maQuyDoi)
+    FOREIGN KEY (maQuyDoi) REFERENCES DonViQuyDoi(maQuyDoi),
+    CONSTRAINT CHK_ChiTietDat_SL_Gia CHECK (soLuong > 0 AND donGiaDuKien > 0)
 );
 
--- ========================================================
--- 4. TẠO BẢNG NGHIỆP VỤ: NHẬP HÀNG
--- ========================================================
-
--- Bảng Phiếu Nhập (Header)
 CREATE TABLE PhieuNhap (
     maPhieuNhap VARCHAR(20) PRIMARY KEY,
-    maPhieuDatHang VARCHAR(20), -- Tuỳ chọn móc sang Phiếu đặt hàng nếu cần thiết (Optional)
+    maPhieuDatHang VARCHAR(20), 
     maNhaCungCap VARCHAR(20) NOT NULL,
     maNhanVien VARCHAR(20) NOT NULL,
     ngayNhap DATETIME DEFAULT GETDATE(),
@@ -167,7 +151,6 @@ CREATE TABLE PhieuNhap (
     FOREIGN KEY (maPhieuDatHang) REFERENCES PhieuDatHang(maPhieuDatHang)
 );
 
--- Bảng Chi Tiết Phiếu Nhập (Detail)
 CREATE TABLE ChiTietPhieuNhap (
     maPhieuNhap VARCHAR(20) NOT NULL,
     maQuyDoi VARCHAR(20) NOT NULL,
@@ -178,14 +161,13 @@ CREATE TABLE ChiTietPhieuNhap (
     PRIMARY KEY (maPhieuNhap, maQuyDoi, maLoThuoc),
     FOREIGN KEY (maPhieuNhap) REFERENCES PhieuNhap(maPhieuNhap) ON DELETE CASCADE,
     FOREIGN KEY (maQuyDoi) REFERENCES DonViQuyDoi(maQuyDoi),
-    FOREIGN KEY (maLoThuoc) REFERENCES LoThuoc(maLoThuoc)
+    FOREIGN KEY (maLoThuoc) REFERENCES LoThuoc(maLoThuoc),
+    CONSTRAINT CHK_ChiTietNhap_SL_Gia CHECK (soLuong > 0 AND donGiaNhap > 0)
 );
 
 -- ========================================================
--- 5. TẠO BẢNG NGHIỆP VỤ: BÁN HÀNG
+-- 4. TẠO BẢNG NGHIỆP VỤ: BÁN HÀNG & ĐỔI TRẢ
 -- ========================================================
-
--- Bảng Hóa Đơn (Header)
 CREATE TABLE HoaDon (
     maHoaDon VARCHAR(20) PRIMARY KEY,
     maKhachHang VARCHAR(20), 
@@ -200,7 +182,6 @@ CREATE TABLE HoaDon (
     CONSTRAINT CHK_ThanhToan CHECK (hinhThucThanhToan IN ('TIEN_MAT', 'CHUYEN_KHOAN', 'THE'))
 );
 
--- Bảng Đơn Thuốc
 CREATE TABLE DonThuoc (
     maDonThuoc VARCHAR(20) PRIMARY KEY,
     maHoaDon VARCHAR(20) UNIQUE NOT NULL, 
@@ -212,9 +193,9 @@ CREATE TABLE DonThuoc (
     FOREIGN KEY (maHoaDon) REFERENCES HoaDon(maHoaDon) ON DELETE CASCADE
 );
 
--- Bảng Chi Tiết Hóa Đơn (Detail)
 CREATE TABLE ChiTietHoaDon (
     maHoaDon VARCHAR(20) NOT NULL,
+    maBangGia VARCHAR(20) NOT NULL, 
     maQuyDoi VARCHAR(20) NOT NULL,
     maLoThuoc VARCHAR(20) NOT NULL,
     soLuong INT NOT NULL,
@@ -222,15 +203,12 @@ CREATE TABLE ChiTietHoaDon (
 
     PRIMARY KEY (maHoaDon, maQuyDoi, maLoThuoc),
     FOREIGN KEY (maHoaDon) REFERENCES HoaDon(maHoaDon) ON DELETE CASCADE,
+    FOREIGN KEY (maBangGia) REFERENCES BangGia(maBangGia),
     FOREIGN KEY (maQuyDoi) REFERENCES DonViQuyDoi(maQuyDoi),
-    FOREIGN KEY (maLoThuoc) REFERENCES LoThuoc(maLoThuoc)
+    FOREIGN KEY (maLoThuoc) REFERENCES LoThuoc(maLoThuoc),
+    CONSTRAINT CHK_ChiTietBan_SL_Gia CHECK (soLuong > 0 AND donGia > 0)
 );
 
--- ========================================================
--- 6. TẠO BẢNG NGHIỆP VỤ: ĐỔI TRẢ
--- ========================================================
-
--- Bảng Phiếu Đổi Trả (Header)
 CREATE TABLE PhieuDoiTra (
     maPhieuDoiTra VARCHAR(20) PRIMARY KEY,
     maHoaDon VARCHAR(20) NOT NULL, 
@@ -245,7 +223,6 @@ CREATE TABLE PhieuDoiTra (
     CONSTRAINT CHK_HinhThucXuLy CHECK (hinhThucXuLy IN ('HOAN_TIEN', 'DOI_SAN_PHAM'))
 );
 
--- Bảng Chi Tiết Đổi Trả (Detail)
 CREATE TABLE ChiTietDoiTra (
     maPhieuDoiTra VARCHAR(20) NOT NULL,
     maQuyDoi VARCHAR(20) NOT NULL,
@@ -256,20 +233,20 @@ CREATE TABLE ChiTietDoiTra (
     PRIMARY KEY (maPhieuDoiTra, maQuyDoi, maLoThuoc),
     FOREIGN KEY (maPhieuDoiTra) REFERENCES PhieuDoiTra(maPhieuDoiTra) ON DELETE CASCADE,
     FOREIGN KEY (maQuyDoi) REFERENCES DonViQuyDoi(maQuyDoi),
-    FOREIGN KEY (maLoThuoc) REFERENCES LoThuoc(maLoThuoc)
+    FOREIGN KEY (maLoThuoc) REFERENCES LoThuoc(maLoThuoc),
+    CONSTRAINT CHK_ChiTietDoiTra_SL CHECK (soLuong > 0)
 );
 
 GO
-PRINT N'Đã tạo xong Database QuanLyNhaThuoc_LongNguyen xịn xò con bò cho sếp! Có update Đặt Hàng nha!';
+PRINT N'Đã tạo xong Database cấu trúc mới!';
 GO
 
 -- ==========================================
--- DỮ LIỆU KHỞI TẠO (DATA)
+-- DỮ LIỆU KHỞI TẠO (DATA FULL GỐC 100%)
 -- ==========================================
 USE QuanLyNhaThuoc_LongNguyen;
 GO
 
--- 1. NHAN VIEN
 INSERT INTO NhanVien (maNhanVien, tenDangNhap, matKhau, hoTen, chucVu, caLamViec, sdt) VALUES
 ('NV001', 'admin', '123456', N'Lê Trọng Nghĩa', N'Quản Lý', N'Hành Chính', '0987654321'),
 ('NV002', 'nhanvien', '123456', N'Trần Thị Thu Trang', N'Nhân Viên', N'Ca Sáng', '0912345678');
@@ -369,8 +346,7 @@ INSERT INTO Thuoc (maThuoc, maDanhMuc, tenThuoc, hoatChat, hamLuong, hangSanXuat
 ('T01802', 'DM006', N'Zoster 800 Tablet', N'Acyclovir (800mg)', N'800mg', N'Leeford Healthcare Ltd', N'Ấn Độ', N'Sốt', N'Thân nhiệt cao, ớn lạnh, mệt mỏi', N'Viên', 'T01802.jpg', 1, 'DANG_BAN');
 GO
 
-INSERT INTO DonViQuyDoi (maQuyDoi, maThuoc, tenDonVi, tyLeQuyDoi)
-VALUES
+INSERT INTO DonViQuyDoi (maQuyDoi, maThuoc, tenDonVi, tyLeQuyDoi) VALUES
 ('QD00045', 'T00045', N'Viên', 1),
 ('QD00051', 'T00045', N'Vỉ', 10),
 ('QD00052', 'T00045', N'Hộp', 100),
@@ -505,153 +481,8 @@ VALUES
 ('QD00133', 'T02883', N'Hộp', 5),
 ('QD02945', 'T02945', N'Viên', 1),
 ('QD00134', 'T02945', N'Vỉ', 10),
-('QD00135', 'T02945', N'Hộp', 100)
+('QD00135', 'T02945', N'Hộp', 100);
 GO
-
-INSERT INTO BangGia (maBangGia, ngayBatDau, ngayKetThuc, moTa, trangThai)
-VALUES
-('BG0001', '2026-01-01', NULL, N'Bảng giá bán lẻ mặc định', 1)
-GO
-
-INSERT INTO ChiTietBangGia (maBangGia, maQuyDoi, donGiaBan)
-VALUES
-('BG0001', 'QD00045', 5200),
-('BG0001', 'QD00051', 49400),
-('BG0001', 'QD00052', 478400),
-('BG0001', 'QD00194', 4800),
-('BG0001', 'QD00053', 45600),
-('BG0001', 'QD00054', 441600),
-('BG0001', 'QD00262', 12000),
-('BG0001', 'QD00055', 114000),
-('BG0001', 'QD00056', 1104000),
-('BG0001', 'QD00276', 8500),
-('BG0001', 'QD00057', 80800),
-('BG0001', 'QD00058', 782000),
-('BG0001', 'QD00486', 3600),
-('BG0001', 'QD00059', 34200),
-('BG0001', 'QD00060', 331200),
-('BG0001', 'QD00504', 68000),
-('BG0001', 'QD00061', 326400),
-('BG0001', 'QD00556', 42000),
-('BG0001', 'QD00062', 201600),
-('BG0001', 'QD00587', 9500),
-('BG0001', 'QD00063', 90200),
-('BG0001', 'QD00064', 874000),
-('BG0001', 'QD00639', 5400),
-('BG0001', 'QD00065', 51300),
-('BG0001', 'QD00066', 496800),
-('BG0001', 'QD00653', 3800),
-('BG0001', 'QD00067', 36100),
-('BG0001', 'QD00068', 349600),
-('BG0001', 'QD00655', 7800),
-('BG0001', 'QD00069', 74100),
-('BG0001', 'QD00070', 717600),
-('BG0001', 'QD00731', 32000),
-('BG0001', 'QD00071', 153600),
-('BG0001', 'QD00742', 4200),
-('BG0001', 'QD00072', 39900),
-('BG0001', 'QD00073', 386400),
-('BG0001', 'QD00840', 78000),
-('BG0001', 'QD00074', 374400),
-('BG0001', 'QD00847', 9800),
-('BG0001', 'QD00075', 93100),
-('BG0001', 'QD00076', 901600),
-('BG0001', 'QD00931', 6500),
-('BG0001', 'QD00077', 61800),
-('BG0001', 'QD00078', 598000),
-('BG0001', 'QD01011', 7600),
-('BG0001', 'QD00079', 72200),
-('BG0001', 'QD00080', 699200),
-('BG0001', 'QD01119', 6200),
-('BG0001', 'QD00081', 58900),
-('BG0001', 'QD00082', 570400),
-('BG0001', 'QD01179', 24000),
-('BG0001', 'QD00083', 228000),
-('BG0001', 'QD00084', 2208000),
-('BG0001', 'QD01191', 4500),
-('BG0001', 'QD00085', 42800),
-('BG0001', 'QD00086', 414000),
-('BG0001', 'QD01264', 36000),
-('BG0001', 'QD00087', 172800),
-('BG0001', 'QD01360', 4800),
-('BG0001', 'QD00088', 45600),
-('BG0001', 'QD00089', 441600),
-('BG0001', 'QD01365', 52000),
-('BG0001', 'QD00090', 249600),
-('BG0001', 'QD01367', 72000),
-('BG0001', 'QD00091', 345600),
-('BG0001', 'QD01435', 8300),
-('BG0001', 'QD00092', 78800),
-('BG0001', 'QD00093', 763600),
-('BG0001', 'QD01538', 9100),
-('BG0001', 'QD00094', 86400),
-('BG0001', 'QD00095', 837200),
-('BG0001', 'QD01551', 3200),
-('BG0001', 'QD00096', 30400),
-('BG0001', 'QD00097', 294400),
-('BG0001', 'QD01657', 58000),
-('BG0001', 'QD00098', 278400),
-('BG0001', 'QD01673', 2800),
-('BG0001', 'QD00099', 26600),
-('BG0001', 'QD00100', 257600),
-('BG0001', 'QD01774', 26000),
-('BG0001', 'QD00101', 124800),
-('BG0001', 'QD01802', 11200),
-('BG0001', 'QD00102', 106400),
-('BG0001', 'QD00103', 1030400),
-('BG0001', 'QD01820', 6900),
-('BG0001', 'QD00104', 65600),
-('BG0001', 'QD00105', 634800),
-('BG0001', 'QD01877', 5200),
-('BG0001', 'QD00106', 49400),
-('BG0001', 'QD00107', 478400),
-('BG0001', 'QD01977', 4100),
-('BG0001', 'QD00108', 39000),
-('BG0001', 'QD00109', 377200),
-('BG0001', 'QD02234', 5600),
-('BG0001', 'QD00110', 53200),
-('BG0001', 'QD00111', 515200),
-('BG0001', 'QD02239', 26000),
-('BG0001', 'QD00112', 247000),
-('BG0001', 'QD00113', 2392000),
-('BG0001', 'QD02247', 4700),
-('BG0001', 'QD00114', 44600),
-('BG0001', 'QD00115', 432400),
-('BG0001', 'QD02296', 58000),
-('BG0001', 'QD02319', 5900),
-('BG0001', 'QD00116', 56000),
-('BG0001', 'QD00117', 542800),
-('BG0001', 'QD02363', 13500),
-('BG0001', 'QD00118', 128200),
-('BG0001', 'QD00119', 1242000),
-('BG0001', 'QD02381', 42000),
-('BG0001', 'QD02394', 68000),
-('BG0001', 'QD00120', 326400),
-('BG0001', 'QD02413', 11000),
-('BG0001', 'QD00121', 104500),
-('BG0001', 'QD00122', 1012000),
-('BG0001', 'QD02541', 9800),
-('BG0001', 'QD00123', 93100),
-('BG0001', 'QD00124', 901600),
-('BG0001', 'QD02594', 2500),
-('BG0001', 'QD00125', 23800),
-('BG0001', 'QD00126', 230000),
-('BG0001', 'QD02671', 2200),
-('BG0001', 'QD00127', 20900),
-('BG0001', 'QD00128', 202400),
-('BG0001', 'QD02729', 7200),
-('BG0001', 'QD00129', 68400),
-('BG0001', 'QD00130', 662400),
-('BG0001', 'QD02811', 7400),
-('BG0001', 'QD00131', 70300),
-('BG0001', 'QD00132', 680800),
-('BG0001', 'QD02883', 30000),
-('BG0001', 'QD00133', 144000),
-('BG0001', 'QD02945', 1800),
-('BG0001', 'QD00134', 17100),
-('BG0001', 'QD00135', 165600)
-GO
-
 
 INSERT INTO LoThuoc (maLoThuoc, maThuoc, ngaySanXuat, hanSuDung, soLuongTon, giaNhap, viTriKho) VALUES
 ('LO00045', 'T00045', '2025-03-20', '2027-09-16', 477, 296100, 'KHO_BAN_HANG'),
@@ -706,55 +537,219 @@ INSERT INTO LoThuoc (maLoThuoc, maThuoc, ngaySanXuat, hanSuDung, soLuongTon, gia
 ('LO02945', 'T02945', '2025-08-02', '2028-02-21', 500, 243599, 'KHO_BAN_HANG');
 GO
 
+INSERT INTO BangGia (maBangGia, tenBangGia, loaiBangGia, ngayBatDau, ngayKetThuc, moTa, trangThai) VALUES
+('BG0001', N'Bảng giá bán lẻ mặc định', 'DEFAULT', '2026-01-01', NULL, N'Bảng giá bán lẻ mặc định', 1),
+('BG0002', N'Khuyến Mãi Lễ 30/4 - 1/5', 'PROMO', '2026-04-25', '2026-05-05', N'Giảm giá các loại thuốc bổ, vitamin dịp lễ', 1),
+('BG0003', N'Bảng giá bán lẻ Quý 3/2026', 'DEFAULT', '2026-07-01', NULL, N'Cập nhật giá theo tình hình lạm phát', 1);
+GO
+
+INSERT INTO ChiTietBangGia (maBangGia, maQuyDoi, donGiaBan) VALUES
+('BG0001', 'QD00045', 5200), 
+('BG0001', 'QD00051', 49400), 
+('BG0001', 'QD00052', 478400),
+('BG0001', 'QD00194', 4800), 
+('BG0001', 'QD00053', 45600), 
+('BG0001', 'QD00054', 441600),
+('BG0001', 'QD00262', 12000), 
+('BG0001', 'QD00055', 114000), 
+('BG0001', 'QD00056', 1104000),
+('BG0001', 'QD00276', 8500), 
+('BG0001', 'QD00057', 80800), 
+('BG0001', 'QD00058', 782000),
+('BG0001', 'QD00486', 3600), 
+('BG0001', 'QD00059', 34200), 
+('BG0001', 'QD00060', 331200),
+('BG0001', 'QD00504', 68000), 
+('BG0001', 'QD00061', 326400),
+('BG0001', 'QD00556', 42000), 
+('BG0001', 'QD00062', 201600),
+('BG0001', 'QD00587', 9500), 
+('BG0001', 'QD00063', 90200), 
+('BG0001', 'QD00064', 874000),
+('BG0001', 'QD00639', 5400), 
+('BG0001', 'QD00065', 51300), 
+('BG0001', 'QD00066', 496800),
+('BG0001', 'QD00653', 3800), 
+('BG0001', 'QD00067', 36100), 
+('BG0001', 'QD00068', 349600),
+('BG0001', 'QD00655', 7800), 
+('BG0001', 'QD00069', 74100), 
+('BG0001', 'QD00070', 717600),
+('BG0001', 'QD00731', 32000), 
+('BG0001', 'QD00071', 153600),
+('BG0001', 'QD00742', 4200), 
+('BG0001', 'QD00072', 39900), 
+('BG0001', 'QD00073', 386400),
+('BG0001', 'QD00840', 78000), 
+('BG0001', 'QD00074', 374400),
+('BG0001', 'QD00847', 9800), 
+('BG0001', 'QD00075', 93100), 
+('BG0001', 'QD00076', 901600),
+('BG0001', 'QD00931', 6500), 
+('BG0001', 'QD00077', 61800), 
+('BG0001', 'QD00078', 598000),
+('BG0001', 'QD01011', 7600), 
+('BG0001', 'QD00079', 72200), 
+('BG0001', 'QD00080', 699200),
+('BG0001', 'QD01119', 6200), 
+('BG0001', 'QD00081', 58900), 
+('BG0001', 'QD00082', 570400),
+('BG0001', 'QD01179', 24000), 
+('BG0001', 'QD00083', 228000), 
+('BG0001', 'QD00084', 2208000),
+('BG0001', 'QD01191', 4500), 
+('BG0001', 'QD00085', 42800), 
+('BG0001', 'QD00086', 414000),
+('BG0001', 'QD01264', 36000), 
+('BG0001', 'QD00087', 172800),
+('BG0001', 'QD01360', 4800), 
+('BG0001', 'QD00088', 45600), 
+('BG0001', 'QD00089', 441600),
+('BG0001', 'QD01365', 52000), 
+('BG0001', 'QD00090', 249600),
+('BG0001', 'QD01367', 72000), 
+('BG0001', 'QD00091', 345600),
+('BG0001', 'QD01435', 8300), 
+('BG0001', 'QD00092', 78800), 
+('BG0001', 'QD00093', 763600),
+('BG0001', 'QD01538', 9100), 
+('BG0001', 'QD00094', 86400), 
+('BG0001', 'QD00095', 837200),
+('BG0001', 'QD01551', 3200), 
+('BG0001', 'QD00096', 30400), 
+('BG0001', 'QD00097', 294400),
+('BG0001', 'QD01657', 58000), 
+('BG0001', 'QD00098', 278400),
+('BG0001', 'QD01673', 2800), 
+('BG0001', 'QD00099', 26600), 
+('BG0001', 'QD00100', 257600),
+('BG0001', 'QD01774', 26000), 
+('BG0001', 'QD00101', 124800),
+('BG0001', 'QD01802', 11200), 
+('BG0001', 'QD00102', 106400), 
+('BG0001', 'QD00103', 1030400),
+('BG0001', 'QD01820', 6900), 
+('BG0001', 'QD00104', 65600), 
+('BG0001', 'QD00105', 634800),
+('BG0001', 'QD01877', 5200), 
+('BG0001', 'QD00106', 49400), 
+('BG0001', 'QD00107', 478400),
+('BG0001', 'QD01977', 4100), 
+('BG0001', 'QD00108', 39000), 
+('BG0001', 'QD00109', 377200),
+('BG0001', 'QD02234', 5600), 
+('BG0001', 'QD00110', 53200), 
+('BG0001', 'QD00111', 515200),
+('BG0001', 'QD02239', 26000), 
+('BG0001', 'QD00112', 247000), 
+('BG0001', 'QD00113', 2392000),
+('BG0001', 'QD02247', 4700), 
+('BG0001', 'QD00114', 44600), 
+('BG0001', 'QD00115', 432400),
+('BG0001', 'QD02296', 58000),
+('BG0001', 'QD02319', 5900), 
+('BG0001', 'QD00116', 56000), 
+('BG0001', 'QD00117', 542800),
+('BG0001', 'QD02363', 13500), 
+('BG0001', 'QD00118', 128200), 
+('BG0001', 'QD00119', 1242000),
+('BG0001', 'QD02381', 42000),
+('BG0001', 'QD02394', 68000), 
+('BG0001', 'QD00120', 326400),
+('BG0001', 'QD02413', 11000), 
+('BG0001', 'QD00121', 104500), 
+('BG0001', 'QD00122', 1012000),
+('BG0001', 'QD02541', 9800), 
+('BG0001', 'QD00123', 93100), 
+('BG0001', 'QD00124', 901600),
+('BG0001', 'QD02594', 2500), 
+('BG0001', 'QD00125', 23800), 
+('BG0001', 'QD00126', 230000),
+('BG0001', 'QD02671', 2200), 
+('BG0001', 'QD00127', 20900), 
+('BG0001', 'QD00128', 202400),
+('BG0001', 'QD02729', 7200), 
+('BG0001', 'QD00129', 68400), 
+('BG0001', 'QD00130', 662400),
+('BG0001', 'QD02811', 7400), 
+('BG0001', 'QD00131', 70300), 
+('BG0001', 'QD00132', 680800),
+('BG0001', 'QD02883', 30000), 
+('BG0001', 'QD00133', 144000),
+('BG0001', 'QD02945', 1800), 
+('BG0001', 'QD00134', 17100), 
+('BG0001', 'QD00135', 165600),
+-- Data của Bảng giá BG0002 (Khuyến mãi 30/4)
+('BG0002', 'QD00045', 4800),
+('BG0002', 'QD00051', 45000),
+('BG0002', 'QD00052', 430000),
+('BG0002', 'QD01877', 4500),
+('BG0002', 'QD00106', 42000),
+('BG0002', 'QD00107', 410000),
+('BG0002', 'QD02883', 25000),
+('BG0002', 'QD00133', 120000),
+('BG0002', 'QD01657', 50000),
+('BG0002', 'QD00098', 240000),
+-- Data của Bảng giá BG0003 (Giá quý 3/2026)
+('BG0003', 'QD01360', 5500), 
+('BG0003', 'QD00088', 52000), 
+('BG0003', 'QD00089', 500000), 
+('BG0003', 'QD00556', 45000), 
+('BG0003', 'QD00062', 220000), 
+('BG0003', 'QD00931', 7000), 
+('BG0003', 'QD00077', 68000), 
+('BG0003', 'QD00078', 650000); 
+GO
+
 INSERT INTO PhieuNhap (maPhieuNhap, maNhaCungCap, maNhanVien, ngayNhap) VALUES
-('PN0001', 'NCC0391', 'NV001', '2026-01-08'),
+('PN0001', 'NCC0391', 'NV001', '2026-01-08'), 
 ('PN0002', 'NCC0055', 'NV002', '2025-12-23'),
-('PN0003', 'NCC0362', 'NV002', '2026-01-06'),
+('PN0003', 'NCC0362', 'NV002', '2026-01-06'), 
 ('PN0004', 'NCC0241', 'NV001', '2026-01-02'),
-('PN0005', 'NCC0391', 'NV001', '2026-01-22'),
+('PN0005', 'NCC0391', 'NV001', '2026-01-22'), 
 ('PN0006', 'NCC0294', 'NV002', '2026-02-15'),
-('PN0007', 'NCC0391', 'NV001', '2026-01-29'),
+('PN0007', 'NCC0391', 'NV001', '2026-01-29'), 
 ('PN0008', 'NCC0362', 'NV002', '2026-01-26'),
-('PN0009', 'NCC0380', 'NV001', '2025-12-11'),
+('PN0009', 'NCC0380', 'NV001', '2025-12-11'), 
 ('PN0010', 'NCC0070', 'NV002', '2026-02-25');
 GO
 
 INSERT INTO ChiTietPhieuNhap (maPhieuNhap, maQuyDoi, maLoThuoc, soLuong, donGiaNhap) VALUES
-('PN0001', 'QD01435', 'LO01435', 145, 201600),
+('PN0001', 'QD01435', 'LO01435', 145, 201600), 
 ('PN0001', 'QD00931', 'LO00931', 88, 252699),
-('PN0001', 'QD01179', 'LO01179', 147, 19600),
+('PN0001', 'QD01179', 'LO01179', 147, 19600), 
 ('PN0001', 'QD02413', 'LO02413', 144, 240099),
-('PN0002', 'QD01179', 'LO01179', 61, 19600),
+('PN0002', 'QD01179', 'LO01179', 61, 19600), 
 ('PN0002', 'QD00262', 'LO00262', 140, 206500),
-('PN0002', 'QD00587', 'LO00587', 69, 306600),
+('PN0002', 'QD00587', 'LO00587', 69, 306600), 
 ('PN0003', 'QD00731', 'LO00731', 142, 342300),
-('PN0003', 'QD01802', 'LO01802', 75, 282100),
+('PN0003', 'QD01802', 'LO01802', 75, 282100), 
 ('PN0003', 'QD00504', 'LO00504', 84, 120399),
-('PN0004', 'QD00262', 'LO00262', 74, 206500),
+('PN0004', 'QD00262', 'LO00262', 74, 206500), 
 ('PN0004', 'QD01264', 'LO01264', 133, 304500),
-('PN0004', 'QD00847', 'LO00847', 121, 300300),
+('PN0004', 'QD00847', 'LO00847', 121, 300300), 
 ('PN0004', 'QD00045', 'LO00045', 73, 296100),
-('PN0004', 'QD02729', 'LO02729', 144, 191100),
+('PN0004', 'QD02729', 'LO02729', 144, 191100), 
 ('PN0005', 'QD02247', 'LO02247', 106, 90300),
-('PN0005', 'QD02945', 'LO02945', 95, 243599),
+('PN0005', 'QD02945', 'LO02945', 95, 243599), 
 ('PN0005', 'QD01657', 'LO01657', 91, 84000),
-('PN0006', 'QD02671', 'LO02671', 133, 51800),
+('PN0006', 'QD02671', 'LO02671', 133, 51800), 
 ('PN0006', 'QD00045', 'LO00045', 146, 296100),
-('PN0006', 'QD00276', 'LO00276', 149, 279300),
+('PN0006', 'QD00276', 'LO00276', 149, 279300), 
 ('PN0006', 'QD01877', 'LO01877', 50, 70700),
-('PN0006', 'QD02239', 'LO02239', 75, 147000),
+('PN0006', 'QD02239', 'LO02239', 75, 147000), 
 ('PN0007', 'QD00276', 'LO00276', 119, 279300),
-('PN0007', 'QD02541', 'LO02541', 90, 70700),
+('PN0007', 'QD02541', 'LO02541', 90, 70700), 
 ('PN0007', 'QD00639', 'LO00639', 113, 83300),
-('PN0008', 'QD01657', 'LO01657', 91, 84000),
+('PN0008', 'QD01657', 'LO01657', 91, 84000), 
 ('PN0008', 'QD00931', 'LO00931', 139, 252699),
-('PN0008', 'QD02234', 'LO02234', 122, 175700),
+('PN0008', 'QD02234', 'LO02234', 122, 175700), 
 ('PN0008', 'QD00194', 'LO00194', 148, 251299),
-('PN0008', 'QD00731', 'LO00731', 65, 342300),
+('PN0008', 'QD00731', 'LO00731', 65, 342300), 
 ('PN0009', 'QD01877', 'LO01877', 110, 70700),
-('PN0009', 'QD01365', 'LO01365', 134, 264600),
+('PN0009', 'QD01365', 'LO01365', 134, 264600), 
 ('PN0010', 'QD01551', 'LO01551', 129, 45500),
-('PN0010', 'QD02247', 'LO02247', 132, 90300),
+('PN0010', 'QD02247', 'LO02247', 132, 90300), 
 ('PN0010', 'QD02394', 'LO02394', 66, 264600),
 ('PN0010', 'QD01179', 'LO01179', 121, 19600);
 GO
@@ -777,46 +772,46 @@ INSERT INTO HoaDon (maHoaDon, maKhachHang, maNhanVien, ngayLap, thueVAT, hinhThu
 ('HD0015', 'KH007', 'NV001', '2026-02-20', 8.0, 'CHUYEN_KHOAN', N'Khách mua thuốc lẻ');
 GO
 
-INSERT INTO ChiTietHoaDon (maHoaDon, maQuyDoi, maLoThuoc, soLuong, donGia) VALUES
-('HD0001', 'QD01538', 'LO01538', 2, 452000),
-('HD0002', 'QD02671', 'LO02671', 2, 74000),
-('HD0002', 'QD02363', 'LO02363', 2, 242000),
-('HD0002', 'QD00840', 'LO00840', 2, 272000),
-('HD0002', 'QD01977', 'LO01977', 1, 269000),
-('HD0003', 'QD00931', 'LO00931', 1, 361000),
-('HD0003', 'QD01820', 'LO01820', 2, 367000),
-('HD0003', 'QD02594', 'LO02594', 2, 77000),
-('HD0003', 'QD00639', 'LO00639', 2, 119000),
-('HD0004', 'QD01365', 'LO01365', 2, 378000),
-('HD0004', 'QD02296', 'LO02296', 1, 55000),
-('HD0004', 'QD02729', 'LO02729', 1, 273000),
-('HD0005', 'QD01551', 'LO01551', 2, 65000),
-('HD0005', 'QD02363', 'LO02363', 3, 242000),
-('HD0005', 'QD00556', 'LO00556', 2, 141000),
-('HD0005', 'QD02413', 'LO02413', 1, 343000),
-('HD0006', 'QD01435', 'LO01435', 3, 288000),
-('HD0006', 'QD00931', 'LO00931', 3, 361000),
-('HD0006', 'QD01119', 'LO01119', 1, 337000),
-('HD0007', 'QD01538', 'LO01538', 1, 452000),
-('HD0007', 'QD01657', 'LO01657', 1, 120000),
-('HD0007', 'QD01191', 'LO01191', 2, 220000),
-('HD0008', 'QD01435', 'LO01435', 1, 288000),
-('HD0008', 'QD01011', 'LO01011', 3, 454000),
-('HD0008', 'QD01179', 'LO01179', 2, 28000),
-('HD0009', 'QD02239', 'LO02239', 1, 210000),
-('HD0010', 'QD02594', 'LO02594', 1, 77000),
-('HD0010', 'QD01673', 'LO01673', 2, 36000),
-('HD0011', 'QD00731', 'LO00731', 1, 489000),
-('HD0012', 'QD00731', 'LO00731', 3, 489000),
-('HD0013', 'QD00639', 'LO00639', 1, 119000),
-('HD0013', 'QD00931', 'LO00931', 1, 361000),
-('HD0013', 'QD02319', 'LO02319', 3, 132000),
-('HD0014', 'QD00276', 'LO00276', 1, 399000),
-('HD0014', 'QD01360', 'LO01360', 1, 108000),
-('HD0015', 'QD01435', 'LO01435', 1, 288000),
-('HD0015', 'QD00840', 'LO00840', 1, 272000),
-('HD0015', 'QD02945', 'LO02945', 3, 348000),
-('HD0015', 'QD02381', 'LO02381', 2, 448000);
+INSERT INTO ChiTietHoaDon (maHoaDon, maBangGia, maQuyDoi, maLoThuoc, soLuong, donGia) VALUES
+('HD0001', 'BG0001', 'QD01538', 'LO01538', 2, 452000),
+('HD0002', 'BG0001', 'QD02671', 'LO02671', 2, 74000), 
+('HD0002', 'BG0001', 'QD02363', 'LO02363', 2, 242000),
+('HD0002', 'BG0001', 'QD00840', 'LO00840', 2, 272000), 
+('HD0002', 'BG0001', 'QD01977', 'LO01977', 1, 269000),
+('HD0003', 'BG0001', 'QD00931', 'LO00931', 1, 361000), 
+('HD0003', 'BG0001', 'QD01820', 'LO01820', 2, 367000),
+('HD0003', 'BG0001', 'QD02594', 'LO02594', 2, 77000), 
+('HD0003', 'BG0001', 'QD00639', 'LO00639', 2, 119000),
+('HD0004', 'BG0001', 'QD01365', 'LO01365', 2, 378000), 
+('HD0004', 'BG0001', 'QD02296', 'LO02296', 1, 55000),
+('HD0004', 'BG0001', 'QD02729', 'LO02729', 1, 273000), 
+('HD0005', 'BG0001', 'QD01551', 'LO01551', 2, 65000),
+('HD0005', 'BG0001', 'QD02363', 'LO02363', 3, 242000), 
+('HD0005', 'BG0001', 'QD00556', 'LO00556', 2, 141000),
+('HD0005', 'BG0001', 'QD02413', 'LO02413', 1, 343000), 
+('HD0006', 'BG0001', 'QD01435', 'LO01435', 3, 288000),
+('HD0006', 'BG0001', 'QD00931', 'LO00931', 3, 361000), 
+('HD0006', 'BG0001', 'QD01119', 'LO01119', 1, 337000),
+('HD0007', 'BG0001', 'QD01538', 'LO01538', 1, 452000), 
+('HD0007', 'BG0001', 'QD01657', 'LO01657', 1, 120000),
+('HD0007', 'BG0001', 'QD01191', 'LO01191', 2, 220000), 
+('HD0008', 'BG0001', 'QD01435', 'LO01435', 1, 288000),
+('HD0008', 'BG0001', 'QD01011', 'LO01011', 3, 454000), 
+('HD0008', 'BG0001', 'QD01179', 'LO01179', 2, 28000),
+('HD0009', 'BG0001', 'QD02239', 'LO02239', 1, 210000), 
+('HD0010', 'BG0001', 'QD02594', 'LO02594', 1, 77000),
+('HD0010', 'BG0001', 'QD01673', 'LO01673', 2, 36000), 
+('HD0011', 'BG0001', 'QD00731', 'LO00731', 1, 489000),
+('HD0012', 'BG0001', 'QD00731', 'LO00731', 3, 489000), 
+('HD0013', 'BG0001', 'QD00639', 'LO00639', 1, 119000),
+('HD0013', 'BG0001', 'QD00931', 'LO00931', 1, 361000), 
+('HD0013', 'BG0001', 'QD02319', 'LO02319', 3, 132000),
+('HD0014', 'BG0001', 'QD00276', 'LO00276', 1, 399000), 
+('HD0014', 'BG0001', 'QD01360', 'LO01360', 1, 108000),
+('HD0015', 'BG0001', 'QD01435', 'LO01435', 1, 288000), 
+('HD0015', 'BG0001', 'QD00840', 'LO00840', 1, 272000),
+('HD0015', 'BG0001', 'QD02945', 'LO02945', 3, 348000), 
+('HD0015', 'BG0001', 'QD02381', 'LO02381', 2, 448000);
 GO
 
 INSERT INTO DonThuoc (maDonThuoc, maHoaDon, tenBacSi, chanDoan, hinhAnhDon, thongTinBenhNhan) VALUES
@@ -831,13 +826,13 @@ INSERT INTO PhieuDoiTra (maPhieuDoiTra, maHoaDon, maNhanVien, ngayDoiTra, lyDo, 
 GO
 
 INSERT INTO ChiTietDoiTra (maPhieuDoiTra, maQuyDoi, maLoThuoc, soLuong, tinhTrang) VALUES
-('PDT0001', 'QD01191', 'LO01191', 1, N'Thuốc còn nguyên seal'),
-('PDT0002', 'QD02541', 'LO02541', 1, N'Thuốc còn nguyên seal');
+('PDT0001', 'QD01538', 'LO01538', 1, N'Thuốc còn nguyên seal'), 
+('PDT0002', 'QD01435', 'LO01435', 1, N'Thuốc còn nguyên seal');
 GO
 
 INSERT INTO PhieuDatHang (maPhieuDatHang, maNhaCungCap, maNhanVien, ngayDat, ngayGiaoDuKien, trangThaiDH) VALUES
 ('PDH0001', 'NCC0391', 'NV001', '2026-03-20', '2026-03-25', 'DA_GUI_NCC'),
-('PDH0002', 'NCC0055', 'NV002', '2026-03-21', '2026-03-26', 'CHO_DUYET');
+('PDH0002', 'NCC0055', 'NV002', '2026-03-21', '2026-03-26', 'DA_GUI_NCC');
 GO
 
 INSERT INTO ChiTietPhieuDatHang (maPhieuDatHang, maQuyDoi, soLuong, donGiaDuKien) VALUES

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox prefHeight="900.0" prefWidth="1200.0" spacing="0.0" styleClass="main-bg"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="gui.main.GUI_QuanLyBangGiaController">
+
+    <stylesheets>
+        <URL value="@../../resources/css/TrangChu.css" />
+        <URL value="@../../resources/css/BanHang.css" />
+        <URL value="@../../resources/css/BangGia.css" />
+    </stylesheets>
+
+    <padding><Insets bottom="30.0" left="40.0" right="40.0" top="30.0" /></padding>
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="20" VBox.vgrow="NEVER">
+        <Label styleClass="main-title" text="QUẢN LÝ BẢNG GIÁ" />
+    </HBox>
+
+    <!-- StackPane: toggle giữa 2 view -->
+    <StackPane VBox.vgrow="ALWAYS">
+
+        <!-- ====================================================
+             VIEW 1: DANH SÁCH BẢNG GIÁ (mặc định hiển thị)
+             ==================================================== -->
+        <VBox fx:id="viewDanhSach" spacing="15.0" styleClass="main-bg" visible="true" managed="true">
+            <padding><Insets top="20.0" /></padding>
+
+            <!-- Action bar -->
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                <Button onAction="#handleThemBangGiaMoi" prefHeight="50.0"
+                        styleClass="top-card, card-green, btn-action"
+                        text="  + Thêm Bảng Giá Mới" textFill="WHITE" />
+                <HBox HBox.hgrow="ALWAYS" />
+                <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="350.0" styleClass="search-box">
+                    <Label styleClass="search-icon" text="🔍" />
+                    <TextField fx:id="txtTimKiemTab1" promptText="Tìm theo mã, tên bảng giá..."
+                               styleClass="search-input" HBox.hgrow="ALWAYS" />
+                </HBox>
+                <Button text="Làm mới" onAction="#handleLamMoiDanhSach" styleClass="bh-btn-secondary" />
+            </HBox>
+
+            <!-- Table -->
+            <VBox VBox.vgrow="ALWAYS" styleClass="panel-white">
+                <TableView fx:id="tableBangGia" VBox.vgrow="ALWAYS" styleClass="bh-drug-table">
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                    <placeholder>
+                        <Label text="Chưa có bảng giá nào" style="-fx-text-fill:#94a3b8; -fx-font-size:14px;" />
+                    </placeholder>
+                    <columns>
+                        <TableColumn fx:id="colMaBangGia"    text="Mã BG"          prefWidth="90" />
+                        <TableColumn fx:id="colTenBangGia"   text="Tên Bảng Giá"   prefWidth="220" />
+                        <TableColumn fx:id="colLoai"         text="Loại"            prefWidth="100" />
+                        <TableColumn fx:id="colNgayBatDau"   text="Ngày Bắt Đầu"   prefWidth="120" />
+                        <TableColumn fx:id="colNgayKetThuc"  text="Ngày Kết Thúc"  prefWidth="120" />
+                        <TableColumn fx:id="colTrangThai"    text="Trạng Thái"      prefWidth="130" />
+                        <TableColumn fx:id="colSoLuong"      text="Số Thuốc"        prefWidth="80" />
+                        <TableColumn fx:id="colHanhDong"     text="Hành Động"       prefWidth="200" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </VBox>
+
+        <!-- ====================================================
+             VIEW 2: TẠO BẢNG GIÁ MỚI (ẩn mặc định)
+             ==================================================== -->
+        <VBox fx:id="viewTaoBangGia" spacing="15.0" styleClass="main-bg" visible="false" managed="false">
+            <padding><Insets top="20.0" /></padding>
+
+            <!-- Sub-header with back button -->
+            <HBox alignment="CENTER_LEFT" spacing="15.0" VBox.vgrow="NEVER">
+                <Button text="← Quay Lại" onAction="#handleQuayLaiDanhSach" styleClass="bh-btn-secondary"
+                        prefHeight="40.0" />
+                <Label text="TẠO BẢNG GIÁ MỚI" styleClass="bh-section-title"
+                       style="-fx-font-size:18px;" />
+            </HBox>
+
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                        style="-fx-background-color:transparent; -fx-background:transparent; -fx-border-color:transparent;">
+                <VBox spacing="20.0" styleClass="main-bg">
+                    <padding><Insets bottom="20.0" /></padding>
+
+                    <!-- Thông tin cơ bản -->
+                    <VBox styleClass="panel-white" spacing="14.0">
+                        <Label text="THÔNG TIN BẢNG GIÁ" styleClass="bh-section-title" />
+
+                        <HBox spacing="15.0" alignment="CENTER_LEFT">
+                            <Label text="Tên bảng giá *" styleClass="bg-form-label" />
+                            <TextField fx:id="txtTenBangGia" promptText="Nhập tên bảng giá..."
+                                       styleClass="bg-form-input" HBox.hgrow="ALWAYS" />
+                        </HBox>
+
+                        <HBox spacing="15.0" alignment="CENTER_LEFT">
+                            <Label text="Loại bảng giá *" styleClass="bg-form-label" />
+                            <ComboBox fx:id="cbLoaiBangGia" prefWidth="200.0" styleClass="bg-form-combo"
+                                      promptText="Chọn loại..." />
+                            <Label fx:id="lblDefaultHienTai" text=""
+                                   style="-fx-text-fill:#2563eb; -fx-font-size:12px;" />
+                        </HBox>
+
+                        <HBox spacing="15.0" alignment="CENTER_LEFT">
+                            <Label text="Ngày bắt đầu *" styleClass="bg-form-label" />
+                            <DatePicker fx:id="dpNgayBatDau" prefWidth="200.0" styleClass="bg-form-datepicker" />
+                        </HBox>
+
+                        <HBox spacing="15.0" alignment="CENTER_LEFT">
+                            <Label fx:id="lblNgayKetThuc" text="Ngày kết thúc *" styleClass="bg-form-label" />
+                            <DatePicker fx:id="dpNgayKetThuc" prefWidth="200.0" styleClass="bg-form-datepicker" />
+                            <Label fx:id="lblNgayKetThucHint" text="(Chỉ bắt buộc với loại PROMO)"
+                                   style="-fx-text-fill:#94a3b8; -fx-font-size:12px;" />
+                        </HBox>
+
+                        <HBox spacing="15.0" alignment="TOP_LEFT">
+                            <Label text="Mô tả" styleClass="bg-form-label" />
+                            <TextArea fx:id="txtMoTa" prefHeight="70.0" promptText="Mô tả bảng giá (không bắt buộc)..."
+                                      styleClass="bg-form-textarea" wrapText="true" HBox.hgrow="ALWAYS" />
+                        </HBox>
+                    </VBox>
+
+                    <!-- Bảng nhập giá thuốc -->
+                    <VBox styleClass="panel-white" spacing="12.0">
+                        <HBox alignment="CENTER_LEFT" spacing="15.0">
+                            <Label text="DANH SÁCH THUỐC VÀ GIÁ BÁN" styleClass="bh-section-title"
+                                   VBox.vgrow="NEVER" HBox.hgrow="ALWAYS" />
+                            <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="320.0" styleClass="search-box">
+                                <Label styleClass="search-icon" text="🔍" />
+                                <TextField fx:id="txtTimKiemTab2" promptText="Tìm theo tên thuốc..."
+                                           styleClass="search-input" HBox.hgrow="ALWAYS" />
+                            </HBox>
+                        </HBox>
+                        <Label text="Nhập giá 0 hoặc để trống = không thêm vào bảng giá"
+                               style="-fx-text-fill:#94a3b8; -fx-font-size:12px;" />
+
+                        <TableView fx:id="tableThuocNhapGia" prefHeight="380.0" styleClass="bg-detail-table">
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                            </columnResizePolicy>
+                            <placeholder>
+                                <Label text="Không có thuốc nào đang bán" style="-fx-text-fill:#94a3b8;" />
+                            </placeholder>
+                            <columns>
+                                <TableColumn fx:id="colNhapTenThuoc"  text="Tên Thuốc"     prefWidth="300" />
+                                <TableColumn fx:id="colNhapDonVi"     text="Đơn Vị"         prefWidth="120" />
+                                <TableColumn fx:id="colNhapGiaBan"    text="Giá Bán (VNĐ)"  prefWidth="200" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+
+                    <!-- Nút lưu -->
+                    <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                        <Button text="Hủy" onAction="#handleQuayLaiDanhSach" styleClass="bh-btn-secondary"
+                                prefHeight="44.0" prefWidth="120.0" />
+                        <Button text="💾  Lưu Bảng Giá" onAction="#handleLuuBangGia"
+                                styleClass="bh-btn-success" prefHeight="44.0" prefWidth="180.0" />
+                    </HBox>
+                </VBox>
+            </ScrollPane>
+        </VBox>
+
+    </StackPane>
+</VBox>

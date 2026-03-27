@@ -135,7 +135,7 @@ public class Dialog_TaoDonNhapHangController {
         chiTiet.setThuoc(selectedThuoc);
         chiTiet.setDonViQuyDoi(selectedDonVi); 
         chiTiet.setSoLuongDat(soLuong);
-        chiTiet.setDonGiaDuKien(selectedDonVi.getGiaBan() * 0.7); // Tạm tính giá vốn = 70% giá bán
+        chiTiet.setDonGiaDuKien(0.0); // Giá dự kiến — người dùng chỉnh sau khi nhận hàng
         
         listDatHang.add(chiTiet);
         tinhTongTien();

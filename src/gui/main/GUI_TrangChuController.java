@@ -249,6 +249,33 @@ public class GUI_TrangChuController {
         utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucNhaCungCap.fxml");
     }
 
+    @FXML
+    void handleMoQuanLyBangGia(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyBangGia.fxml");
+    }
+
+    @FXML
+    void handleMoDanhSachHoaDon(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_DanhSachHoaDon.fxml");
+    }
+
+    @FXML
+    void handleMoTaoBangGia(ActionEvent event) {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/gui/main/GUI_QuanLyBangGia.fxml"));
+            javafx.scene.Parent root = loader.load();
+            Object controller = loader.getController();
+            if (controller instanceof GUI_QuanLyBangGiaController) {
+                ((GUI_QuanLyBangGiaController) controller).handleThemBangGiaMoi();
+            }
+            mainBorderPane.setCenter(root);
+        } catch (Exception e) {
+            System.err.println("Lỗi mở Tạo Bảng Giá: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     public void switchPage(String fxmlPath) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));

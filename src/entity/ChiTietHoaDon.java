@@ -5,10 +5,11 @@ public class ChiTietHoaDon {
     private Thuoc thuoc;
     private int soLuong;
     private double donGia;
-    // Bổ sung để bám đúng schema ChiTietHoaDon (maQuyDoi, maLoThuoc)
+    // Bổ sung để bám đúng schema ChiTietHoaDon
     private String maQuyDoi;
     private String maLoThuoc;
-    
+    private String maBangGia;   // snapshot bảng giá đã dùng
+
     // Field dùng để trừ kho chính xác (theo đơn vị cơ bản)
     private int soLuongTruKho;
 
@@ -35,6 +36,8 @@ public class ChiTietHoaDon {
     public void setMaQuyDoi(String maQuyDoi) { this.maQuyDoi = maQuyDoi; }
     public String getMaLoThuoc() { return maLoThuoc; }
     public void setMaLoThuoc(String maLoThuoc) { this.maLoThuoc = maLoThuoc; }
+    public String getMaBangGia() { return maBangGia; }
+    public void setMaBangGia(String maBangGia) { this.maBangGia = maBangGia; }
 
     public int getSoLuongTruKho() { return soLuongTruKho; }
     public void setSoLuongTruKho(int soLuongTruKho) { this.soLuongTruKho = soLuongTruKho; }

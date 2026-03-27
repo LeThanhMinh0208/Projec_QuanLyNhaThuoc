@@ -42,8 +42,18 @@
                         <content>
                            <VBox styleClass="dropdown-content">
                               <Button onAction="#handleMoQuanLyBanHangLapHoaDon" styleClass="sub-btn" text="Lập Hóa Đơn" />
-                              <Button styleClass="sub-btn" text="Danh Sách Hóa Đơn" />
+                              <Button onAction="#handleMoDanhSachHoaDon" styleClass="sub-btn" text="Danh Sách Hóa Đơn" />
                               <Button styleClass="sub-btn" text="Xử Lý Đổi Trả" />
+                           </VBox>
+                        </content>
+                     </TitledPane>
+
+                     <TitledPane expanded="false" styleClass="sidebar-dropdown" text="Quản Lý Bảng Giá">
+                        <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/baocao.png" /></ImageView></graphic>
+                        <content>
+                           <VBox styleClass="dropdown-content">
+                              <Button onAction="#handleMoQuanLyBangGia" styleClass="sub-btn" text="Danh Sách Bảng Giá" />
+                              <Button onAction="#handleMoTaoBangGia" styleClass="sub-btn" text="Tạo Bảng Giá Mới" />
                            </VBox>
                         </content>
                      </TitledPane>

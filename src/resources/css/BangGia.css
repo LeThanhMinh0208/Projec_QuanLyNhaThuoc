@@ -1,0 +1,241 @@
+/* ============================================================
+   BANGGIA.CSS - Giao diện Quản Lý Bảng Giá
+   Tái dùng TrangChu.css + BanHang.css làm base
+   ============================================================ */
+
+/* --- BADGE TRẠNG THÁI BẢNG GIÁ --- */
+.bg-badge-active {
+    -fx-background-color: #dcfce7;
+    -fx-text-fill: #15803d;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 4 10;
+    -fx-background-radius: 20;
+}
+
+.bg-badge-ended {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #64748b;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 4 10;
+    -fx-background-radius: 20;
+}
+
+.bg-badge-pending {
+    -fx-background-color: #fff7ed;
+    -fx-text-fill: #c2410c;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 4 10;
+    -fx-background-radius: 20;
+}
+
+/* --- BADGE LOẠI BẢNG GIÁ --- */
+.bg-badge-default {
+    -fx-background-color: #dbeafe;
+    -fx-text-fill: #1d4ed8;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 4 10;
+    -fx-background-radius: 20;
+}
+
+.bg-badge-promo {
+    -fx-background-color: #fae8ff;
+    -fx-text-fill: #7e22ce;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 4 10;
+    -fx-background-radius: 20;
+}
+
+/* --- FORM INPUTS --- */
+.bg-form-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #374151;
+    -fx-font-weight: bold;
+    -fx-min-width: 140px;
+}
+
+.bg-form-input {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 1.5;
+    -fx-font-size: 14px;
+    -fx-padding: 7 12;
+}
+
+.bg-form-input:focused {
+    -fx-background-color: white;
+    -fx-border-color: #0ea5e9;
+    -fx-effect: dropshadow(three-pass-box, rgba(14,165,233,0.2), 6, 0, 0, 0);
+}
+
+.bg-form-textarea {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 1.5;
+    -fx-font-size: 13px;
+}
+
+.bg-form-combo {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 1.5;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+}
+
+.bg-form-datepicker {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 1.5;
+    -fx-cursor: hand;
+}
+
+/* --- GIÁ NHẬP TRONG TABLE --- */
+.bg-price-input {
+    -fx-background-color: #f0fdf4;
+    -fx-border-color: #86efac;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-border-width: 1;
+    -fx-font-size: 13px;
+    -fx-padding: 4 8;
+    -fx-alignment: CENTER_RIGHT;
+}
+
+.bg-price-input:focused {
+    -fx-background-color: white;
+    -fx-border-color: #22c55e;
+}
+
+/* --- SECTION DIVIDER --- */
+.bg-section-header {
+    -fx-background-color: linear-gradient(to right, #f0f9ff, #e0f2fe);
+    -fx-padding: 10 15;
+    -fx-border-color: transparent transparent #bae6fd transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.bg-section-header-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #0369a1;
+}
+
+/* --- INLINE ACTION BUTTONS --- */
+.bg-btn-view {
+    -fx-background-color: #dbeafe;
+    -fx-text-fill: #1d4ed8;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-padding: 5 12;
+}
+.bg-btn-view:hover {
+    -fx-background-color: #1d4ed8;
+    -fx-text-fill: white;
+}
+
+.bg-btn-disable {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #dc2626;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-padding: 5 12;
+}
+.bg-btn-disable:hover {
+    -fx-background-color: #dc2626;
+    -fx-text-fill: white;
+}
+
+.bg-btn-edit-price {
+    -fx-background-color: #fef9c3;
+    -fx-text-fill: #854d0e;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-padding: 4 10;
+}
+.bg-btn-edit-price:hover {
+    -fx-background-color: #ca8a04;
+    -fx-text-fill: white;
+}
+
+.bg-btn-delete {
+    -fx-background-color: rgba(239,68,68,0.1);
+    -fx-text-fill: #ef4444;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-padding: 4 10;
+}
+.bg-btn-delete:hover {
+    -fx-background-color: #ef4444;
+    -fx-text-fill: white;
+}
+
+/* --- INFO READONLY FIELDS --- */
+.bg-info-value {
+    -fx-font-size: 14px;
+    -fx-text-fill: #1e293b;
+    -fx-font-weight: bold;
+}
+
+.bg-info-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #94a3b8;
+    -fx-font-weight: bold;
+}
+
+/* --- TABLE DRUG LIST IN TAB 2 --- */
+.bg-detail-table {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.bg-detail-table .column-header-background {
+    -fx-background-color: #0ea5e9;
+    -fx-background-radius: 10 10 0 0;
+}
+
+.bg-detail-table .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 40px;
+}
+
+.bg-detail-table .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: 900;
+}
+
+.bg-detail-table .table-row-cell {
+    -fx-cell-size: 44px;
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #f1f5f9 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.bg-detail-table .table-row-cell:filled:even {
+    -fx-background-color: #fafafa;
+}
+
+.bg-detail-table .table-row-cell:filled:hover {
+    -fx-background-color: #e0f2fe;
+}
