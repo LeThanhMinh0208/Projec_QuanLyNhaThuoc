@@ -19,7 +19,7 @@
 
    <Label styleClass="dmk-page-title" text="QUẢN LÝ DANH MỤC KHO" />
 
-<HBox spacing="20.0">
+   <HBox spacing="20.0">
       <Button fx:id="btnNhapKho" maxWidth="Infinity" onAction="#moTrangNhapKho" styleClass="btn-action, btn-nhap" text="Nhập Kho" HBox.hgrow="ALWAYS">
          <graphic>
             <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
@@ -56,7 +56,7 @@
       
       <HBox alignment="CENTER_LEFT" styleClass="dmk-search-wrapper" HBox.hgrow="ALWAYS">
          <Label style="-fx-font-size: 16px; -fx-text-fill: #1ea0eb;" text="🔍" />
-         <TextField fx:id="txtTimKiem" prefHeight="45.0" promptText="Tìm kiếm nhanh thuốc theo mã, tên lô..." styleClass="dmk-search-field" HBox.hgrow="ALWAYS" />
+         <TextField fx:id="txtTimKiem" prefHeight="45.0" promptText="Tìm kiếm nhanh thuốc theo mã, tên lô, tồn kho..." styleClass="dmk-search-field" HBox.hgrow="ALWAYS" />
          <padding>
             <Insets left="15.0" right="15.0" />
          </padding>
@@ -68,12 +68,11 @@
         <columns>
           <TableColumn fx:id="colMaThuoc" prefWidth="90.0" text="Mã Thuốc" />
           <TableColumn fx:id="colHinhAnh" prefWidth="90.0" text="Ảnh" />
-          <TableColumn fx:id="colTenThuoc" prefWidth="220.0" text="Tên Thuốc" />
+          <TableColumn fx:id="colTenThuoc" prefWidth="250.0" text="Tên Thuốc" />
           <TableColumn fx:id="colViTriKho" prefWidth="150.0" text="Vị Trí Kho" />
-          <TableColumn fx:id="colMaLo" prefWidth="100.0" text="Mã Lô" />
-          <TableColumn fx:id="colSoLuong" prefWidth="100.0" text="Số Lượng Tồn" style="-fx-alignment: CENTER; -fx-font-weight: bold; -fx-text-fill: #059669;" />
-          <TableColumn fx:id="colNgayHetHan" prefWidth="110.0" text="Hạn Sử Dụng" />
-          <TableColumn fx:id="colCanhBao" prefWidth="160.0" text="Trạng Thái Hạn" />
+          <TableColumn fx:id="colMaLo" prefWidth="120.0" text="Mã Lô" />
+          <TableColumn fx:id="colSoLuong" prefWidth="120.0" text="Số Lượng Tồn" style="-fx-alignment: CENTER; -fx-font-weight: bold;" />
+          <TableColumn fx:id="colTrangThaiTon" prefWidth="150.0" text="Trạng Thái Tồn" />
         </columns>
          <columnResizePolicy>
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

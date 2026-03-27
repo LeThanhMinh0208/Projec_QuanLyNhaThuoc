@@ -3,11 +3,7 @@ package dao;
 import connectDB.ConnectDB;
 import entity.DonViQuyDoi;
 
-
 import java.sql.*;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class DAO_DonViQuyDoi {
@@ -24,7 +20,10 @@ public class DAO_DonViQuyDoi {
                 String maT = rs.getString("maThuoc");
                 String tenDonVi = rs.getString("tenDonVi");
                 int tyLeQuyDoi = rs.getInt("tyLeQuyDoi");
-                double giaBan = rs.getDouble("giaBan");
+                
+                // FIX LỖI: Bảng CSDL không có cột giaBan, gán mặc định = 0
+                double giaBan = 0.0; 
+                
                 list.add(new DonViQuyDoi(maQuyDoi, maT, tenDonVi, tyLeQuyDoi, giaBan));
             }
         } catch (Exception e) {
@@ -35,7 +34,8 @@ public class DAO_DonViQuyDoi {
 
     public DonViQuyDoi getByMaQuyDoi(String maQuyDoi) {
         String sql = "SELECT * FROM DonViQuyDoi WHERE maQuyDoi = ?";
-        try (Connection con = ConnectDB.getConnection(); PreparedStatement pst = con.prepareStatement(sql)) {
+        try (Connection con = ConnectDB.getConnection(); 
+             PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setString(1, maQuyDoi);
             ResultSet rs = pst.executeQuery();
             if (rs.next()) {
@@ -44,7 +44,7 @@ public class DAO_DonViQuyDoi {
                         rs.getString("maThuoc"),
                         rs.getString("tenDonVi"),
                         rs.getInt("tyLeQuyDoi"),
-                        rs.getDouble("giaBan")
+                        0.0 // FIX LỖI TƯƠNG TỰ
                 );
             }
         } catch (SQLException e) {

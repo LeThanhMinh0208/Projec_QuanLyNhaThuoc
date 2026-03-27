@@ -74,7 +74,7 @@
                         <content>
                            <VBox styleClass="dropdown-content">
                               <Button onAction="#moTrangDanhMucKho" styleClass="sub-btn" text="Danh Mục Kho" />
-                              <Button onAction="#moQuanLyDonNhapHang" styleClass="sub-btn" text="Quản Lý Đơn Nhập Hàng" />
+                              <Button onAction="#moQuanLyDonDatHang" styleClass="sub-btn" text="Quản Lý Đơn Đặt Hàng" />
                               <Button onAction="#moTrangNhapKho" styleClass="sub-btn" text="Nhập Kho" />
                               <Button onAction="#moTrangXuatKho" styleClass="sub-btn" text="Xuất Kho" />
                               <Button styleClass="sub-btn" text="Kiểm Kê Kho" />

@@ -4,42 +4,25 @@ import connectDB.ConnectDB;
 import entity.NhaCungCap;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DAO_NhaCungCap {
 
     // Lấy tất cả nhà cung cấp (đã có sẵn, mình giữ nguyên và cải thiện nhẹ)
-    public ArrayList<NhaCungCap> getAllNhaCungCap() {
-        ArrayList<NhaCungCap> ds = new ArrayList<>();
-        Connection con = null;
-        Statement stmt = null;
-        ResultSet rs = null;
-        try {
-            con = ConnectDB.getConnection();
-            String sql = "SELECT * FROM NhaCungCap";
-            stmt = con.createStatement();
-            rs = stmt.executeQuery(sql);
+	public List<NhaCungCap> getAllNhaCungCap() {
+        List<NhaCungCap> list = new ArrayList<>();
+        String sql = "SELECT maNhaCungCap, tenNhaCungCap FROM NhaCungCap";
+        try (Connection con = ConnectDB.getInstance().getConnection();
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                NhaCungCap ncc = new NhaCungCap(
-                    rs.getString("maNhaCungCap"),
-                    rs.getString("tenNhaCungCap"),
-                    rs.getString("sdt"),
-                    rs.getString("diaChi"),
-                    rs.getDouble("congNo")
-                );
-                ds.add(ncc);
+                NhaCungCap ncc = new NhaCungCap();
+                ncc.setMaNhaCungCap(rs.getString("maNhaCungCap"));
+                ncc.setTenNhaCungCap(rs.getString("tenNhaCungCap"));
+                list.add(ncc);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            // Đóng tài nguyên an toàn
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return ds;
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
     }
 
     // Tự động sinh mã NCC mới (ví dụ: NCC001, NCC002, ...)

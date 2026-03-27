@@ -28,4 +28,8 @@ public class NhaCungCap {
     public void setDiaChi(String diaChi) { this.diaChi = diaChi; }
     public double getCongNo() { return congNo; }
     public void setCongNo(double congNo) { this.congNo = congNo; }
+    @Override
+    public String toString() {
+        return this.tenNhaCungCap == null ? "" : this.tenNhaCungCap;
+    }
 }

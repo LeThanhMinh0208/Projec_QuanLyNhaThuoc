@@ -80,4 +80,8 @@ public class Thuoc {
     
     public String getTenDanhMuc() { return tenDanhMuc; }
     public void setTenDanhMuc(String tenDanhMuc) { this.tenDanhMuc = tenDanhMuc; }
+    @Override
+    public String toString() {
+        return this.tenThuoc == null ? "" : this.tenThuoc;
+    }
 }
