@@ -40,6 +40,8 @@ public class GUI_DanhSachHoaDonController {
     @FXML private Label lblTongDoanhThu;
 
     private final DAO_HoaDon dao = new DAO_HoaDon();
+    private ObservableList<HoaDonView> masterData = FXCollections.observableArrayList();
+    private javafx.collections.transformation.FilteredList<HoaDonView> filteredData;
     private ObservableList<HoaDonView> data = FXCollections.observableArrayList();
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -51,6 +53,16 @@ public class GUI_DanhSachHoaDonController {
         dpTuNgay.setValue(LocalDate.now().withDayOfMonth(1));
         dpDenNgay.setValue(LocalDate.now());
         loadData();
+        // Realtime search listener (filter local, không query DB)
+        txtTimKiem.textProperty().addListener((obs, oldVal, newVal) -> filterByKeyword(newVal.trim()));
+        // ENTER trên row hóa đơn → mở chi tiết
+        tableHoaDon.setOnKeyPressed(event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
+                HoaDonView selected = tableHoaDon.getSelectionModel().getSelectedItem();
+                if (selected != null) moDialogChiTiet(selected);
+                event.consume();
+            }
+        });
     }
 
     private void setupComboBox() {
@@ -86,7 +98,7 @@ public class GUI_DanhSachHoaDonController {
             }
         });
 
-        tableHoaDon.setItems(data);
+        tableHoaDon.setItems(filteredData != null ? filteredData : data);
     }
 
     private void loadData() {
@@ -101,18 +113,49 @@ public class GUI_DanhSachHoaDonController {
                 default: hinhThuc = null;
             }
         }
-        String kw = txtTimKiem.getText().trim();
-        List<HoaDonView> list = dao.getDanhSach(tu, den, hinhThuc, kw.isEmpty() ? null : kw);
-        data.setAll(list);
+        // Load tất cả vào masterData (không gửi keyword xuống DB)
+        List<HoaDonView> list = dao.getDanhSach(tu, den, hinhThuc, null);
+        masterData.setAll(list);
 
-        // Footer
-        lblTongHoaDon.setText("Tổng: " + list.size() + " hóa đơn");
-        double tongDT = list.stream().mapToDouble(HoaDonView::getTongSauVAT).sum();
+        // Wrap bằng FilteredList để filter keyword local
+        filteredData = new javafx.collections.transformation.FilteredList<>(masterData, hd -> true);
+        tableHoaDon.setItems(filteredData);
+
+        // Áp lại keyword nếu đang có
+        String kw = txtTimKiem.getText().trim();
+        filterByKeyword(kw);
+
+        updateFooter();
+    }
+
+    /** Filter keyword trên data đã load (không query DB) */
+    private void filterByKeyword(String keyword) {
+        if (filteredData == null) return;
+        if (keyword == null || keyword.isEmpty()) {
+            filteredData.setPredicate(hd -> true);
+        } else {
+            String lower = keyword.toLowerCase();
+            filteredData.setPredicate(hd -> {
+                if (hd.getMaHoaDon() != null && hd.getMaHoaDon().toLowerCase().contains(lower)) return true;
+                if (hd.getTenKhachHang() != null && hd.getTenKhachHang().toLowerCase().contains(lower)) return true;
+                if (hd.getSdt() != null && hd.getSdt().toLowerCase().contains(lower)) return true;
+                return false;
+            });
+        }
+        updateFooter();
+    }
+
+    private void updateFooter() {
+        int count = filteredData != null ? filteredData.size() : masterData.size();
+        lblTongHoaDon.setText("Tổng: " + count + " hóa đơn");
+        double tongDT = (filteredData != null ? filteredData : masterData)
+                .stream().mapToDouble(HoaDonView::getTongSauVAT).sum();
         lblTongDoanhThu.setText(String.format("%,.0f ₫", tongDT));
     }
 
     @FXML
     void handleTimKiem(ActionEvent event) {
+        // Lại load data từ DB (xài filter ngày/hình thức) rồi filter local
         loadData();
     }
 

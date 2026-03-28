@@ -24,6 +24,8 @@ import java.util.Optional;
 public class Dialog_ChiTietBangGiaController {
 
     @FXML private Label     lblHeaderTitle, lblMa, lblLoai, lblNgayBatDau, lblTrangThai, lblNgayKTHint;
+    @FXML private Label     lblCanhBaoActive, lblCanhBaoDefault;
+    @FXML private Button    btnThemThuoc, btnXoaBangGia;
     @FXML private TextField txtTen;
     @FXML private DatePicker dpNgayKetThuc;
     @FXML private TextArea  txtMoTa;
@@ -36,6 +38,7 @@ public class Dialog_ChiTietBangGiaController {
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private BangGia bangGia;
+    private boolean isBangGiaDangHoatDong = false;
     private ObservableList<ChiTietBangGia> listCT = FXCollections.observableArrayList();
 
     @FXML
@@ -62,7 +65,27 @@ public class Dialog_ChiTietBangGiaController {
             }
             @Override protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : box);
+                if (empty) { setGraphic(null); return; }
+                // Disable nút sửa/xóa nếu bảng giá đang hoạt động
+                btnSua.setDisable(isBangGiaDangHoatDong);
+                btnXoa.setDisable(isBangGiaDangHoatDong);
+                
+                // Ràng buộc riêng cho DEFAULT
+                if (bangGia != null && "DEFAULT".equals(bangGia.getLoaiBangGia())) {
+                    btnXoa.setVisible(false);
+                    btnXoa.setManaged(false);
+                    // Sửa giá: ẩn luôn nếu đang active, hiện nếu chưa active
+                    if (isBangGiaDangHoatDong) {
+                        btnSua.setVisible(false);
+                        btnSua.setManaged(false);
+                    } else {
+                        btnSua.setVisible(true);
+                        btnSua.setManaged(true);
+                        btnSua.setDisable(false);
+                    }
+                }
+                
+                setGraphic(box);
             }
         });
 
@@ -86,6 +109,57 @@ public class Dialog_ChiTietBangGiaController {
         lblNgayKTHint.setText(isPromo
                 ? (daKetThuc ? "(Bảng giá đã kết thúc, không sửa được)" : "")
                 : "(DEFAULT không có ngày kết thúc)");
+
+        // Xác định bảng giá đang thực sự hoạt động
+        LocalDate today = LocalDate.now();
+        isBangGiaDangHoatDong = bg.isTrangThai()
+                && !bg.getNgayBatDau().isAfter(today)
+                && (bg.getNgayKetThuc() == null || !bg.getNgayKetThuc().isBefore(today));
+
+        // Ràng buộc Label
+        if ("DEFAULT".equals(bg.getLoaiBangGia())) {
+            if (isBangGiaDangHoatDong) {
+                lblCanhBaoActive.setVisible(true);
+                lblCanhBaoActive.setManaged(true);
+                lblCanhBaoDefault.setVisible(false);
+                lblCanhBaoDefault.setManaged(false);
+            } else {
+                lblCanhBaoActive.setVisible(false);
+                lblCanhBaoActive.setManaged(false);
+                lblCanhBaoDefault.setVisible(true);
+                lblCanhBaoDefault.setManaged(true);
+            }
+            btnThemThuoc.setVisible(false);
+            btnThemThuoc.setManaged(false);
+        } else {
+            // PROMO -> Ẩn cả 2
+            lblCanhBaoActive.setVisible(false);
+            lblCanhBaoActive.setManaged(false);
+            lblCanhBaoDefault.setVisible(false);
+            lblCanhBaoDefault.setManaged(false);
+            
+            btnThemThuoc.setVisible(true);
+            btnThemThuoc.setManaged(true);
+            btnThemThuoc.setDisable(isBangGiaDangHoatDong);
+        }
+
+        // VẤN ĐỀ 3: Nút Xóa bảng áp dụng cho TẤT CẢ TƯƠNG LAI
+        if (bg.getNgayBatDau().isAfter(today)) {
+            btnXoaBangGia.setVisible(true);
+            btnXoaBangGia.setManaged(true);
+        } else {
+            btnXoaBangGia.setVisible(false);
+            btnXoaBangGia.setManaged(false);
+        }
+
+        // Khóa textbox nếu active
+        if (isBangGiaDangHoatDong) {
+            txtTen.setEditable(false);
+            txtMoTa.setEditable(false);
+        } else {
+            txtTen.setEditable(true);
+            txtMoTa.setEditable(true);
+        }
 
         loadChiTiet();
     }
@@ -194,5 +268,26 @@ public class Dialog_ChiTietBangGiaController {
     @FXML
     private void handleDong() {
         ((Stage) tableChiTiet.getScene().getWindow()).close();
+    }
+    
+    @FXML
+    private void handleXoaBangGia() {
+        if (bangGia == null) return;
+        
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Xác nhận xóa bảng giá");
+        confirm.setHeaderText(null);
+        confirm.setContentText("Bạn chắc chắn muốn xóa toàn bộ bảng giá " + bangGia.getTenBangGia() + "?\n"
+                             + "Hành động này không thể hoàn tác.");
+        
+        Optional<ButtonType> r = confirm.showAndWait();
+        if (r.isPresent() && r.get() == ButtonType.OK) {
+            if (daoBG.xoaBangGia(bangGia.getMaBangGia())) {
+                AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã xóa bảng giá thành công.");
+                ((Stage) tableChiTiet.getScene().getWindow()).close();
+            } else {
+                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể xóa bảng giá.");
+            }
+        }
     }
 }

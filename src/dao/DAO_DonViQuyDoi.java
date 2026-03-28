@@ -19,14 +19,10 @@ public class DAO_DonViQuyDoi {
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 String maQuyDoi = rs.getString("maQuyDoi");
-                String maT = rs.getString("maThuoc");
                 String tenDonVi = rs.getString("tenDonVi");
                 int tyLeQuyDoi = rs.getInt("tyLeQuyDoi");
                 
-                // FIX LỖI: Bảng CSDL không có cột giaBan, gán mặc định = 0
-                double giaBan = 0.0; 
-                
-                list.add(new DonViQuyDoi(maQuyDoi, maT, tenDonVi, tyLeQuyDoi, giaBan));
+                list.add(new DonViQuyDoi(maQuyDoi, maThuoc, tenDonVi, tyLeQuyDoi));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -46,8 +42,7 @@ public class DAO_DonViQuyDoi {
                         rs.getString("maQuyDoi"),
                         rs.getString("maThuoc"),
                         rs.getString("tenDonVi"),
-                        rs.getInt("tyLeQuyDoi"),
-                        0.0 // FIX LỖI TƯƠNG TỰ
+                        rs.getInt("tyLeQuyDoi")
                 );
             }
         } catch (SQLException e) {

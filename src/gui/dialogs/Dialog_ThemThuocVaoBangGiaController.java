@@ -74,7 +74,7 @@ public class Dialog_ThemThuocVaoBangGiaController {
     public void setBangGia(BangGia bg) {
         this.bangGia = bg;
         // Load thuốc chưa có trong bảng giá
-        List<ChiTietBangGia> chuaCo = daoBG.getAllThuocDangBanVaDonVi();
+        List<ChiTietBangGia> chuaCo = daoBG.getAllThuocVaDonVi();
         // Lọc bỏ các maQuyDoi đã có trong bảng giá
         daoBG.getChiTietByMaBangGia(bg.getMaBangGia()).forEach(existing -> {
             chuaCo.removeIf(ct -> ct.getMaQuyDoi().equals(existing.getMaQuyDoi()));

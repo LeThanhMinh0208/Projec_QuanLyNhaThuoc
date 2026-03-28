@@ -563,8 +563,7 @@ GO
 
 INSERT INTO BangGia (maBangGia, tenBangGia, loaiBangGia, ngayBatDau, ngayKetThuc, moTa, trangThai) VALUES
 ('BG0001', N'Bảng giá bán lẻ mặc định', 'DEFAULT', '2026-01-01', NULL, N'Bảng giá bán lẻ mặc định', 1),
-('BG0002', N'Khuyến Mãi Lễ 30/4 - 1/5', 'PROMO', '2026-04-25', '2026-05-05', N'Giảm giá các loại thuốc bổ, vitamin dịp lễ', 1),
-('BG0003', N'Bảng giá bán lẻ Quý 3/2026', 'DEFAULT', '2026-07-01', NULL, N'Cập nhật giá theo tình hình lạm phát', 1);
+('BG0002', N'Khuyến Mãi Lễ 30/4 - 1/5', 'PROMO', '2026-04-25', '2026-05-05', N'Giảm giá các loại thuốc bổ, vitamin dịp lễ', 1);
 GO
 
 INSERT INTO ChiTietBangGia (maBangGia, maQuyDoi, donGiaBan) VALUES
@@ -713,16 +712,7 @@ INSERT INTO ChiTietBangGia (maBangGia, maQuyDoi, donGiaBan) VALUES
 ('BG0002', 'QD02883', 25000),
 ('BG0002', 'QD00133', 120000),
 ('BG0002', 'QD01657', 50000),
-('BG0002', 'QD00098', 240000),
--- Data của Bảng giá BG0003 (Giá quý 3/2026)
-('BG0003', 'QD01360', 5500), 
-('BG0003', 'QD00088', 52000), 
-('BG0003', 'QD00089', 500000), 
-('BG0003', 'QD00556', 45000), 
-('BG0003', 'QD00062', 220000), 
-('BG0003', 'QD00931', 7000), 
-('BG0003', 'QD00077', 68000), 
-('BG0003', 'QD00078', 650000); 
+('BG0002', 'QD00098', 240000);
 GO
 
 INSERT INTO HoaDon (maHoaDon, maKhachHang, maNhanVien, ngayLap, thueVAT, hinhThucThanhToan, ghiChu) VALUES

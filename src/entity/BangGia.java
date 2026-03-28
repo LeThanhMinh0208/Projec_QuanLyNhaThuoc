@@ -10,7 +10,8 @@ public class BangGia {
     private LocalDate ngayKetThuc; // null = chưa kết thúc
     private String moTa;
     private boolean trangThai;     // true = đang hoạt động
-    private int soLuongThuoc;      // computed từ COUNT JOIN, không lưu DB
+    private int soLuongThuoc;      // computed từ COUNT DISTINCT mà thuốc, không lưu DB
+    private int soDonVi;           // computed từ COUNT mã quy đổi, không lưu DB
 
     public BangGia() {}
 
@@ -51,6 +52,9 @@ public class BangGia {
 
     public int getSoLuongThuoc() { return soLuongThuoc; }
     public void setSoLuongThuoc(int soLuongThuoc) { this.soLuongThuoc = soLuongThuoc; }
+
+    public int getSoDonVi() { return soDonVi; }
+    public void setSoDonVi(int soDonVi) { this.soDonVi = soDonVi; }
 
     /**
      * Tính trạng thái hiển thị:

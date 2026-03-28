@@ -108,6 +108,8 @@
                         <HBox spacing="15.0" alignment="CENTER_LEFT">
                             <Label text="Ngày bắt đầu *" styleClass="bg-form-label" />
                             <DatePicker fx:id="dpNgayBatDau" prefWidth="200.0" styleClass="bg-form-datepicker" />
+                            <Label text="(Phải từ ngày mai trở đi)"
+                                   style="-fx-text-fill:#94a3b8; -fx-font-size:12px;" />
                         </HBox>
 
                         <HBox spacing="15.0" alignment="CENTER_LEFT">
@@ -129,14 +131,20 @@
                         <HBox alignment="CENTER_LEFT" spacing="15.0">
                             <Label text="DANH SÁCH THUỐC VÀ GIÁ BÁN" styleClass="bh-section-title"
                                    VBox.vgrow="NEVER" HBox.hgrow="ALWAYS" />
-                            <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="320.0" styleClass="search-box">
+                            <Button text="Lấy giá từ bảng mặc định hiện tại" onAction="#handleLayGiaTuDefault"
+                                    style="-fx-background-color:#7c3aed; -fx-text-fill:white; -fx-font-size:12px; -fx-padding:6 12; -fx-cursor:hand; -fx-background-radius:6;">
+                                <tooltip>
+                                    <Tooltip text="Lấy giá từ bảng giá mặc định đang hiệu lực cho các thuốc chưa có giá" />
+                                </tooltip>
+                            </Button>
+                            <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="300.0" styleClass="search-box">
                                 <Label styleClass="search-icon" text="🔍" />
                                 <TextField fx:id="txtTimKiemTab2" promptText="Tìm theo tên thuốc..."
                                            styleClass="search-input" HBox.hgrow="ALWAYS" />
                             </HBox>
                         </HBox>
-                        <Label text="Nhập giá 0 hoặc để trống = không thêm vào bảng giá"
-                               style="-fx-text-fill:#94a3b8; -fx-font-size:12px;" />
+                        <!-- <Label text="Nhập giá 0 hoặc để trống = không thêm vào bảng giá"
+                               style="-fx-text-fill:#94a3b8; -fx-font-size:12px;" /> -->
 
                         <TableView fx:id="tableThuocNhapGia" prefHeight="380.0" styleClass="bg-detail-table">
                             <columnResizePolicy>

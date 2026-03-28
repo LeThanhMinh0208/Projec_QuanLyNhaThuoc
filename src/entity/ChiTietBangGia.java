@@ -11,6 +11,11 @@ public class ChiTietBangGia {
     private String tenDonVi;
     private String maThuoc;
     private int tyLeQuyDoi; // display only — join từ DonViQuyDoi
+    
+    // Thêm các trường hỗ trợ hiển thị trùng PROMO
+    private String tenBangGia;
+    private java.time.LocalDate ngayBatDau;
+    private java.time.LocalDate ngayKetThuc;
 
     public ChiTietBangGia() {}
 
@@ -51,4 +56,13 @@ public class ChiTietBangGia {
 
     public int getTyLeQuyDoi() { return tyLeQuyDoi; }
     public void setTyLeQuyDoi(int tyLeQuyDoi) { this.tyLeQuyDoi = tyLeQuyDoi; }
+
+    public String getTenBangGia() { return tenBangGia; }
+    public void setTenBangGia(String tenBangGia) { this.tenBangGia = tenBangGia; }
+
+    public java.time.LocalDate getNgayBatDau() { return ngayBatDau; }
+    public void setNgayBatDau(java.time.LocalDate ngayBatDau) { this.ngayBatDau = ngayBatDau; }
+
+    public java.time.LocalDate getNgayKetThuc() { return ngayKetThuc; }
+    public void setNgayKetThuc(java.time.LocalDate ngayKetThuc) { this.ngayKetThuc = ngayKetThuc; }
 }

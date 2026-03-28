@@ -60,12 +60,11 @@
                                             <Label text="Không có thuốc nào phù hợp" style="-fx-text-fill:#94a3b8; -fx-font-size:14px;"/>
                                         </placeholder>
                                         <columns>
-                                            <TableColumn fx:id="colThuocMa" prefWidth="90" text="Mã thuốc" />
-                                            <TableColumn fx:id="colThuocAnh" prefWidth="90" text="Ảnh" />
-                                            <TableColumn fx:id="colThuocTen" prefWidth="230" text="Tên thuốc" />
-                                            <TableColumn fx:id="colThuocTrieuChung" prefWidth="220" text="Triệu chứng / Công dụng" />
-                                            <TableColumn fx:id="colThuocKeDon" prefWidth="80" text="Kê đơn" />
-                                            <TableColumn fx:id="colThuocTrangThai" prefWidth="100" text="Trạng thái" />
+                                            <TableColumn fx:id="colThuocMa" prefWidth="80" text="Mã thuốc" />
+                                            <TableColumn fx:id="colThuocAnh" prefWidth="80" text="Ảnh" />
+                                            <TableColumn fx:id="colThuocTen" prefWidth="240" text="Tên thuốc" />
+                                            <TableColumn fx:id="colThuocTrieuChung" prefWidth="260" text="Triệu chứng / Công dụng" />
+                                            <TableColumn fx:id="colThuocKeDon" prefWidth="90" text="Kê đơn" />
                                         </columns>
                                     </TableView>
 
@@ -79,7 +78,7 @@
 
                         <!-- ── CỘT PHẢI: GIỎ HÀNG + THANH TOÁN (40%) ── -->
                         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
-                                    prefWidth="440" minWidth="400"
+                                    prefWidth="480" minWidth="460"
                                     style="-fx-background-color:transparent; -fx-background:transparent; -fx-border-color:transparent;">
                             <content>
                                 <VBox spacing="12" style="-fx-padding: 0 16 0 0;">
@@ -98,7 +97,7 @@
                                                                 styleClass="bh-btn-primary" prefHeight="38" prefWidth="80"/>
                                                     </children>
                                                 </HBox>
-                                                <Label fx:id="lblTenKhachLe" text="👤  Khách lẻ (vãng lai)" styleClass="bh-customer-name" />
+                                                <Label fx:id="lblTenKhachLe" text="👤  Khách lẻ (vãng lai)" styleClass="bh-customer-name" minWidth="300" maxWidth="Infinity" HBox.hgrow="ALWAYS" wrapText="false" />
                                             </children>
                                         </VBox>
 
@@ -120,13 +119,13 @@
                                                         <Label text="Giỏ trống — chọn thuốc để thêm vào" style="-fx-text-fill:#334155; -fx-font-size:13px;"/>
                                                     </placeholder>
                                                     <columns>
-                                                        <TableColumn fx:id="colCartTenThuoc" prefWidth="160" text="Thuốc" />
-                                                        <TableColumn fx:id="colCartDonVi" prefWidth="70" text="ĐV" />
-                                                        <TableColumn fx:id="colCartSoLuong" prefWidth="45" text="SL" />
-                                                        <TableColumn fx:id="colCartDonGia" prefWidth="100" text="Đơn giá" />
-                                                        <TableColumn fx:id="colCartThanhTien" prefWidth="100" text="Thành tiền" />
-                                                        <TableColumn fx:id="colCartHanSuDung" prefWidth="90" text="HSD" />
-                                                        <TableColumn fx:id="colCartXoa" prefWidth="45" text="" />
+                                                        <TableColumn fx:id="colCartTenThuoc" text="Thuốc" />
+                                                        <TableColumn fx:id="colCartDonVi" prefWidth="70" minWidth="70" maxWidth="70" text="ĐV" />
+                                                        <TableColumn fx:id="colCartSoLuong" prefWidth="45" minWidth="45" maxWidth="45" text="SL" />
+                                                        <TableColumn fx:id="colCartDonGia" prefWidth="90" minWidth="90" maxWidth="90" text="Đơn giá" />
+                                                        <TableColumn fx:id="colCartThanhTien" prefWidth="100" minWidth="100" maxWidth="100" text="Thành tiền" />
+                                                        <TableColumn fx:id="colCartHanSuDung" prefWidth="85" minWidth="85" maxWidth="85" text="HSD" />
+                                                        <TableColumn fx:id="colCartXoa" prefWidth="40" minWidth="40" maxWidth="40" text="" />
                                                     </columns>
                                                 </TableView>
                                             </children>
@@ -226,7 +225,7 @@
 
                         <!-- ── CỘT PHẢI: GIỎ HÀNG THEO ĐƠN + THANH TOÁN (65%) ── -->
                         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
-                                    HBox.hgrow="ALWAYS" prefWidth="440"
+                                    HBox.hgrow="ALWAYS" prefWidth="480"
                                     style="-fx-background-color:transparent; -fx-background:transparent; -fx-border-color:transparent;">
                             <content>
                                 <VBox spacing="12" style="-fx-padding: 0 16 0 0;">
@@ -245,7 +244,7 @@
                                                                 styleClass="bh-btn-primary" prefHeight="38" prefWidth="80"/>
                                                     </children>
                                                 </HBox>
-                                                <Label fx:id="lblTenKhachDon" text="👤  Khách lẻ (vãng lai)" styleClass="bh-customer-name" />
+                                                <Label fx:id="lblTenKhachDon" text="👤  Khách lẻ (vãng lai)" styleClass="bh-customer-name" minWidth="300" maxWidth="Infinity" HBox.hgrow="ALWAYS" wrapText="false" />
                                             </children>
                                         </VBox>
 
@@ -270,13 +269,13 @@
                                                         <Label text="Giỏ trống — chọn thuốc để thêm vào" style="-fx-text-fill:#334155; -fx-font-size:13px;"/>
                                                     </placeholder>
                                                     <columns>
-                                                        <TableColumn fx:id="colCartDonTenThuoc" prefWidth="180" text="Thuốc" />
-                                                        <TableColumn fx:id="colCartDonDonVi" prefWidth="70" text="ĐV" />
-                                                        <TableColumn fx:id="colCartDonSoLuong" prefWidth="45" text="SL" />
-                                                        <TableColumn fx:id="colCartDonDonGia" prefWidth="110" text="Đơn giá" />
-                                                        <TableColumn fx:id="colCartDonThanhTien" prefWidth="110" text="Thành tiền" />
-                                                        <TableColumn fx:id="colCartDonHanSuDung" prefWidth="90" text="HSD" />
-                                                        <TableColumn fx:id="colCartDonXoa" prefWidth="45" text="" />
+                                                        <TableColumn fx:id="colCartDonTenThuoc" text="Thuốc" />
+                                                        <TableColumn fx:id="colCartDonDonVi" prefWidth="70" minWidth="70" maxWidth="70" text="ĐV" />
+                                                        <TableColumn fx:id="colCartDonSoLuong" prefWidth="45" minWidth="45" maxWidth="45" text="SL" />
+                                                        <TableColumn fx:id="colCartDonDonGia" prefWidth="90" minWidth="90" maxWidth="90" text="Đơn giá" />
+                                                        <TableColumn fx:id="colCartDonThanhTien" prefWidth="100" minWidth="100" maxWidth="100" text="Thành tiền" />
+                                                        <TableColumn fx:id="colCartDonHanSuDung" prefWidth="85" minWidth="85" maxWidth="85" text="HSD" />
+                                                        <TableColumn fx:id="colCartDonXoa" prefWidth="40" minWidth="40" maxWidth="40" text="" />
                                                     </columns>
                                                 </TableView>
                                             </children>

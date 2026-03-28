@@ -72,6 +72,7 @@ public class GUI_QuanLyBangGiaController {
         setupLoaiComboBox();
         loadDanhSach();
         hienViewDanhSach();
+        setupKeyboardNavigation();
     }
 
     // ============================================================
@@ -86,7 +87,14 @@ public class GUI_QuanLyBangGiaController {
                 d.getValue().getNgayBatDau() != null ? d.getValue().getNgayBatDau().format(FMT) : ""));
         colNgayKetThuc.setCellValueFactory(d -> new SimpleStringProperty(
                 d.getValue().getNgayKetThuc() != null ? d.getValue().getNgayKetThuc().format(FMT) : "—"));
-        colSoLuong.setCellValueFactory(d -> new SimpleStringProperty(String.valueOf(d.getValue().getSoLuongThuoc())));
+        colSoLuong.setCellValueFactory(d -> {
+            BangGia bg = d.getValue();
+            int soLoai = bg.getSoLuongThuoc();
+            int soDV   = bg.getSoDonVi();
+            String text = soLoai + " loại";
+            if (soDV > 0) text += " (" + soDV + " đv)";
+            return new SimpleStringProperty(text);
+        });
 
         colTrangThai.setCellValueFactory(d -> new SimpleStringProperty(tinhTrangThai(d.getValue())));
         colTrangThai.setCellFactory(col -> new TableCell<>() {
@@ -137,6 +145,15 @@ public class GUI_QuanLyBangGiaController {
             try {
                 BigDecimal gia = raw.isEmpty() ? BigDecimal.ZERO : new BigDecimal(raw);
                 evt.getRowValue().setDonGiaBan(gia);
+                // ENTER chuyển sang dòng tiếp theo
+                int nextRow = tableThuocNhapGia.getSelectionModel().getSelectedIndex() + 1;
+                if (nextRow < tableThuocNhapGia.getItems().size()) {
+                    final int row = nextRow;
+                    javafx.application.Platform.runLater(() -> {
+                        tableThuocNhapGia.getSelectionModel().select(row);
+                        tableThuocNhapGia.edit(row, colNhapGiaBan);
+                    });
+                }
             } catch (NumberFormatException ex) {
                 showAlert(Alert.AlertType.WARNING, "Lỗi nhập liệu", "Giá phải là số hợp lệ.");
                 tableThuocNhapGia.refresh();
@@ -230,9 +247,25 @@ public class GUI_QuanLyBangGiaController {
         dpNgayKetThuc.setValue(null);
         dpNgayKetThuc.setDisable(false);
         txtMoTa.clear();
-        masterThuocNhapGia.setAll(dao.getAllThuocDangBanVaDonVi());
+        masterThuocNhapGia.setAll(dao.getAllThuocVaDonVi());
         txtTimKiemTab2.clear();
         hienViewTaoBangGia();
+
+        // ESC confirm hủy form tạo mới
+        viewTaoBangGia.setOnKeyPressed(event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.ESCAPE) {
+                Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                        "Hủy tạo bảng giá mới? Mọi thay đổi sẽ bị mất.",
+                        ButtonType.YES, ButtonType.NO);
+                confirm.setHeaderText(null);
+                confirm.showAndWait();
+                if (confirm.getResult() == ButtonType.YES) {
+                    hienViewDanhSach();
+                }
+                event.consume();
+            }
+        });
+        viewTaoBangGia.setFocusTraversable(true);
     }
 
     @FXML
@@ -260,8 +293,10 @@ public class GUI_QuanLyBangGiaController {
         if (ten.isEmpty()) { showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng nhập tên bảng giá."); return; }
         if (loai == null)  { showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng chọn loại bảng giá."); return; }
         if (ngayBatDau == null) { showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng chọn ngày bắt đầu."); return; }
-        if (ngayBatDau.isBefore(LocalDate.now())) {
-            showAlert(Alert.AlertType.WARNING, "Lỗi ngày", "Ngày bắt đầu không được là ngày trong quá khứ."); return;
+        // FIX 3D: ngày bắt đầu phải từ ngày mai trở đi
+        if (!ngayBatDau.isAfter(LocalDate.now())) {
+            showAlert(Alert.AlertType.WARNING, "Lỗi ngày bắt đầu", "Ngày bắt đầu phải từ ngày mai trở đi (tối thiểu " + LocalDate.now().plusDays(1).format(FMT) + ").");
+            return;
         }
 
         if ("PROMO".equals(loai)) {
@@ -276,12 +311,70 @@ public class GUI_QuanLyBangGiaController {
             }
         }
 
-        // Validate giá > 0 cho ít nhất 1 thuốc
+        // Collect danh sách có giá (> 0)
         List<ChiTietBangGia> danhSachGia = masterThuocNhapGia.stream()
                 .filter(ct -> ct.getDonGiaBan() != null && ct.getDonGiaBan().compareTo(BigDecimal.ZERO) > 0)
                 .collect(Collectors.toList());
         if (danhSachGia.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng nhập giá cho ít nhất một đơn vị thuốc."); return;
+            showAlert(Alert.AlertType.WARNING, "Ít nhất 1 giá", "Vui lòng nhập giá cho ít nhất một đơn vị thuốc."); return;
+        }
+
+        // 3D: Validate DEFAULT phải có giá cho TẤT CẢ đơn vị (Chặn cứng)
+        if ("DEFAULT".equals(loai)) {
+            List<ChiTietBangGia> thieu = masterThuocNhapGia.stream()
+                    .filter(ct -> ct.getDonGiaBan() == null || ct.getDonGiaBan().compareTo(BigDecimal.ZERO) == 0)
+                    .collect(Collectors.toList());
+            if (!thieu.isEmpty()) {
+                String mauTen = thieu.stream().limit(5)
+                        .map(ct -> " \u2022 " + ct.getTenThuoc() + " - " + ct.getTenDonVi())
+                        .collect(Collectors.joining("\n"));
+                
+                ButtonType btnKeThua = new ButtonType("Kế thừa giá cũ", ButtonBar.ButtonData.OK_DONE);
+                ButtonType btnNhapTay = new ButtonType("Nhập tay", ButtonBar.ButtonData.CANCEL_CLOSE);
+                
+                Alert confirm = new Alert(Alert.AlertType.WARNING,
+                        "Bảng giá mặc định phải có đầy đủ giá cho TẤT CẢ thuốc\nvà đơn vị quy đổi trong hệ thống.\n"
+                        + "Còn thiếu " + thieu.size() + " đơn vị chưa có giá:\n" + mauTen
+                        + (thieu.size() > 5 ? "\n ..." : "")
+                        + "\n\nChọn [Kế thừa giá cũ] để tự động điền từ bảng hiện tại,\nhoặc [Nhập tay] để quay lại form tiếp tục nhập.",
+                        btnKeThua, btnNhapTay);
+                confirm.setTitle("Không thể lưu bảng giá");
+                confirm.setHeaderText(null);
+                confirm.showAndWait();
+                
+                if (confirm.getResult() == btnKeThua) {
+                    handleLayGiaTuDefault(null);
+                }
+                return; // CHẶN LƯU THIẾU
+            }
+        }
+
+        // 3F: Kiểm tra PROMO trùng thời gian (CHẶN HOÀN TOÀN)
+        if ("PROMO".equals(loai)) {
+            List<String> dsQuyDoi = danhSachGia.stream()
+                    .map(ChiTietBangGia::getMaQuyDoi).collect(Collectors.toList());
+            List<ChiTietBangGia> dsTrung = dao.kiemTraTrungPromo(dsQuyDoi, ngayBatDau, ngayKetThuc, null);
+            
+            if (!dsTrung.isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Không thể tạo bảng giá. Các đơn vị sau đã có giá PROMO \n");
+                sb.append("trong cùng khoảng thời gian [").append(ngayBatDau.format(FMT))
+                  .append("] - [").append(ngayKetThuc.format(FMT)).append("]:\n\n");
+                
+                for (ChiTietBangGia ct : dsTrung) {
+                    sb.append(" • ").append(ct.getTenThuoc()).append(" - ").append(ct.getTenDonVi());
+                    sb.append("  →  Bảng: ").append(ct.getTenBangGia());
+                    sb.append(" (").append(ct.getNgayBatDau().format(FMT));
+                    if (ct.getNgayKetThuc() != null) {
+                        sb.append(" - ").append(ct.getNgayKetThuc().format(FMT));
+                    }
+                    sb.append(")\n");
+                }
+                sb.append("\nVui lòng bỏ các thuốc trùng khỏi bảng giá này hoặc điều chỉnh thời gian áp dụng.");
+                
+                showAlert(Alert.AlertType.ERROR, "Cảnh báo trùng PROMO", sb.toString());
+                return; // CHẶN LƯU
+            }
         }
 
         // --- Build entity ---
@@ -383,5 +476,69 @@ public class GUI_QuanLyBangGiaController {
         a.setTitle(title);
         a.setHeaderText(null);
         a.showAndWait();
+    }
+
+    // ============================================================
+    // FIX 3E: LẤY GIÁ KếTHA TỪ BANG DEFAULT
+    // ============================================================
+    @FXML
+    public void handleLayGiaTuDefault(ActionEvent event) {
+        java.util.Map<String, java.math.BigDecimal> giaDefault = dao.getGiaKeThuaTuDefaultHienTai();
+        if (giaDefault.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Không tìm thấy",
+                    "Không tìm thấy bảng giá mặc định đang hoạt động để kế thừa.\n"
+                    + "Vui lòng nhập giá thủ công.");
+            return;
+        }
+        int count = 0;
+        for (ChiTietBangGia ct : masterThuocNhapGia) {
+            java.math.BigDecimal gia = giaDefault.get(ct.getMaQuyDoi());
+            if (gia != null && ct.getDonGiaBan().compareTo(java.math.BigDecimal.ZERO) == 0) {
+                ct.setDonGiaBan(gia);
+                count++;
+            }
+        }
+        tableThuocNhapGia.refresh();
+        showAlert(Alert.AlertType.INFORMATION, "Hoàn tất",
+                "Dã kế thừa giá cho " + count + " đơn vị từ bảng giá DEFAULT hiện tại.");
+    }
+
+    // ============================================================
+    // FIX 5C: KEYBOARD NAVIGATION
+    // ============================================================
+    private void setupKeyboardNavigation() {
+        // Search box → ENTER: focus table
+        txtTimKiemTab1.setOnKeyPressed(event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
+                tableBangGia.requestFocus();
+                if (!tableBangGia.getItems().isEmpty()) {
+                    tableBangGia.getSelectionModel().selectFirst();
+                }
+                event.consume();
+            }
+        });
+
+        // Table → ENTER: mở dialog chi tiết
+        tableBangGia.setOnKeyPressed(event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
+                BangGia sel = tableBangGia.getSelectionModel().getSelectedItem();
+                if (sel != null) moDialogChiTiet(sel);
+                event.consume();
+            } else if (event.getCode() == javafx.scene.input.KeyCode.F5) {
+                loadDanhSach();
+                event.consume();
+            }
+        });
+
+        // Thuốc nhập giá search → ENTER: focus table
+        txtTimKiemTab2.setOnKeyPressed(event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
+                tableThuocNhapGia.requestFocus();
+                if (!tableThuocNhapGia.getItems().isEmpty()) {
+                    tableThuocNhapGia.getSelectionModel().selectFirst();
+                }
+                event.consume();
+            }
+        });
     }
 }

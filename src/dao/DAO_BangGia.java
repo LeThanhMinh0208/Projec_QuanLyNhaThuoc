@@ -18,11 +18,14 @@ public class DAO_BangGia {
     // ============================================================
     public List<BangGia> getAllBangGia() {
         List<BangGia> list = new ArrayList<>();
+        // FIX 3G: dem DISTINCT loai thuoc va tong don vi
         String sql = "SELECT bg.maBangGia, bg.tenBangGia, bg.loaiBangGia, " +
                      "       bg.ngayBatDau, bg.ngayKetThuc, bg.moTa, bg.trangThai, " +
-                     "       COUNT(DISTINCT ctbg.maQuyDoi) AS soLuongThuoc " +
+                     "       COUNT(DISTINCT dv.maThuoc) AS soLuongThuoc, " +
+                     "       COUNT(ctbg.maQuyDoi)       AS soDonVi " +
                      "FROM BangGia bg " +
                      "LEFT JOIN ChiTietBangGia ctbg ON bg.maBangGia = ctbg.maBangGia " +
+                     "LEFT JOIN DonViQuyDoi dv ON ctbg.maQuyDoi = dv.maQuyDoi " +
                      "GROUP BY bg.maBangGia, bg.tenBangGia, bg.loaiBangGia, " +
                      "         bg.ngayBatDau, bg.ngayKetThuc, bg.moTa, bg.trangThai " +
                      "ORDER BY bg.ngayBatDau DESC";
@@ -44,9 +47,11 @@ public class DAO_BangGia {
     public BangGia getBangGiaById(String maBangGia) {
         String sql = "SELECT bg.maBangGia, bg.tenBangGia, bg.loaiBangGia, " +
                      "       bg.ngayBatDau, bg.ngayKetThuc, bg.moTa, bg.trangThai, " +
-                     "       COUNT(DISTINCT ctbg.maQuyDoi) AS soLuongThuoc " +
+                     "       COUNT(DISTINCT dv.maThuoc) AS soLuongThuoc, " +
+                     "       COUNT(ctbg.maQuyDoi)       AS soDonVi " +
                      "FROM BangGia bg " +
                      "LEFT JOIN ChiTietBangGia ctbg ON bg.maBangGia = ctbg.maBangGia " +
+                     "LEFT JOIN DonViQuyDoi dv ON ctbg.maQuyDoi = dv.maQuyDoi " +
                      "WHERE bg.maBangGia = ? " +
                      "GROUP BY bg.maBangGia, bg.tenBangGia, bg.loaiBangGia, " +
                      "         bg.ngayBatDau, bg.ngayKetThuc, bg.moTa, bg.trangThai";
@@ -105,6 +110,10 @@ public class DAO_BangGia {
     public String taoBangGiaMoi(BangGia bg, List<ChiTietBangGia> chiTiet) {
         // --- Validate DEFAULT logic ---
         if ("DEFAULT".equals(bg.getLoaiBangGia())) {
+            // FIX 3D: ngay bat dau phai tu ngay mai tro di
+            if (!bg.getNgayBatDau().isAfter(LocalDate.now())) {
+                return "Ngày bắt đầu phải từ ngày mai trở đi (tối thiểu " + LocalDate.now().plusDays(1) + ")";
+            }
             BangGia cuoi = getBangGiaDefaultDangMo();
             if (cuoi != null) {
                 if (!bg.getNgayBatDau().isAfter(cuoi.getNgayBatDau())) {
@@ -213,6 +222,7 @@ public class DAO_BangGia {
         String sql = "SELECT COUNT(*) FROM BangGia "
                    + "WHERE loaiBangGia='DEFAULT' AND trangThai=1 "
                    + "  AND maBangGia <> ? "
+                   + "  AND ngayBatDau <= CAST(GETDATE() AS DATE) "
                    + "  AND (ngayKetThuc IS NULL OR ngayKetThuc >= CAST(GETDATE() AS DATE))";
         try (Connection con = ConnectDB.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
@@ -365,15 +375,14 @@ public class DAO_BangGia {
     }
 
     // ============================================================
-    // LẤY THUỐC ĐANG BÁN VÀ ĐƠN VỊ QUY ĐỔI (dùng cho Tab Tạo mới)
+    // LẤY TẤT CẢ THUỐC VÀ ĐƠN VỊ QUY ĐỔI (Không lọc trangThai)
     // ============================================================
-    public List<ChiTietBangGia> getAllThuocDangBanVaDonVi() {
+    public List<ChiTietBangGia> getAllThuocVaDonVi() {
         List<ChiTietBangGia> list = new ArrayList<>();
-        String sql = "SELECT t.maThuoc, t.tenThuoc, dv.maQuyDoi, dv.tenDonVi " +
+        String sql = "SELECT t.maThuoc, t.tenThuoc, dv.maQuyDoi, dv.tenDonVi, dv.tyLeQuyDoi " +
                      "FROM Thuoc t " +
                      "JOIN DonViQuyDoi dv ON t.maThuoc = dv.maThuoc " +
-                     "WHERE t.trangThai = 'DANG_BAN' " +
-                     "ORDER BY t.tenThuoc, dv.tenDonVi";
+                     "ORDER BY t.tenThuoc ASC";
         try (Connection con = ConnectDB.getConnection();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
@@ -393,12 +402,104 @@ public class DAO_BangGia {
     }
 
     // ============================================================
+    // XÓA BẢNG GIÁ (Xử lý chuỗi ngày kết thúc an toàn)
+    // ============================================================
+    public boolean xoaBangGia(String maBangGia) {
+        BangGia bg = getBangGiaById(maBangGia);
+        if (bg == null) return false;
+
+        Connection con = null;
+        try {
+            con = ConnectDB.getConnection();
+            con.setAutoCommit(false);
+
+            // Nếu xóa bảng DEFAULT
+            if ("DEFAULT".equals(bg.getLoaiBangGia())) {
+                // BƯỚC 1: Tìm bảng liền TRƯỚC (P)
+                LocalDate ngayLienTruoc = bg.getNgayBatDau().minusDays(1);
+                String sqlP = "SELECT TOP 1 maBangGia FROM BangGia WHERE loaiBangGia = 'DEFAULT' AND trangThai = 1 AND ngayKetThuc = ?";
+                String maP = null;
+                try (PreparedStatement pstP = con.prepareStatement(sqlP)) {
+                    pstP.setDate(1, Date.valueOf(ngayLienTruoc));
+                    try (ResultSet rsP = pstP.executeQuery()) {
+                        if (rsP.next()) {
+                            maP = rsP.getString(1);
+                        }
+                    }
+                }
+
+                // BƯỚC 2: Tìm bảng liền SAU (N)
+                String maN = null;
+                if (bg.getNgayKetThuc() != null) {
+                    LocalDate ngayLienSau = bg.getNgayKetThuc().plusDays(1);
+                    String sqlN = "SELECT TOP 1 maBangGia FROM BangGia WHERE loaiBangGia = 'DEFAULT' AND trangThai = 1 AND ngayBatDau = ?";
+                    try (PreparedStatement pstN = con.prepareStatement(sqlN)) {
+                        pstN.setDate(1, Date.valueOf(ngayLienSau));
+                        try (ResultSet rsN = pstN.executeQuery()) {
+                            if (rsN.next()) {
+                                maN = rsN.getString(1);
+                            }
+                        }
+                    }
+                }
+
+                // BƯỚC 3: Xử lý theo từng trường hợp
+                if (maP != null) {
+                    if (maN == null || bg.getNgayKetThuc() == null) {
+                        // CASE 1 & CASE 3: Cuối chuỗi hoặc duy nhất -> P mở vô hạn (NULL)
+                        String updateSql = "UPDATE BangGia SET ngayKetThuc = NULL WHERE maBangGia = ?";
+                        try (PreparedStatement pstUpdate = con.prepareStatement(updateSql)) {
+                            pstUpdate.setString(1, maP);
+                            pstUpdate.executeUpdate();
+                        }
+                    } else {
+                        // CASE 2: Ở giữa chuỗi -> P nối liền khoảng trống tới N
+                        String updateSql = "UPDATE BangGia SET ngayKetThuc = ? WHERE maBangGia = ?";
+                        try (PreparedStatement pstUpdate = con.prepareStatement(updateSql)) {
+                            pstUpdate.setDate(1, Date.valueOf(bg.getNgayKetThuc()));
+                            pstUpdate.setString(2, maP);
+                            pstUpdate.executeUpdate();
+                        }
+                    }
+                }
+            }
+
+            // Xóa chi tiết bảng giá trước
+            String delChiTietSql = "DELETE FROM ChiTietBangGia WHERE maBangGia = ?";
+            try (PreparedStatement pstDelCT = con.prepareStatement(delChiTietSql)) {
+                pstDelCT.setString(1, maBangGia);
+                pstDelCT.executeUpdate();
+            }
+
+            // Xóa bảng giá chính
+            String sql = "DELETE FROM BangGia WHERE maBangGia = ?";
+            try (PreparedStatement pstDelBG = con.prepareStatement(sql)) {
+                pstDelBG.setString(1, maBangGia);
+                pstDelBG.executeUpdate();
+            }
+
+            con.commit();
+            return true;
+        } catch (SQLException e) {
+            if (con != null) {
+                try { con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (con != null) {
+                try { con.setAutoCommit(true); con.close(); } catch (SQLException ex) { ex.printStackTrace(); }
+            }
+        }
+    }
+
+    // ============================================================
     // HELPER PRIVATE
     // ============================================================
     private BangGia mapBangGia(ResultSet rs) throws SQLException {
         LocalDate ngayKetThuc = rs.getDate("ngayKetThuc") != null
                 ? rs.getDate("ngayKetThuc").toLocalDate() : null;
-        return new BangGia(
+        BangGia bg = new BangGia(
                 rs.getString("maBangGia"),
                 rs.getString("tenBangGia"),
                 rs.getString("loaiBangGia"),
@@ -408,6 +509,9 @@ public class DAO_BangGia {
                 rs.getBoolean("trangThai"),
                 rs.getInt("soLuongThuoc")
         );
+        // Doc soDonVi neu co column nay
+        try { bg.setSoDonVi(rs.getInt("soDonVi")); } catch (SQLException ignore) {}
+        return bg;
     }
 
     private BangGia getBangGiaDefaultDangMoWithCon(Connection con) throws SQLException {
@@ -418,5 +522,86 @@ public class DAO_BangGia {
             if (rs.next()) return mapBangGia(rs);
         }
         return null;
+    }
+
+    // ============================================================
+    // LAY GIA KE THUA TU BANG DEFAULT DANG HIEU LUC (FIX 3E)
+    // ============================================================
+    public java.util.Map<String, BigDecimal> getGiaKeThuaTuDefaultHienTai() {
+        java.util.Map<String, BigDecimal> map = new java.util.LinkedHashMap<>();
+        String sql = "SELECT ctbg.maQuyDoi, ctbg.donGiaBan " +
+                     "FROM ChiTietBangGia ctbg " +
+                     "JOIN BangGia bg ON ctbg.maBangGia = bg.maBangGia " +
+                     "WHERE bg.loaiBangGia = 'DEFAULT' " +
+                     "  AND bg.trangThai = 1 " +
+                     "  AND bg.ngayBatDau <= CAST(GETDATE() AS DATE) " +
+                     "  AND (bg.ngayKetThuc IS NULL OR bg.ngayKetThuc >= CAST(GETDATE() AS DATE)) " +
+                     "ORDER BY bg.ngayBatDau DESC";
+        try (Connection con = ConnectDB.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                map.put(rs.getString("maQuyDoi"), rs.getBigDecimal("donGiaBan"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+    // ============================================================
+    // KIEM TRA TRUNG THOI GIAN PROMO (FIX 3F)
+    // Tra ve map maQuyDoi -> tenBangTrung
+    // ============================================================
+    public List<ChiTietBangGia> kiemTraTrungPromo(
+            List<String> dsQuyDoi, LocalDate ngayBD, LocalDate ngayKT, String maBangGiaMoi) {
+        List<ChiTietBangGia> result = new ArrayList<>();
+        if (dsQuyDoi == null || dsQuyDoi.isEmpty()) return result;
+        
+        // Tạo chuỗi tham số cho IN (?)
+        StringBuilder placeholders = new StringBuilder();
+        for (int i = 0; i < dsQuyDoi.size(); i++) {
+            placeholders.append("?");
+            if (i < dsQuyDoi.size() - 1) placeholders.append(",");
+        }
+
+        String sql = "SELECT t.tenThuoc, dv.tenDonVi, bg.tenBangGia, bg.ngayBatDau, bg.ngayKetThuc, ctbg.maQuyDoi " +
+                     "FROM ChiTietBangGia ctbg " +
+                     "JOIN BangGia bg ON ctbg.maBangGia = bg.maBangGia " +
+                     "JOIN DonViQuyDoi dv ON ctbg.maQuyDoi = dv.maQuyDoi " +
+                     "JOIN Thuoc t ON dv.maThuoc = t.maThuoc " +
+                     "WHERE ctbg.maQuyDoi IN (" + placeholders + ") " +
+                     "  AND bg.loaiBangGia = 'PROMO' " +
+                     "  AND bg.trangThai = 1 " +
+                     "  AND bg.maBangGia <> ? " +
+                     "  AND bg.ngayBatDau <= ? " +
+                     "  AND (bg.ngayKetThuc IS NULL OR bg.ngayKetThuc >= ?)";
+        
+        try (Connection con = ConnectDB.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            int idx = 1;
+            for (String maQD : dsQuyDoi) {
+                pst.setString(idx++, maQD);
+            }
+            pst.setString(idx++, maBangGiaMoi == null ? "" : maBangGiaMoi);
+            pst.setDate(idx++, Date.valueOf(ngayKT != null ? ngayKT : LocalDate.now().plusYears(100)));
+            pst.setDate(idx++, Date.valueOf(ngayBD));
+            
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                ChiTietBangGia ct = new ChiTietBangGia();
+                ct.setTenThuoc(rs.getString("tenThuoc"));
+                ct.setTenDonVi(rs.getString("tenDonVi"));
+                ct.setTenBangGia(rs.getString("tenBangGia"));
+                ct.setNgayBatDau(rs.getDate("ngayBatDau").toLocalDate());
+                Date kt = rs.getDate("ngayKetThuc");
+                if (kt != null) ct.setNgayKetThuc(kt.toLocalDate());
+                ct.setMaQuyDoi(rs.getString("maQuyDoi"));
+                result.add(ct);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }

@@ -17,7 +17,10 @@
 
     <!-- Header -->
     <HBox styleClass="dialog-header" alignment="CENTER_LEFT" spacing="12.0">
-        <Label fx:id="lblHeaderTitle" text="Chi Tiết Bảng Giá" styleClass="dialog-header-title" />
+        <Label fx:id="lblHeaderTitle" text="Chi Tiết Bảng Giá" styleClass="dialog-header-title" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+        <Button fx:id="btnXoaBangGia" text="🗑 Xóa bảng giá này" onAction="#handleXoaBangGia" 
+                style="-fx-background-color:#ef4444;-fx-text-fill:white;-fx-font-weight:bold;-fx-cursor:hand;" 
+                visible="false" managed="false"/>
     </HBox>
 
     <!-- Body -->
@@ -66,11 +69,23 @@
         <!-- Separator -->
         <Separator/>
 
+        <!-- Cảnh báo bảng giá đang hoạt động -->
+        <Label fx:id="lblCanhBaoActive" text="⚠ Bảng giá đang hoạt động - Chỉ được xem, không thể sửa"
+               style="-fx-background-color:#fff7ed; -fx-text-fill:#c2410c; -fx-font-weight:bold;
+                      -fx-font-size:13px; -fx-padding:8 14; -fx-background-radius:6;"
+               managed="false" visible="false" maxWidth="Infinity" />
+
+        <!-- Cảnh báo bảng giá mặc định -->
+        <Label fx:id="lblCanhBaoDefault" text="ℹ Bảng giá mặc định - không thể xóa thuốc, chỉ có thể chỉnh sửa giá"
+               style="-fx-background-color:#eff6ff; -fx-text-fill:#1d4ed8; -fx-font-weight:bold;
+                      -fx-font-size:13px; -fx-padding:8 14; -fx-background-radius:6;"
+               managed="false" visible="false" maxWidth="Infinity" />
+
         <!-- Table header -->
         <HBox alignment="CENTER_LEFT" spacing="12.0">
             <Label text="DANH SÁCH THUỐC TRONG BẢNG GIÁ"
                    style="-fx-font-weight:bold; -fx-font-size:13px;" HBox.hgrow="ALWAYS"/>
-            <Button text="+ Thêm thuốc" onAction="#handleThemThuoc"
+            <Button fx:id="btnThemThuoc" text="+ Thêm thuốc" onAction="#handleThemThuoc"
                     styleClass="bh-btn-primary" prefHeight="34"/>
         </HBox>
 
