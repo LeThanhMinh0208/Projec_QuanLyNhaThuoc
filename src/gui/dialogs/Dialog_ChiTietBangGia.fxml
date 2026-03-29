@@ -75,6 +75,12 @@
                       -fx-font-size:13px; -fx-padding:8 14; -fx-background-radius:6;"
                managed="false" visible="false" maxWidth="Infinity" />
 
+        <!-- Cảnh báo bảng giá đã kết thúc -->
+        <Label fx:id="lblCanhBaoKetThuc" text="🔒 Bảng giá đã kết thúc - chỉ được xem"
+               style="-fx-background-color:#f1f5f9; -fx-text-fill:#475569; -fx-font-weight:bold;
+                      -fx-font-size:13px; -fx-padding:8 14; -fx-background-radius:6;"
+               managed="false" visible="false" maxWidth="Infinity" />
+
         <!-- Cảnh báo bảng giá mặc định -->
         <Label fx:id="lblCanhBaoDefault" text="ℹ Bảng giá mặc định - không thể xóa thuốc, chỉ có thể chỉnh sửa giá"
                style="-fx-background-color:#eff6ff; -fx-text-fill:#1d4ed8; -fx-font-weight:bold;

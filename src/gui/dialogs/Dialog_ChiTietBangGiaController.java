@@ -24,7 +24,7 @@ import java.util.Optional;
 public class Dialog_ChiTietBangGiaController {
 
     @FXML private Label     lblHeaderTitle, lblMa, lblLoai, lblNgayBatDau, lblTrangThai, lblNgayKTHint;
-    @FXML private Label     lblCanhBaoActive, lblCanhBaoDefault;
+    @FXML private Label     lblCanhBaoActive, lblCanhBaoDefault, lblCanhBaoKetThuc;
     @FXML private Button    btnThemThuoc, btnXoaBangGia;
     @FXML private TextField txtTen;
     @FXML private DatePicker dpNgayKetThuc;
@@ -38,7 +38,9 @@ public class Dialog_ChiTietBangGiaController {
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private BangGia bangGia;
-    private boolean isBangGiaDangHoatDong = false;
+    private boolean chuaActive = false;
+    private boolean dangActive = false;
+    private boolean daKetThuc = false;
     private ObservableList<ChiTietBangGia> listCT = FXCollections.observableArrayList();
 
     @FXML
@@ -65,24 +67,21 @@ public class Dialog_ChiTietBangGiaController {
             }
             @Override protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) { setGraphic(null); return; }
-                // Disable nút sửa/xóa nếu bảng giá đang hoạt động
-                btnSua.setDisable(isBangGiaDangHoatDong);
-                btnXoa.setDisable(isBangGiaDangHoatDong);
+                if (empty || bangGia == null) { setGraphic(null); return; }
                 
-                // Ràng buộc riêng cho DEFAULT
-                if (bangGia != null && "DEFAULT".equals(bangGia.getLoaiBangGia())) {
+                // Tính năng sửa/xóa được quyết định bởi bảng giá chưa active
+                btnSua.setVisible(chuaActive);
+                btnSua.setManaged(chuaActive);
+                btnSua.setDisable(!chuaActive);
+
+                btnXoa.setVisible(chuaActive);
+                btnXoa.setManaged(chuaActive);
+                btnXoa.setDisable(!chuaActive);
+                
+                // Ràng buộc riêng cho DEFAULT: KHÔNG xóa từng dòng thuốc
+                if ("DEFAULT".equals(bangGia.getLoaiBangGia())) {
                     btnXoa.setVisible(false);
                     btnXoa.setManaged(false);
-                    // Sửa giá: ẩn luôn nếu đang active, hiện nếu chưa active
-                    if (isBangGiaDangHoatDong) {
-                        btnSua.setVisible(false);
-                        btnSua.setManaged(false);
-                    } else {
-                        btnSua.setVisible(true);
-                        btnSua.setManaged(true);
-                        btnSua.setDisable(false);
-                    }
                 }
                 
                 setGraphic(box);
@@ -95,6 +94,11 @@ public class Dialog_ChiTietBangGiaController {
     /** Gọi từ bên ngoài để nạp dữ liệu vào dialog */
     public void setBangGia(BangGia bg) {
         this.bangGia = bg;
+        // Sử dụng logic 3 trạng thái từ BangGia (TrangChu đã tính sẵn)
+        chuaActive = "Chưa hiệu lực".equals(bg.getTrangThaiHienThi());
+        dangActive = "Đang hiệu lực".equals(bg.getTrangThaiHienThi());
+        daKetThuc = "Đã kết thúc".equals(bg.getTrangThaiHienThi());
+
         lblMa.setText(bg.getMaBangGia());
         lblLoai.setText(bg.getLoaiBangGia());
         lblNgayBatDau.setText(bg.getNgayBatDau() != null ? bg.getNgayBatDau().format(FMT) : "—");
@@ -104,61 +108,70 @@ public class Dialog_ChiTietBangGiaController {
         dpNgayKetThuc.setValue(bg.getNgayKetThuc());
 
         boolean isPromo = "PROMO".equals(bg.getLoaiBangGia());
-        boolean daKetThuc = "Đã kết thúc".equals(bg.getTrangThaiHienThi());
         dpNgayKetThuc.setDisable(!isPromo || daKetThuc);
         lblNgayKTHint.setText(isPromo
                 ? (daKetThuc ? "(Bảng giá đã kết thúc, không sửa được)" : "")
                 : "(DEFAULT không có ngày kết thúc)");
 
-        // Xác định bảng giá đang thực sự hoạt động
-        LocalDate today = LocalDate.now();
-        isBangGiaDangHoatDong = bg.isTrangThai()
-                && !bg.getNgayBatDau().isAfter(today)
-                && (bg.getNgayKetThuc() == null || !bg.getNgayKetThuc().isBefore(today));
-
-        // Ràng buộc Label
-        if ("DEFAULT".equals(bg.getLoaiBangGia())) {
-            if (isBangGiaDangHoatDong) {
-                lblCanhBaoActive.setVisible(true);
-                lblCanhBaoActive.setManaged(true);
-                lblCanhBaoDefault.setVisible(false);
-                lblCanhBaoDefault.setManaged(false);
-            } else {
-                lblCanhBaoActive.setVisible(false);
-                lblCanhBaoActive.setManaged(false);
-                lblCanhBaoDefault.setVisible(true);
-                lblCanhBaoDefault.setManaged(true);
-            }
-            btnThemThuoc.setVisible(false);
-            btnThemThuoc.setManaged(false);
-        } else {
-            // PROMO -> Ẩn cả 2
-            lblCanhBaoActive.setVisible(false);
-            lblCanhBaoActive.setManaged(false);
-            lblCanhBaoDefault.setVisible(false);
-            lblCanhBaoDefault.setManaged(false);
-            
-            btnThemThuoc.setVisible(true);
-            btnThemThuoc.setManaged(true);
-            btnThemThuoc.setDisable(isBangGiaDangHoatDong);
+        // Reset visibility Label cảnh báo
+        lblCanhBaoActive.setVisible(false);
+        lblCanhBaoActive.setManaged(false);
+        lblCanhBaoDefault.setVisible(false);
+        lblCanhBaoDefault.setManaged(false);
+        if (lblCanhBaoKetThuc != null) {
+            lblCanhBaoKetThuc.setVisible(false);
+            lblCanhBaoKetThuc.setManaged(false);
         }
 
-        // VẤN ĐỀ 3: Nút Xóa bảng áp dụng cho TẤT CẢ TƯƠNG LAI
-        if (bg.getNgayBatDau().isAfter(today)) {
+        // Logic UI theo 3 trạng thái chuẩn nghiệp vụ
+        if (chuaActive) {
+            // Chưa hiệu lực -> Mở mọi chỉnh sửa (trừ xóa dòng của DEFAULT)
+            btnThemThuoc.setVisible(!isPromo ? false : true);
+            btnThemThuoc.setManaged(!isPromo ? false : true);
+            btnThemThuoc.setDisable(false);
+            
             btnXoaBangGia.setVisible(true);
             btnXoaBangGia.setManaged(true);
-        } else {
+            
+            lblCanhBaoDefault.setVisible(true);
+            lblCanhBaoDefault.setManaged(true);
+            
+            if (!isPromo) {
+                lblCanhBaoDefault.setText("ℹ Bảng giá mặc định - chỉ có thể sửa giá, không xóa thuốc");
+            } else {
+                lblCanhBaoDefault.setText("ℹ Bảng giá chưa hiệu lực - có thể chỉnh sửa");
+            }
+        } else if (dangActive) {
+            // Đang hoạt động -> Tất cả Read Only + Cảnh báo active
+            btnThemThuoc.setVisible(false);
+            btnThemThuoc.setManaged(false);
+            
             btnXoaBangGia.setVisible(false);
             btnXoaBangGia.setManaged(false);
+            
+            lblCanhBaoActive.setVisible(true);
+            lblCanhBaoActive.setManaged(true);
+        } else if (daKetThuc) {
+            // Đã kết thúc -> Tất cả Read Only + Cảnh báo kết thúc
+            btnThemThuoc.setVisible(false);
+            btnThemThuoc.setManaged(false);
+            
+            btnXoaBangGia.setVisible(false);
+            btnXoaBangGia.setManaged(false);
+            
+            if (lblCanhBaoKetThuc != null) {
+                lblCanhBaoKetThuc.setVisible(true);
+                lblCanhBaoKetThuc.setManaged(true);
+            }
         }
 
-        // Khóa textbox nếu active
-        if (isBangGiaDangHoatDong) {
-            txtTen.setEditable(false);
-            txtMoTa.setEditable(false);
-        } else {
+        // Khóa textbox
+        if (chuaActive) {
             txtTen.setEditable(true);
             txtMoTa.setEditable(true);
+        } else {
+            txtTen.setEditable(false);
+            txtMoTa.setEditable(false);
         }
 
         loadChiTiet();
