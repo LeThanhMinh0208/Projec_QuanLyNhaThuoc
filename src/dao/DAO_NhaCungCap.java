@@ -8,7 +8,6 @@ import java.util.List;
 
 public class DAO_NhaCungCap {
 
-    // Lấy tất cả nhà cung cấp (đã có sẵn, mình giữ nguyên và cải thiện nhẹ)
 	public List<NhaCungCap> getAllNhaCungCap() {
         List<NhaCungCap> list = new ArrayList<>();
         String sql = "SELECT maNhaCungCap, tenNhaCungCap FROM NhaCungCap";
@@ -156,5 +155,28 @@ public class DAO_NhaCungCap {
                 e.printStackTrace();
             }
         }
+    }
+ // HÀM MỚI: Lấy đầy đủ tất cả thông tin để hiển thị cho trang Danh Mục
+    public List<NhaCungCap> getAllNhaCungCapFull() {
+        List<NhaCungCap> list = new ArrayList<>();
+        // Câu lệnh SQL lấy full 5 cột
+        String sql = "SELECT maNhaCungCap, tenNhaCungCap, sdt, diaChi, congNo FROM NhaCungCap";
+        
+        try (Connection con = ConnectDB.getConnection(); 
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                NhaCungCap ncc = new NhaCungCap();
+                ncc.setMaNhaCungCap(rs.getString("maNhaCungCap"));
+                ncc.setTenNhaCungCap(rs.getString("tenNhaCungCap"));
+                ncc.setSdt(rs.getString("sdt"));
+                ncc.setDiaChi(rs.getString("diaChi"));
+                ncc.setCongNo(rs.getDouble("congNo"));
+                list.add(ncc);
+            }
+        } catch (Exception e) { 
+            e.printStackTrace(); 
+        }
+        return list;
     }
 }

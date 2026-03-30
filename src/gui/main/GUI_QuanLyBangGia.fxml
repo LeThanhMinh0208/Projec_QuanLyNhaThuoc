@@ -35,7 +35,7 @@
             <HBox alignment="CENTER_LEFT" spacing="15.0">
                 <Button onAction="#handleThemBangGiaMoi" prefHeight="50.0"
                         styleClass="top-card, card-green, btn-action"
-                        text="  + Thêm Bảng Giá Mới" textFill="WHITE" />
+                        text="  + Thêm Bảng Giá Mới  " textFill="WHITE" />
                 <HBox HBox.hgrow="ALWAYS" />
                 <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="350.0" styleClass="search-box">
                     <Label styleClass="search-icon" text="🔍" />

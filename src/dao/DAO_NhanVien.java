@@ -19,19 +19,24 @@ public class DAO_NhanVien {
             ResultSet rs = pst.executeQuery();
             
             if (rs.next()) {
-                String maNV = rs.getString("maNhanVien");
-                String tenDN = rs.getString("tenDangNhap");
-                String pass = rs.getString("matKhau");
-                String hoTen = rs.getString("hoTen");
-                String chucVu = rs.getString("chucVu");
-                String caLam = rs.getString("caLamViec");
-                String sdt = rs.getString("sdt");
+                String tenDN_DB = rs.getString("tenDangNhap");
+                String pass_DB = rs.getString("matKhau");
                 
-                return new NhanVien(maNV, tenDN, pass, hoTen, chucVu, caLam, sdt);
+                if (tenDN_DB.equals(taiKhoan) && pass_DB.equals(matKhau)) {
+                    
+                    String maNV = rs.getString("maNhanVien");
+                    String hoTen = rs.getString("hoTen");
+                    String chucVu = rs.getString("chucVu");
+                    String caLam = rs.getString("caLamViec");
+                    String sdt = rs.getString("sdt");
+                    
+                    return new NhanVien(maNV, tenDN_DB, pass_DB, hoTen, chucVu, caLam, sdt);
+                } 
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
         return null;
     }
 }

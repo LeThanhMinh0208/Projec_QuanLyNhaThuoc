@@ -96,7 +96,7 @@
         </HBox>
 
         <!-- Chi tiết bảng giá table -->
-        <TableView fx:id="tableChiTiet" prefHeight="320.0" styleClass="bg-detail-table">
+        <TableView fx:id="tableChiTiet" prefHeight="250.0" styleClass="bg-detail-table">
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
             </columnResizePolicy>
@@ -118,6 +118,6 @@
         <Button text="Đóng" onAction="#handleDong" styleClass="dialog-btn-cancel"
                 prefWidth="100" prefHeight="40"/>
         <Button text="💾 Lưu Thay Đổi" onAction="#handleLuu" styleClass="dialog-btn-ok"
-                prefWidth="160" prefHeight="40"/>
+                prefWidth="180" prefHeight="40"/>
     </HBox>
 </VBox>

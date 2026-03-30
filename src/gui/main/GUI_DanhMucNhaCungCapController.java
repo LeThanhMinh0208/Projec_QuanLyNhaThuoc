@@ -73,7 +73,7 @@ public class GUI_DanhMucNhaCungCapController {
     }
 
     private void loadData() {
-        masterData.setAll(daoNhaCungCap.getAllNhaCungCap()); 
+        masterData.setAll(daoNhaCungCap.getAllNhaCungCapFull()); 
 
         filteredData = new FilteredList<>(masterData, p -> true);
 

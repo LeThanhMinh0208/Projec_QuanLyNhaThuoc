@@ -12,10 +12,8 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            // Mở kết nối Database khi khởi động
             ConnectDB.getInstance().connect();
 
-            // Gọi màn hình Đăng Nhập lên
             Parent root = FXMLLoader.load(getClass().getResource("GUI_DangNhap.fxml"));
             Scene scene = new Scene(root);
             
