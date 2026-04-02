@@ -155,7 +155,10 @@ public class GUI_QuanLyDonDatHangController {
     }
 
     public void loadData() {
-        List<DonDatHang> list = dao.getAllDonDatHang();
+List<DonDatHang> list = dao.getAllDonDatHang();
+  
+        list.sort((d1, d2) -> d2.getMaDonDatHang().compareTo(d1.getMaDonDatHang()));
+        
         masterData.setAll(list);
         tableDonDat.setItems(masterData);
     }

@@ -191,7 +191,7 @@ CREATE TABLE ChiTietPhieuNhap (
 );
 
 -- ========================================================
--- 4. TẠO BẢNG NGHIỆP VỤ: BÁN HÀNG & ĐỔI TRẢ
+-- 5. TẠO BẢNG NGHIỆP VỤ: BÁN HÀNG & ĐỔI TRẢ
 -- ========================================================
 CREATE TABLE HoaDon (
     maHoaDon VARCHAR(20) PRIMARY KEY,
@@ -261,6 +261,44 @@ CREATE TABLE ChiTietDoiTra (
     FOREIGN KEY (maLoThuoc) REFERENCES LoThuoc(maLoThuoc),
     CONSTRAINT CHK_ChiTietDoiTra_SL CHECK (soLuong > 0)
 );
+USE QuanLyNhaThuoc_LongNguyen;
+GO
+
+-- ========================================================
+-- 6. TẠO BẢNG NGHIỆP VỤ: QUẢN LÝ CÔNG NỢ (TRẢ TIỀN NCC)
+-- ========================================================
+
+-- Bảng Phiếu Chi (Lưu thông tin chung của lần đi trả tiền)
+CREATE TABLE PhieuChi (
+    maPhieuChi VARCHAR(20) PRIMARY KEY,
+    maNhaCungCap VARCHAR(20) NOT NULL,
+    maNhanVien VARCHAR(20) NOT NULL,
+    ngayChi DATETIME DEFAULT GETDATE(),
+    tongTienChi DECIMAL(18,2) NOT NULL,
+    hinhThucChi VARCHAR(20) DEFAULT 'TIEN_MAT',
+    ghiChu NVARCHAR(255),
+
+    FOREIGN KEY (maNhaCungCap) REFERENCES NhaCungCap(maNhaCungCap),
+    FOREIGN KEY (maNhanVien) REFERENCES NhanVien(maNhanVien),
+    CONSTRAINT CHK_TongTienChi CHECK (tongTienChi > 0),
+    CONSTRAINT CHK_HinhThucChi CHECK (hinhThucChi IN ('TIEN_MAT', 'CHUYEN_KHOAN', 'THE'))
+);
+
+-- Bảng Chi Tiết Phiếu Chi (Lưu chi tiết lần này trả cho những phiếu nhập nào)
+-- *Lưu ý: Nếu sếp chỉ muốn quản lý nợ theo CỤC (của NCC) thì không cần bảng này.
+-- *Nhưng thiết kế chuẩn là trả tiền cho phiếu nhập nào thì trừ vào phiếu đó.
+CREATE TABLE ChiTietPhieuChi (
+    maPhieuChi VARCHAR(20) NOT NULL,
+    maPhieuNhap VARCHAR(20) NOT NULL,
+    soTienTra DECIMAL(18,2) NOT NULL,
+
+    PRIMARY KEY (maPhieuChi, maPhieuNhap),
+    FOREIGN KEY (maPhieuChi) REFERENCES PhieuChi(maPhieuChi) ON DELETE CASCADE,
+    FOREIGN KEY (maPhieuNhap) REFERENCES PhieuNhap(maPhieuNhap),
+    CONSTRAINT CHK_SoTienTra CHECK (soTienTra > 0)
+);
+
+
 
 GO
 PRINT N'Đã tạo xong Database cấu trúc mới!';

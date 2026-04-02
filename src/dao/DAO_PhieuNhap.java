@@ -25,18 +25,6 @@ public class DAO_PhieuNhap {
         return ma;
     }
 
-    private String getMaDonMoi(Connection con) throws SQLException {
-        String ma = "DDH001";
-        try (Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery("SELECT MAX(maDonDatHang) FROM DonDatHang")) {
-            if (rs.next() && rs.getString(1) != null) {
-                int so = Integer.parseInt(rs.getString(1).substring(3)) + 1;
-                ma = String.format("DDH%03d", so);
-            }
-        }
-        return ma;
-    }
-
     public boolean luuPhieuNhapVaCapNhatDon(PhieuNhap phieuNhap, List<ChiTietDonDatHang> listChiTietNhan, DonDatHang donGoc, int soNgayHen) {
         Connection con = null;
         try {
@@ -114,17 +102,23 @@ public class DAO_PhieuNhap {
                 }
             }
 
+            // ========================================================
+            // XỬ LÝ TÁCH ĐƠN NẾU GIAO THIẾU
+            // ========================================================
             if (isGiaoThieu && soNgayHen > 0) {
                 try (PreparedStatement pstUpdateOld = con.prepareStatement("UPDATE DonDatHang SET trangThai = 'GIAO_MOT_PHAN' WHERE maDonDatHang = ?")) {
                     pstUpdateOld.setString(1, donGoc.getMaDonDatHang());
                     pstUpdateOld.executeUpdate();
                 }
 
-                String maDonMoi = getMaDonMoi(con);
+             
+                dao.DAO_DonDatHang daoDon = new dao.DAO_DonDatHang();
+                String maDonMoi = daoDon.getMaDonGiaoThieu(donGoc.getMaDonDatHang());
+
                 String sqlInsertNewDon = "INSERT INTO DonDatHang (maDonDatHang, maNhaCungCap, maNhanVien, ngayDat, ngayGiaoDuKien, tongTienDuTinh, trangThai, ghiChu) " +
                                          "VALUES (?, ?, ?, GETDATE(), DATEADD(day, ?, GETDATE()), ?, 'CHO_GIAO', ?)";
                 try (PreparedStatement pstInsertNew = con.prepareStatement(sqlInsertNewDon)) {
-                    pstInsertNew.setString(1, maDonMoi);
+                    pstInsertNew.setString(1, maDonMoi); // Lắp cái mã .1 .2 vào đây
                     pstInsertNew.setString(2, donGoc.getNhaCungCap().getMaNhaCungCap());
                     pstInsertNew.setString(3, donGoc.getNhanVien().getMaNhanVien());
                     pstInsertNew.setInt(4, soNgayHen); 
@@ -138,7 +132,7 @@ public class DAO_PhieuNhap {
                     for (ChiTietDonDatHang ct : listChiTietNhan) {
                         int slThieu = ct.getSoLuongDat() - ct.getSoLuongDaNhan();
                         if (slThieu > 0) {
-                            pstInsertCT.setString(1, maDonMoi);
+                            pstInsertCT.setString(1, maDonMoi); // Lắp cái mã .1 .2 vào đây luôn
                             pstInsertCT.setString(2, ct.getDonViQuyDoi().getMaQuyDoi());
                             pstInsertCT.setInt(3, slThieu);
                             pstInsertCT.setDouble(4, ct.getDonGiaDuKien());
@@ -147,7 +141,7 @@ public class DAO_PhieuNhap {
                     }
                     pstInsertCT.executeBatch();
                 }
-            } else {
+            } else if (!isGiaoThieu) {
                 try (PreparedStatement pstTrangThai = con.prepareStatement("UPDATE DonDatHang SET trangThai = 'GIAO_DU' WHERE maDonDatHang = ?")) {
                     pstTrangThai.setString(1, donGoc.getMaDonDatHang());
                     pstTrangThai.executeUpdate();

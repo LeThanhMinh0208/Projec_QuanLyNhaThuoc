@@ -1,0 +1,190 @@
+/* ========================================================
+   FULL CODE CSS QUẢN LÝ CÔNG NỢ & DIALOG ĐỒNG BỘ 100%
+   ======================================================== */
+
+/* --- 1. NỀN TỔNG THỂ & TIÊU ĐỀ --- */
+.cn-main-bg { 
+    -fx-background-color: #f0f4f8; 
+}
+
+.cn-page-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #0284c7;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.cn-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 15px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 10, 0, 0, 5);
+}
+
+/* --- 2. Ô TÌM KIẾM (SEARCH BOX) - ĐÃ FIX LỖI LỆCH --- */
+.cn-search-box, .cn-search-container {
+    -fx-background-color: white;
+    -fx-background-radius: 25px;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 25px;
+    -fx-padding: 0 15 0 15;
+    -fx-alignment: CENTER_LEFT; /* Căn giữa kính lúp và chữ */
+}
+
+.cn-search-box:focused-within, .cn-search-container:focused-within {
+    -fx-border-color: #0ea5e9;
+    -fx-border-width: 2px;
+}
+
+.cn-search-input {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1e293b;
+    -fx-prompt-text-fill: #94a3b8;
+}
+
+/* --- 3. TABLE VIEW - FIX LỖI CLICK MẤT NỘI DUNG --- */
+.cn-table {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.cn-table .column-header-background {
+    -fx-background-color: #0ea5e9;
+    -fx-background-radius: 12px 12px 0 0;
+}
+
+.cn-table .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 50px;
+}
+
+.cn-table .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-text-transform: uppercase;
+}
+
+.cn-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-cell-size: 55px;
+    -fx-border-color: #f1f5f9;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.cn-table .table-row-cell:odd { -fx-background-color: #f8fafc; }
+
+/* FIX CLICK: Đảm bảo chữ luôn hiện màu đen/xám đậm khi dòng được chọn */
+.cn-table .table-row-cell:selected, 
+.cn-table .table-row-cell:focused:selected {
+    -fx-background-color: #e0f2fe; /* Màu nền xanh nhạt khi chọn */
+}
+
+.cn-table .table-row-cell:selected .table-cell {
+    -fx-text-fill: #0f172a !important; /* Ép chữ phải hiện màu đen đậm */
+    -fx-font-weight: bold;
+}
+
+.cn-table .table-cell {
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 15;
+}
+
+/* --- 4. DIALOG (LẬP PHIẾU & CHI TIẾT) - ĐỒNG BỘ 100% --- */
+.dialog-container {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 15px;
+}
+
+/* Header xanh dương gradient đặc trưng */
+.dialog-header-area {
+    -fx-background-color: linear-gradient(to right, #2563eb, #0ea5e9);
+    -fx-padding: 25px;
+    -fx-background-radius: 15px 15px 0 0;
+}
+
+.dialog-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+    -fx-text-fill: white;
+}
+
+.dialog-label-static {
+    -fx-font-weight: bold;
+    -fx-text-fill: #64748b;
+    -fx-font-size: 14px;
+}
+
+.dialog-value-text {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}
+
+.dialog-input-field {
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 10px;
+}
+
+.dialog-input-field:focused {
+    -fx-border-color: #0ea5e9;
+    -fx-border-width: 2px;
+}
+
+/* --- 5. HỆ THỐNG NÚT BẤM (BUTTONS) --- */
+
+/* Nút chính (Lưu, Xác nhận) */
+.btn-dialog-save, .cn-btn-action {
+    -fx-background-color: linear-gradient(to right, #0ea5e9, #0284c7);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 25px;
+    -fx-cursor: hand;
+    -fx-padding: 10 25;
+}
+
+/* Nút phụ (In PDF) */
+.btn-dialog-print {
+    -fx-background-color: linear-gradient(to bottom, #10b981, #059669);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 25px;
+    -fx-cursor: hand;
+    -fx-padding: 10 25;
+}
+
+/* Nút hủy/Đóng */
+.btn-dialog-cancel, .cn-btn-secondary {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-background-radius: 25px;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 25px;
+    -fx-cursor: hand;
+    -fx-padding: 10 25;
+}
+
+/* --- 6. TABS CHUYỂN TRANG --- */
+.cn-tab-container {
+    -fx-background-color: #e2e8f0;
+    -fx-background-radius: 30px;
+    -fx-padding: 5px;
+}
+
+.cn-tab-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #64748b;
+    -fx-font-weight: bold;
+    -fx-background-radius: 30px;
+    -fx-padding: 10 30;
+    -fx-cursor: hand;
+}
+
+.cn-tab-button:selected {
+    -fx-background-color: linear-gradient(to right, #0ea5e9, #0284c7);
+    -fx-text-fill: white;
+}

@@ -73,11 +73,13 @@ public class Dialog_ChiTietPhieuNhapController {
     private void loadChiTietTuDatabase(String maPhieu) {
         ObservableList<ChiTietUI> list = FXCollections.observableArrayList();
         
-        String sql = "SELECT t.tenThuoc, ctpn.maQuyDoi AS tenDonVi, ctpn.soLuong, ctpn.donGiaNhap, " +
+        // ĐÃ SỬA CÂU LỆNH SQL: Join thêm bảng DonViQuyDoi để lấy đúng tenDonVi thay vì maQuyDoi
+        String sql = "SELECT t.tenThuoc, dv.tenDonVi, ctpn.soLuong, ctpn.donGiaNhap, " +
                      "lt.maLoThuoc, lt.ngaySanXuat, lt.hanSuDung " +
                      "FROM ChiTietPhieuNhap ctpn " +
                      "JOIN LoThuoc lt ON ctpn.maLoThuoc = lt.maLoThuoc " +
                      "JOIN Thuoc t ON lt.maThuoc = t.maThuoc " +
+                     "JOIN DonViQuyDoi dv ON ctpn.maQuyDoi = dv.maQuyDoi " + // Thêm dòng này
                      "WHERE ctpn.maPhieuNhap = ?";
 
         try (Connection con = ConnectDB.getInstance().getConnection();
@@ -87,7 +89,10 @@ public class Dialog_ChiTietPhieuNhapController {
             while (rs.next()) {
                 ChiTietUI ct = new ChiTietUI();
                 ct.setTenThuoc(rs.getString("tenThuoc"));
+                
+                // ĐÃ SỬA: Lấy từ cột tenDonVi vừa Join
                 ct.setDonVi(rs.getString("tenDonVi")); 
+                
                 ct.setSoLuong(rs.getInt("soLuong"));
                 ct.setGiaNhap(rs.getDouble("donGiaNhap"));
                 ct.setMaLo(rs.getString("maLoThuoc"));

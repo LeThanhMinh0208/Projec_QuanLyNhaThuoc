@@ -118,17 +118,22 @@ public class DAO_DonDatHang {
     // 4. Sinh mã tự động (DDH001, DDH002...)
     public String getMaDonMoi() {
         String ma = "DDH001";
-        try (Connection con = ConnectDB.getInstance().getConnection();
+        // ĐK: LEN(maDonDatHang) = 6 để chỉ lấy DDH001, bỏ qua DDH001.1
+        String sql = "SELECT MAX(maDonDatHang) FROM DonDatHang WHERE LEN(maDonDatHang) = 6"; 
+        
+        try (Connection con = connectDB.ConnectDB.getConnection();
              Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery("SELECT MAX(maDonDatHang) FROM DonDatHang")) {
+             ResultSet rs = st.executeQuery(sql)) {
+             
             if (rs.next() && rs.getString(1) != null) {
                 int so = Integer.parseInt(rs.getString(1).substring(3)) + 1;
                 ma = String.format("DDH%03d", so);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return ma;
     }
-
     // =========================================================================
     // NGHIỆP VỤ NÂNG CAO: TÁCH ĐƠN TỰ ĐỘNG KHI GIAO THIẾU KÈM NGÀY HẸN
     // =========================================================================
@@ -251,5 +256,52 @@ public class DAO_DonDatHang {
         } finally {
             try { if (con != null) con.setAutoCommit(true); } catch (SQLException e) { e.printStackTrace(); }
         }
+    }
+    public String getMaDonGiaoThieu(String maDonGoc) {
+        String baseId = maDonGoc;
+        if (maDonGoc.contains(".")) {
+            baseId = maDonGoc.substring(0, maDonGoc.indexOf(".")); 
+        }
+        
+        String newId = baseId + ".1"; 
+        int maxSuffix = 0;
+        
+        String sql = "SELECT maDonDatHang FROM DonDatHang WHERE maDonDatHang LIKE ?";
+        
+        // SỬA CHỖ NÀY: Dùng Connection riêng, tách biệt hoàn toàn để không đá nhau với hàm Cha
+        java.sql.Connection con = null;
+        java.sql.PreparedStatement pst = null;
+        java.sql.ResultSet rs = null;
+        
+        try {
+            // Lấy kết nối mới hoàn toàn
+            con = connectDB.ConnectDB.getInstance().getConnection(); 
+            pst = con.prepareStatement(sql);
+            pst.setString(1, baseId + ".%");
+            rs = pst.executeQuery();
+            
+            while (rs.next()) {
+                String id = rs.getString(1); 
+                try {
+                    int suffix = Integer.parseInt(id.substring(id.indexOf(".") + 1));
+                    if (suffix > maxSuffix) {
+                        maxSuffix = suffix;
+                    }
+                } catch (Exception e) {} 
+            }
+            
+            if (maxSuffix > 0) {
+                newId = baseId + "." + (maxSuffix + 1);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // Chỉ đóng ResultSet và PreparedStatement, TUYỆT ĐỐI KHÔNG ĐÓNG Connection
+            // Vì thằng DAO_PhieuNhap vẫn đang dùng nó để làm việc!
+            try { if (rs != null) rs.close(); } catch (Exception e) {}
+            try { if (pst != null) pst.close(); } catch (Exception e) {}
+        }
+        return newId;
     }
 }

@@ -350,10 +350,30 @@ public class GUI_NhapKhoController {
         nv.setMaNhanVien("NV001"); // TODO: Lấy user đang đăng nhập
         pn.setNhanVien(nv);
 
-        boolean tc = daoPhieuNhap.luuPhieuNhapVaCapNhatDon(pn, listChiTietHienTai, donHienTai, soNgayHen);
+boolean tc = daoPhieuNhap.luuPhieuNhapVaCapNhatDon(pn, listChiTietHienTai, donHienTai, soNgayHen);
         
         if (tc) {
-            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã lưu phiếu nhập kho và đóng đơn đặt hàng thành công!");
+            // =========================================================
+            // BẮT ĐẦU LOGIC MỚI: CỘNG DỒN CÔNG NỢ CHO NHÀ CUNG CẤP
+            // =========================================================
+            double tongTienNhap = 0;
+            for (ChiTietDonDatHang ct : listChiTietHienTai) {
+                tongTienNhap += ct.getSoLuongDaNhan() * ct.getDonGiaDuKien();
+            }
+            
+            // Gọi hàm DAO vừa tạo để cộng tiền
+            dao.DAO_NhaCungCap daoNCC = new dao.DAO_NhaCungCap();
+            boolean updateCongNo = daoNCC.congCongNoNhaCungCap(donHienTai.getNhaCungCap().getMaNhaCungCap(), tongTienNhap);
+            
+            if (updateCongNo) {
+                AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", 
+                    "Đã lưu phiếu nhập kho!\nĐã cộng dồn " + df.format(tongTienNhap) + " vào công nợ của NCC.");
+            } else {
+                AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo", 
+                    "Đã lưu phiếu nhập nhưng có lỗi xảy ra khi cập nhật công nợ NCC!");
+            }
+            // =========================================================
+
             loadDonChoNhap(); 
             handleHuyNhapKho(null);
             
@@ -361,7 +381,7 @@ public class GUI_NhapKhoController {
             if(txtTimKiemPhieuNhap != null) txtTimKiemPhieuNhap.clear();
             loadDanhSachPhieuNhap(); 
         } else {
-            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi Server", "Không thể lưu dữ liệu, vui lòng thử lại!");
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi Server", "Không thể lưu dữ liệu phiếu nhập, vui lòng thử lại!");
         }
     }
 

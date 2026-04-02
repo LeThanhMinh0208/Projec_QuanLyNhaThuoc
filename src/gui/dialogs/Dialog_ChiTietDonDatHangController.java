@@ -192,7 +192,7 @@ public class Dialog_ChiTietDonDatHangController {
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("Xác nhận hủy đơn");
         alert.setHeaderText("Bạn có chắc chắn muốn HỦY đơn đặt hàng " + donHienTai.getMaDonDatHang() + " không?");
-        alert.setContentText("Lưu ý: NCC sẽ không giao hàng cho đơn này nữa. Thao tác này không thể hoàn tác!");
+        alert.setContentText("Lưu ý: NCC sẽ không giao hàng cho đơn này nữa.\nThao tác này không thể hoàn tác!");
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {

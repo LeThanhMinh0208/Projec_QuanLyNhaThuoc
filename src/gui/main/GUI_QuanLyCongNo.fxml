@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="850.0" prefWidth="1200.0" spacing="20.0" styleClass="cn-main-bg" stylesheets="@../../resources/css/QuanLyCongNo.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.GUI_QuanLyCongNoController">
+   <padding><Insets bottom="25.0" left="30.0" right="30.0" top="25.0" /></padding>
+   
+   <children>
+      <HBox alignment="CENTER_LEFT" spacing="30.0">
+         <children>
+            <VBox spacing="5.0">
+               <children>
+                  <Label styleClass="cn-page-title" text="QUẢN LÝ CÔNG NỢ" />
+                  <Region prefHeight="4.0" prefWidth="120.0" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+               </children>
+            </VBox>
+            
+            <HBox styleClass="cn-tab-container" alignment="CENTER_LEFT">
+               <children>
+                  <ToggleButton fx:id="tabLapPhieu" selected="true" text="💸 Lập Phiếu Chi" styleClass="cn-tab-button">
+                     <toggleGroup><ToggleGroup fx:id="tabGroup" /></toggleGroup>
+                  </ToggleButton>
+                  <ToggleButton fx:id="tabDanhSach" text="📋 Danh Mục Phiếu Chi" toggleGroup="$tabGroup" styleClass="cn-tab-button" />
+               </children>
+            </HBox>
+         </children>
+      </HBox>
+
+      <StackPane VBox.vgrow="ALWAYS">
+         <children>
+            <VBox fx:id="viewLapPhieu" spacing="20.0" styleClass="cn-card">
+               <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
+               <children>
+                  <HBox alignment="CENTER_LEFT" spacing="20.0">
+                     <children>
+                        <Button onAction="#handleMoFormLapPhieu" prefHeight="45.0" styleClass="cn-btn-action" text="➕ Lập Phiếu Chi Mới" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <HBox alignment="CENTER_LEFT" styleClass="cn-search-box">
+                           <children>
+                              <Label style="-fx-font-size: 16px; -fx-text-fill: #0ea5e9;" text="🔍" />
+                              <TextField fx:id="txtTimKiemNCC" prefHeight="40.0" prefWidth="300.0" promptText="Tìm theo tên nhà cung cấp, SĐT..." styleClass="cn-search-input" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </HBox>
+
+                  <TableView fx:id="tableCongNoNCC" styleClass="cn-table" VBox.vgrow="ALWAYS">
+                     <columns>
+                        <TableColumn fx:id="colMaNCC" prefWidth="150.0" text="MÃ NCC" />
+                        <TableColumn fx:id="colTenNCC" prefWidth="350.0" text="TÊN NHÀ CUNG CẤP" />
+                        <TableColumn fx:id="colSdtNCC" prefWidth="200.0" text="SỐ ĐIỆN THOẠI" />
+                        <TableColumn fx:id="colCongNo" prefWidth="250.0" text="CÔNG NỢ HIỆN TẠI (VNĐ)" />
+                     </columns>
+                     <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+                  </TableView>
+               </children>
+            </VBox>
+
+            <VBox fx:id="viewDanhSach" managed="false" visible="false" spacing="20.0" styleClass="cn-card">
+               <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
+               <children>
+                   <HBox alignment="CENTER_LEFT" spacing="15.0">
+                     <children>
+                        <DatePicker fx:id="dpTuNgay" prefHeight="40.0" promptText="Từ ngày..." />
+                        <DatePicker fx:id="dpDenNgay" prefHeight="40.0" promptText="Đến ngày..." />
+                        <Button styleClass="cn-btn-secondary" text="Lọc" prefHeight="40.0" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <HBox spacing="10.0" styleClass="cn-search-container" prefHeight="45.0" prefWidth="400.0">
+   <children>
+      <Label style="-fx-text-fill: #0ea5e9; -fx-font-size: 18px;" text="🔍" />
+      <TextField fx:id="txtTimKiem" promptText="Tìm theo tên nhà cung cấp, SĐT..." styleClass="cn-search-input" HBox.hgrow="ALWAYS" />
+   </children>
+</HBox>
+                     </children>
+                  </HBox>
+
+                  <TableView fx:id="tablePhieuChi" styleClass="cn-table" VBox.vgrow="ALWAYS">
+                     <columns>
+                        <TableColumn fx:id="colXemChiTiet" prefWidth="80.0" text="XEM" />
+                        <TableColumn fx:id="colMaPhieuChi" prefWidth="120.0" text="MÃ PHIẾU" />
+                        <TableColumn fx:id="colNhaCungCapPhieu" prefWidth="250.0" text="NHÀ CUNG CẤP" />
+                        <TableColumn fx:id="colNhanVienChi" prefWidth="150.0" text="NGƯỜI LẬP" />
+                        <TableColumn fx:id="colSoTienChi" prefWidth="180.0" text="SỐ TIỀN CHI" />
+                      
+                     </columns>
+                     <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+                  </TableView>
+               </children>
+            </VBox>
+
+         </children>
+      </StackPane>
+   </children>
+</VBox>

@@ -179,4 +179,28 @@ public class DAO_NhaCungCap {
         }
         return list;
     }
+ // HÀM MỚI: Cộng dồn tiền vào công nợ hiện tại của Nhà Cung Cấp
+    public boolean congCongNoNhaCungCap(String maNCC, double soTienCongThem) {
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        try {
+            con = ConnectDB.getConnection();
+            // Lệnh SQL tự động lấy số cũ cộng số mới an toàn tuyệt đối
+            String sql = "UPDATE NhaCungCap SET congNo = congNo + ? WHERE maNhaCungCap = ?";
+            pstmt = con.prepareStatement(sql);
+            pstmt.setDouble(1, soTienCongThem);
+            pstmt.setString(2, maNCC);
+            
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

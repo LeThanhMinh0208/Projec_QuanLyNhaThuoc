@@ -248,6 +248,10 @@ public class GUI_TrangChuController {
     void handleMoQuanLyDanhMucNhaCungCap(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucNhaCungCap.fxml");
     }
+    @FXML
+    void handleMoQuanLyCongNo(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyCongNo.fxml");
+    }
 
     @FXML
     void handleMoQuanLyBangGia(ActionEvent event) {
@@ -258,6 +262,7 @@ public class GUI_TrangChuController {
     void handleMoDanhSachHoaDon(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_DanhSachHoaDon.fxml");
     }
+    
 
     @FXML
     void handleMoTaoBangGia(ActionEvent event) {
