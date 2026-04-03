@@ -11,6 +11,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import java.util.List;
+
 public class DAO_LoThuoc {
     public ArrayList<LoThuoc> getAllLoThuoc() {
         ArrayList<LoThuoc> list = new ArrayList<>();
@@ -155,5 +157,35 @@ public class DAO_LoThuoc {
             e.printStackTrace();
         }
         return null;
+    }
+ /// ========================================================
+    // HÀM ĐỘC QUYỀN CHO TRẢ NHÀ CUNG CẤP (Lấy đầy đủ Giá Nhập)
+    // ========================================================
+    public List<LoThuoc> getLoThuocTraNCC(String maThuoc, String viTriKho) {
+        List<LoThuoc> list = new ArrayList<>();
+        String sql = "SELECT * FROM LoThuoc WHERE maThuoc = ? AND viTriKho = ? AND soLuongTon > 0 ORDER BY hanSuDung ASC";
+        
+        try (Connection con = ConnectDB.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            
+            pst.setString(1, maThuoc);
+            pst.setString(2, viTriKho);
+            ResultSet rs = pst.executeQuery();
+            
+            while (rs.next()) {
+                LoThuoc lo = new LoThuoc();
+                lo.setMaLoThuoc(rs.getString("maLoThuoc"));
+                lo.setSoLuongTon(rs.getInt("soLuongTon"));
+                lo.setHanSuDung(rs.getDate("hanSuDung"));
+                lo.setNgaySanXuat(rs.getDate("ngaySanXuat"));
+                lo.setViTriKho(rs.getString("viTriKho"));
+                
+                // Cột quan trọng nhất để tính tiền hoàn lại
+                lo.setGiaNhap(rs.getDouble("giaNhap")); 
+                
+                list.add(lo);
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
     }
 }

@@ -51,21 +51,25 @@ public class GUI_DanhMucNhaCungCapController {
 
         // Format cột Công nợ
         colCongNo.setCellValueFactory(new PropertyValueFactory<>("congNo"));
-        colCongNo.setCellFactory(column -> new TableCell<>() {
+        colCongNo.setCellFactory(column -> new TableCell<NhaCungCap, Double>() {
             @Override
             protected void updateItem(Double item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
+                    setStyle("");
                 } else {
                     setText(df.format(item));
-                    // Màu sắc tùy theo công nợ (ví dụ: âm = đỏ, dương = cam)
-                    if (item < 0) {
-                        setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold;");
-                    } else if (item > 0) {
-                        setStyle("-fx-text-fill: #f59e0b; -fx-font-weight: bold;");
+                    if (item > 0) {
+                        // Mình đang nợ NCC -> Màu đỏ
+                        setStyle("-fx-text-fill: #e11d48; -fx-font-weight: bold; -fx-alignment: CENTER-RIGHT;");
+                    } else if (item == 0) {
+                        // Trắng nợ -> Màu xanh lá
+                        setText("0 VNĐ");
+                        setStyle("-fx-text-fill: #10b981; -fx-font-weight: bold; -fx-alignment: CENTER-RIGHT;");
                     } else {
-                        setStyle("-fx-text-fill: #10b981;");
+                        // NCC nợ ngược mình (Số âm) -> Màu xanh dương
+                        setStyle("-fx-text-fill: #0ea5e9; -fx-font-weight: bold; -fx-alignment: CENTER-RIGHT;");
                     }
                 }
             }

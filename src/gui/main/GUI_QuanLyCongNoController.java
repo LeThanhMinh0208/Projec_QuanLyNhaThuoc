@@ -97,13 +97,18 @@ public class GUI_QuanLyCongNoController {
                     setText(null);
                     setStyle("");
                 } else {
-                    setText(df.format(item));
                     if (item > 0) {
+                        // Trường hợp 1: Mình đang nợ NCC -> Hiện màu Đỏ báo động
                         setText(df.format(item) + " VNĐ");
                         setStyle("-fx-text-fill: #e11d48; -fx-font-weight: bold; -fx-alignment: CENTER-RIGHT;");
-                    } else {
+                    } else if (item == 0) {
+                        // Trường hợp 2: Trắng nợ -> Hiện màu Xanh lá an toàn
                         setText("0 VNĐ");
-                        setStyle("-fx-text-fill: #10b981; -fx-alignment: CENTER-RIGHT;");
+                        setStyle("-fx-text-fill: #10b981; -fx-font-weight: bold; -fx-alignment: CENTER-RIGHT;");
+                    } else {
+                        // Trường hợp 3: Số ÂM (NCC nợ ngược lại mình do trả hàng) -> Hiện màu Xanh dương
+                        setText(df.format(item) + " VNĐ");
+                        setStyle("-fx-text-fill: #0ea5e9; -fx-font-weight: bold; -fx-alignment: CENTER-RIGHT;");
                     }
                 }
             }

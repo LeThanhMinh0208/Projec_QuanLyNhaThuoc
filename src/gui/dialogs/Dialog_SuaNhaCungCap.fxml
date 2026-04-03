@@ -49,7 +49,7 @@
                                 <TextField fx:id="txtDiaChi" prefHeight="40.0" styleClass="ds-input" GridPane.columnIndex="3" GridPane.rowIndex="1" />
 
                                 <Label text="Công Nợ:" GridPane.rowIndex="2" />
-                                <TextField fx:id="txtCongNo" prefHeight="40.0" styleClass="ds-input" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                <TextField disable="true" fx:id="txtCongNo" prefHeight="40.0" styleClass="ds-input" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                 <HBox alignment="CENTER_LEFT" spacing="10" GridPane.columnIndex="3" GridPane.rowIndex="4" />
                                 <TextField fx:id="txtSdt" prefHeight="40.0" styleClass="ds-input" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                             </children>

@@ -1,0 +1,148 @@
+package gui.dialogs;
+
+import dao.*;
+import entity.*;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.collections.*;
+import javafx.collections.transformation.FilteredList;
+import javafx.fxml.*;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.*;
+import javafx.stage.Stage;
+import javafx.util.StringConverter;
+import utils.*;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+
+public class Dialog_XuatChuyenKhoController implements Initializable {
+    @FXML private ComboBox<String> cbKhoXuat;
+    @FXML private TextField txtKhoNhan, txtNguoiLap, txtNguoiVanChuyen, txtTimNhanhThuoc, txtSoLuongChuyen, txtGhiChu;
+    @FXML private ComboBox<Thuoc> cbChonThuoc;
+    @FXML private ComboBox<LoThuoc> cbChonLo;
+    @FXML private TableView<ChiTietPhieuXuat> tableThuocChuyen;
+    @FXML private TableColumn<ChiTietPhieuXuat, Integer> colSTT, colSoLuong;
+    @FXML private TableColumn<ChiTietPhieuXuat, String> colTenThuoc, colSoLo, colXoa;
+
+    private ObservableList<ChiTietPhieuXuat> dsXuatTam = FXCollections.observableArrayList();
+    private DAO_LoThuoc daoLo = new DAO_LoThuoc();
+    private DAO_PhieuXuat daoPX = new DAO_PhieuXuat();
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        setupTable();
+        if (UserSession.getInstance().getUser() != null) txtNguoiLap.setText(UserSession.getInstance().getUser().getHoTen());
+
+        cbKhoXuat.getItems().addAll("Kho dự trữ", "Kho bán hàng");
+        cbKhoXuat.valueProperty().addListener((o, oldV, newV) -> {
+            txtKhoNhan.setText(newV.equals("Kho dự trữ") ? "Kho bán hàng" : "Kho dự trữ");
+            cbChonLo.getItems().clear();
+        });
+
+        ObservableList<Thuoc> allThuoc = FXCollections.observableArrayList(new DAO_Thuoc().getAllThuoc());
+        FilteredList<Thuoc> filter = new FilteredList<>(allThuoc, p -> true);
+        cbChonThuoc.setItems(filter);
+        setupComboThuoc();
+
+        txtTimNhanhThuoc.textProperty().addListener((o, oldV, newV) -> {
+            filter.setPredicate(t -> newV == null || newV.isEmpty() || t.getTenThuoc().toLowerCase().contains(newV.toLowerCase()));
+            if (!newV.isEmpty()) cbChonThuoc.show();
+        });
+
+        cbChonLo.setConverter(new StringConverter<LoThuoc>() {
+            @Override public String toString(LoThuoc l) { return l==null?"":"Lô: "+l.getMaLoThuoc()+" (Tồn: "+l.getSoLuongTon()+")"; }
+            @Override public LoThuoc fromString(String s) { return null; }
+        });
+
+        // KHI CHỌN LÔ -> TỰ ĐỘNG ĐIỀN MAX SỐ LƯỢNG VÀ KHÓA Ô LẠI
+        cbChonLo.valueProperty().addListener((o, old, lo) -> {
+            if (lo != null) {
+                txtSoLuongChuyen.setText(String.valueOf(lo.getSoLuongTon()));
+                txtSoLuongChuyen.setDisable(true); // Khóa ô nhập, ép chuyển full
+            } else {
+                txtSoLuongChuyen.setText("");
+            }
+        });
+
+        cbChonThuoc.valueProperty().addListener((o, oldV, s) -> {
+            if (s != null && cbKhoXuat.getValue() != null) {
+                String k = cbKhoXuat.getValue().equals("Kho dự trữ") ? "KHO_DU_TRU" : "KHO_BAN_HANG";
+                cbChonLo.setItems(FXCollections.observableArrayList(daoLo.getLoThuocTheoFEFO(s.getMaThuoc(), k)));
+            }
+        });
+    }
+
+    private void setupComboThuoc() {
+        cbChonThuoc.setCellFactory(lv -> new ListCell<Thuoc>() {
+            private final ImageView iv = new ImageView();
+            @Override protected void updateItem(Thuoc t, boolean e) {
+                super.updateItem(t, e);
+                if (e || t == null) { setGraphic(null); setText(null); }
+                else {
+                    setText(t.getTenThuoc());
+                    try {
+                        InputStream is = getClass().getResourceAsStream("/resources/images/images_thuoc/" + t.getHinhAnh().trim());
+                        if (is != null) { iv.setImage(new Image(is)); iv.setFitWidth(40); iv.setFitHeight(30); setGraphic(iv); }
+                    } catch (Exception ex) { setGraphic(null); }
+                }
+            }
+        });
+        cbChonThuoc.setButtonCell(cbChonThuoc.getCellFactory().call(null));
+    }
+
+
+    private void setupTable() {
+        colSTT.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(dsXuatTam.indexOf(c.getValue()) + 1));
+        colTenThuoc.setCellValueFactory(new PropertyValueFactory<>("maThuoc")); 
+        colSoLo.setCellValueFactory(new PropertyValueFactory<>("soLo"));
+        colSoLuong.setCellValueFactory(new PropertyValueFactory<>("soLuong"));
+        
+        colXoa.setCellFactory(c -> new TableCell<>() {
+            private final Button b = new Button("🗑");
+            { b.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white;"); 
+              b.setOnAction(e -> { dsXuatTam.remove(getTableView().getItems().get(getIndex())); tableThuocChuyen.refresh(); }); }
+            @Override protected void updateItem(String i, boolean e) {
+                super.updateItem(i, e); setGraphic(e ? null : b); setAlignment(Pos.CENTER);
+            }
+        });
+        tableThuocChuyen.setItems(dsXuatTam);
+    }
+
+    @FXML private void handleThemThuoc() {
+        Thuoc t = cbChonThuoc.getValue(); LoThuoc l = cbChonLo.getValue();
+        if (t == null || l == null || txtSoLuongChuyen.getText().isEmpty()) return;
+        
+        // Kiểm tra xem lô này đã được đưa vào danh sách chuyển chưa
+        for(ChiTietPhieuXuat ct : dsXuatTam) {
+            if(ct.getSoLo().equals(l.getMaLoThuoc())) {
+                AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Lô này đã có trong danh sách chờ chuyển!");
+                return;
+            }
+        }
+        
+        int sl = Integer.parseInt(txtSoLuongChuyen.getText());
+        dsXuatTam.add(new ChiTietPhieuXuat(null, t.getMaThuoc(), l.getMaLoThuoc(), sl, l.getGiaNhap(), sl*l.getGiaNhap()));
+    }
+    @FXML 
+    private void handleXacNhanChuyen() {
+        if (dsXuatTam.isEmpty()) return;
+        String maKhoNhan = txtKhoNhan.getText().equals("Kho bán hàng") ? "KHO_BAN_HANG" : "KHO_DU_TRU";
+        
+        // 1. GỌI HÀM SINH MÃ TỰ ĐỘNG THAY VÌ DÙNG System.currentTimeMillis()
+        String maPhieuMoi = daoPX.getMaPhieuXuatMoi("CK");
+        
+        // 2. TẠO PHIẾU VỚI MÃ VỪA SINH
+        PhieuXuat px = new PhieuXuat(maPhieuMoi, null, UserSession.getInstance().getUser().getMaNhanVien(), 1, null, maKhoNhan, 0, txtGhiChu.getText()+" | VC: "+txtNguoiVanChuyen.getText());
+        
+        // 3. LƯU VÀO DATABASE
+        if (daoPX.chuyenKhoNoiBo(px, new ArrayList<>(dsXuatTam), maKhoNhan)) {
+            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chuyển kho hoàn tất! Mã phiếu: " + maPhieuMoi); 
+            ((Stage) txtKhoNhan.getScene().getWindow()).close();
+        }
+    }
+    
+    @FXML private void handleHuyBo() { ((Stage) txtKhoNhan.getScene().getWindow()).close(); }
+}

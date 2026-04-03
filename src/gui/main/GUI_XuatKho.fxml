@@ -1,65 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefHeight="850.0" prefWidth="1300.0" spacing="25.0" styleClass="dmk-main-bg" stylesheets="@../../resources/css/XuatKho.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.GUI_XuatKhoController">
-   <padding>
-      <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
-   </padding>
+<VBox prefHeight="850.0" prefWidth="1200.0" spacing="25.0" styleClass="xk-main-bg" stylesheets="@../../resources/css/XuatKho.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.GUI_XuatKhoController">
+   <padding><Insets bottom="30.0" left="30.0" right="30.0" top="30.0" /></padding>
+   
+   <children>
+      <VBox spacing="8.0">
+         <Label styleClass="xk-page-title" text="QUẢN LÝ XUẤT KHO" />
+         <Region maxWidth="400.0" styleClass="xk-title-line" />
+      </VBox>
 
-   <Label styleClass="xk-page-title" text="Hệ Thống Quản Lý Xuất Kho" />
-
-   <HBox spacing="15.0" alignment="CENTER">
-      <Button fx:id="btnTabChuyenKho" onAction="#handleTabChuyenKho" prefHeight="60.0" maxWidth="Infinity" HBox.hgrow="ALWAYS" 
-              styleClass="xk-tab-btn, xk-tab-chuyen" text="📦 CHUYỂN KHO NỘI BỘ" />
-              
-      <Button fx:id="btnTabTraNCC" onAction="#handleTabTraNCC" prefHeight="60.0" maxWidth="Infinity" HBox.hgrow="ALWAYS" 
-              styleClass="xk-tab-btn, xk-tab-tra" text="🔙 XUẤT TRẢ NHÀ CUNG CẤP" />
-              
-      <Button fx:id="btnTabXuatHuy" onAction="#handleTabXuatHuy" prefHeight="60.0" maxWidth="Infinity" HBox.hgrow="ALWAYS" 
-              styleClass="xk-tab-btn, xk-tab-huy" text="🗑️ XUẤT HỦY THUỐC" />
-   </HBox>
-
-   <VBox styleClass="xk-card" VBox.vgrow="ALWAYS" spacing="20.0">
-      
       <HBox alignment="CENTER_LEFT" spacing="20.0">
-         <Label fx:id="lblTieuDeTrang" styleClass="xk-section-title" text="Danh Sách Phiếu Chuyển Kho" />
-         <Region HBox.hgrow="ALWAYS" />
-         
-         <Button fx:id="btnTaoPhieuMoi" onAction="#moDialogTaoPhieuMoi" prefHeight="50.0" prefWidth="260.0" 
-                 styleClass="xk-btn-action" text="➕ LẬP PHIẾU CHUYỂN KHO" />
+         <children>
+            <Button maxWidth="Infinity" minWidth="0.0" onAction="#handleMoDialogChuyenKho" prefHeight="70.0" styleClass="btn-color-1" text="🚚 Lệnh Chuyển Kho" HBox.hgrow="ALWAYS" />
+            
+            <Button maxWidth="Infinity" minWidth="0.0" onAction="#handleMoDialogTraNCC" prefHeight="70.0" styleClass="btn-color-2" text="🔙 Trả Nhà Cung Cấp" HBox.hgrow="ALWAYS" />
+            
+            <Button maxWidth="Infinity" minWidth="0.0" onAction="#handleMoDialogXuatHuy" prefHeight="70.0" styleClass="btn-color-3" text="🗑 Lệnh Xuất Hủy" HBox.hgrow="ALWAYS" />
+         </children>
       </HBox>
 
-      <HBox alignment="BOTTOM_LEFT" spacing="15.0" styleClass="xk-filter-bar">
-         <VBox spacing="8.0">
-            <Label text="Từ ngày:" styleClass="xk-label" />
-            <DatePicker fx:id="dpTuNgay" prefWidth="170.0" styleClass="xk-input" prefHeight="40.0" />
-         </VBox>
-         <VBox spacing="8.0">
-            <Label text="Đến ngày:" styleClass="xk-label" />
-            <DatePicker fx:id="dpDenNgay" prefWidth="170.0" styleClass="xk-input" prefHeight="40.0" />
-         </VBox>
-         <VBox spacing="8.0" HBox.hgrow="ALWAYS">
-            <Label text="Tìm kiếm nhanh:" styleClass="xk-label" />
-            <TextField fx:id="txtTimKiem" promptText="Tìm theo mã phiếu, người lập..." styleClass="xk-input" prefHeight="40.0" />
-         </VBox>
-         <Button onAction="#handleLamMoi" prefHeight="40.0" prefWidth="120.0" styleClass="xk-btn-refresh" text="🔄 Làm Mới" />
-      </HBox>
+      <VBox spacing="20.0" styleClass="xk-card" VBox.vgrow="ALWAYS">
+         <padding><Insets bottom="20.0" left="25.0" right="25.0" top="25.0" /></padding>
+         <children>
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+               <Label styleClass="danh-muc-title" text="Danh Mục Phiếu Xuất" />
+               <Region HBox.hgrow="ALWAYS" />
+               
+             <ComboBox fx:id="cbLocLoaiPhieu" prefHeight="45.0" prefWidth="180.0" promptText="Lọc theo loại phiếu" styleClass="xk-input" />
+<DatePicker fx:id="dpTuNgay" prefHeight="45.0" prefWidth="150.0" promptText="Từ ngày" styleClass="xk-input" />
+<DatePicker fx:id="dpDenNgay" prefHeight="45.0" prefWidth="150.0" promptText="Đến ngày" styleClass="xk-input" />
 
-      <TableView fx:id="tablePhieuXuat" styleClass="xk-table" VBox.vgrow="ALWAYS">
-         <columns>
-            <TableColumn fx:id="colChiTiet" prefWidth="90.0" text="Chi Tiết" style="-fx-alignment: CENTER;" />
-            <TableColumn fx:id="colMaPhieu" prefWidth="120.0" text="Mã Phiếu" style="-fx-alignment: CENTER;" />
-            <TableColumn fx:id="colNgayXuat" prefWidth="130.0" text="Ngày Lập" style="-fx-alignment: CENTER;" />
-            <TableColumn fx:id="colNguoiLap" prefWidth="200.0" text="Người Lập" />
-            <TableColumn fx:id="colThongTinDacThu" prefWidth="250.0" text="Kho Nhận" />
-            <TableColumn fx:id="colGhiChu" prefWidth="250.0" text="Ghi Chú" />
-         </columns>
-         <columnResizePolicy>
-            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-         </columnResizePolicy>
-      </TableView>
-   </VBox>
+               <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="300.0" styleClass="xk-search-wrapper">
+                  <children>
+                     <Label style="-fx-text-fill: #0ea5e9; -fx-font-size: 16px;" text="🔍 " />
+                     <TextField fx:id="txtTimPhieu" promptText="Tìm mã phiếu, người lập..." styleClass="xk-search-field" HBox.hgrow="ALWAYS" />
+                  </children>
+               </HBox>
+            </HBox>
+
+<TableView fx:id="tableDanhMucPhieuXuat" styleClass="xk-table" VBox.vgrow="ALWAYS">
+   <columns>
+      <TableColumn fx:id="colSTT" prefWidth="50.0" text="STT" />
+      <TableColumn fx:id="colMaPhieu" prefWidth="120.0" text="MÃ PHIẾU" />
+      <TableColumn fx:id="colThoiGian" prefWidth="160.0" text="THỜI GIAN LẬP" />
+      <TableColumn fx:id="colLoaiPhieu" prefWidth="160.0" text="LOẠI PHIẾU" />
+      <TableColumn fx:id="colNguoiLap" prefWidth="180.0" text="NGƯỜI LẬP" />
+      <TableColumn fx:id="colKhoNhan" prefWidth="280.0" text="NƠI NHẬN" /> 
+      <TableColumn fx:id="colThaoTac" prefWidth="100.0" text="THAO TÁC" /> 
+   </columns>
+   <columnResizePolicy>
+      <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+   </columnResizePolicy>
+</TableView>
+         </children>
+      </VBox>
+   </children>
 </VBox>

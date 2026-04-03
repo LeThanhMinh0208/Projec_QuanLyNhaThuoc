@@ -297,7 +297,32 @@ CREATE TABLE ChiTietPhieuChi (
     FOREIGN KEY (maPhieuNhap) REFERENCES PhieuNhap(maPhieuNhap),
     CONSTRAINT CHK_SoTienTra CHECK (soTienTra > 0)
 );
+-- BẢNG PHIẾU XUẤT (Header)
+CREATE TABLE PhieuXuat (
+    MaPhieuXuat VARCHAR(20) PRIMARY KEY,
+    NgayXuat DATETIME DEFAULT GETDATE(),
+    MaNhanVien VARCHAR(20) NOT NULL,
+    LoaiPhieu INT NOT NULL, -- 1: Chuyển kho nội bộ | 2: Trả NCC | 3: Xuất hủy
+    
+    -- Các trường linh hoạt (Cho phép NULL)
+    MaNhaCungCap VARCHAR(20) NULL, -- Có data nếu LoaiPhieu = 2
+    KhoNhan NVARCHAR(100) NULL,    -- Có data nếu LoaiPhieu = 1
+    
+    TongTien DECIMAL(18,2) DEFAULT 0,
+    GhiChu NVARCHAR(255)           -- Ghi lý do xuất/hủy
+);
 
+-- BẢNG CHI TIẾT PHIẾU XUẤT (Detail)
+CREATE TABLE ChiTietPhieuXuat (
+    MaPhieuXuat VARCHAR(20),
+    MaThuoc VARCHAR(20),
+    SoLo VARCHAR(50),
+    SoLuong INT NOT NULL,
+    DonGia DECIMAL(18,2), -- Lấy giá nhập gốc để tính giá trị xuất/hủy
+    ThanhTien DECIMAL(18,2),
+    PRIMARY KEY (MaPhieuXuat, MaThuoc, SoLo),
+    FOREIGN KEY (MaPhieuXuat) REFERENCES PhieuXuat(MaPhieuXuat)
+);
 
 
 GO

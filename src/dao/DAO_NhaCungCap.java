@@ -203,4 +203,30 @@ public class DAO_NhaCungCap {
             }
         }
     }
+ // ========================================================
+    // HÀM TÌM NHÀ CUNG CẤP THEO MÃ (Dùng để hiển thị chi tiết)
+    // ========================================================
+    public NhaCungCap getNhaCungCapByMa(String maNCC) {
+        NhaCungCap ncc = null;
+        String sql = "SELECT * FROM NhaCungCap WHERE maNhaCungCap = ?";
+        
+        try (Connection con = ConnectDB.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            
+            pst.setString(1, maNCC);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    ncc = new NhaCungCap();
+                    ncc.setMaNhaCungCap(rs.getString("maNhaCungCap"));
+                    ncc.setTenNhaCungCap(rs.getString("tenNhaCungCap"));
+                    ncc.setSdt(rs.getString("sdt"));
+                    ncc.setDiaChi(rs.getString("diaChi"));
+                    ncc.setCongNo(rs.getDouble("congNo"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ncc;
+    }
 }
