@@ -138,22 +138,33 @@ public class GUI_QuanLyBanHangController {
         colThuocAnh.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("hinhAnh"));
         colThuocAnh.setCellFactory(column -> new TableCell<Thuoc, String>() {
             private final javafx.scene.image.ImageView imageView = new javafx.scene.image.ImageView();
+            private final javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(imageView);
+            {
+                imageView.setFitWidth(60);
+                imageView.setFitHeight(60);
+                imageView.setPreserveRatio(true);
+                imageView.setSmooth(true);
+                box.setAlignment(javafx.geometry.Pos.CENTER);
+                box.setPrefHeight(72);
+            }
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null || item.isEmpty()) {
-                    setGraphic(null);
+                if (empty || item == null || item.trim().isEmpty()) {
+                    imageView.setImage(null);
+                    setGraphic(empty ? null : box);
                 } else {
                     try {
-                        javafx.scene.image.Image image = new javafx.scene.image.Image(getClass().getResourceAsStream("/resources/images/images_thuoc/" + item));
-                        imageView.setImage(image);
-                        imageView.setFitWidth(50);
-                        imageView.setFitHeight(50);
-                        imageView.setPreserveRatio(true);
-                        setGraphic(imageView);
+                        java.io.InputStream is = getClass().getResourceAsStream("/resources/images/images_thuoc/" + item.trim());
+                        if (is != null) {
+                            imageView.setImage(new javafx.scene.image.Image(is, 60, 60, true, true));
+                        } else {
+                            imageView.setImage(null);
+                        }
                     } catch (Exception e) {
-                        setGraphic(null);
+                        imageView.setImage(null);
                     }
+                    setGraphic(box);
                 }
             }
         });

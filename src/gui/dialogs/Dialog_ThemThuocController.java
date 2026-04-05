@@ -18,8 +18,8 @@ import java.util.ArrayList;
 public class Dialog_ThemThuocController {
 
     @FXML private ImageView imgPreview;
-    @FXML private TextField txtMa, txtTen, txtHoatChat, txtHangSX, txtNuocSX, txtHamLuong;
-    @FXML private ComboBox<String> cbDanhMuc, cbDonVi; 
+    @FXML private TextField txtMa, txtTen, txtHoatChat, txtHangSX, txtHamLuong;
+    @FXML private ComboBox<String> cbDanhMuc, cbDonVi, cbNuocSX; 
     @FXML private CheckBox chkKeDon;
     @FXML private TextArea txtCongDung, txtTrieuChung;
 
@@ -44,6 +44,14 @@ public class Dialog_ThemThuocController {
         // Nạp Đơn Vị Tính
         cbDonVi.setItems(FXCollections.observableArrayList("Hộp", "Vỉ", "Viên", "Tuýp", "Chai"));
 
+        // Nạp Nước Sản Xuất
+        cbNuocSX.getItems().setAll(
+            "Việt Nam", "Mỹ", "Pháp", "Đức", "Nhật Bản",
+            "Hàn Quốc", "Ấn Độ", "Trung Quốc", "Anh",
+            "Thụy Sĩ", "Ý", "Tây Ban Nha", "Úc", "Canada",
+            "Singapore", "Thái Lan", "Indonesia"
+        );
+
         // KÍCH HOẠT TÍNH NĂNG: Click vào ô nào là ô đó tự xóa màu đỏ báo lỗi
         kichHoatTuDongXoaLoi();
     }
@@ -65,7 +73,7 @@ public class Dialog_ThemThuocController {
     }
 
     private void kichHoatTuDongXoaLoi() {
-        Control[] danhSachO = {txtTen, txtHoatChat, txtHangSX, txtNuocSX, txtHamLuong, cbDonVi, cbDanhMuc, txtCongDung, txtTrieuChung};
+        Control[] danhSachO = {txtTen, txtHoatChat, txtHangSX, cbNuocSX, txtHamLuong, cbDonVi, cbDanhMuc, txtCongDung, txtTrieuChung};
         for (Control c : danhSachO) {
             // Lắng nghe sự kiện: Chỉ cần click chuột vào (Focus) là tự động xóa báo lỗi đỏ
             c.focusedProperty().addListener((obs, oldVal, newVal) -> {
@@ -94,7 +102,7 @@ public class Dialog_ThemThuocController {
         boolean hopLe = true;
 
         // Xóa sạch các báo lỗi đỏ cũ trước khi kiểm tra lại
-        Control[] danhSachO = {txtTen, txtHoatChat, txtHangSX, txtNuocSX, txtHamLuong, cbDonVi, cbDanhMuc, txtCongDung, txtTrieuChung};
+        Control[] danhSachO = {txtTen, txtHoatChat, txtHangSX, cbNuocSX, txtHamLuong, cbDonVi, cbDanhMuc, txtCongDung, txtTrieuChung};
         for (Control c : danhSachO) xoaLoi(c);
 
         // --- KIỂM TRA TỪNG Ô (RỖNG VÀ ĐỘ DÀI) ---
@@ -135,12 +143,9 @@ public class Dialog_ThemThuocController {
             hopLe = false;
         }
 
-        String nuocSX = txtNuocSX.getText();
-        nuocSX = utils.ValidationUtils.capitalizeName(nuocSX);
-        txtNuocSX.setText(nuocSX);
-
-        if (!utils.ValidationUtils.isValidHangSanXuat(nuocSX)) {
-            setLoi(txtNuocSX, "Nước sản xuất phải từ 2-100 ký tự và chứa ít nhất 1 chữ cái!");
+        String nuocSX = cbNuocSX.getValue();
+        if (nuocSX == null || nuocSX.trim().isEmpty()) {
+            setLoi(cbNuocSX, "Vui lòng chọn Nước sản xuất!");
             hopLe = false;
         }
 

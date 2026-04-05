@@ -19,10 +19,11 @@ public class ConnectDB {
 
                  String url = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyNhaThuoc_LongNguyen;encrypt=true;trustServerCertificate=true;";
                  String user = "sa";
-                 String password = "123456";
+                 String password = "sapassword";
                  con = DriverManager.getConnection(url, user, password);
              }
             System.out.println("Kết nối CSDL thành công!");
+            
         } catch (SQLException e) {
             System.out.println("Lỗi kết nối CSDL: " + e.getMessage());
         } catch (ClassNotFoundException e) { // THÊM CATCH NÀY
@@ -45,7 +46,7 @@ public class ConnectDB {
 
                 String url = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyNhaThuoc_LongNguyen;encrypt=true;trustServerCertificate=true;";
                 String user = "sa";
-                String password = "123456";
+                String password = "sapassword";
                 con = DriverManager.getConnection(url, user, password);
             }
         } catch (SQLException e) {

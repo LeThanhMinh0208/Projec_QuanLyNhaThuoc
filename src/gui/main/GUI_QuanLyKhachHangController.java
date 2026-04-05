@@ -11,18 +11,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
-
 import javafx.stage.Stage;
-
-
-
 
 public class GUI_QuanLyKhachHangController {
 
@@ -51,13 +43,14 @@ public class GUI_QuanLyKhachHangController {
         colDiaChi.setCellValueFactory(new PropertyValueFactory<>("diaChi"));
         colDiem.setCellValueFactory(new PropertyValueFactory<>("diemTichLuy"));
 
-        tableKhachHang.setOnMouseClicked((MouseEvent event) -> {
-            if (event.getClickCount() == 2) {
-                KhachHang selected = tableKhachHang.getSelectionModel().getSelectedItem();
-                if (selected != null) {
+        tableKhachHang.setRowFactory(tv -> {
+            TableRow<KhachHang> row = new TableRow<>();
+            row.setOnMouseClicked((MouseEvent event) -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
                     handleSua(null);
                 }
-            }
+            });
+            return row;
         });
     }
 
@@ -148,6 +141,7 @@ public class GUI_QuanLyKhachHangController {
             stage.showAndWait();
 
             loadData();
+            setupSearch();
         } catch (java.io.IOException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Lỗi Giao Diện", "Không thể mở hộp thoại: " + e.getMessage());

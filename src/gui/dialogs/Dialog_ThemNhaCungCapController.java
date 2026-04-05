@@ -23,6 +23,7 @@ public class Dialog_ThemNhaCungCapController {
         txtMa.setText(daoNCC.getMaNhaCungCapMoi());
         txtMa.setEditable(false);
         txtMa.setDisable(true);
+        txtCongNo.setTooltip(new javafx.scene.control.Tooltip("Công nợ được cập nhật tự động từ phiếu nhập hàng"));
     }
 
     @FXML
@@ -59,14 +60,15 @@ public class Dialog_ThemNhaCungCapController {
 
         // Validate công nợ
         double congNo = 0.0;
-        try {
-            if (!congNoStr.isEmpty()) {
-                congNo = Double.parseDouble(congNoStr);
-            }
-        } catch (NumberFormatException e) {
-            new Alert(Alert.AlertType.ERROR, "Công nợ phải là số hợp lệ (ví dụ: 0 hoặc 5000000)!").show();
-            return;
-        }
+        // Bỏ validate công nợ cho dialog thêm mới vì bị disable
+        // try {
+        //     if (!congNoStr.isEmpty()) {
+        //         congNo = Double.parseDouble(congNoStr);
+        //     }
+        // } catch (NumberFormatException e) {
+        //     new Alert(Alert.AlertType.ERROR, "Công nợ phải là số hợp lệ (ví dụ: 0 hoặc 5000000)!").show();
+        //     return;
+        // }
 
         NhaCungCap ncc = new NhaCungCap();
         ncc.setMaNhaCungCap(txtMa.getText());

@@ -41,7 +41,17 @@ public class GUI_DangNhapController {
 
             // 5. Mở Trang Chủ
             String title = "Long Nguyên Pharma — " + nv.getChucVu() + ": " + nv.getHoTen();
-            WindowUtils.openWindow("/gui/main/GUI_TrangChu.fxml", title, 1280, 720);
+            try {
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/main/GUI_TrangChu.fxml"));
+                javafx.scene.Parent root = loader.load();
+                javafx.stage.Stage mainStage = new javafx.stage.Stage();
+                mainStage.setTitle(title);
+                mainStage.setScene(new javafx.scene.Scene(root, 1280, 720));
+                mainStage.show();
+                mainStage.setMaximized(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             
         } else {
             // 6. Xử lý khi đăng nhập thất bại

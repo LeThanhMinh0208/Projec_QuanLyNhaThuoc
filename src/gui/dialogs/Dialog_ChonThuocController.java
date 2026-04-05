@@ -47,7 +47,7 @@ public class Dialog_ChonThuocController {
             }
         });
 
-        dsThuoc.setAll(daoThuoc.getAllThuoc());
+        dsThuoc.setAll(daoThuoc.getAllThuocDangBan());
         FilteredList<Thuoc> filtered = new FilteredList<>(dsThuoc, p -> true);
         txtTim.textProperty().addListener((obs, ov, nv) -> {
             filtered.setPredicate(t -> {

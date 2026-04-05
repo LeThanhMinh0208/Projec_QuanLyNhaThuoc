@@ -111,8 +111,8 @@ public class Dialog_TaoDonDatHangController {
         List<NhaCungCap> dsNcc = daoNcc.getAllNhaCungCap(); 
         cbNhaCungCap.setItems(FXCollections.observableArrayList(dsNcc));
 
-        // 2. Lấy danh sách Thuốc đưa vào masterList
-        ArrayList<Thuoc> dsThuoc = daoThuoc.getAllThuoc(); 
+        // 2. Lấy danh sách Thuốc đưa vào masterList (kể cả NGUNG_BAN — vì đây là nhập hàng)
+        ArrayList<Thuoc> dsThuoc = daoThuoc.getAllThuocTatCa(); 
         masterListThuoc.setAll(dsThuoc);
         cbThuoc.setItems(masterListThuoc);
 

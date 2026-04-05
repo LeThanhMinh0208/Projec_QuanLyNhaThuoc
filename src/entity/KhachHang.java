@@ -6,8 +6,11 @@ public class KhachHang {
     private String sdt;
     private String diaChi;
     private int diemTichLuy;
+    private boolean trangThai; // true = hoạt động, false = đã vô hiệu
 
-    public KhachHang() {}
+    public KhachHang() {
+        this.trangThai = true;
+    }
 
     public KhachHang(String maKhachHang, String hoTen, String sdt, String diaChi, int diemTichLuy) {
         this.maKhachHang = maKhachHang;
@@ -15,6 +18,16 @@ public class KhachHang {
         this.sdt = sdt;
         this.diaChi = diaChi;
         this.diemTichLuy = diemTichLuy;
+        this.trangThai = true;
+    }
+
+    public KhachHang(String maKhachHang, String hoTen, String sdt, String diaChi, int diemTichLuy, boolean trangThai) {
+        this.maKhachHang = maKhachHang;
+        this.hoTen = hoTen;
+        this.sdt = sdt;
+        this.diaChi = diaChi;
+        this.diemTichLuy = diemTichLuy;
+        this.trangThai = trangThai;
     }
 
     // Getters and Setters
@@ -28,4 +41,6 @@ public class KhachHang {
     public void setDiaChi(String diaChi) { this.diaChi = diaChi; }
     public int getDiemTichLuy() { return diemTichLuy; }
     public void setDiemTichLuy(int diemTichLuy) { this.diemTichLuy = diemTichLuy; }
+    public boolean isTrangThai() { return trangThai; }
+    public void setTrangThai(boolean trangThai) { this.trangThai = trangThai; }
 }

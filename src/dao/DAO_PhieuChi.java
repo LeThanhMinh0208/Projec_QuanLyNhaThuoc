@@ -13,7 +13,7 @@ public class DAO_PhieuChi {
     private String getMaPhieuChiMoi(Connection con) throws SQLException {
         String sql = "SELECT TOP 1 maPhieuChi FROM PhieuChi ORDER BY maPhieuChi DESC";
         try (Statement stmt = con.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) {
                 String maCu = rs.getString("maPhieuChi");
                 int soCu = Integer.parseInt(maCu.substring(2));
@@ -33,7 +33,7 @@ public class DAO_PhieuChi {
             // 1. Tạo Phiếu Chi
             String maPhieuChi = getMaPhieuChiMoi(con);
             String sqlInsert = "INSERT INTO PhieuChi (maPhieuChi, maNhaCungCap, maNhanVien, ngayChi, tongTienChi, hinhThucChi, ghiChu) "
-                             + "VALUES (?, ?, ?, GETDATE(), ?, ?, ?)";
+                    + "VALUES (?, ?, ?, GETDATE(), ?, ?, ?)";
             try (PreparedStatement pst1 = con.prepareStatement(sqlInsert)) {
                 pst1.setString(1, maPhieuChi);
                 pst1.setString(2, maNCC);
@@ -58,12 +58,20 @@ public class DAO_PhieuChi {
         } catch (SQLException e) {
             e.printStackTrace();
             if (con != null) {
-                try { con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); } // Lỗi thì hoàn tác
+                try {
+                    con.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                } // Lỗi thì hoàn tác
             }
             return false;
         } finally {
             if (con != null) {
-                try { con.setAutoCommit(true); } catch (SQLException ex) { ex.printStackTrace(); }
+                try {
+                    con.setAutoCommit(true);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
     }
@@ -76,10 +84,10 @@ public class DAO_PhieuChi {
         try {
             con = ConnectDB.getConnection();
             String sql = "SELECT pc.*, ncc.tenNhaCungCap, nv.hoTen " +
-                         "FROM PhieuChi pc " +
-                         "JOIN NhaCungCap ncc ON pc.maNhaCungCap = ncc.maNhaCungCap " +
-                         "JOIN NhanVien nv ON pc.maNhanVien = nv.maNhanVien ";
-            
+                    "FROM PhieuChi pc " +
+                    "JOIN NhaCungCap ncc ON pc.maNhaCungCap = ncc.maNhaCungCap " +
+                    "JOIN NhanVien nv ON pc.maNhanVien = nv.maNhanVien ";
+
             // Nếu có từ khóa tìm kiếm
             if (tuKhoa != null && !tuKhoa.trim().isEmpty()) {
                 sql += "WHERE pc.maPhieuChi LIKE ? OR ncc.tenNhaCungCap LIKE ? ";
@@ -91,7 +99,7 @@ public class DAO_PhieuChi {
                 pstmt.setString(1, "%" + tuKhoa.trim() + "%");
                 pstmt.setString(2, "%" + tuKhoa.trim() + "%");
             }
-            
+
             rs = pstmt.executeQuery();
             while (rs.next()) {
                 entity.PhieuChi pc = new entity.PhieuChi();

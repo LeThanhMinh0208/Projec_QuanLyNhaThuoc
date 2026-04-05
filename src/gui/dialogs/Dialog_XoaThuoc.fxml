@@ -3,7 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
 
 <VBox prefWidth="550.0" spacing="0.0" styleClass="ds-dialog-root" 
       stylesheets="@../../resources/css/DanhMucThuoc.css" 
@@ -13,7 +12,7 @@
     <children>
         <HBox styleClass="ds-header-danger-area" alignment="CENTER_LEFT">
             <children>
-                <Label text="⚠ XÁC NHẬN XÓA THUỐC" styleClass="ds-dialog-title" />
+                <Label text="⚠ Xác nhận xóa" styleClass="ds-dialog-title" />
             </children>
         </HBox>
 
@@ -24,8 +23,9 @@
             <children>
                 <Label text="❓" style="-fx-font-size: 60px;" />
                 
-                <Label text="Bạn có chắc chắn muốn xóa thuốc này?" 
-                       style="-fx-font-size: 19px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" />
+                <Label text="Bạn có chắc muốn xóa thuốc này không?" 
+                       style="-fx-font-size: 15px; -fx-text-fill: #1e293b;" 
+                       wrapText="true" textAlignment="CENTER" />
                 
                 <VBox alignment="CENTER" spacing="8" 
                       style="-fx-background-color: #fef2f2; -fx-padding: 20; -fx-background-radius: 12; -fx-border-color: #fee2e2; -fx-border-radius: 12; -fx-border-width: 2;">
@@ -37,15 +37,12 @@
                     </children>
                 </VBox>
 
-                <Label text="Hành động này không thể hoàn tác trong tương lai!" 
-                       style="-fx-text-fill: #64748b; -fx-font-style: italic; -fx-font-size: 13px;" />
-
                 <HBox alignment="CENTER" spacing="20.0">
                     <children>
                         <Button fx:id="btnHuy" onAction="#handleHuy" prefHeight="48.0" prefWidth="150.0" 
-                                text="Quay Lại" styleClass="ds-btn-cancel" style="-fx-font-weight: bold;" />
-                        <Button onAction="#handleXoa" prefHeight="48.0" prefWidth="180.0" 
-                                text="VẪN XÓA 🔥" styleClass="ds-btn-danger" />
+                                text="Hủy" styleClass="ds-btn-cancel" style="-fx-font-weight: bold;" />
+                        <Button fx:id="btnXoa" onAction="#handleXoa" prefHeight="48.0" prefWidth="180.0" 
+                                text="Xóa" styleClass="ds-btn-danger" />
                     </children>
                 </HBox>
             </children>

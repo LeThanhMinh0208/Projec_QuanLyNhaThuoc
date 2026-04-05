@@ -54,7 +54,7 @@
                             <!-- Bảng danh sách thuốc -->
                             <VBox styleClass="bh-panel" VBox.vgrow="ALWAYS" spacing="8">
                                 <children>
-                                    <TableView fx:id="tblThuocLe" styleClass="table-view" VBox.vgrow="ALWAYS">
+                                    <TableView fx:id="tblThuocLe" styleClass="table-view" style="-fx-fixed-cell-size: 72;" VBox.vgrow="ALWAYS">
                                         <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
                                         <placeholder>
                                             <Label text="Không có thuốc nào phù hợp" style="-fx-text-fill:#94a3b8; -fx-font-size:14px;"/>

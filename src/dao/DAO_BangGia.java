@@ -375,13 +375,14 @@ public class DAO_BangGia {
     }
 
     // ============================================================
-    // LẤY TẤT CẢ THUỐC VÀ ĐƠN VỊ QUY ĐỔI (Không lọc trangThai)
+    // LẤY TẤT CẢ THUỐC VÀ ĐƠN VỊ QUY ĐỔI (bỏ qua NGUNG_BAN)
     // ============================================================
     public List<ChiTietBangGia> getAllThuocVaDonVi() {
         List<ChiTietBangGia> list = new ArrayList<>();
         String sql = "SELECT t.maThuoc, t.tenThuoc, dv.maQuyDoi, dv.tenDonVi, dv.tyLeQuyDoi " +
                      "FROM Thuoc t " +
                      "JOIN DonViQuyDoi dv ON t.maThuoc = dv.maThuoc " +
+                     "WHERE t.trangThai IN ('DANG_BAN', 'HET_HANG') " +
                      "ORDER BY t.tenThuoc ASC";
         try (Connection con = ConnectDB.getConnection();
              Statement st = con.createStatement();

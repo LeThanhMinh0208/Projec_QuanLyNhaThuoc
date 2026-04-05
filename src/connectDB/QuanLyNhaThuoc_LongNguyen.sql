@@ -324,10 +324,21 @@ CREATE TABLE ChiTietPhieuXuat (
     FOREIGN KEY (MaPhieuXuat) REFERENCES PhieuXuat(MaPhieuXuat)
 );
 
-
 GO
 PRINT N'Đã tạo xong Database cấu trúc mới!';
 GO
+
+-- ========================================================
+-- MIGRATION: THÊM CỘT trangThai CHO KHACHHANG VÀ NHACUNGCAP
+-- ========================================================
+ALTER TABLE KhachHang  ADD trangThai BIT NOT NULL DEFAULT 1;
+ALTER TABLE NhaCungCap ADD trangThai BIT NOT NULL DEFAULT 1;
+GO
+PRINT N'Migration hoàn tất: đã thêm cột trangThai vào KhachHang và NhaCungCap.';
+GO
+
+
+
 -- ==========================================
 -- DỮ LIỆU KHỞI TẠO (DATA FULL GỐC 100%)
 -- ==========================================

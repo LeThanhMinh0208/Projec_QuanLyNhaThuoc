@@ -6,8 +6,11 @@ public class NhaCungCap {
     private String sdt;
     private String diaChi;
     private double congNo;
+    private boolean trangThai; // true = hoạt động, false = đã vô hiệu
 
-    public NhaCungCap() {}
+    public NhaCungCap() {
+        this.trangThai = true;
+    }
 
     public NhaCungCap(String maNhaCungCap, String tenNhaCungCap, String sdt, String diaChi, double congNo) {
         this.maNhaCungCap = maNhaCungCap;
@@ -15,6 +18,16 @@ public class NhaCungCap {
         this.sdt = sdt;
         this.diaChi = diaChi;
         this.congNo = congNo;
+        this.trangThai = true;
+    }
+
+    public NhaCungCap(String maNhaCungCap, String tenNhaCungCap, String sdt, String diaChi, double congNo, boolean trangThai) {
+        this.maNhaCungCap = maNhaCungCap;
+        this.tenNhaCungCap = tenNhaCungCap;
+        this.sdt = sdt;
+        this.diaChi = diaChi;
+        this.congNo = congNo;
+        this.trangThai = trangThai;
     }
 
     // Getters and Setters
@@ -28,6 +41,9 @@ public class NhaCungCap {
     public void setDiaChi(String diaChi) { this.diaChi = diaChi; }
     public double getCongNo() { return congNo; }
     public void setCongNo(double congNo) { this.congNo = congNo; }
+    public boolean isTrangThai() { return trangThai; }
+    public void setTrangThai(boolean trangThai) { this.trangThai = trangThai; }
+
     @Override
     public String toString() {
         return this.tenNhaCungCap == null ? "" : this.tenNhaCungCap;

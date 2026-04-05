@@ -169,7 +169,6 @@
 }
 
 .table-row-cell {
-    -fx-cell-size: 85px;
     -fx-border-color: transparent transparent #f0f9ff transparent;
 }
 
