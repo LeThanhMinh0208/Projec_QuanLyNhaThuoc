@@ -42,7 +42,7 @@ public class Dialog_ThemThuocController {
         cbDanhMuc.getItems().setAll(dsTenDM);
 
         // Nạp Đơn Vị Tính
-        cbDonVi.setItems(FXCollections.observableArrayList("Hộp", "Vỉ", "Viên", "Tuýp", "Chai"));
+        cbDonVi.setItems(FXCollections.observableArrayList( "Lọ", "Viên", "Tuýp", "Chai"));
 
         // KÍCH HOẠT TÍNH NĂNG: Click vào ô nào là ô đó tự xóa màu đỏ báo lỗi
         kichHoatTuDongXoaLoi();

@@ -42,7 +42,7 @@ public class Dialog_TaoDonDatHangController {
     // UI Nhập thuốc
     @FXML private TextField txtTimThuoc; // Thanh tìm kiếm mới
     @FXML private ComboBox<Thuoc> cbThuoc;
-    @FXML private ComboBox<DonViQuyDoi> cbDonVi;
+    @FXML private TextField txtDonVi;
     @FXML private TextField txtSoLuong, txtGiaDuKien;
     
     @FXML private TableView<ChiTietDonDatHang> tableChiTiet;
@@ -59,7 +59,7 @@ public class Dialog_TaoDonDatHangController {
     private DAO_DonDatHang daoDon = new DAO_DonDatHang();
     private DAO_NhaCungCap daoNcc = new DAO_NhaCungCap();
     private DAO_Thuoc daoThuoc = new DAO_Thuoc();
-    private DAO_DonViQuyDoi daoDonVi = new DAO_DonViQuyDoi();
+    private DonViQuyDoi donViDuocChon = null;
     private DecimalFormat df = new DecimalFormat("#,### VNĐ");
 
     @FXML public void initialize() {
@@ -165,34 +165,30 @@ public class Dialog_TaoDonDatHangController {
         // Áp dụng cho ô đang hiển thị (ButtonCell)
         cbThuoc.setButtonCell(cellFactory.call(null)); 
         
-     // 3. Sự kiện: Khi chọn Thuốc -> Load Đơn vị và TÍNH GIÁ LUÔN
         cbThuoc.getSelectionModel().selectedItemProperty().addListener((obs, oldV, thuocDuocChon) -> {
             if (thuocDuocChon != null) {
-                ArrayList<DonViQuyDoi> dsDonVi = daoDonVi.getDonViByMaThuoc(thuocDuocChon.getMaThuoc());
-                cbDonVi.setItems(FXCollections.observableArrayList(dsDonVi));
+                DonViQuyDoi dvLonNhat = new dao.DAO_DonViQuyDoi().getDonViLonNhatCuaThuoc(thuocDuocChon.getMaThuoc());
                 
-                if (!dsDonVi.isEmpty()) {
-                    cbDonVi.getSelectionModel().selectFirst(); // Chọn đơn vị đầu tiên
+                if (dvLonNhat != null) {
+                    // 1. Lưu ngầm vào biến toàn cục để tí nữa bấm "Thêm" còn lấy ra xài
+                    donViDuocChon = dvLonNhat; 
                     
-                    // ÉP TÍNH GIÁ NGAY LẬP TỨC:
-                    DonViQuyDoi dvDauTien = dsDonVi.get(0);
+                    // 2. Hiển thị chữ lên cái khung
+                    txtDonVi.setText(dvLonNhat.getTenDonVi()); 
+                    
+                    // 3. Tính giá
                     double giaGoc = daoThuoc.getGiaNhapGanNhat(thuocDuocChon.getMaThuoc());
-                    txtGiaDuKien.setText(String.valueOf(Math.round(giaGoc * dvDauTien.getTyLeQuyDoi())));
+                    txtGiaDuKien.setText(String.valueOf(Math.round(giaGoc * dvLonNhat.getTyLeQuyDoi())));
                 } else {
-                    txtGiaDuKien.setText("0"); 
+                    donViDuocChon = null;
+                    txtDonVi.setText("Lỗi ĐV");
+                    txtGiaDuKien.setText("0");
+                    AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi Dữ Liệu", "Thuốc chưa có Đơn vị trong DB!");
                 }
             } else {
-                cbDonVi.setItems(FXCollections.observableArrayList());
+                donViDuocChon = null;
+                txtDonVi.clear();
                 txtGiaDuKien.clear();
-            }
-        });
-
-        // 4. Sự kiện: Khi người dùng đổi Đơn Vị thủ công (ví dụ từ Viên sang Hộp)
-        cbDonVi.getSelectionModel().selectedItemProperty().addListener((obs, oldV, dvDuocChon) -> {
-            Thuoc thuocHienTai = cbThuoc.getSelectionModel().getSelectedItem();
-            if (dvDuocChon != null && thuocHienTai != null) {
-                double giaGoc = daoThuoc.getGiaNhapGanNhat(thuocHienTai.getMaThuoc());
-                txtGiaDuKien.setText(String.valueOf(Math.round(giaGoc * dvDuocChon.getTyLeQuyDoi())));
             }
         });
     }
@@ -227,12 +223,15 @@ public class Dialog_TaoDonDatHangController {
 
     @FXML void handleThemThuoc(ActionEvent event) {
         Thuoc thuoc = cbThuoc.getSelectionModel().getSelectedItem();
-        DonViQuyDoi dv = cbDonVi.getSelectionModel().getSelectedItem();
+        
+        // FIX NÈ: Gọi cái biến toàn cục ra xài, bỏ cái cbDonVi đi
+        DonViQuyDoi dv = donViDuocChon; 
+        
         String slStr = txtSoLuong.getText();
         String giaStr = txtGiaDuKien.getText();
 
         if (thuoc == null || dv == null) {
-            AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Vui lòng chọn thuốc và đơn vị tính!"); return;
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Vui lòng chọn thuốc (Thuốc phải có đơn vị hợp lệ)!"); return;
         }
         if (slStr.isEmpty() || giaStr.isEmpty()) {
             AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Vui lòng nhập đầy đủ số lượng và giá dự kiến!"); return;
@@ -283,13 +282,15 @@ public class Dialog_TaoDonDatHangController {
     }
 
     private void resetFormThuoc() {
-        txtTimThuoc.clear(); // Xóa khung tìm kiếm
+        txtTimThuoc.clear(); 
         cbThuoc.getSelectionModel().clearSelection();
-        cbDonVi.getSelectionModel().clearSelection();
+        
+        txtDonVi.clear();
+        donViDuocChon = null;
+        
         txtSoLuong.clear();
         txtGiaDuKien.clear();
     }
-
     @FXML void handleTaoDon(ActionEvent event) {
         NhaCungCap ncc = cbNhaCungCap.getSelectionModel().getSelectedItem();
         if (ncc == null) {

@@ -67,14 +67,14 @@ CREATE TABLE Thuoc (
     CONSTRAINT CHK_TrangThai CHECK (trangThai IN ('DANG_BAN', 'NGUNG_BAN', 'HET_HANG'))
 );
 
-CREATE TABLE DonViQuyDoi (
-    maQuyDoi VARCHAR(20) PRIMARY KEY,
-    maThuoc VARCHAR(20) NOT NULL,
-    tenDonVi NVARCHAR(50) NOT NULL,
-    tyLeQuyDoi INT NOT NULL,
-
-    FOREIGN KEY (maThuoc) REFERENCES Thuoc(maThuoc) ON DELETE CASCADE
-);
+	CREATE TABLE DonViQuyDoi (
+	    maQuyDoi VARCHAR(20) PRIMARY KEY,
+	    maThuoc VARCHAR(20) NOT NULL,
+	    tenDonVi NVARCHAR(50) NOT NULL,
+	    tyLeQuyDoi INT NOT NULL,
+	
+	    FOREIGN KEY (maThuoc) REFERENCES Thuoc(maThuoc) ON DELETE CASCADE
+	);
 
 CREATE TABLE LoThuoc (
     maLoThuoc VARCHAR(20) PRIMARY KEY,
@@ -299,29 +299,35 @@ CREATE TABLE ChiTietPhieuChi (
 );
 -- BẢNG PHIẾU XUẤT (Header)
 CREATE TABLE PhieuXuat (
-    MaPhieuXuat VARCHAR(20) PRIMARY KEY,
-    NgayXuat DATETIME DEFAULT GETDATE(),
-    MaNhanVien VARCHAR(20) NOT NULL,
-    LoaiPhieu INT NOT NULL, -- 1: Chuyển kho nội bộ | 2: Trả NCC | 3: Xuất hủy
+    maPhieuXuat VARCHAR(20) PRIMARY KEY,
+    ngayXuat DATETIME DEFAULT GETDATE(),
+    maNhanVien VARCHAR(20) NOT NULL,
+    loaiPhieu INT NOT NULL, -- 1: Chuyển kho nội bộ | 2: Trả NCC | 3: Xuất hủy
     
-    -- Các trường linh hoạt (Cho phép NULL)
-    MaNhaCungCap VARCHAR(20) NULL, -- Có data nếu LoaiPhieu = 2
-    KhoNhan NVARCHAR(100) NULL,    -- Có data nếu LoaiPhieu = 1
+    maNhaCungCap VARCHAR(20) NULL, 
+    khoNhan NVARCHAR(100) NULL,    
     
-    TongTien DECIMAL(18,2) DEFAULT 0,
-    GhiChu NVARCHAR(255)           -- Ghi lý do xuất/hủy
+    tongTien DECIMAL(18,2) DEFAULT 0,
+    ghiChu NVARCHAR(255),
+    
+    -- Móc khóa ngoại bảo vệ dữ liệu
+    FOREIGN KEY (maNhanVien) REFERENCES NhanVien(maNhanVien),
+    FOREIGN KEY (maNhaCungCap) REFERENCES NhaCungCap(maNhaCungCap)
 );
 
 -- BẢNG CHI TIẾT PHIẾU XUẤT (Detail)
 CREATE TABLE ChiTietPhieuXuat (
-    MaPhieuXuat VARCHAR(20),
-    MaThuoc VARCHAR(20),
-    SoLo VARCHAR(50),
-    SoLuong INT NOT NULL,
-    DonGia DECIMAL(18,2), -- Lấy giá nhập gốc để tính giá trị xuất/hủy
-    ThanhTien DECIMAL(18,2),
-    PRIMARY KEY (MaPhieuXuat, MaThuoc, SoLo),
-    FOREIGN KEY (MaPhieuXuat) REFERENCES PhieuXuat(MaPhieuXuat)
+    maPhieuXuat VARCHAR(20),
+    maLoThuoc VARCHAR(20),  
+    soLuong INT NOT NULL,
+    donGia DECIMAL(18,2), 
+    thanhTien DECIMAL(18,2),
+    
+    PRIMARY KEY (maPhieuXuat, maLoThuoc),
+    
+    -- Móc khóa ngoại bảo vệ dữ liệu
+    FOREIGN KEY (maPhieuXuat) REFERENCES PhieuXuat(maPhieuXuat),
+    FOREIGN KEY (maLoThuoc) REFERENCES LoThuoc(maLoThuoc) -- Đảm bảo xuất đúng cái lô đang có trong kho
 );
 
 
