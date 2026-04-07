@@ -34,8 +34,7 @@ public class DAO_PhieuXuat {
                 px.setLoaiPhieu(rs.getInt("loaiPhieu"));
                 px.setKhoNhan(rs.getString("khoNhan"));
                 px.setGhiChu(rs.getString("ghiChu"));
-
-                // FIX: Thêm 2 dòng này để Dialog Xem Chi Tiết nhận diện được NCC
+                
                 px.setMaNhaCungCap(rs.getString("maNhaCungCap"));
                 px.setTongTien(rs.getDouble("tongTien"));
 
@@ -47,7 +46,9 @@ public class DAO_PhieuXuat {
         return ds;
     }
 
-    // LOGIC ĐỔI HỘ KHẨU (CHUYỂN CẢ CỤC)
+    // ========================================================
+    // LOGIC ĐỔI HỘ KHẨU (CHUYỂN CẢ CỤC) - Loại Phiếu 1
+    // ========================================================
     public boolean chuyenKhoNoiBo(PhieuXuat px, List<ChiTietPhieuXuat> listCT, String khoNhan) {
         Connection conn = null;
         try {
@@ -55,7 +56,7 @@ public class DAO_PhieuXuat {
             conn.setAutoCommit(false);
 
             // 1. Lưu Header
-            String sqlP = "INSERT INTO PhieuXuat (MaPhieuXuat, NgayXuat, MaNhanVien, LoaiPhieu, KhoNhan, GhiChu) VALUES (?, GETDATE(), ?, 1, ?, ?)";
+            String sqlP = "INSERT INTO PhieuXuat (maPhieuXuat, ngayXuat, maNhanVien, loaiPhieu, khoNhan, ghiChu) VALUES (?, GETDATE(), ?, 1, ?, ?)";
             PreparedStatement psP = conn.prepareStatement(sqlP);
             psP.setString(1, px.getMaPhieuXuat());
             psP.setString(2, px.getMaNhanVien());
@@ -63,8 +64,8 @@ public class DAO_PhieuXuat {
             psP.setString(4, px.getGhiChu());
             psP.executeUpdate();
 
-            // 2. Lưu Chi Tiết
-            String sqlCT = "INSERT INTO ChiTietPhieuXuat (MaPhieuXuat, MaThuoc, SoLo, SoLuong, DonGia, ThanhTien) VALUES (?, ?, ?, ?, ?, ?)";
+            // 2. Lưu Chi Tiết (ĐÃ BỎ maThuoc, ĐỔI SoLo THÀNH maLoThuoc)
+            String sqlCT = "INSERT INTO ChiTietPhieuXuat (maPhieuXuat, maLoThuoc, soLuong, donGia, thanhTien) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement psCT = conn.prepareStatement(sqlCT);
 
             // 3. Đổi vị trí kho
@@ -72,12 +73,11 @@ public class DAO_PhieuXuat {
             PreparedStatement psUpdateKho = conn.prepareStatement(sqlUpdateKho);
 
             for (ChiTietPhieuXuat ct : listCT) {
-                psCT.setString(1, px.getMaPhieuXuat());
-                psCT.setString(2, ct.getMaThuoc());
-                psCT.setString(3, ct.getSoLo());
-                psCT.setInt(4, ct.getSoLuong()); // Số lượng này chỉ để hiện lên bảng "Xem"
-                psCT.setDouble(5, ct.getDonGia());
-                psCT.setDouble(6, ct.getThanhTien());
+                psCT.setString(1, px.getMaPhieuXuat()); 
+                psCT.setString(2, ct.getSoLo()); // Trong Java vẫn dùng getSoLo() tạm, ném xuống DB là maLoThuoc
+                psCT.setInt(3, ct.getSoLuong()); 
+                psCT.setDouble(4, ct.getDonGia()); 
+                psCT.setDouble(5, ct.getThanhTien());
                 psCT.addBatch();
 
                 psUpdateKho.setString(1, khoNhan);
@@ -108,18 +108,16 @@ public class DAO_PhieuXuat {
     }
 
     // ========================================================
-    // HÀM SINH MÃ TỰ ĐỘNG (Đã fix lỗi bỏ qua mã rác cũ)
+    // HÀM SINH MÃ TỰ ĐỘNG
     // ========================================================
     public String getMaPhieuXuatMoi(String tienTo) {
-        // Thêm điều kiện AND LEN(MaPhieuXuat) = 7 để loại bỏ các mã thời gian cũ (VD:
-        // CK1775212821968)
-        String sql = "SELECT MAX(CAST(SUBSTRING(MaPhieuXuat, 3, LEN(MaPhieuXuat)) AS INT)) " +
-                "FROM PhieuXuat WHERE MaPhieuXuat LIKE '" + tienTo + "%' AND LEN(MaPhieuXuat) = 7";
+        String sql = "SELECT MAX(CAST(SUBSTRING(maPhieuXuat, 3, LEN(maPhieuXuat)) AS INT)) " +
+                        "FROM PhieuXuat WHERE maPhieuXuat LIKE '" + tienTo + "%' AND LEN(maPhieuXuat) = 7";
         try (Connection con = ConnectDB.getConnection();
                 Statement st = con.createStatement();
                 ResultSet rs = st.executeQuery(sql)) {
             if (rs.next()) {
-                int max = rs.getInt(1); // rs.getInt sẽ trả về 0 nếu MAX() bị NULL
+                int max = rs.getInt(1);
                 return String.format("%s%05d", tienTo, max + 1);
             }
         } catch (SQLException e) {
@@ -129,7 +127,7 @@ public class DAO_PhieuXuat {
     }
 
     // ========================================================
-    // LOGIC TRẢ NHÀ CUNG CẤP (Loại phiếu = 2) - BẢN FIX CÔNG NỢ
+    // LOGIC TRẢ NHÀ CUNG CẤP (Loại phiếu = 2)
     // ========================================================
     public boolean traNhaCungCap(PhieuXuat px, List<ChiTietPhieuXuat> listCT) {
         Connection conn = null;
@@ -138,7 +136,7 @@ public class DAO_PhieuXuat {
             conn.setAutoCommit(false);
 
             // 1. Lưu Header Phiếu Xuất
-            String sqlP = "INSERT INTO PhieuXuat (MaPhieuXuat, NgayXuat, MaNhanVien, LoaiPhieu, MaNhaCungCap, TongTien, GhiChu) VALUES (?, GETDATE(), ?, 2, ?, ?, ?)";
+            String sqlP = "INSERT INTO PhieuXuat (maPhieuXuat, ngayXuat, maNhanVien, loaiPhieu, maNhaCungCap, tongTien, ghiChu) VALUES (?, GETDATE(), ?, 2, ?, ?, ?)";
             PreparedStatement psP = conn.prepareStatement(sqlP);
             psP.setString(1, px.getMaPhieuXuat());
             psP.setString(2, px.getMaNhanVien());
@@ -147,23 +145,21 @@ public class DAO_PhieuXuat {
             psP.setString(5, px.getGhiChu());
             psP.executeUpdate();
 
-            // 2. Chi Tiết và Trừ Tồn Kho
-            String sqlCT = "INSERT INTO ChiTietPhieuXuat (MaPhieuXuat, MaThuoc, SoLo, SoLuong, DonGia, ThanhTien) VALUES (?, ?, ?, ?, ?, ?)";
+            // 2. Chi Tiết và Trừ Tồn Kho (ĐÃ BỎ maThuoc, ĐỔI SoLo THÀNH maLoThuoc)
+            String sqlCT = "INSERT INTO ChiTietPhieuXuat (maPhieuXuat, maLoThuoc, soLuong, donGia, thanhTien) VALUES (?, ?, ?, ?, ?)";
             String sqlGiamTon = "UPDATE LoThuoc SET soLuongTon = soLuongTon - ? WHERE maLoThuoc = ?";
 
             PreparedStatement psCT = conn.prepareStatement(sqlCT);
             PreparedStatement psGiamTon = conn.prepareStatement(sqlGiamTon);
 
             for (ChiTietPhieuXuat ct : listCT) {
-                psCT.setString(1, px.getMaPhieuXuat());
-                psCT.setString(2, ct.getMaThuoc());
-                psCT.setString(3, ct.getSoLo());
-                psCT.setInt(4, ct.getSoLuong());
-                psCT.setDouble(5, ct.getDonGia());
-                psCT.setDouble(6, ct.getThanhTien());
+                psCT.setString(1, px.getMaPhieuXuat()); 
+                psCT.setString(2, ct.getSoLo()); 
+                psCT.setInt(3, ct.getSoLuong());
+                psCT.setDouble(4, ct.getDonGia()); 
+                psCT.setDouble(5, ct.getThanhTien());
                 psCT.addBatch();
 
-                // Trừ trực tiếp số lượng trong kho
                 psGiamTon.setInt(1, ct.getSoLuong());
                 psGiamTon.setString(2, ct.getSoLo());
                 psGiamTon.addBatch();
@@ -171,7 +167,7 @@ public class DAO_PhieuXuat {
             psCT.executeBatch();
             psGiamTon.executeBatch();
 
-            // 3. TRỪ CÔNG NỢ NHÀ CUNG CẤP (Fix lỗi NULL)
+            // 3. TRỪ CÔNG NỢ NHÀ CUNG CẤP
             String sqlTruCongNo = "UPDATE NhaCungCap SET congNo = ISNULL(congNo, 0) - ? WHERE maNhaCungCap = ?";
             PreparedStatement psTruCongNo = conn.prepareStatement(sqlTruCongNo);
             psTruCongNo.setDouble(1, px.getTongTien());
@@ -198,14 +194,15 @@ public class DAO_PhieuXuat {
     }
 
     // ========================================================
-    // HÀM LẤY CHI TIẾT PHIẾU XUẤT ĐỂ HIỂN THỊ LÊN DIALOG
+    // HÀM LẤY CHI TIẾT PHIẾU XUẤT ĐỂ HIỂN THỊ LÊN DIALOG (ĐÃ JOIN LẠI BẢNG THUỐC)
     // ========================================================
     public List<ChiTietPhieuXuat> getChiTietPhieuXuat(String maPhieu) {
         List<ChiTietPhieuXuat> list = new ArrayList<>();
-        // JOIN để lấy Tên thuốc gán tạm vào trường MaThuoc để hiện lên bảng
+        // JOIN 3 BẢNG ĐỂ TÌM LẠI TÊN THUỐC THÔNG QUA MÃ LÔ
         String sql = "SELECT ct.*, t.tenThuoc FROM ChiTietPhieuXuat ct " +
-                "JOIN Thuoc t ON ct.maThuoc = t.maThuoc " +
-                "WHERE ct.maPhieuXuat = ?";
+                        "JOIN LoThuoc lt ON ct.maLoThuoc = lt.maLoThuoc " +
+                        "JOIN Thuoc t ON lt.maThuoc = t.maThuoc " +
+                        "WHERE ct.maPhieuXuat = ?";
         try (Connection con = ConnectDB.getConnection();
                 PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setString(1, maPhieu);
@@ -213,8 +210,8 @@ public class DAO_PhieuXuat {
             while (rs.next()) {
                 ChiTietPhieuXuat ct = new ChiTietPhieuXuat();
                 ct.setMaPhieuXuat(rs.getString("maPhieuXuat"));
-                ct.setMaThuoc(rs.getString("tenThuoc")); // Mượn trường này lưu Tên thuốc hiển thị
-                ct.setSoLo(rs.getString("soLo"));
+                ct.setMaThuoc(rs.getString("tenThuoc")); // Vẫn mượn trường này lưu Tên thuốc để đổ lên TableView
+                ct.setSoLo(rs.getString("maLoThuoc"));   // Ánh xạ đúng tên cột mới
                 ct.setSoLuong(rs.getInt("soLuong"));
                 ct.setDonGia(rs.getDouble("donGia"));
                 ct.setThanhTien(rs.getDouble("thanhTien"));
@@ -236,31 +233,29 @@ public class DAO_PhieuXuat {
             conn.setAutoCommit(false);
 
             // 1. Lưu Header Phiếu Xuất (Loại 3, KHÔNG có Kho Nhận, KHÔNG có NCC)
-            String sqlP = "INSERT INTO PhieuXuat (MaPhieuXuat, NgayXuat, MaNhanVien, LoaiPhieu, TongTien, GhiChu) VALUES (?, GETDATE(), ?, 3, ?, ?)";
+            String sqlP = "INSERT INTO PhieuXuat (maPhieuXuat, ngayXuat, maNhanVien, loaiPhieu, tongTien, ghiChu) VALUES (?, GETDATE(), ?, 3, ?, ?)";
             PreparedStatement psP = conn.prepareStatement(sqlP);
             psP.setString(1, px.getMaPhieuXuat());
             psP.setString(2, px.getMaNhanVien());
-            psP.setDouble(3, px.getTongTien()); // Ghi nhận giá trị thiệt hại (tùy chọn)
+            psP.setDouble(3, px.getTongTien()); 
             psP.setString(4, px.getGhiChu());
             psP.executeUpdate();
 
-            // 2. Chi Tiết và Trừ Tồn Kho
-            String sqlCT = "INSERT INTO ChiTietPhieuXuat (MaPhieuXuat, MaThuoc, SoLo, SoLuong, DonGia, ThanhTien) VALUES (?, ?, ?, ?, ?, ?)";
+            // 2. Chi Tiết và Trừ Tồn Kho (ĐÃ BỎ maThuoc, ĐỔI SoLo THÀNH maLoThuoc)
+            String sqlCT = "INSERT INTO ChiTietPhieuXuat (maPhieuXuat, maLoThuoc, soLuong, donGia, thanhTien) VALUES (?, ?, ?, ?, ?)";
             String sqlGiamTon = "UPDATE LoThuoc SET soLuongTon = soLuongTon - ? WHERE maLoThuoc = ?";
 
             PreparedStatement psCT = conn.prepareStatement(sqlCT);
             PreparedStatement psGiamTon = conn.prepareStatement(sqlGiamTon);
 
             for (ChiTietPhieuXuat ct : listCT) {
-                psCT.setString(1, px.getMaPhieuXuat());
-                psCT.setString(2, ct.getMaThuoc());
-                psCT.setString(3, ct.getSoLo());
-                psCT.setInt(4, ct.getSoLuong());
-                psCT.setDouble(5, ct.getDonGia());
-                psCT.setDouble(6, ct.getThanhTien());
+                psCT.setString(1, px.getMaPhieuXuat()); 
+                psCT.setString(2, ct.getSoLo()); 
+                psCT.setInt(3, ct.getSoLuong());
+                psCT.setDouble(4, ct.getDonGia()); 
+                psCT.setDouble(5, ct.getThanhTien());
                 psCT.addBatch();
 
-                // Trừ trực tiếp số lượng trong kho
                 psGiamTon.setInt(1, ct.getSoLuong());
                 psGiamTon.setString(2, ct.getSoLo());
                 psGiamTon.addBatch();

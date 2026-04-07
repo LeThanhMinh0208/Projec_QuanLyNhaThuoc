@@ -2,6 +2,7 @@ package dao;
 
 import connectDB.ConnectDB;
 import entity.DonViQuyDoi;
+import entity.Thuoc;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -49,5 +50,34 @@ public class DAO_DonViQuyDoi {
             e.printStackTrace();
         }
         return null;
+    }
+ // ========================================================
+    // HÀM LẤY ĐƠN VỊ LỚN NHẤT CỦA THUỐC (Dành riêng cho Đặt Hàng)
+    // ========================================================
+    public DonViQuyDoi getDonViLonNhatCuaThuoc(String maThuoc) {
+        DonViQuyDoi dvMax = null;
+        String sql = "SELECT TOP 1 * FROM DonViQuyDoi WHERE maThuoc = ? ORDER BY tyLeQuyDoi DESC";
+        
+        ConnectDB.getInstance();
+		try (Connection con = ConnectDB.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            
+            pst.setString(1, maThuoc);
+            ResultSet rs = pst.executeQuery();
+            
+            if (rs.next()) {
+                dvMax = new DonViQuyDoi();
+                dvMax.setMaQuyDoi(rs.getString("maQuyDoi"));
+                
+                // FIX LỖI GẠCH ĐỎ Ở ĐÂY NÈ SẾP:
+                dvMax.setMaThuoc(maThuoc); 
+                
+                dvMax.setTenDonVi(rs.getString("tenDonVi"));
+                dvMax.setTyLeQuyDoi(rs.getInt("tyLeQuyDoi"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return dvMax;
     }
 }

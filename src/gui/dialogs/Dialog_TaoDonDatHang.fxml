@@ -51,10 +51,10 @@
                      </HBox>
                   </VBox>
                   
-                  <VBox spacing="5.0" alignment="BOTTOM_LEFT">
-                     <Label text="Đơn vị" style="-fx-font-size: 13px; -fx-text-fill: #475569; -fx-font-weight: bold;" />
-                     <ComboBox fx:id="cbDonVi" prefWidth="120.0" styleClass="input-field" />
-                  </VBox>
+      				<VBox spacing="5.0" alignment="BOTTOM_LEFT">
+   						<Label text="Đơn vị" style="-fx-font-size: 13px; -fx-text-fill: #475569; -fx-font-weight: bold;" />
+   						<TextField fx:id="txtDonVi" prefWidth="120.0" editable="false" styleClass="input-field" style="-fx-background-color: #f1f5f9; -fx-text-fill: #0f172a; -fx-font-weight: bold; -fx-cursor: default;" />
+				</VBox>
                   <VBox spacing="5.0" alignment="BOTTOM_LEFT">
                      <Label text="SL Đặt" style="-fx-font-size: 13px; -fx-text-fill: #475569; -fx-font-weight: bold;" />
                      <TextField fx:id="txtSoLuong" prefWidth="80.0" styleClass="input-field" alignment="CENTER" promptText="0" />

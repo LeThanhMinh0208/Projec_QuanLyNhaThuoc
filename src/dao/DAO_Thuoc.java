@@ -145,6 +145,122 @@ public class DAO_Thuoc {
         return null;
     }
 
+    public boolean capNhatThuoc(Thuoc t) {
+        String sql = "UPDATE Thuoc SET maDanhMuc=?, tenThuoc=?, hoatChat=?, hamLuong=?, " +
+                     "hangSanXuat=?, nuocSanXuat=?, congDung=?, donViCoBan=?, hinhAnh=?, " +
+                     "canKeDon=?, trangThai=?, trieuChung=? WHERE maThuoc=?";
+        try (Connection con = ConnectDB.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            
+            pst.setString(1, t.getMaDanhMuc());
+            pst.setString(2, t.getTenThuoc());
+            pst.setString(3, t.getHoatChat());
+            pst.setString(4, t.getHamLuong());
+            pst.setString(5, t.getHangSanXuat());
+            pst.setString(6, t.getNuocSanXuat());
+            pst.setString(7, t.getCongDung());
+            pst.setString(8, t.getDonViCoBan());
+            pst.setString(9, t.getHinhAnh());
+            pst.setBoolean(10, t.isCanKeDon());
+            pst.setString(11, t.getTrangThai());
+            pst.setString(12, t.getTrieuChung());
+            pst.setString(13, t.getMaThuoc()); // Dùng maThuoc để định vị dòng cần sửa
+
+            return pst.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public String getMaThuocMoi() {
+        String maMoi = "T00001"; // 1. Đổi giá trị khởi tạo thành T + 5 số 0
+        String sql = "SELECT MAX(maThuoc) FROM Thuoc WHERE maThuoc LIKE 'T%'"; // Thêm điều kiện LIKE 'T%' cho chắc cú
+        Connection con = ConnectDB.getConnection();
+        
+        try (PreparedStatement pst = con.prepareStatement(sql);
+             ResultSet rs = pst.executeQuery()) {
+             
+            if (rs.next() && rs.getString(1) != null) {
+                String maHienTai = rs.getString(1);
+                
+                // 2. Cắt đúng 1 ký tự "T" ở đầu (index 1)
+                int soHienTai = Integer.parseInt(maHienTai.substring(1)); 
+                
+                // 3. Tăng lên 1 đơn vị và ép format về dạng T + 5 chữ số
+                maMoi = String.format("T%05d", soHienTai + 1); 
+            }
+        } catch (SQLException e) { 
+            e.printStackTrace(); 
+        }
+        return maMoi;
+    }
+
+    // 2. Hàm thêm thuốc vào CSDL
+    public boolean themThuoc(Thuoc t) {
+        Connection con = null;
+        try {
+            con = ConnectDB.getConnection();
+            con.setAutoCommit(false); // BẬT TRANSACTION (Lưu 2 bảng cùng lúc)
+
+            // ========================================================
+            // 1. THÊM VÀO BẢNG THUỐC
+            // ========================================================
+            String sqlThuoc = "INSERT INTO Thuoc (maThuoc, maDanhMuc, tenThuoc, hoatChat, hamLuong, " +
+                         "hangSanXuat, nuocSanXuat, congDung, donViCoBan, hinhAnh, canKeDon, trangThai, trieuChung) " +
+                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement pstThuoc = con.prepareStatement(sqlThuoc)) {
+                pstThuoc.setString(1, t.getMaThuoc());
+                pstThuoc.setString(2, t.getMaDanhMuc());
+                pstThuoc.setString(3, t.getTenThuoc());
+                pstThuoc.setString(4, t.getHoatChat());
+                pstThuoc.setString(5, t.getHamLuong());
+                pstThuoc.setString(6, t.getHangSanXuat());
+                pstThuoc.setString(7, t.getNuocSanXuat());
+                pstThuoc.setString(8, t.getCongDung());
+                pstThuoc.setString(9, t.getDonViCoBan()); 
+                pstThuoc.setString(10, t.getHinhAnh());
+                pstThuoc.setBoolean(11, t.isCanKeDon());
+                pstThuoc.setString(12, t.getTrangThai());
+                pstThuoc.setString(13, t.getTrieuChung());
+                pstThuoc.executeUpdate();
+            }
+
+            String maQuyDoiMoi = "QD" + t.getMaThuoc().substring(1);
+
+            String sqlDonVi = "INSERT INTO DonViQuyDoi (maQuyDoi, maThuoc, tenDonVi, tyLeQuyDoi) VALUES (?, ?, ?, 1)";
+            try (PreparedStatement pstDonVi = con.prepareStatement(sqlDonVi)) {
+                pstDonVi.setString(1, maQuyDoiMoi);
+                pstDonVi.setString(2, t.getMaThuoc());
+                pstDonVi.setString(3, t.getDonViCoBan()); // Lấy đơn vị cơ bản (Viên/Hộp/Chai) làm gốc
+                pstDonVi.executeUpdate();
+            }
+
+            con.commit(); 
+            return true;
+            
+        } catch (SQLException e) { 
+            try { if (con != null) con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            e.printStackTrace(); 
+            return false; 
+        } finally {
+            try { if (con != null) con.setAutoCommit(true); } catch (SQLException ex) { ex.printStackTrace(); }
+        }
+    }
+    public boolean xoaThuoc(String ma) {
+        Connection con = ConnectDB.getConnection();
+        String sql = "DELETE FROM Thuoc WHERE maThuoc = ?";
+        
+        
+        try (PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, ma);
+            return pst.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public Thuoc getThuocTheoMaHoacTen(String query) {
         Thuoc thuoc = null;
         try {

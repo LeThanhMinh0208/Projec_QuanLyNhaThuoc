@@ -66,33 +66,43 @@ public class DAO_PhieuNhap {
                  PreparedStatement pstChiTietPN = con.prepareStatement(sqlInsertChiTietPN);
                  PreparedStatement pstUpdateCTDon = con.prepareStatement(sqlUpdateChiTietDon)) {
 
-                for (ChiTietDonDatHang ct : listChiTietNhan) {
+            	for (ChiTietDonDatHang ct : listChiTietNhan) {
                     if (ct.getSoLuongDaNhan() > 0) {
                         
                         Date ngaySX = Date.valueOf(ChuyenDoiNgay(ct.getNgaySanXuatTemp()));
                         Date hanSD = Date.valueOf(ChuyenDoiNgay(ct.getHanSuDung()));
 
-                        // Bảng LoThuoc: Thêm mới hoặc cộng dồn
-                        pstLoThuoc.setString(1, ct.getMaLo()); // Param 1: IF NOT EXISTS
-                        pstLoThuoc.setString(2, ct.getMaLo()); // Param 2: Insert
-                        pstLoThuoc.setString(3, ct.getThuoc().getMaThuoc()); // Param 3: Insert
-                        pstLoThuoc.setDate(4, ngaySX); // Param 4: Insert
-                        pstLoThuoc.setDate(5, hanSD); // Param 5: Insert
-                        pstLoThuoc.setInt(6, ct.getSoLuongDaNhan()); // Param 6: Insert
-                        pstLoThuoc.setDouble(7, ct.getDonGiaDuKien()); // Param 7: Insert
-                        pstLoThuoc.setInt(8, ct.getSoLuongDaNhan()); // Param 8: Update
-                        pstLoThuoc.setString(9, ct.getMaLo()); // Param 9: Update
+                        // ========================================================
+                        // THUẬT TOÁN QUY ĐỔI ĐƠN VỊ TÍNH (SỐ LƯỢNG & GIÁ VỐN)
+                        // ========================================================
+                        int tyLe = ct.getDonViQuyDoi().getTyLeQuyDoi();
+                        if (tyLe <= 0) tyLe = 1; // Đảm bảo an toàn không chia cho 0
+                        
+                        int soLuongThucTeVaoKho = ct.getSoLuongDaNhan() * tyLe;  // 1 hộp x 100 = 100 viên
+                        double giaNhapThucTeVaoKho = ct.getDonGiaDuKien() / tyLe; // 100k / 100 = 1k/viên
+
+                        // 1. Cập nhật bảng LoThuoc (Lưu theo Đơn vị cơ sở - VIÊN)
+                        pstLoThuoc.setString(1, ct.getMaLo()); 
+                        pstLoThuoc.setString(2, ct.getMaLo()); 
+                        pstLoThuoc.setString(3, ct.getThuoc().getMaThuoc()); 
+                        pstLoThuoc.setDate(4, ngaySX); 
+                        pstLoThuoc.setDate(5, hanSD); 
+                        
+                        pstLoThuoc.setInt(6, soLuongThucTeVaoKho);    // (FIX) Đã nhân tỷ lệ
+                        pstLoThuoc.setDouble(7, giaNhapThucTeVaoKho); // (FIX) Đã chia tỷ lệ
+                        pstLoThuoc.setInt(8, soLuongThucTeVaoKho);    // (FIX) Đã nhân tỷ lệ
+                        pstLoThuoc.setString(9, ct.getMaLo()); 
                         pstLoThuoc.executeUpdate();
 
-                        // Chi tiết Phiếu Nhập
+                        // 2. Chi tiết Phiếu Nhập (Giữ nguyên đơn vị Hộp để in phiếu chứng từ cho khớp)
                         pstChiTietPN.setString(1, phieuNhap.getMaPhieuNhap());
                         pstChiTietPN.setString(2, ct.getDonViQuyDoi().getMaQuyDoi());
                         pstChiTietPN.setString(3, ct.getMaLo());
-                        pstChiTietPN.setInt(4, ct.getSoLuongDaNhan());
-                        pstChiTietPN.setDouble(5, ct.getDonGiaDuKien());
+                        pstChiTietPN.setInt(4, ct.getSoLuongDaNhan()); // Giữ nguyên số lượng Đặt
+                        pstChiTietPN.setDouble(5, ct.getDonGiaDuKien()); // Giữ nguyên giá trị Đặt
                         pstChiTietPN.executeUpdate();
 
-                        // Cập nhật Đơn đặt hàng gốc
+                        // 3. Cập nhật Đơn đặt hàng gốc (Giữ nguyên đơn vị Đặt)
                         pstUpdateCTDon.setInt(1, ct.getSoLuongDaNhan()); 
                         pstUpdateCTDon.setDouble(2, ct.getDonGiaDuKien()); 
                         pstUpdateCTDon.setString(3, ct.getMaLo());
