@@ -196,16 +196,51 @@ public class DAO_Thuoc {
         return maMoi;
     }
 
-    // 2. Hàm thêm thuốc vào CSDL
+    // 2. Hàm thêm thuốc vào CSDL (có Auto-Restore nếu trùng NGUNG_BAN)
     public boolean themThuoc(Thuoc t) {
         Connection con = null;
         try {
             con = ConnectDB.getConnection();
-            con.setAutoCommit(false); // BẬT TRANSACTION (Lưu 2 bảng cùng lúc)
+            
+            // ========================================================
+            // BƯỚC 1: KIỂM TRA TRÙNG LẮP (AUTO-RESTORE)
+            // ========================================================
+            String sqlCheck = "SELECT maThuoc FROM Thuoc " +
+                               "WHERE LOWER(tenThuoc) = LOWER(?) " +
+                               "AND LOWER(hoatChat) = LOWER(?) " +
+                               "AND LOWER(hamLuong) = LOWER(?) " +
+                               "AND trangThai = 'NGUNG_BAN'";
+            try (PreparedStatement pstCheck = con.prepareStatement(sqlCheck)) {
+                pstCheck.setString(1, t.getTenThuoc());
+                pstCheck.setString(2, t.getHoatChat());
+                pstCheck.setString(3, t.getHamLuong());
+                ResultSet rs = pstCheck.executeQuery();
+                if (rs.next()) {
+                    // CẬP NHẬT LẠI TRẠNG THÁI (RESTORE)
+                    String maCu = rs.getString("maThuoc");
+                    String sqlRestore = "UPDATE Thuoc SET trangThai = 'DANG_BAN', " +
+                                        "maDanhMuc = ?, hangSanXuat = ?, nuocSanXuat = ?, " +
+                                        "congDung = ?, trieuChung = ?, hinhAnh = ?, canKeDon = ? " +
+                                        "WHERE maThuoc = ?";
+                    try (PreparedStatement pstRestore = con.prepareStatement(sqlRestore)) {
+                        pstRestore.setString(1, t.getMaDanhMuc());
+                        pstRestore.setString(2, t.getHangSanXuat());
+                        pstRestore.setString(3, t.getNuocSanXuat());
+                        pstRestore.setString(4, t.getCongDung());
+                        pstRestore.setString(5, t.getTrieuChung());
+                        pstRestore.setString(6, t.getHinhAnh());
+                        pstRestore.setBoolean(7, t.isCanKeDon());
+                        pstRestore.setString(8, maCu);
+                        return pstRestore.executeUpdate() > 0;
+                    }
+                }
+            }
 
             // ========================================================
-            // 1. THÊM VÀO BẢNG THUỐC
+            // BƯỚC 2: KHÔNG TRÙNG -> INSERT MỚI (VÀO 2 BẢNG)
             // ========================================================
+            con.setAutoCommit(false); // BẬT TRANSACTION
+
             String sqlThuoc = "INSERT INTO Thuoc (maThuoc, maDanhMuc, tenThuoc, hoatChat, hamLuong, " +
                          "hangSanXuat, nuocSanXuat, congDung, donViCoBan, hinhAnh, canKeDon, trangThai, trieuChung) " +
                          "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -232,7 +267,7 @@ public class DAO_Thuoc {
             try (PreparedStatement pstDonVi = con.prepareStatement(sqlDonVi)) {
                 pstDonVi.setString(1, maQuyDoiMoi);
                 pstDonVi.setString(2, t.getMaThuoc());
-                pstDonVi.setString(3, t.getDonViCoBan()); // Lấy đơn vị cơ bản (Viên/Hộp/Chai) làm gốc
+                pstDonVi.setString(3, t.getDonViCoBan()); 
                 pstDonVi.executeUpdate();
             }
 
@@ -245,19 +280,6 @@ public class DAO_Thuoc {
             return false; 
         } finally {
             try { if (con != null) con.setAutoCommit(true); } catch (SQLException ex) { ex.printStackTrace(); }
-        }
-    }
-    public boolean xoaThuoc(String ma) {
-        Connection con = ConnectDB.getConnection();
-        String sql = "DELETE FROM Thuoc WHERE maThuoc = ?";
-        
-        
-        try (PreparedStatement pst = con.prepareStatement(sql)) {
-            pst.setString(1, ma);
-            return pst.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
         }
     }
 
@@ -315,114 +337,7 @@ public class DAO_Thuoc {
         }
     }
 
-    // ===================================================================
-    // THÊM / CẬP NHẬT (Thêm mới có auto-restore nếu trùng NGUNG_BAN)
-    // ===================================================================
 
-    public String getMaThuocMoi() {
-        String maMoi = "TH001";
-        String sql = "SELECT MAX(maThuoc) FROM Thuoc";
-        Connection con = ConnectDB.getConnection();
-        try (PreparedStatement pst = con.prepareStatement(sql);
-             ResultSet rs = pst.executeQuery()) {
-            if (rs.next() && rs.getString(1) != null) {
-                String maHienTai = rs.getString(1);
-                int soHienTai = Integer.parseInt(maHienTai.substring(2));
-                maMoi = String.format("TH%03d", soHienTai + 1);
-            }
-        } catch (SQLException e) { e.printStackTrace(); }
-        return maMoi;
-    }
-
-    /**
-     * Thêm thuốc mới — Auto-restore nếu tìm thấy bản ghi NGUNG_BAN trùng
-     * (cùng tenThuoc + hoatChat + hamLuong).
-     * @return true nếu thành công (INSERT mới hoặc RESTORE cũ)
-     */
-    public boolean themThuoc(Thuoc t) {
-        Connection con = ConnectDB.getConnection();
-
-        // Bước 1: Tìm bản ghi NGUNG_BAN trùng (cùng tên + hoạt chất + hàm lượng)
-        String sqlCheck = "SELECT maThuoc FROM Thuoc " +
-                           "WHERE LOWER(tenThuoc) = LOWER(?) " +
-                           "AND LOWER(hoatChat) = LOWER(?) " +
-                           "AND LOWER(hamLuong) = LOWER(?) " +
-                           "AND trangThai = 'NGUNG_BAN'";
-        try (PreparedStatement pstCheck = con.prepareStatement(sqlCheck)) {
-            pstCheck.setString(1, t.getTenThuoc());
-            pstCheck.setString(2, t.getHoatChat());
-            pstCheck.setString(3, t.getHamLuong());
-            ResultSet rs = pstCheck.executeQuery();
-            if (rs.next()) {
-                // Tìm thấy bản ghi cũ → RESTORE thay vì INSERT
-                String maCu = rs.getString("maThuoc");
-                String sqlRestore = "UPDATE Thuoc SET trangThai = 'DANG_BAN', " +
-                                    "maDanhMuc = ?, hangSanXuat = ?, nuocSanXuat = ?, " +
-                                    "congDung = ?, trieuChung = ?, hinhAnh = ?, canKeDon = ? " +
-                                    "WHERE maThuoc = ?";
-                try (PreparedStatement pstRestore = con.prepareStatement(sqlRestore)) {
-                    pstRestore.setString(1, t.getMaDanhMuc());
-                    pstRestore.setString(2, t.getHangSanXuat());
-                    pstRestore.setString(3, t.getNuocSanXuat());
-                    pstRestore.setString(4, t.getCongDung());
-                    pstRestore.setString(5, t.getTrieuChung());
-                    pstRestore.setString(6, t.getHinhAnh());
-                    pstRestore.setBoolean(7, t.isCanKeDon());
-                    pstRestore.setString(8, maCu);
-                    return pstRestore.executeUpdate() > 0;
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        // Bước 2: Không tìm thấy trùng → INSERT bình thường
-        String sql = "INSERT INTO Thuoc (maThuoc, maDanhMuc, tenThuoc, hoatChat, hamLuong, " +
-                     "hangSanXuat, nuocSanXuat, congDung, donViCoBan, hinhAnh, canKeDon, trangThai, trieuChung) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement pst = con.prepareStatement(sql)) {
-            pst.setString(1, t.getMaThuoc());
-            pst.setString(2, t.getMaDanhMuc());
-            pst.setString(3, t.getTenThuoc());
-            pst.setString(4, t.getHoatChat());
-            pst.setString(5, t.getHamLuong());
-            pst.setString(6, t.getHangSanXuat());
-            pst.setString(7, t.getNuocSanXuat());
-            pst.setString(8, t.getCongDung());
-            pst.setString(9, t.getDonViCoBan());
-            pst.setString(10, t.getHinhAnh());
-            pst.setBoolean(11, t.isCanKeDon());
-            pst.setString(12, t.getTrangThai());
-            pst.setString(13, t.getTrieuChung());
-            return pst.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); return false; }
-    }
-
-    public boolean capNhatThuoc(Thuoc t) {
-        String sql = "UPDATE Thuoc SET maDanhMuc=?, tenThuoc=?, hoatChat=?, hamLuong=?, " +
-                     "hangSanXuat=?, nuocSanXuat=?, congDung=?, donViCoBan=?, hinhAnh=?, " +
-                     "canKeDon=?, trangThai=?, trieuChung=? WHERE maThuoc=?";
-        try (Connection con = ConnectDB.getConnection();
-             PreparedStatement pst = con.prepareStatement(sql)) {
-            pst.setString(1, t.getMaDanhMuc());
-            pst.setString(2, t.getTenThuoc());
-            pst.setString(3, t.getHoatChat());
-            pst.setString(4, t.getHamLuong());
-            pst.setString(5, t.getHangSanXuat());
-            pst.setString(6, t.getNuocSanXuat());
-            pst.setString(7, t.getCongDung());
-            pst.setString(8, t.getDonViCoBan());
-            pst.setString(9, t.getHinhAnh());
-            pst.setBoolean(10, t.isCanKeDon());
-            pst.setString(11, t.getTrangThai());
-            pst.setString(12, t.getTrieuChung());
-            pst.setString(13, t.getMaThuoc());
-            return pst.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 
     public boolean capNhatGiaNhapMoi(String maThuoc, double giaMoi) {
         int n = 0;
