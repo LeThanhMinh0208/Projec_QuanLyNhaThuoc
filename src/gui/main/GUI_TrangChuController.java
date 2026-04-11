@@ -263,6 +263,16 @@ public class GUI_TrangChuController {
         utils.SceneUtils.switchPage("/gui/main/GUI_DanhSachHoaDon.fxml");
     }
     
+    @FXML
+    void handleMoXuLyDoiTra(ActionEvent event) {
+        switchPage("/gui/main/GUI_XuLyDoiTra.fxml");
+    }
+
+    @FXML
+    void handleMoXuLyDoiTraCard(javafx.scene.input.MouseEvent event) {
+        switchPage("/gui/main/GUI_XuLyDoiTra.fxml");
+    }
+    
 
     @FXML
     void handleMoTaoBangGia(ActionEvent event) {

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" prefWidth="1120" prefHeight="760" fx:controller="gui.dialogs.Dialog_ChiTietDoiTraController"
+            style="-fx-background-color:transparent; -fx-background:transparent;"
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+    <content>
+        <VBox prefWidth="1080" spacing="16"
+              style="-fx-background-color:#f8fafc; -fx-padding:24;">
+
+            <stylesheets>
+                <URL value="@../../resources/css/TrangChu.css" />
+                <URL value="@../../resources/css/BanHang.css" />
+            </stylesheets>
+
+            <VBox styleClass="bh-panel" spacing="10">
+                <Label text="THONG TIN HOA DON DOI TRA" styleClass="bh-section-title" />
+                <GridPane hgap="20" vgap="8">
+                    <columnConstraints>
+                        <ColumnConstraints prefWidth="130" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                        <ColumnConstraints prefWidth="130" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                    </columnConstraints>
+                    <Label text="Ma hoa don:" style="-fx-text-fill:#64748b;" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                    <Label fx:id="lblMaHD" style="-fx-font-weight:bold; -fx-text-fill:#0f172a;" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                    <Label text="Ngay lap:" style="-fx-text-fill:#64748b;" GridPane.rowIndex="0" GridPane.columnIndex="2" />
+                    <Label fx:id="lblNgayLap" style="-fx-text-fill:#0f172a;" GridPane.rowIndex="0" GridPane.columnIndex="3" />
+
+                    <Label text="Khach hang:" style="-fx-text-fill:#64748b;" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                    <Label fx:id="lblKhachHang" style="-fx-text-fill:#0f172a;" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                    <Label text="Nhan vien:" style="-fx-text-fill:#64748b;" GridPane.rowIndex="1" GridPane.columnIndex="2" />
+                    <Label fx:id="lblNhanVien" style="-fx-text-fill:#0f172a;" GridPane.rowIndex="1" GridPane.columnIndex="3" />
+
+                    <Label text="Tong thanh toan:" style="-fx-text-fill:#64748b;" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                    <Label fx:id="lblTongHoaDon" style="-fx-text-fill:#0f172a; -fx-font-weight:bold;" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                    <Label text="Hinh thuc TT:" style="-fx-text-fill:#64748b;" GridPane.rowIndex="2" GridPane.columnIndex="2" />
+                    <Label fx:id="lblHinhThuc" style="-fx-text-fill:#0f172a;" GridPane.rowIndex="2" GridPane.columnIndex="3" />
+                </GridPane>
+            </VBox>
+
+            <VBox styleClass="bh-panel" spacing="8" VBox.vgrow="ALWAYS">
+                <Label text="MAT HANG CO THE DOI TRA" styleClass="bh-section-title" />
+                <TableView fx:id="tableCoTheDoiTra" minHeight="220" prefHeight="220" VBox.vgrow="ALWAYS"
+                           style="-fx-text-background-color:#0f172a; -fx-control-inner-background:white; -fx-table-cell-border-color:#e2e8f0;">
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                    <placeholder>
+                        <Label text="Khong co mat hang nao co the doi tra" style="-fx-text-fill:#64748b; -fx-font-size:14px;" />
+                    </placeholder>
+                    <columns>
+                        <TableColumn fx:id="colHangTenThuoc" text="Ten thuoc" prefWidth="220" />
+                        <TableColumn fx:id="colHangDonVi" text="Don vi" prefWidth="90" />
+                        <TableColumn fx:id="colHangLo" text="Lo thuoc" prefWidth="110" />
+                        <TableColumn fx:id="colHangHSD" text="HSD" prefWidth="110" />
+                        <TableColumn fx:id="colHangDaMua" text="Da mua" prefWidth="80" />
+                        <TableColumn fx:id="colHangDaTra" text="Da tra" prefWidth="80" />
+                        <TableColumn fx:id="colHangConLai" text="Con lai" prefWidth="80" />
+                        <TableColumn fx:id="colHangDonGia" text="Don gia" prefWidth="110" />
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <VBox styleClass="bh-panel" spacing="12" VBox.vgrow="NEVER">
+                <Label text="THEM CHI TIET DOI TRA" styleClass="bh-section-title" />
+                <GridPane hgap="16" vgap="10">
+                    <columnConstraints>
+                        <ColumnConstraints prefWidth="120" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                        <ColumnConstraints prefWidth="120" />
+                        <ColumnConstraints prefWidth="180" />
+                    </columnConstraints>
+                    <Label text="So luong tra:" style="-fx-text-fill:#64748b;" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                    <TextField fx:id="txtSoLuongTra" promptText="Nhap so luong" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                    <Label text="Phi phat:" style="-fx-text-fill:#64748b;" GridPane.rowIndex="0" GridPane.columnIndex="2" />
+                    <TextField fx:id="txtPhiPhat" promptText="0" GridPane.rowIndex="0" GridPane.columnIndex="3" />
+
+                    <Label text="Tinh trang:" style="-fx-text-fill:#64748b;" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                    <TextField fx:id="txtTinhTrang" promptText="Vi du: con nguyen seal" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="3" />
+
+                    <Label text="Ly do:" style="-fx-text-fill:#64748b;" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                    <TextArea fx:id="txtLyDo" prefRowCount="2" wrapText="true" promptText="Nhap ly do doi tra" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="3" />
+
+                    <Label text="Hinh thuc xu ly:" style="-fx-text-fill:#64748b;" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                    <ComboBox fx:id="cbHinhThucXuLy" prefWidth="220" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                    <HBox alignment="CENTER_RIGHT" spacing="10" GridPane.rowIndex="3" GridPane.columnIndex="2" GridPane.columnSpan="2">
+                        <Button text="Them vao phieu" onAction="#handleThemChiTiet" styleClass="bh-btn-secondary" prefHeight="36" />
+                    </HBox>
+                </GridPane>
+            </VBox>
+
+            <VBox styleClass="bh-panel" spacing="8" VBox.vgrow="ALWAYS">
+                <Label text="CHI TIET PHIEU DOI TRA" styleClass="bh-section-title" />
+                <TableView fx:id="tableChiTietDoiTra" minHeight="220" prefHeight="220" VBox.vgrow="ALWAYS"
+                           style="-fx-text-background-color:#0f172a; -fx-control-inner-background:white; -fx-table-cell-border-color:#e2e8f0;">
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                    <placeholder>
+                        <Label text="Chua co chi tiet doi tra nao" style="-fx-text-fill:#64748b; -fx-font-size:14px;" />
+                    </placeholder>
+                    <columns>
+                        <TableColumn fx:id="colCTTenThuoc" text="Ten thuoc" prefWidth="220" />
+                        <TableColumn fx:id="colCTDonVi" text="Don vi" prefWidth="90" />
+                        <TableColumn fx:id="colCTLo" text="Lo thuoc" prefWidth="110" />
+                        <TableColumn fx:id="colCTSoLuong" text="So luong tra" prefWidth="90" />
+                        <TableColumn fx:id="colCTTinhTrang" text="Tinh trang" prefWidth="220" />
+                        <TableColumn fx:id="colCTThanhTien" text="Tien hoan" prefWidth="120" />
+                        <TableColumn fx:id="colCTHanhDong" text="Hanh dong" prefWidth="100" />
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <VBox styleClass="bh-panel" spacing="8" VBox.vgrow="NEVER">
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <Label text="Tong so mat hang:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" />
+                    <Label fx:id="lblTongDong" style="-fx-text-fill:#0f172a;" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label text="Tong tien hoan:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" />
+                    <Label fx:id="lblTongTienHoan" style="-fx-text-fill:#16a34a; -fx-font-size:18px; -fx-font-weight:bold;" />
+                </HBox>
+                <Separator />
+                <HBox alignment="CENTER_RIGHT" spacing="12">
+                    <Button text="Dong" onAction="#handleDong" styleClass="bh-btn-secondary" prefHeight="40" prefWidth="100" />
+                    <Button text="Luu phieu doi tra" onAction="#handleLuu" styleClass="bh-btn-primary" prefHeight="40" prefWidth="180" />
+                </HBox>
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>
