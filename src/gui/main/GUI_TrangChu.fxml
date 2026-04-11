@@ -43,7 +43,7 @@
                            <VBox styleClass="dropdown-content">
                               <Button onAction="#handleMoQuanLyBanHangLapHoaDon" styleClass="sub-btn" text="Lập Hóa Đơn" />
                               <Button onAction="#handleMoDanhSachHoaDon" styleClass="sub-btn" text="Danh Sách Hóa Đơn" />
-                              <Button styleClass="sub-btn" text="Xử Lý Đổi Trả" />
+                     <Button onAction="#moTrangXuLyDoiTra" styleClass="sub-btn" text="Xử Lý Đổi Trả" />
                            </VBox>
                         </content>
                      </TitledPane>
