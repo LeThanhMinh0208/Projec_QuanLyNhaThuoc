@@ -12,22 +12,19 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.util.converter.DoubleStringConverter;
-import javafx.util.converter.IntegerStringConverter;
+import javafx.util.StringConverter;
 import utils.AlertUtils;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import javafx.scene.control.TableCell;
+
 public class GUI_NhapKhoController {
 
     @FXML private ToggleGroup tabGroup;
@@ -47,7 +44,7 @@ public class GUI_NhapKhoController {
     @FXML private TableView<ChiTietDonDatHang> tableNhapKho;
     @FXML private TableColumn<ChiTietDonDatHang, String> colTenThuoc, colDonVi, colMaLo, colNgaySX, colHanDung;
     @FXML private TableColumn<ChiTietDonDatHang, Integer> colSLDat, colSLNhan;
-    @FXML private TableColumn<ChiTietDonDatHang, Double> colGiaNhap;
+    @FXML private TableColumn<ChiTietDonDatHang, String> colGiaNhap; 
 
     // ==========================================
     // UI TAB 2: DANH MỤC PHIẾU NHẬP
@@ -56,46 +53,48 @@ public class GUI_NhapKhoController {
     @FXML private TableView<PhieuNhap> tablePhieuNhap;
     @FXML private TableColumn<PhieuNhap, Void> colXemChiTietPN;
     @FXML private TableColumn<PhieuNhap, String> colMaPhieuNhap, colNhaCungCapPN, colNhanVienPN;
-    @FXML private TableColumn<PhieuNhap, java.sql.Timestamp> colNgayNhapPN; // Đã đổi sang Timestamp
+    @FXML private TableColumn<PhieuNhap, java.sql.Timestamp> colNgayNhapPN; 
     @FXML private TableColumn<PhieuNhap, Double> colTongTienPN;
 
-    // ==========================================
-    // BIẾN TOÀN CỤC
-    // ==========================================
     private DAO_DonDatHang daoDon = new DAO_DonDatHang();
     private DAO_PhieuNhap daoPhieuNhap = new DAO_PhieuNhap();
     private DonDatHang donHienTai;
     private List<ChiTietDonDatHang> listChiTietHienTai;
     
     private DecimalFormat df = new DecimalFormat("#,### VNĐ");
-    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm"); // Hiển thị cả giờ phút cho chuyên nghiệp
+    private DecimalFormat dfInput = new DecimalFormat("#,###"); 
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm"); 
+    private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @FXML public void initialize() {
         setupTabs();
         setupTableTaoPhieu();
-        setupTableDanhSachPhieuNhap(); // Khởi tạo bảng danh mục phiếu nhập
+        setupTableDanhSachPhieuNhap(); 
         
         loadDonChoNhap(); 
         
-        if(dpNgayNhap != null) dpNgayNhap.setValue(LocalDate.now());
+        // Khóa ngày nhập kho (mặc định hôm nay)
+        if(dpNgayNhap != null) {
+            dpNgayNhap.setValue(LocalDate.now());
+            dpNgayNhap.setDisable(true);
+            dpNgayNhap.setStyle("-fx-opacity: 1; -fx-background-color: #f1f5f9;"); 
+            dpNgayNhap.setConverter(new StringConverter<LocalDate>() {
+                @Override public String toString(LocalDate date) { return (date != null) ? dateFormatter.format(date) : ""; }
+                @Override public LocalDate fromString(String string) { return (string != null && !string.isEmpty()) ? LocalDate.parse(string, dateFormatter) : null; }
+            });
+        }
 
         cbMaDon.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
             if (newV != null) hienThiChiTietDon(newV);
         });
     }
 
-    // ========================================================
-    // CÁC HÀM XỬ LÝ TAB 1: TẠO PHIẾU
-    // ========================================================
     private void loadDonChoNhap() {
         List<DonDatHang> dsDon = daoDon.getAllDonDatHang().stream()
-                
                 .filter(DonDatHang::isChoPhepNhapKho)
-              
                 .filter(don -> {
                     String ttDB = don.getTrangThai();
                     if (ttDB == null) return true;
-                    
                     if (ttDB.equals("GIAO_DU") || ttDB.equals("DONG_DON_THIEU") || ttDB.equals("DA_HUY") || ttDB.equals("GIAO_MOT_PHAN")) {
                         return false;
                     }
@@ -113,6 +112,7 @@ public class GUI_NhapKhoController {
         txtGhiChu.clear();
 
         listChiTietHienTai = daoDon.getChiTietByMaDon(don.getMaDonDatHang());
+        
         tableNhapKho.setItems(FXCollections.observableArrayList(listChiTietHienTai));
         tinhToanTongTienHienThi();
     }
@@ -129,27 +129,34 @@ public class GUI_NhapKhoController {
     }
 
     private void setupTableTaoPhieu() {
+        colTenThuoc.setPrefWidth(220);
+        colDonVi.setPrefWidth(70);
+        colSLDat.setPrefWidth(70);
+        colSLNhan.setPrefWidth(80);
+        colMaLo.setPrefWidth(120);
+        colNgaySX.setPrefWidth(140);
+        colHanDung.setPrefWidth(140);
+        colGiaNhap.setPrefWidth(140);
+
         colTenThuoc.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getThuoc().getTenThuoc()));
         colDonVi.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getDonViQuyDoi().getTenDonVi()));
-        
         colSLDat.setCellValueFactory(new PropertyValueFactory<>("soLuongDat"));
         colSLDat.setStyle("-fx-alignment: CENTER; -fx-font-weight: bold;");
 
-        // 1. Ô SỐ LƯỢNG NHẬN (Gõ thẳng, lưu liền, tự tính tiền)
+        // Ô SỐ LƯỢNG NHẬN
         colSLNhan.setCellValueFactory(new PropertyValueFactory<>("soLuongDaNhan"));
         colSLNhan.setCellFactory(column -> new TableCell<ChiTietDonDatHang, Integer>() {
             private final TextField textField = new TextField();
             {
                 textField.getStyleClass().add("table-input-active");
+                textField.setAlignment(Pos.CENTER);
                 textField.textProperty().addListener((obs, oldV, newV) -> {
                     if (getTableRow() != null && getTableRow().getItem() != null) {
                         try {
                             int val = newV.isEmpty() ? 0 : Integer.parseInt(newV);
                             getTableRow().getItem().setSoLuongDaNhan(val);
-                            tinhToanTongTienHienThi(); // Gõ số nhảy tiền ngay lập tức!
-                        } catch (NumberFormatException e) {
-                            // Bỏ qua nếu gõ chữ
-                        }
+                            tinhToanTongTienHienThi(); 
+                        } catch (NumberFormatException e) { textField.setText(oldV); }
                     }
                 });
             }
@@ -165,13 +172,13 @@ public class GUI_NhapKhoController {
             }
         });
 
-        // 2. Ô MÃ LÔ (Gõ thẳng)
+        // Ô MÃ LÔ
         colMaLo.setCellValueFactory(new PropertyValueFactory<>("maLo"));
         colMaLo.setCellFactory(column -> new TableCell<ChiTietDonDatHang, String>() {
             private final TextField textField = new TextField();
             {
                 textField.getStyleClass().add("table-input-active");
-                textField.setPromptText("Nhập lô...");
+                textField.setPromptText("Nhập mã...");
                 textField.textProperty().addListener((obs, oldV, newV) -> {
                     if (getTableRow() != null && getTableRow().getItem() != null) {
                         getTableRow().getItem().setMaLo(newV);
@@ -190,17 +197,32 @@ public class GUI_NhapKhoController {
             }
         });
 
-        // 3. Ô NGÀY SẢN XUẤT (Sổ Lịch)
+        // 🚨 Ô NGÀY SX (SỔ LỊCH + ĐIỀU KIỆN TRƯỚC HÔM NAY) 🚨
         colNgaySX.setCellValueFactory(new PropertyValueFactory<>("ngaySanXuatTemp"));
         colNgaySX.setCellFactory(column -> new TableCell<ChiTietDonDatHang, String>() {
             private final DatePicker datePicker = new DatePicker();
             {
                 datePicker.getStyleClass().add("table-date-active");
-                datePicker.setPrefWidth(120);
+                datePicker.setPrefWidth(130);
+                
+                // Format dd/MM/yyyy
+                datePicker.setConverter(new StringConverter<LocalDate>() {
+                    @Override public String toString(LocalDate date) { return (date != null) ? dateFormatter.format(date) : ""; }
+                    @Override public LocalDate fromString(String string) { return (string != null && !string.isEmpty()) ? LocalDate.parse(string, dateFormatter) : null; }
+                });
+                
                 datePicker.valueProperty().addListener((obs, oldDate, newDate) -> {
                     if (getTableRow() != null && getTableRow().getItem() != null && newDate != null) {
-                        // Lưu dạng yyyy-MM-dd để nhét vào Database SQL chuẩn xác
-                        getTableRow().getItem().setNgaySanXuatTemp(newDate.toString());
+                        getTableRow().getItem().setNgaySanXuatTemp(newDate.toString()); // Lưu DB dạng yyyy-MM-dd
+                    }
+                });
+                
+                // CHẶN NGÀY: Chỉ cho chọn ngày trước hôm nay
+                datePicker.setDayCellFactory(picker -> new DateCell() {
+                    public void updateItem(LocalDate date, boolean empty) {
+                        super.updateItem(date, empty);
+                        // Disable nếu ngày đó lớn hơn hoặc bằng hôm nay (nghĩa là chỉ nhận quá khứ)
+                        setDisable(empty || date.compareTo(LocalDate.now()) >= 0); 
                     }
                 });
             }
@@ -211,7 +233,7 @@ public class GUI_NhapKhoController {
                     setGraphic(null);
                 } else {
                     String dateStr = getTableRow().getItem().getNgaySanXuatTemp();
-                    if (dateStr != null && !dateStr.isEmpty()) {
+                    if (dateStr != null && !dateStr.isEmpty() && dateStr.contains("-")) {
                         try { datePicker.setValue(LocalDate.parse(dateStr)); } catch(Exception e) {}
                     } else {
                         datePicker.setValue(null);
@@ -221,16 +243,39 @@ public class GUI_NhapKhoController {
             }
         });
 
-        // 4. Ô HẠN SỬ DỤNG (Sổ Lịch)
+        // 🚨 Ô HSD (SỔ LỊCH + ĐIỀU KIỆN SAU NSX) 🚨
         colHanDung.setCellValueFactory(new PropertyValueFactory<>("hanSuDung"));
         colHanDung.setCellFactory(column -> new TableCell<ChiTietDonDatHang, String>() {
             private final DatePicker datePicker = new DatePicker();
             {
                 datePicker.getStyleClass().add("table-date-active");
-                datePicker.setPrefWidth(120);
+                datePicker.setPrefWidth(130);
+                
+                datePicker.setConverter(new StringConverter<LocalDate>() {
+                    @Override public String toString(LocalDate date) { return (date != null) ? dateFormatter.format(date) : ""; }
+                    @Override public LocalDate fromString(String string) { return (string != null && !string.isEmpty()) ? LocalDate.parse(string, dateFormatter) : null; }
+                });
+                
                 datePicker.valueProperty().addListener((obs, oldDate, newDate) -> {
                     if (getTableRow() != null && getTableRow().getItem() != null && newDate != null) {
                         getTableRow().getItem().setHanSuDung(newDate.toString());
+                    }
+                });
+                
+                // MẸO UX: Khi vừa click mở lịch HSD, kiểm tra xem NSX là ngày nào để khóa những ngày trước đó
+                datePicker.setOnShowing(event -> {
+                    if (getTableRow() != null && getTableRow().getItem() != null) {
+                        String nsxStr = getTableRow().getItem().getNgaySanXuatTemp();
+                        if (nsxStr != null && !nsxStr.isEmpty()) {
+                            LocalDate nsx = LocalDate.parse(nsxStr);
+                            datePicker.setDayCellFactory(picker -> new DateCell() {
+                                public void updateItem(LocalDate date, boolean empty) {
+                                    super.updateItem(date, empty);
+                                    // Disable nếu ngày HSD nhỏ hơn hoặc bằng NSX
+                                    setDisable(empty || date.compareTo(nsx) <= 0); 
+                                }
+                            });
+                        }
                     }
                 });
             }
@@ -241,7 +286,7 @@ public class GUI_NhapKhoController {
                     setGraphic(null);
                 } else {
                     String dateStr = getTableRow().getItem().getHanSuDung();
-                    if (dateStr != null && !dateStr.isEmpty()) {
+                    if (dateStr != null && !dateStr.isEmpty() && dateStr.contains("-")) {
                         try { datePicker.setValue(LocalDate.parse(dateStr)); } catch(Exception e) {}
                     } else {
                         datePicker.setValue(null);
@@ -251,31 +296,40 @@ public class GUI_NhapKhoController {
             }
         });
 
-        // 5. Ô GIÁ NHẬP (Gõ thẳng, tính tiền ngay)
-        colGiaNhap.setCellValueFactory(new PropertyValueFactory<>("donGiaDuKien"));
-        colGiaNhap.setCellFactory(column -> new TableCell<ChiTietDonDatHang, Double>() {
+        // Ô GIÁ NHẬP
+        colGiaNhap.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue().getDonGiaDuKien())));
+        colGiaNhap.setCellFactory(column -> new TableCell<ChiTietDonDatHang, String>() {
             private final TextField textField = new TextField();
             {
                 textField.getStyleClass().add("table-input-active");
+                textField.setAlignment(Pos.CENTER_RIGHT);
                 textField.textProperty().addListener((obs, oldV, newV) -> {
-                    if (getTableRow() != null && getTableRow().getItem() != null) {
+                    if (getTableRow() != null && getTableRow().getItem() != null && newV != null && !newV.isEmpty()) {
+                        String cleanStr = newV.replaceAll("[^\\d]", ""); 
                         try {
-                            String cleanStr = newV.replaceAll("[,\\s]", ""); // Xóa dấu phẩy nếu có
-                            double val = cleanStr.isEmpty() ? 0 : Double.parseDouble(cleanStr);
-                            getTableRow().getItem().setDonGiaDuKien(val);
-                            tinhToanTongTienHienThi();
-                        } catch (NumberFormatException e) {}
+                            if (!cleanStr.isEmpty()) {
+                                long val = Long.parseLong(cleanStr);
+                                String formatted = dfInput.format(val).replace(',', '.'); 
+                                if (!newV.equals(formatted)) {
+                                    textField.setText(formatted);
+                                }
+                                getTableRow().getItem().setDonGiaDuKien(val);
+                                tinhToanTongTienHienThi();
+                            }
+                        } catch (NumberFormatException e) {
+                            textField.setText(oldV);
+                        }
                     }
                 });
             }
             @Override
-            protected void updateItem(Double item, boolean empty) {
+            protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || getTableRow() == null || getTableRow().getItem() == null) {
                     setGraphic(null);
                 } else {
-                    Double val = getTableRow().getItem().getDonGiaDuKien();
-                    textField.setText(val != null ? String.format("%.0f", val) : "0");
+                    double val = getTableRow().getItem().getDonGiaDuKien();
+                    textField.setText(dfInput.format(val).replace(',', '.'));
                     setGraphic(textField);
                 }
             }
@@ -313,6 +367,28 @@ public class GUI_NhapKhoController {
                     AlertUtils.showAlert(Alert.AlertType.WARNING, "Thiếu dữ liệu", "Vui lòng nhập Mã Lô cho thuốc: " + ct.getThuoc().getTenThuoc());
                     return; 
                 }
+                
+                // 🚨 KIỂM TRA ĐIỀU KIỆN NGÀY THÁNG LÚC LƯU 🚨
+                try {
+                    if (ct.getNgaySanXuatTemp() == null || ct.getHanSuDung() == null) throw new Exception();
+                    
+                    LocalDate nsx = LocalDate.parse(ct.getNgaySanXuatTemp());
+                    LocalDate hsd = LocalDate.parse(ct.getHanSuDung());
+                    LocalDate today = LocalDate.now();
+
+                    if (!nsx.isBefore(today)) {
+                        AlertUtils.showAlert(Alert.AlertType.WARNING, "Lỗi Ngày", "Ngày sản xuất của lô " + ct.getMaLo() + " phải TRƯỚC ngày hôm nay!");
+                        return;
+                    }
+                    if (!hsd.isAfter(nsx)) {
+                        AlertUtils.showAlert(Alert.AlertType.WARNING, "Lỗi Ngày", "Hạn sử dụng của lô " + ct.getMaLo() + " phải SAU ngày sản xuất!");
+                        return;
+                    }
+                } catch (Exception e) {
+                    AlertUtils.showAlert(Alert.AlertType.WARNING, "Thiếu dữ liệu", "Vui lòng chọn đầy đủ Ngày SX và HSD cho lô " + ct.getMaLo());
+                    return;
+                }
+
                 if (daoPhieuNhap.kiemTraMaLoTonTai(ct.getMaLo().trim())) {
                     AlertUtils.showAlert(Alert.AlertType.ERROR, "Trùng Mã Lô", 
                         "Mã lô [" + ct.getMaLo().trim() + "] của thuốc " + ct.getThuoc().getTenThuoc() + 
@@ -347,37 +423,26 @@ public class GUI_NhapKhoController {
         pn.setNhaCungCap(donHienTai.getNhaCungCap());
         
         entity.NhanVien nv = new entity.NhanVien();
-        nv.setMaNhanVien("NV001"); // TODO: Lấy user đang đăng nhập
+        nv.setMaNhanVien("NV001"); 
         pn.setNhanVien(nv);
 
-boolean tc = daoPhieuNhap.luuPhieuNhapVaCapNhatDon(pn, listChiTietHienTai, donHienTai, soNgayHen);
+        boolean tc = daoPhieuNhap.luuPhieuNhapVaCapNhatDon(pn, listChiTietHienTai, donHienTai, soNgayHen);
         
         if (tc) {
-            // =========================================================
-            // BẮT ĐẦU LOGIC MỚI: CỘNG DỒN CÔNG NỢ CHO NHÀ CUNG CẤP
-            // =========================================================
             double tongTienNhap = 0;
             for (ChiTietDonDatHang ct : listChiTietHienTai) {
                 tongTienNhap += ct.getSoLuongDaNhan() * ct.getDonGiaDuKien();
             }
             
-            // Gọi hàm DAO vừa tạo để cộng tiền
             dao.DAO_NhaCungCap daoNCC = new dao.DAO_NhaCungCap();
-            boolean updateCongNo = daoNCC.congCongNoNhaCungCap(donHienTai.getNhaCungCap().getMaNhaCungCap(), tongTienNhap);
+            daoNCC.congCongNoNhaCungCap(donHienTai.getNhaCungCap().getMaNhaCungCap(), tongTienNhap);
             
-            if (updateCongNo) {
-                AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", 
-                    "Đã lưu phiếu nhập kho!\nĐã cộng dồn " + df.format(tongTienNhap) + " vào công nợ của NCC.");
-            } else {
-                AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo", 
-                    "Đã lưu phiếu nhập nhưng có lỗi xảy ra khi cập nhật công nợ NCC!");
-            }
-            // =========================================================
+            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", 
+                "Đã lưu phiếu nhập kho!\nĐã cộng dồn " + df.format(tongTienNhap) + " vào công nợ của NCC.");
 
             loadDonChoNhap(); 
             handleHuyNhapKho(null);
             
-            // Xóa bộ lọc tìm kiếm và tải lại dữ liệu mới nhất cho Tab Danh mục
             if(txtTimKiemPhieuNhap != null) txtTimKiemPhieuNhap.clear();
             loadDanhSachPhieuNhap(); 
         } else {
@@ -395,9 +460,6 @@ boolean tc = daoPhieuNhap.luuPhieuNhapVaCapNhatDon(pn, listChiTietHienTai, donHi
         donHienTai = null;
     }
 
-    // ========================================================
-    // CÁC HÀM XỬ LÝ TAB 2: DANH MỤC PHIẾU NHẬP
-    // ========================================================
     private void setupTabs() {
         tabGroup.selectedToggleProperty().addListener((obs, oldT, newT) -> {
             if (newT == null) { oldT.setSelected(true); return; }
@@ -408,7 +470,6 @@ boolean tc = daoPhieuNhap.luuPhieuNhapVaCapNhatDon(pn, listChiTietHienTai, donHi
                 viewDanhSach.setVisible(!isTao);
                 viewDanhSach.setManaged(!isTao);
                 
-                // Khi người dùng bấm sang Tab Danh Sách thì tự động tải dữ liệu từ DB
                 if (!isTao) {
                     loadDanhSachPhieuNhap();
                 }
@@ -422,21 +483,18 @@ boolean tc = daoPhieuNhap.luuPhieuNhapVaCapNhatDon(pn, listChiTietHienTai, donHi
         colMaPhieuNhap.setCellValueFactory(new PropertyValueFactory<>("maPhieuNhap"));
         colMaPhieuNhap.setStyle("-fx-alignment: CENTER; -fx-font-weight: bold;");
 
-        // Lấy Tên Nhà cung cấp
         colNhaCungCapPN.setCellValueFactory(c -> {
             if(c.getValue().getNhaCungCap() != null) 
                 return new SimpleStringProperty(c.getValue().getNhaCungCap().getTenNhaCungCap());
             return new SimpleStringProperty("N/A");
         });
         
-        // Lấy Họ Tên Nhân viên (khớp với entity NhanVien)
         colNhanVienPN.setCellValueFactory(c -> {
             if(c.getValue().getNhanVien() != null) 
                 return new SimpleStringProperty(c.getValue().getNhanVien().getHoTen());
             return new SimpleStringProperty("N/A");
         });
 
-        // Định dạng Timestamp
         colNgayNhapPN.setCellValueFactory(new PropertyValueFactory<>("ngayNhap"));
         colNgayNhapPN.setStyle("-fx-alignment: CENTER;");
         colNgayNhapPN.setCellFactory(column -> new TableCell<PhieuNhap, java.sql.Timestamp>() {
@@ -446,7 +504,6 @@ boolean tc = daoPhieuNhap.luuPhieuNhapVaCapNhatDon(pn, listChiTietHienTai, donHi
             }
         });
 
-        // Định dạng Tiền tệ
         colTongTienPN.setCellValueFactory(new PropertyValueFactory<>("tongTien")); 
         colTongTienPN.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: #be123c;");
         colTongTienPN.setCellFactory(column -> new TableCell<PhieuNhap, Double>() {
@@ -456,7 +513,6 @@ boolean tc = daoPhieuNhap.luuPhieuNhapVaCapNhatDon(pn, listChiTietHienTai, donHi
             }
         });
 
-        // Cột Nút XEM CHI TIẾT
         colXemChiTietPN.setCellFactory(param -> new TableCell<PhieuNhap, Void>() {
             private final Button btnXem = new Button("Xem");
             {
@@ -480,7 +536,6 @@ boolean tc = daoPhieuNhap.luuPhieuNhapVaCapNhatDon(pn, listChiTietHienTai, donHi
             }
         });
         
-        // Sự kiện gõ tìm kiếm (Tìm theo mã phiếu hoặc Tên NCC)
         if(txtTimKiemPhieuNhap != null) {
             txtTimKiemPhieuNhap.textProperty().addListener((obs, oldText, newText) -> {
                 loadDanhSachPhieuNhap(newText);
@@ -489,13 +544,11 @@ boolean tc = daoPhieuNhap.luuPhieuNhapVaCapNhatDon(pn, listChiTietHienTai, donHi
     }
 
     private void loadDanhSachPhieuNhap() {
-        loadDanhSachPhieuNhap(""); // Mặc định tải tất cả
+        loadDanhSachPhieuNhap(""); 
     }
     
     private void loadDanhSachPhieuNhap(String tuKhoa) {
         if (daoPhieuNhap == null || tablePhieuNhap == null) return;
-        
-        // Kéo dữ liệu từ DAO đổ lên bảng
         List<PhieuNhap> ds = daoPhieuNhap.getAllPhieuNhap(tuKhoa); 
         tablePhieuNhap.setItems(FXCollections.observableArrayList(ds));
     }
@@ -505,7 +558,6 @@ boolean tc = daoPhieuNhap.luuPhieuNhapVaCapNhatDon(pn, listChiTietHienTai, donHi
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ChiTietPhieuNhap.fxml"));
             javafx.scene.Parent root = loader.load();
 
-            // Truyền dữ liệu phiếu qua Dialog
             gui.dialogs.Dialog_ChiTietPhieuNhapController controller = loader.getController();
             controller.setPhieuNhap(phieuNhap); 
 
