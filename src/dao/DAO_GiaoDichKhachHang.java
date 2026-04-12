@@ -100,14 +100,15 @@ public class DAO_GiaoDichKhachHang {
     }
     public List<GiaoDichKhachHang> getAllGiaoDich() {
         List<GiaoDichKhachHang> list = new java.util.ArrayList<>();
-        String sql = "SELECT hd.maHoaDon, hd.ngayLap, nv.hoTen AS tenNhanVien, " +
+        // Thêm JOIN KhachHang và lấy thêm trường hoTen, sdt
+        String sql = "SELECT hd.maHoaDon, hd.ngayLap, kh.hoTen AS tenKhachHang, kh.sdt, " +
                      "       hd.thueVAT, hd.hinhThucThanhToan, hd.ghiChu, " +
                      "       SUM(ct.soLuong * ct.donGia) AS tamTinh, " +
                      "       SUM(ct.soLuong * ct.donGia) * (1 + hd.thueVAT/100.0) AS tongSauVAT " +
                      "FROM HoaDon hd " +
-                     "JOIN NhanVien nv ON hd.maNhanVien = nv.maNhanVien " +
+                     "JOIN KhachHang kh ON hd.maKhachHang = kh.maKhachHang " + // Join bảng KH
                      "JOIN ChiTietHoaDon ct ON hd.maHoaDon = ct.maHoaDon " +
-                     "GROUP BY hd.maHoaDon, hd.ngayLap, nv.hoTen, hd.thueVAT, hd.hinhThucThanhToan, hd.ghiChu " +
+                     "GROUP BY hd.maHoaDon, hd.ngayLap, kh.hoTen, kh.sdt, hd.thueVAT, hd.hinhThucThanhToan, hd.ghiChu " +
                      "ORDER BY hd.ngayLap DESC";
 
         try (java.sql.Connection con = connectDB.ConnectDB.getConnection();
@@ -117,10 +118,12 @@ public class DAO_GiaoDichKhachHang {
                 GiaoDichKhachHang gd = new GiaoDichKhachHang();
                 gd.setMaHoaDon(rs.getString("maHoaDon"));
                 gd.setNgayLap(rs.getTimestamp("ngayLap"));
-                gd.setTenNhanVien(rs.getString("tenNhanVien"));
+                // Lưu thông tin khách hàng vào Entity (Đảm bảo class GiaoDichKhachHang có các field này)
+                gd.setTenKhachHang(rs.getString("tenKhachHang")); 
+                gd.setSdtKhachHang(rs.getString("sdt"));
+                
                 gd.setThueVAT(rs.getDouble("thueVAT"));
                 gd.setHinhThucThanhToan(rs.getString("hinhThucThanhToan"));
-                gd.setGhiChu(rs.getString("ghiChu"));
                 gd.setTamTinh(rs.getDouble("tamTinh"));
                 gd.setTongSauVAT(rs.getDouble("tongSauVAT"));
                 list.add(gd);

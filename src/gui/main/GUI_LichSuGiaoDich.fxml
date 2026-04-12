@@ -33,7 +33,7 @@
             <Label text="Tìm kiếm:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" prefWidth="70" />
             <HBox alignment="CENTER_LEFT" styleClass="search-box" HBox.hgrow="ALWAYS">
                 <Label styleClass="search-icon" text="🔍" />
-                <TextField fx:id="txtTimKiem" promptText="Mã HĐ, Tên nhân viên..."
+                <TextField fx:id="txtTimKiem" promptText="Mã HĐ, Tên hoặc SĐT khách hàng..."
                            styleClass="search-input" HBox.hgrow="ALWAYS" />
             </HBox>
             <Button text="🔍 Tìm kiếm" onAction="#handleLoc"
@@ -52,21 +52,23 @@
                 <Label text="Chưa có hóa đơn nào" style="-fx-text-fill:#94a3b8; -fx-font-size:14px;" />
             </placeholder>
             <columns>
-                <TableColumn fx:id="colMaHD"     text="Mã HĐ"        prefWidth="100"/>
-                <TableColumn fx:id="colNgayLap"  text="Ngày Lập"     prefWidth="150"/>
-                <TableColumn fx:id="colNhanVien" text="Nhân Viên"    prefWidth="180"/>
-                <TableColumn fx:id="colTamTinh"  text="Tạm Tính"     prefWidth="120"/>
-                <TableColumn fx:id="colVAT"      text="VAT"          prefWidth="70"/>
-                <TableColumn fx:id="colTongTT"   text="Tổng TT"      prefWidth="140"/>
-                <TableColumn fx:id="colHinhThuc" text="Hình Thức TT" prefWidth="140"/>
-                <TableColumn fx:id="colHanhDong" text="Hành Động"    prefWidth="120"/>
+                <TableColumn fx:id="colMaHD"      text="Mã HĐ"          prefWidth="90"/>
+                <TableColumn fx:id="colNgayLap"   text="Ngày Lập"       prefWidth="140"/>
+                <TableColumn fx:id="colKhachHang" text="Khách Hàng"     prefWidth="180"/>
+                <TableColumn fx:id="colSdt"       text="Số Điện Thoại"  prefWidth="120"/>
+                <TableColumn fx:id="colTamTinh"   text="Tạm Tính"       prefWidth="110"/>
+                <TableColumn fx:id="colVAT"       text="VAT"            prefWidth="60"/>
+                <TableColumn fx:id="colTongTT"    text="Tổng TT"        prefWidth="130"/>
+                <TableColumn fx:id="colHinhThuc"  text="Hình Thức TT"   prefWidth="130"/>
+                <TableColumn fx:id="colHanhDong"  text="Hành Động"      prefWidth="110"/>
             </columns>
         </TableView>
     </VBox>
 
     <HBox alignment="CENTER_LEFT" spacing="30" VBox.vgrow="NEVER" style="-fx-padding:12 0 0 0;">
         <Label fx:id="lblTongGiaoDich" text="Tổng: 0 giao dịch" style="-fx-text-fill:#64748b; -fx-font-size:13px;" />
-        <HBox HBox.hgrow="ALWAYS" /> <Label text="Tổng doanh thu:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" />
+        <HBox HBox.hgrow="ALWAYS" />
+        <Label text="Tổng doanh thu:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" />
         <Label fx:id="lblTongDoanhThu" text="0 ₫" style="-fx-text-fill:#16a34a; -fx-font-size:16px; -fx-font-weight:bold;" />
     </HBox>
 </VBox>
