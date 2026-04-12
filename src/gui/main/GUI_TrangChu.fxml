@@ -73,6 +73,7 @@
                         <content>
                            <VBox styleClass="dropdown-content">
                               <Button onAction="#handleMoQuanLyDanhMucThuoc" styleClass="sub-btn" text="Danh Mục Thuốc" />
+                              <Button onAction="#handleMoQuanLyDonViQuyDoi" styleClass="sub-btn" text="Quản Lý Đơn Vị Quy Đổi" />
                               <Button styleClass="sub-btn" text="Theo Dõi Hạn Sử Dụng" />
                               <Button styleClass="sub-btn" text="Quản Lý Lô Thuốc" />
                            </VBox>

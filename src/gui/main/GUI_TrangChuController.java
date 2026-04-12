@@ -210,6 +210,11 @@ public class GUI_TrangChuController {
     }
 
     @FXML
+    void handleMoQuanLyDonViQuyDoi(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_DonViQuyDoi.fxml");
+    }
+
+    @FXML
     void handleMoQuanLyBanHangLapHoaDon(ActionEvent event) {
         switchPage("/gui/main/GUI_QuanLyBanHang.fxml");
     }
