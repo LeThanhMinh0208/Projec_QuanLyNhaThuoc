@@ -74,7 +74,7 @@ public class GUI_TrangChuController {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    setText(item ? "CÃƒÂ³" : "KhÃƒÂ´ng");
+                    setText(item ? "Có" : "Không");
                     getStyleClass().add(item ? "text-do" : "text-xanh-la");
                 }
             }
@@ -90,13 +90,13 @@ public class GUI_TrangChuController {
                     setText(null);
                 } else {
                     if ("DANG_BAN".equals(item)) {
-                        setText("Ã„Âang BÃƒÂ¡n");
+                        setText("Đang Bán");
                         getStyleClass().add("text-xanh-bien");
                     } else if ("HET_HANG".equals(item)) {
-                        setText("HÃ¡ÂºÂ¿t HÃƒÂ ng");
+                        setText("Hết Hàng");
                         getStyleClass().add("text-vang-cam");
                     } else if ("NGUNG_BAN".equals(item)) {
-                        setText("NgÃ¡Â»Â«ng BÃƒÂ¡n");
+                        setText("Ngừng Bán");
                         getStyleClass().add("text-do");
                     } else {
                         setText(item);
@@ -166,7 +166,7 @@ public class GUI_TrangChuController {
                 if (thuoc.getHangSanXuat() != null && thuoc.getHangSanXuat().toLowerCase().contains(filter)) return true;
                 if (thuoc.getNuocSanXuat() != null && thuoc.getNuocSanXuat().toLowerCase().contains(filter)) return true;
                 
-                String keDonString = thuoc.isCanKeDon() ? "cÃƒÂ³ kÃƒÂª Ã„â€˜Ã†Â¡n" : "khÃƒÂ´ng kÃƒÂª Ã„â€˜Ã†Â¡n";
+                String keDonString = thuoc.isCanKeDon() ? "có kê đơn" : "không kê đơn";
                 return keDonString.contains(filter);
             });
         });
@@ -192,7 +192,7 @@ public class GUI_TrangChuController {
             Parent root = FXMLLoader.load(getClass().getResource("GUI_DangNhap.fxml"));
             Stage loginStage = new Stage();
             loginStage.setScene(new Scene(root));
-            loginStage.setTitle("Ã„ÂÃ„Æ’ng nhÃ¡ÂºÂ­p");
+            loginStage.setTitle("Đăng nhập");
             loginStage.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -294,7 +294,7 @@ public class GUI_TrangChuController {
             }
             mainBorderPane.setCenter(root);
         } catch (Exception e) {
-            System.err.println("LÃ¡Â»â€”i mÃ¡Â»Å¸ TÃ¡ÂºÂ¡o BÃ¡ÂºÂ£ng GiÃƒÂ¡: " + e.getMessage());
+            System.err.println("Lỗi mở Tạo Bảng Giá: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -312,7 +312,7 @@ public class GUI_TrangChuController {
             }
             mainBorderPane.setCenter(root);
         } catch (Exception e) {
-            System.err.println("LÃ¡Â»â€”i nÃ¡ÂºÂ¡p file FXML: " + fxmlPath);
+            System.err.println("Lỗi nạp file FXML: " + fxmlPath);
             e.printStackTrace();
         }
     }
