@@ -98,7 +98,7 @@
                         <content>
                            <VBox styleClass="dropdown-content">
                               <Button onAction="#handleMoQuanLyKhachHang" styleClass="sub-btn" text="Danh Mục Khách Hàng" />
-                              <Button styleClass="sub-btn" text="Lịch Sử Giao Dịch" />
+                              <Button onAction="#handleMoLichSuGiaoDich" styleClass="sub-btn" text="Lịch Sử Giao Dịch"/>                    
                            </VBox>
                         </content>
                      </TitledPane>

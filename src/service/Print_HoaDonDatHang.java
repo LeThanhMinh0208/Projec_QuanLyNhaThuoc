@@ -1,13 +1,25 @@
 package service;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.*;
-import entity.ChiTietDonDatHang;
-import entity.DonDatHang;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.awt.Desktop;
 import java.util.List;
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+import com.lowagie.text.Document;
+import com.lowagie.text.Element;
+import com.lowagie.text.Font;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.pdf.BaseFont;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
+
+import entity.ChiTietDonDatHang;
+import entity.DonDatHang;
 
 public class Print_HoaDonDatHang {
     

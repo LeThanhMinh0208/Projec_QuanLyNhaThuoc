@@ -262,7 +262,10 @@ public class GUI_TrangChuController {
     void handleMoDanhSachHoaDon(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_DanhSachHoaDon.fxml");
     }
-    
+    @FXML
+    void handleMoLichSuGiaoDich(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_LichSuGiaoDich.fxml");
+    }
 
     @FXML
     void handleMoTaoBangGia(ActionEvent event) {
