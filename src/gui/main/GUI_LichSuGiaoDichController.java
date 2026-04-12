@@ -30,7 +30,8 @@ public class GUI_LichSuGiaoDichController {
     @FXML private DatePicker dpTuNgay, dpDenNgay;
     
     @FXML private TableView<GiaoDichKhachHang> tableGiaoDich;
-    @FXML private TableColumn<GiaoDichKhachHang, String> colMaHD, colNgayLap, colNhanVien;
+    // Khai báo cột mới
+    @FXML private TableColumn<GiaoDichKhachHang, String> colMaHD, colNgayLap, colKhachHang, colSdt;
     @FXML private TableColumn<GiaoDichKhachHang, String> colTamTinh, colVAT, colTongTT, colHinhThuc;
     @FXML private TableColumn<GiaoDichKhachHang, Void> colHanhDong;
     
@@ -47,22 +48,21 @@ public class GUI_LichSuGiaoDichController {
     public void initialize() {
         setupComboBox();
         setupTable();
-        loadData(); // Load thẳng dữ liệu ra
+        loadData(); 
         setupFilter();
     }
 
     private void setupComboBox() {
         cbHinhThuc.setItems(FXCollections.observableArrayList("Tất cả", "Tiền mặt", "Chuyển khoản", "Thẻ tín dụng"));
         cbHinhThuc.getSelectionModel().selectFirst();
-        
-        // CỐ TÌNH ĐỂ TRỐNG (null) -> ĐỂ HIỂN THỊ TẤT CẢ DỮ LIỆU KHI VỪA MỞ GIAO DIỆN
         dpTuNgay.setValue(null);
         dpDenNgay.setValue(null);
     }
 
     private void setupTable() {
         colMaHD.setCellValueFactory(new PropertyValueFactory<>("maHoaDon"));
-        colNhanVien.setCellValueFactory(new PropertyValueFactory<>("tenNhanVien"));
+        colKhachHang.setCellValueFactory(new PropertyValueFactory<>("tenKhachHang")); // Cột Khách hàng
+        colSdt.setCellValueFactory(new PropertyValueFactory<>("sdtKhachHang"));       // Cột SĐT
         
         colNgayLap.setCellValueFactory(c -> new SimpleStringProperty(
             c.getValue().getNgayLap() != null ? dateFormat.format(c.getValue().getNgayLap()) : ""));
@@ -75,7 +75,6 @@ public class GUI_LichSuGiaoDichController {
         colHanhDong.setCellFactory(param -> new TableCell<>() {
             private final Button btn = new Button("👁 Chi tiết");
             {
-                // Set style màu xanh chuẩn y chang form của bạn
                 btn.setStyle("-fx-background-color:#2563eb;-fx-text-fill:white;-fx-font-size:12px;-fx-padding:4 10;-fx-cursor:hand;");
                 btn.setOnAction(e -> moDialogChiTiet(getTableView().getItems().get(getIndex())));
             }
@@ -96,7 +95,6 @@ public class GUI_LichSuGiaoDichController {
         tableGiaoDich.setItems(filteredData);
         applyFilter(); 
         
-        // Vừa gõ chữ vừa tự động tìm
         txtTimKiem.textProperty().addListener((obs, oldVal, newVal) -> applyFilter());
     }
 
@@ -113,9 +111,12 @@ public class GUI_LichSuGiaoDichController {
     private void applyFilter() {
         filteredData.setPredicate(gd -> {
             String keyword = txtTimKiem.getText().toLowerCase().trim();
+            
+            // Tìm theo Mã HĐ, Tên KH, hoặc SĐT KH
             boolean matchText = keyword.isEmpty() || 
                                 (gd.getMaHoaDon() != null && gd.getMaHoaDon().toLowerCase().contains(keyword)) ||
-                                (gd.getTenNhanVien() != null && gd.getTenNhanVien().toLowerCase().contains(keyword));
+                                (gd.getTenKhachHang() != null && gd.getTenKhachHang().toLowerCase().contains(keyword)) ||
+                                (gd.getSdtKhachHang() != null && gd.getSdtKhachHang().contains(keyword));
                                 
             String ht = cbHinhThuc.getValue();
             boolean matchHT = "Tất cả".equals(ht) || ht == null || (gd.getHinhThucLabel() != null && gd.getHinhThucLabel().equals(ht));
@@ -145,7 +146,8 @@ public class GUI_LichSuGiaoDichController {
             HoaDonView hd = new HoaDonView();
             hd.setMaHoaDon(gd.getMaHoaDon());
             hd.setNgayLap(gd.getNgayLap());
-            hd.setTenNhanVien(gd.getTenNhanVien());
+            hd.setTenKhachHang(gd.getTenKhachHang());
+            hd.setSdt(gd.getSdtKhachHang());
             hd.setTamTinh(gd.getTamTinh());
             hd.setThueVAT(gd.getThueVAT());
             hd.setTongSauVAT(gd.getTongSauVAT());

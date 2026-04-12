@@ -3,6 +3,8 @@ package entity;
 import java.sql.Timestamp;
 
 public class GiaoDichKhachHang {
+	private String tenKhachHang;
+	private String sdtKhachHang;
     private String maHoaDon;
     private Timestamp ngayLap;
     private String tenNhanVien;
@@ -31,7 +33,21 @@ public class GiaoDichKhachHang {
     public void setHinhThucThanhToan(String v) { this.hinhThucThanhToan = v; }
     public String getGhiChu() { return ghiChu; }
     public void setGhiChu(String v) { this.ghiChu = v; }
+    public String getTenKhachHang() {
+        return tenKhachHang;
+    }
 
+    public void setTenKhachHang(String tenKhachHang) {
+        this.tenKhachHang = tenKhachHang;
+    }
+
+    public String getSdtKhachHang() {
+        return sdtKhachHang;
+    }
+
+    public void setSdtKhachHang(String sdtKhachHang) {
+        this.sdtKhachHang = sdtKhachHang;
+    }
     public String getHinhThucLabel() {
         if (hinhThucThanhToan == null) return "Tiền mặt";
         switch (hinhThucThanhToan) {
