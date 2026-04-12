@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="500.0" prefWidth="700.0" spacing="12.0" styleClass="dialog-root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.dialogs.Dialog_SuaDonViQuyDoiController">
+    <stylesheets>
+        <URL value="@../../resources/css/TrangChu.css" />
+        <URL value="@../../resources/css/DonViQuyDoi.css" />
+    </stylesheets>
+
+    <padding>
+        <Insets bottom="14.0" left="16.0" right="16.0" top="14.0" />
+    </padding>
+
+    <children>
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <children>
+                <Label fx:id="lblTitle" styleClass="dialog-title" text="SỬA QUY ĐỔI ĐƠN VỊ THUỐC" />
+            </children>
+        </HBox>
+
+        <GridPane hgap="12.0" vgap="10.0">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="45" />
+                <ColumnConstraints percentWidth="55" />
+            </columnConstraints>
+            <children>
+                <Label fx:id="lblChonThuoc" text="Chọn Thuốc (Thêm mới):" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <ComboBox fx:id="cbThuoc" prefWidth="360.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                <Label text="Mã Thuốc:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <TextField fx:id="txtMaThuoc" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                <Label text="Tên Thuốc:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <TextField fx:id="txtTenThuoc" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            </children>
+        </GridPane>
+
+        <VBox fx:id="boxDonViBac1" spacing="10.0" styleClass="section-card">
+            <children>
+                <Label styleClass="section-title-strong" text="ĐƠN VỊ CƠ BẢN (BẬC 1)" />
+                <GridPane hgap="12.0" vgap="10.0">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="45" />
+                        <ColumnConstraints percentWidth="55" />
+                    </columnConstraints>
+                    <children>
+                        <Label text="Tên đơn vị:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <TextField fx:id="txtDonViBac1" disable="true" promptText="Ví dụ: Viên" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    </children>
+                </GridPane>
+            </children>
+            <padding>
+                <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+            </padding>
+        </VBox>
+
+        <VBox spacing="10.0" styleClass="section-card">
+            <children>
+                <Label styleClass="section-title-strong" text="ĐƠN VỊ QUY ĐỔI KHÁC (TÙY CHỌN)" />
+
+                <GridPane hgap="12.0" vgap="10.0">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="20" />
+                        <ColumnConstraints percentWidth="45" />
+                        <ColumnConstraints percentWidth="35" />
+                    </columnConstraints>
+                    <children>
+                        <Label text="Bậc 2" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <ComboBox fx:id="cbDonViBac2" editable="false" promptText="Chọn đơn vị" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                        <Spinner fx:id="spTyLeBac2" prefWidth="160.0" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+
+                        <Label text="Bậc 3" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <ComboBox fx:id="cbDonViBac3" editable="false" promptText="Chọn đơn vị" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Spinner fx:id="spTyLeBac3" prefWidth="160.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                    </children>
+                </GridPane>
+
+                <Label styleClass="hint-text" text="Gợi ý: Bậc 2 và Bậc 3 là tùy chọn. Tỷ lệ quy đổi phải lớn hơn 1 và bậc sau lớn hơn bậc trước." />
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="12.0" right="12.0" top="10.0" />
+            </padding>
+        </VBox>
+
+        <Separator fx:id="sepFooter" />
+
+        <HBox fx:id="boxActions" alignment="CENTER_RIGHT" spacing="10.0">
+            <children>
+                <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="btnLuu" onAction="#handleLuu" prefHeight="38.0" prefWidth="142.0" styleClass="dvqd-btn-save" text="Lưu thay đổi" />
+                <Button fx:id="btnHuy" onAction="#handleHuy" prefHeight="38.0" prefWidth="108.0" styleClass="dvqd-btn-cancel" text="Hủy bỏ" />
+            </children>
+        </HBox>
+    </children>
+</VBox>

@@ -11,14 +11,17 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import utils.AlertUtils;
 import utils.WindowUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 public class GUI_DanhMucThuocController {
@@ -198,6 +201,23 @@ public class GUI_DanhMucThuocController {
             stage.showAndWait();
             
             loadData();
+        }
+    }
+    private void moCuaSoDonViQuyDoi(Thuoc thuoc) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/main/GUI_DonViQuyDoi.fxml"));
+            Parent root = loader.load();
+            
+            GUI_DonViQuyDoiController controller = loader.getController();
+            controller.setThuoc(thuoc); // Truyền đối tượng thuốc đang chọn sang
+            
+            Stage stage = new Stage();
+            stage.setTitle("Quy đổi đơn vị - " + thuoc.getTenThuoc());
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
