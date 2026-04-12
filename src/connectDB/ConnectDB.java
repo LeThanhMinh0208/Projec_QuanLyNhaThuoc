@@ -23,7 +23,6 @@ public class ConnectDB {
                  con = DriverManager.getConnection(url, user, password);
              }
             System.out.println("Kết nối CSDL thành công!");
-            
         } catch (SQLException e) {
             System.out.println("Lỗi kết nối CSDL: " + e.getMessage());
         } catch (ClassNotFoundException e) { // THÊM CATCH NÀY

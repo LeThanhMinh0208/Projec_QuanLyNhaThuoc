@@ -273,6 +273,11 @@ public class GUI_TrangChuController {
     }
 
     @FXML
+    void handleMoLichSuGiaoDich(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_LichSuGiaoDich.fxml");
+    }
+
+    @FXML
     void handleMoTaoBangGia(ActionEvent event) {
         try {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(

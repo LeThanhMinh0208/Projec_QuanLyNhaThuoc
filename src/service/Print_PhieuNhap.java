@@ -1,17 +1,29 @@
 package service;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.*;
-import entity.PhieuNhap;
-import gui.dialogs.Dialog_ChiTietPhieuNhapController.ChiTietUI;
-import javafx.collections.ObservableList;
-import utils.AlertUtils;
-import javafx.scene.control.Alert.AlertType;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+import com.lowagie.text.Document;
+import com.lowagie.text.Element;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
+
+import entity.PhieuNhap;
+import gui.dialogs.Dialog_ChiTietPhieuNhapController.ChiTietUI;
+import javafx.collections.ObservableList;
+import javafx.scene.control.Alert.AlertType;
+import utils.AlertUtils;
 
 public class Print_PhieuNhap {
 

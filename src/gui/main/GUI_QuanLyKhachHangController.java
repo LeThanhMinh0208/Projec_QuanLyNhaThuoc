@@ -2,7 +2,8 @@ package gui.main;
 
 import dao.DAO_KhachHang;
 import entity.KhachHang;
-
+import javafx.scene.Parent;
+import gui.dialogs.Dialog_LichSuGiaoDichController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -99,7 +100,29 @@ public class GUI_QuanLyKhachHangController {
     void handleThem(ActionEvent event) {
         openDialog("/gui/dialogs/Dialog_ThemKhachHang.fxml", "Thêm Khách Hàng Mới", null);
     }
+    @FXML
+    void handleXemLichSu(ActionEvent event) {
+        KhachHang selected = tableKhachHang.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng chọn một khách hàng!");
+            return;
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/gui/dialogs/Dialog_LichSuGiaoDich.fxml"));
+            Parent root = loader.load();
+            Dialog_LichSuGiaoDichController ctrl = loader.getController();
+            ctrl.setKhachHang(selected);
 
+            Stage stage = new Stage();
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            stage.setTitle("Lịch Sử Giao Dịch — " + selected.getHoTen());
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     @FXML
     void handleSua(ActionEvent event) {
         checkAndOpenDialog("/gui/dialogs/Dialog_SuaKhachHang.fxml", "Cập Nhật Thông Tin Khách Hàng");
