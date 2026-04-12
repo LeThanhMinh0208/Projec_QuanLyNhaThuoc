@@ -1,5 +1,7 @@
 package gui.dialogs;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.sql.Date;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -7,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import dao.DAO_HoaDon;
 import entity.HoaDonView;
+import utils.HoaDonPdfExporter;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,10 +27,12 @@ public class Dialog_ChiTietHoaDonController {
     @FXML private Label lblTamTinh, lblVATTien, lblTong;
 
     private final DAO_HoaDon dao = new DAO_HoaDon();
+    private HoaDonView currentHoaDon;
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final DateTimeFormatter DFMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public void setHoaDon(HoaDonView hd) {
+        this.currentHoaDon = hd;
         lblMaHD.setText(hd.getMaHoaDon());
         lblNgayLap.setText(hd.getNgayLap() != null ? hd.getNgayLap().toLocalDateTime().format(FMT) : "—");
         lblNhanVien.setText(hd.getTenNhanVien());
@@ -68,11 +73,31 @@ public class Dialog_ChiTietHoaDonController {
 
     @FXML
     void handleIn(ActionEvent event) {
-        Alert a = new Alert(Alert.AlertType.INFORMATION,
-                "Chức năng in hóa đơn chưa được implement.\n(Placeholder)", ButtonType.OK);
-        a.setTitle("In Hóa Đơn");
-        a.setHeaderText(null);
-        a.showAndWait();
+        if (currentHoaDon == null) {
+            new Alert(Alert.AlertType.WARNING, "Không có thông tin hóa đơn để in!").showAndWait();
+            return;
+        }
+        try {
+            List<Object[]> chiTiet = dao.getChiTietByMaHoaDon(currentHoaDon.getMaHoaDon());
+
+            String filePath = HoaDonPdfExporter.xuatPDF(currentHoaDon, chiTiet);
+
+            // Tự động mở file PDF
+            // if (Desktop.isDesktopSupported()) {
+            //     Desktop.getDesktop().open(new File(filePath));
+            // }
+
+            Alert a = new Alert(Alert.AlertType.INFORMATION,
+                "Xuất hóa đơn thành công!\nFile: " + filePath, ButtonType.OK);
+            a.setTitle("In Hóa Đơn");
+            a.setHeaderText(null);
+            a.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR,
+                "Lỗi khi in hóa đơn:\n" + e.getMessage()).showAndWait();
+        }
     }
 
     @FXML

@@ -212,7 +212,7 @@ public class GUI_XuLyDoiTraController {
 
     private void updateFooter() {
         int count = filteredData != null ? filteredData.size() : masterData.size();
-        lblTongHoaDon.setText("Tong: " + count + " hoa don");
+        lblTongHoaDon.setText("Tổng: " + count + " hóa đơn");
         double tongDT = (filteredData != null ? filteredData : masterData).stream().mapToDouble(HoaDonView::getTongSauVAT).sum();
         lblTongDoanhThu.setText(String.format("%,.0f VND", tongDT));
     }
@@ -226,7 +226,7 @@ public class GUI_XuLyDoiTraController {
     void handleXoaBoLoc(ActionEvent event) {
         dpTuNgay.setValue(LocalDate.now().withDayOfMonth(1));
         dpDenNgay.setValue(LocalDate.now());
-        cbHinhThuc.setValue("Tat ca");
+        cbHinhThuc.setValue("Tất cả");
         txtTimKiem.clear();
         loadHoaDon();
     }

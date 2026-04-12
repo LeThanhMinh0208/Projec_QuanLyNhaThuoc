@@ -27,7 +27,7 @@ public class DAO_GiaoDichKhachHang {
             "       SUM(ct.soLuong * ct.donGia) AS tamTinh, " +
             "       SUM(ct.soLuong * ct.donGia) * (1 + hd.thueVAT/100.0) AS tongSauVAT " +
             "FROM HoaDon hd " +
-            "JOIN NhanVien nv ON hd.maNhanVien = nv.maNhanVien " +
+            "LEFT JOIN NhanVien nv ON hd.maNhanVien = nv.maNhanVien " +
             "JOIN ChiTietHoaDon ct ON hd.maHoaDon = ct.maHoaDon " +
             "WHERE hd.maKhachHang = ?"
         );
@@ -61,7 +61,7 @@ public class DAO_GiaoDichKhachHang {
                 GiaoDichKhachHang gd = new GiaoDichKhachHang();
                 gd.setMaHoaDon(rs.getString("maHoaDon"));
                 gd.setNgayLap(rs.getTimestamp("ngayLap"));
-                gd.setTenNhanVien(rs.getString("tenNhanVien"));
+                gd.setTenNhanVien(rs.getString("tenNhanVien") != null ? rs.getString("tenNhanVien") : "—");
                 gd.setThueVAT(rs.getDouble("thueVAT"));
                 gd.setHinhThucThanhToan(rs.getString("hinhThucThanhToan"));
                 gd.setGhiChu(rs.getString("ghiChu"));
@@ -102,13 +102,16 @@ public class DAO_GiaoDichKhachHang {
         List<GiaoDichKhachHang> list = new java.util.ArrayList<>();
         // Thêm JOIN KhachHang và lấy thêm trường hoTen, sdt
         String sql = "SELECT hd.maHoaDon, hd.ngayLap, kh.hoTen AS tenKhachHang, kh.sdt, " +
+                     "       nv.hoTen AS tenNhanVien, " +
                      "       hd.thueVAT, hd.hinhThucThanhToan, hd.ghiChu, " +
                      "       SUM(ct.soLuong * ct.donGia) AS tamTinh, " +
                      "       SUM(ct.soLuong * ct.donGia) * (1 + hd.thueVAT/100.0) AS tongSauVAT " +
                      "FROM HoaDon hd " +
-                     "JOIN KhachHang kh ON hd.maKhachHang = kh.maKhachHang " + // Join bảng KH
+                     "LEFT JOIN KhachHang kh ON hd.maKhachHang = kh.maKhachHang " + // Join bảng KH
+                     "LEFT JOIN NhanVien nv ON hd.maNhanVien = nv.maNhanVien " + // Thêm Join Nhân Viên
                      "JOIN ChiTietHoaDon ct ON hd.maHoaDon = ct.maHoaDon " +
-                     "GROUP BY hd.maHoaDon, hd.ngayLap, kh.hoTen, kh.sdt, hd.thueVAT, hd.hinhThucThanhToan, hd.ghiChu " +
+                     "WHERE hd.maKhachHang IS NOT NULL " + 
+                     "GROUP BY hd.maHoaDon, hd.ngayLap, kh.hoTen, kh.sdt, nv.hoTen, hd.thueVAT, hd.hinhThucThanhToan, hd.ghiChu " +
                      "ORDER BY hd.ngayLap DESC";
 
         try (java.sql.Connection con = connectDB.ConnectDB.getConnection();
@@ -121,6 +124,7 @@ public class DAO_GiaoDichKhachHang {
                 // Lưu thông tin khách hàng vào Entity (Đảm bảo class GiaoDichKhachHang có các field này)
                 gd.setTenKhachHang(rs.getString("tenKhachHang")); 
                 gd.setSdtKhachHang(rs.getString("sdt"));
+                gd.setTenNhanVien(rs.getString("tenNhanVien") != null ? rs.getString("tenNhanVien") : "—");
                 
                 gd.setThueVAT(rs.getDouble("thueVAT"));
                 gd.setHinhThucThanhToan(rs.getString("hinhThucThanhToan"));

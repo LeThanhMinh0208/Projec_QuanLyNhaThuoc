@@ -64,7 +64,7 @@
                     <TableView fx:id="tableCoTheDoiTra" prefHeight="260" style="-fx-text-background-color:#0f172a; -fx-control-inner-background:white; -fx-table-cell-border-color:#e2e8f0;">
                         <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
                         <placeholder>
-                            <Label text="Khong tim thay chi tiet hoa don" style="-fx-text-fill:#64748b; -fx-font-size:14px;" />
+                            <Label text="Không tìm thấy chi tiết hóa đơn" style="-fx-text-fill:#64748b; -fx-font-size:14px;" />
                         </placeholder>
                         <columns>
                             <TableColumn fx:id="colHangTenThuoc" text="Tên thuốc" prefWidth="220" />

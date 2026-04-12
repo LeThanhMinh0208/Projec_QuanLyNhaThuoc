@@ -163,6 +163,21 @@ public class GUI_QuanLyKhachHangController {
             stage.setResizable(false);
             stage.showAndWait();
 
+            // Xử lý thêm khách hàng sau khi dialog đóng
+            if (ctrl instanceof gui.dialogs.Dialog_ThemKhachHangController) {
+                gui.dialogs.Dialog_ThemKhachHangController themCtrl =
+                    (gui.dialogs.Dialog_ThemKhachHangController) ctrl;
+                KhachHang newKh = themCtrl.getResultKhachHang();
+                if (newKh != null) {
+                    boolean saved = daoKhachHang.themKhachHang(newKh);
+                    if (saved) {
+                        showAlert(Alert.AlertType.INFORMATION, "Thành công", "Thêm khách hàng thành công!");
+                    } else {
+                        showAlert(Alert.AlertType.ERROR, "Thất bại", "Lỗi khi thêm khách hàng vào cơ sở dữ liệu!");
+                    }
+                }
+            }
+
             loadData();
             setupSearch();
         } catch (java.io.IOException e) {

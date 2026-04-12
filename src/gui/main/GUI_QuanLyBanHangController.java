@@ -1,8 +1,12 @@
 package gui.main;
 
-import java.time.LocalDate;
+import java.awt.Desktop;
+import java.io.File;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import dao.DAO_HoaDon;
 import dao.DAO_KhachHang;
@@ -12,11 +16,13 @@ import entity.ChiTietHoaDon;
 import entity.DonThuoc;
 import entity.DonViQuyDoi;
 import entity.HoaDon;
+import entity.HoaDonView;
 import entity.KhachHang;
 import entity.LoThuoc;
 import entity.NhanVien;
 import entity.Thuoc;
 import gui.dialogs.Dialog_ChonSoLuongDonViController;
+import utils.HoaDonPdfExporter;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -31,6 +37,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -45,6 +52,18 @@ import javafx.stage.Stage;
 public class GUI_QuanLyBanHangController {
 
     @FXML private TabPane tabPaneBanHang;
+    @FXML private javafx.scene.control.ToggleButton btnBanLe;
+    @FXML private javafx.scene.control.ToggleButton btnDonThuoc;
+
+    @FXML
+    private void onTabBanLe() {
+        if (tabPaneBanHang != null) tabPaneBanHang.getSelectionModel().select(0);
+    }
+    
+    @FXML
+    private void onTabDonThuoc() {
+        if (tabPaneBanHang != null) tabPaneBanHang.getSelectionModel().select(1);
+    }
 
     // --- TAB 1: BÁN LẺ ---
     @FXML private TextField txtTimKiemThuocLe;
@@ -129,6 +148,9 @@ public class GUI_QuanLyBanHangController {
     public void chonTabBanLe() {
         if (tabPaneBanHang != null) {
             tabPaneBanHang.getSelectionModel().select(0);
+        }
+        if (btnBanLe != null) {
+            btnBanLe.setSelected(true);
         }
     }
 
@@ -227,13 +249,8 @@ public class GUI_QuanLyBanHangController {
     }
 
     private void loadDataThuocLe() {
-        List<Thuoc> allThuoc = daoThuoc.getAllThuoc();
-        List<Thuoc> filtered = new ArrayList<>();
-        for (Thuoc t : allThuoc) {
-            if ("DANG_BAN".equals(t.getTrangThai())) {
-                filtered.add(t);
-            }
-        }
+        // VĐ5A: Chỉ hiện thuốc có lô ở KHO_BAN_HANG, còn hạn, còn tồn
+        List<Thuoc> filtered = daoThuoc.getAllThuocCoLoKhoBanHang();
         masterDataLe.setAll(filtered);
         tblThuocLe.setItems(masterDataLe);
     }
@@ -423,7 +440,7 @@ public class GUI_QuanLyBanHangController {
         
         NhanVien user = GUI_TrangChuController.getNhanVienDangNhap();
         if (user == null) {
-            user = new NhanVien("NV001", "testuser", "123", "Nhân Viên Test", "Nhân viên", "Ca 1", "0123"); // Fallback for debugging
+            user = new NhanVien("NV001", "testuser", "123", "—", "Nhân viên", "Ca 1", "0123"); // Fallback for debugging
         }
         
         // Tao Hoa don
@@ -433,7 +450,7 @@ public class GUI_QuanLyBanHangController {
                             pMethod.equals("Thẻ tín dụng") ? "THE" : "TIEN_MAT";
 
         // --- FIX thueVAT: DB lưu 8.0 = 8%, KHÔNG phải 0.08 ---
-        HoaDon hd = new HoaDon(maHD, java.sql.Date.valueOf(LocalDate.now()), 8.0, 
+        HoaDon hd = new HoaDon(maHD, Timestamp.valueOf(LocalDateTime.now()), 8.0, 
                 dbHinhThuc, "", user, currentKhachHang);
         
         // Tạo danh sách ChiTietHoaDon – mỗi sản phẩm 1 lô FEFO (strict)
@@ -466,7 +483,39 @@ public class GUI_QuanLyBanHangController {
                 int diemCong = (int) ((tongTienLe + thueVatLe) / 1000);
                 daoKhachHang.capNhatDiemTichLuy(currentKhachHang.getMaKhachHang(), currentKhachHang.getDiemTichLuy() + diemCong);
             }
-            showAlert(AlertType.INFORMATION, "Thành công", "Thanh toán thành công! Mã HĐ: " + maHD);
+            // ── VĐ3: Hỏi in hóa đơn sau khi thanh toán thành công ──
+            Alert confirmPrint = new Alert(AlertType.CONFIRMATION);
+            confirmPrint.setTitle("Thanh toán thành công");
+            confirmPrint.setHeaderText("✅ Hóa đơn " + maHD + " đã được lưu!");
+            confirmPrint.setContentText("Bạn có muốn in hóa đơn ngay bây giờ không?");
+
+            ButtonType btnIn = new ButtonType("🖨 In hóa đơn");
+            ButtonType btnBo = new ButtonType("Bỏ qua", ButtonBar.ButtonData.CANCEL_CLOSE);
+            confirmPrint.getButtonTypes().setAll(btnIn, btnBo);
+
+            Optional<ButtonType> resultPrint = confirmPrint.showAndWait();
+            if (resultPrint.isPresent() && resultPrint.get() == btnIn) {
+                try {
+                    List<Object[]> chiTiet = daoHoaDon.getChiTietByMaHoaDon(maHD);
+
+                    // VĐ1: Reload từ DB để lấy thông tin JOIN (tên nhân viên)
+                    HoaDonView hdView = daoHoaDon.getHoaDonViewByMa(maHD);
+                    if (hdView == null) {
+                        throw new Exception("Lỗi: không reload được hóa đơn từ DB để in PDF.");
+                    }
+
+                    String filePdf = HoaDonPdfExporter.xuatPDF(hdView, chiTiet);
+                    Alert a = new Alert(Alert.AlertType.INFORMATION,
+                        "Xuất hóa đơn thành công!\nFile: " + filePdf, ButtonType.OK);
+                    a.setTitle("In Hóa Đơn");
+                    a.setHeaderText(null);
+                    a.showAndWait();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    showAlert(AlertType.ERROR, "Lỗi in PDF", "Lỗi khi xuất PDF: " + ex.getMessage());
+                }
+            }
+
             handleHuyGioLe(null);
         } else {
             showAlert(AlertType.ERROR, "Lỗi", "Thanh toán thất bại. Vui lòng thử lại!");
@@ -786,7 +835,7 @@ public class GUI_QuanLyBanHangController {
         
         NhanVien user = GUI_TrangChuController.getNhanVienDangNhap();
         if (user == null) {
-            user = new NhanVien("NV001", "testuser", "123", "Nhân Viên Test", "Nhân viên", "Ca 1", "0123");
+            user = new NhanVien("NV001", "testuser", "123", "—", "Nhân viên", "Ca 1", "0123"); // Fallback for debugging
         }
         
         String maHD = daoHoaDon.generateMaHoaDon();
@@ -795,7 +844,7 @@ public class GUI_QuanLyBanHangController {
                             pMethod.equals("Thẻ tín dụng") ? "THE" : "TIEN_MAT";
 
         // --- FIX thueVAT: DB lưu 8.0 = 8%, KHÔNG phải 0.08 ---
-        HoaDon hd = new HoaDon(maHD, java.sql.Date.valueOf(LocalDate.now()), 8.0, dbHinhThuc, "Bán hóa đơn theo đơn thuốc", user, currentKhachHangDon);
+        HoaDon hd = new HoaDon(maHD, Timestamp.valueOf(LocalDateTime.now()), 8.0, dbHinhThuc, "Bán hóa đơn theo đơn thuốc", user, currentKhachHangDon);
         
         List<ChiTietHoaDon> dsCT = new ArrayList<>();
         for (CartItem item : cartDataDon) {
@@ -831,7 +880,39 @@ public class GUI_QuanLyBanHangController {
                 int diemCong = (int) ((tongTienDon + thueVatDon) / 1000);
                 daoKhachHang.capNhatDiemTichLuy(currentKhachHangDon.getMaKhachHang(), currentKhachHangDon.getDiemTichLuy() + diemCong);
             }
-            showAlert(AlertType.INFORMATION, "Thành công", "Thanh toán thành công! Mã Hóa Đơn: " + maHD);
+            // ── VĐ3: Hỏi in hóa đơn sau thanh toán đơn thuốc ──
+            Alert confirmPrint = new Alert(AlertType.CONFIRMATION);
+            confirmPrint.setTitle("Thanh toán thành công");
+            confirmPrint.setHeaderText("✅ Hóa đơn " + maHD + " đã được lưu!");
+            confirmPrint.setContentText("Bạn có muốn in hóa đơn ngay bây giờ không?");
+
+            ButtonType btnIn = new ButtonType("🖨 In hóa đơn");
+            ButtonType btnBo = new ButtonType("Bỏ qua", ButtonBar.ButtonData.CANCEL_CLOSE);
+            confirmPrint.getButtonTypes().setAll(btnIn, btnBo);
+
+            Optional<ButtonType> resultPrint = confirmPrint.showAndWait();
+            if (resultPrint.isPresent() && resultPrint.get() == btnIn) {
+                try {
+                    List<Object[]> chiTiet = daoHoaDon.getChiTietByMaHoaDon(maHD);
+
+                    // VĐ1: Reload từ DB để lấy thông tin JOIN (tên nhân viên)
+                    HoaDonView hdView = daoHoaDon.getHoaDonViewByMa(maHD);
+                    if (hdView == null) {
+                        throw new Exception("Lỗi: không reload được hóa đơn từ DB để in PDF.");
+                    }
+
+                    String filePdf = HoaDonPdfExporter.xuatPDF(hdView, chiTiet);
+                    Alert a = new Alert(Alert.AlertType.INFORMATION,
+                        "Xuất hóa đơn thành công!\nFile: " + filePdf, ButtonType.OK);
+                    a.setTitle("In Hóa Đơn");
+                    a.setHeaderText(null);
+                    a.showAndWait();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    showAlert(AlertType.ERROR, "Lỗi in PDF", "Lỗi khi xuất PDF: " + ex.getMessage());
+                }
+            }
+
             handleHuyGioDon(null);
         } else {
             showAlert(AlertType.ERROR, "Lỗi CSDL", "Thanh toán theo đơn thất bại!");

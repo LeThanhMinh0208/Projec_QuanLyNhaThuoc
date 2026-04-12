@@ -146,6 +146,7 @@ public class GUI_LichSuGiaoDichController {
             HoaDonView hd = new HoaDonView();
             hd.setMaHoaDon(gd.getMaHoaDon());
             hd.setNgayLap(gd.getNgayLap());
+            hd.setTenNhanVien(gd.getTenNhanVien());
             hd.setTenKhachHang(gd.getTenKhachHang());
             hd.setSdt(gd.getSdtKhachHang());
             hd.setTamTinh(gd.getTamTinh());

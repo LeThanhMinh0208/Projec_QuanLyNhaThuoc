@@ -84,7 +84,7 @@
 
     <!-- NÚT -->
     <HBox spacing="12" alignment="CENTER_RIGHT" VBox.vgrow="NEVER">
-        <Button text="🖨 In Hóa Đơn (Chưa implement)" onAction="#handleIn"
+        <Button text="🖨 In Hóa Đơn" onAction="#handleIn"
                 styleClass="bh-btn-secondary" prefHeight="40" prefWidth="220" />
         <Button text="Đóng" onAction="#handleDong"
                 styleClass="bh-btn-primary" prefHeight="40" prefWidth="100" />
