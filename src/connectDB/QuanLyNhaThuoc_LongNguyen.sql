@@ -45,8 +45,10 @@ CREATE TABLE NhanVien (
     hoTen NVARCHAR(100) NOT NULL,
     chucVu NVARCHAR(50),
     caLamViec NVARCHAR(50),
-    sdt VARCHAR(15)
+    sdt VARCHAR(15),
+    trangThai INT DEFAULT 1 
 );
+GO
 
 CREATE TABLE DanhMucThuoc (
     maDanhMuc VARCHAR(20) PRIMARY KEY,
@@ -325,15 +327,10 @@ GO
 INSERT INTO NhanVien (maNhanVien, tenDangNhap, matKhau, hoTen, chucVu, caLamViec, sdt) VALUES
 ('NV001', 'admin', '123456', N'Lê Trọng Nghĩa', N'Quản Lý', N'Hành Chính', '0987654321'),
 ('NV002', 'lethanhminh', '123456', N'Lê Thanh Minh', N'Nhân Viên', N'Ca Sáng', '0912345678'),
-('NV003', 'nguyenvanan', '123456', N'Nguyễn Văn An', N'Nhân Viên', N'Ca Chiều', '0933112233'),
-('NV004', 'phamminhtuan', '123456', N'Phạm Minh Tuấn', N'Nhân Viên', N'Ca Sáng', '0944556677'),
-('NV005', 'lythimyduyen', '123456', N'Lý Thị Mỹ Duyên', N'Nhân Viên', N'Ca Tối', '0901889900'),
-('NV006', 'hoangquocviet', '123456', N'Hoàng Quốc Việt', N'Nhân Viên', N'Ca Chiều', '0977223344'),
-('NV007', 'vungocbich', '123456', N'Vũ Ngọc Bích', N'Nhân Viên', N'Ca Sáng', '0966445566'),
-('NV008', 'dangthanhson', '123456', N'Đặng Thanh Sơn', N'Nhân Viên', N'Ca Tối', '0922667788'),
-('NV009', 'buithicamtu', '123456', N'Bùi Thị Cẩm Tú', N'Nhân Viên', N'Ca Chiều', '0955889911'),
-('NV010', 'dothaibao', '123456', N'Đỗ Thái Bảo', N'Nhân Viên', N'Ca Sáng', '0988112244'),
-('NV011', 'hokimyen', '123456', N'Hồ Kim Yến', N'Nhân Viên', N'Ca Tối', '0933778899');
+('NV003', 'nguyenhoanglong', '123456', N'Nguyễn Hoàng Long', N'Nhân Viên', N'Ca Chiều', '0933112233'),
+('NV004', 'tatuankiet', '123456', N'Tạ Tuấn Kiệt', N'Nhân Viên', N'Ca Sáng', '0944556677'),
+('NV005', 'nguyenminhkhoi', '123456', N'Nguyễn Minh Khôi', N'Nhân Viên', N'Ca Tối', '0901889900'),
+('NV006', 'tranducnguyen', '123456', N'Trần Đức Nguyên', N'Nhân Viên', N'Ca Chiều', '0977223344');
 GO
 
 INSERT INTO KhachHang (maKhachHang, hoTen, sdt, diaChi, diemTichLuy) VALUES
