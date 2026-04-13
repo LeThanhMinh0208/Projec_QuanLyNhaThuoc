@@ -423,7 +423,7 @@ public class GUI_QuanLyBanHangController {
         
         NhanVien user = GUI_TrangChuController.getNhanVienDangNhap();
         if (user == null) {
-            user = new NhanVien("NV001", "testuser", "123", "Nhân Viên Test", "Nhân viên", "Ca 1", "0123"); // Fallback for debugging
+            user = new NhanVien("NV001", "testuser", "123", "Nhân Viên Test", "Nhân viên", "Ca 1", "0123",1); // Fallback for debugging
         }
         
         // Tao Hoa don
@@ -786,7 +786,7 @@ public class GUI_QuanLyBanHangController {
         
         NhanVien user = GUI_TrangChuController.getNhanVienDangNhap();
         if (user == null) {
-            user = new NhanVien("NV001", "testuser", "123", "Nhân Viên Test", "Nhân viên", "Ca 1", "0123");
+            user = new NhanVien("NV001", "testuser", "123", "Nhân Viên Test", "Nhân viên", "Ca 1", "0123",1);
         }
         
         String maHD = daoHoaDon.generateMaHoaDon();

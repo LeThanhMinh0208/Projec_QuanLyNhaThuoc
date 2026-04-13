@@ -118,7 +118,7 @@
                         <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/users.png" /></ImageView></graphic>
                         <content>
                            <VBox styleClass="dropdown-content">
-                              <Button styleClass="sub-btn" text="Danh Mục Người Dùng" />
+                              <Button onAction="#handleMoQuanLyNguoiDung" styleClass="sub-btn" text="Danh Mục Người Dùng" />
                               <Button styleClass="sub-btn" text="Phân Quyền Người Dùng" />
                               <Button styleClass="sub-btn" text="Quản Lý Ca Làm Việc" />
                               <Button styleClass="sub-btn" text="Nhật Ký Hoạt Động" />

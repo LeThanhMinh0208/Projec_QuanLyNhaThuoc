@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefWidth="550.0" spacing="0.0" styleClass="dialog-container" 
+      stylesheets="@../../resources/css/QuanLyNguoiDung.css"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="gui.dialogs.Dialog_ThemNhanVienController">
+    <children>
+        <HBox styleClass="dialog-header">
+            <Label text="✨ THÊM NGƯỜI DÙNG MỚI" styleClass="dialog-header-title"/>
+        </HBox>
+
+        <VBox spacing="15.0" style="-fx-padding: 20;">
+            <VBox styleClass="dialog-card" spacing="15.0">
+                <GridPane hgap="20" vgap="20">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="35" />
+                        <ColumnConstraints percentWidth="65" />
+                    </columnConstraints>
+                    <children>
+                        <Label text="Họ Tên (*):" styleClass="input-label" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                        <TextField fx:id="txtHoTen" promptText="Nhập họ và tên..." styleClass="input-field" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                        <Label text="Số Điện Thoại (*):" styleClass="input-label" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                        <TextField fx:id="txtSdt" promptText="Gồm 10 số (VD: 09...)" styleClass="input-field" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+                        <Label text="Tài Khoản (Tự sinh):" styleClass="input-label" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                        <TextField fx:id="txtTaiKhoan" disable="true" promptText="Hệ thống tự động tạo..." styleClass="input-field, input-readonly" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+                        <Label text="Mật Khẩu Mặc Định:" styleClass="input-label" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                        <TextField text="123456" disable="true" styleClass="input-field, input-readonly" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                    </children>
+                </GridPane>
+            </VBox>
+
+            <HBox alignment="CENTER_RIGHT" spacing="15" style="-fx-padding: 10 0 0 0;">
+                <Button text="Hủy Bỏ" onAction="#handleHuy" prefWidth="100" prefHeight="40" styleClass="btn-cancel" />
+                <Button text="💾 TẠO NGƯỜI DÙNG" onAction="#handleLuu" prefWidth="180" prefHeight="40" styleClass="btn-save" />
+            </HBox>
+        </VBox>
+    </children>
+</VBox>
