@@ -276,6 +276,11 @@ public class GUI_TrangChuController {
     void handleMoQuanLyLoThuoc(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyLoThuoc.fxml");
     }
+    @FXML
+    void handleMoQuanLyNguoiDung(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyNguoiDung.fxml");
+        
+    }
 
     @FXML
     void handleMoLichSuGiaoDich(ActionEvent event) {
