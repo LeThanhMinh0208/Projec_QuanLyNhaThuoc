@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="500.0" prefWidth="700.0" spacing="12.0" styleClass="dialog-root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.dialogs.Dialog_SuaDonViQuyDoiController">
+<VBox prefWidth="700.0" spacing="12.0" styleClass="dialog-root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.dialogs.Dialog_SuaDonViQuyDoiController">
     <stylesheets>
         <URL value="@../../resources/css/TrangChu.css" />
         <URL value="@../../resources/css/DonViQuyDoi.css" />
@@ -41,10 +41,10 @@
                 <ComboBox fx:id="cbThuoc" prefWidth="360.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
                 <Label text="Mã Thuốc:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                <TextField fx:id="txtMaThuoc" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <TextField fx:id="txtMaThuoc" disable="true" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
                 <Label text="Tên Thuốc:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                <TextField fx:id="txtTenThuoc" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                <TextField fx:id="txtTenThuoc" disable="true" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             </children>
         </GridPane>
 
@@ -80,11 +80,11 @@
                     <children>
                         <Label text="Bậc 2" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                         <ComboBox fx:id="cbDonViBac2" editable="false" promptText="Chọn đơn vị" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                        <Spinner fx:id="spTyLeBac2" prefWidth="160.0" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                        <Spinner fx:id="spTyLeBac2" editable="true" prefWidth="160.0" GridPane.columnIndex="2" GridPane.rowIndex="0" />
 
                         <Label text="Bậc 3" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                         <ComboBox fx:id="cbDonViBac3" editable="false" promptText="Chọn đơn vị" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <Spinner fx:id="spTyLeBac3" prefWidth="160.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <Spinner fx:id="spTyLeBac3" editable="true" prefWidth="160.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                     </children>
                 </GridPane>
 

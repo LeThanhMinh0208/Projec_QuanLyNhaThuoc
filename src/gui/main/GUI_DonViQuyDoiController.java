@@ -21,6 +21,7 @@ import utils.AlertUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class GUI_DonViQuyDoiController {
 
@@ -115,6 +116,21 @@ public class GUI_DonViQuyDoiController {
     private void loadData() {
         masterData.clear();
         List<Thuoc> dsThuoc = daoThuoc.getAllThuocTatCa();
+        dsThuoc.sort((a, b) -> {
+            String maA = a == null ? null : a.getMaThuoc();
+            String maB = b == null ? null : b.getMaThuoc();
+            if (Objects.equals(maA, maB)) {
+                return 0;
+            }
+            if (maA == null) {
+                return 1;
+            }
+            if (maB == null) {
+                return -1;
+            }
+            return maB.compareTo(maA);
+        });
+
         int stt = 1;
         for (Thuoc thuoc : dsThuoc) {
             ArrayList<DonViQuyDoi> donVi = daoDonViQuyDoi.getDonViByMaThuocOrderAsc(thuoc.getMaThuoc());
@@ -136,30 +152,6 @@ public class GUI_DonViQuyDoiController {
             }
 
             masterData.add(new DonViQuyDoiRow(stt++, thuoc, donVi, bac1, bac2, bac3));
-        }
-    }
-
-    @FXML
-    void handleThemQuyDoiMoi() {
-        moPopupThemMoi();
-    }
-
-    private void moPopupThemMoi() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_SuaDonViQuyDoi.fxml"));
-            Parent root = loader.load();
-
-            gui.dialogs.Dialog_SuaDonViQuyDoiController controller = loader.getController();
-            controller.setAddMode(true);
-            controller.setOnSaved(this::loadData);
-
-            Stage stage = new Stage();
-            stage.setTitle("Thêm Quy Đổi Đơn Vị Thuốc");
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
-        } catch (Exception e) {
-            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể mở form thêm quy đổi.");
         }
     }
 
