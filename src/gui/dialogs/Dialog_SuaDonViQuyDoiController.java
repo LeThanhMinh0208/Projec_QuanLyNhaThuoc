@@ -49,16 +49,25 @@ public class Dialog_SuaDonViQuyDoiController {
 
     @FXML
     public void initialize() {
+        txtMaThuoc.setDisable(true);
+        txtTenThuoc.setDisable(true);
         txtDonViBac1.setDisable(true);
 
         configureThuocComboDisplay();
+        configureSpinnerTyping(spTyLeBac2, 2, 10000);
+        configureSpinnerTyping(spTyLeBac3, 3, 100000);
 
-        cbDonViBac2.setItems(FXCollections.observableArrayList(goiYDonVi()));
-        cbDonViBac3.setItems(FXCollections.observableArrayList(goiYDonVi()));
+        cbDonViBac2.setItems(FXCollections.observableArrayList(goiYDonViWithEmpty()));
+        cbDonViBac3.setItems(FXCollections.observableArrayList(goiYDonViWithEmpty()));
 
-        spTyLeBac2.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(2, 10000, 10));
-        spTyLeBac3.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(3, 100000, 100));
+        spTyLeBac2.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10000, 0));
+        spTyLeBac3.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100000, 0));
         addDirtyTrackingListeners();
+
+        cbDonViBac2.valueProperty().addListener((obs, oldValue, newValue) -> {
+            capNhatGoiYBac3();
+            updateSaveButtonState();
+        });
 
         cbThuoc.getItems().setAll(daoThuoc.getAllThuocTatCa());
         cbThuoc.valueProperty().addListener((obs, oldV, newV) -> {
@@ -107,10 +116,11 @@ public class Dialog_SuaDonViQuyDoiController {
         txtTenThuoc.setText(thuoc.getTenThuoc());
 
         txtDonViBac1.setText(thuoc.getDonViCoBan());
+        capNhatGoiYBac2();
         cbDonViBac2.setValue(null);
         cbDonViBac3.setValue(null);
-        spTyLeBac2.getValueFactory().setValue(10);
-        spTyLeBac3.getValueFactory().setValue(100);
+        spTyLeBac2.getValueFactory().setValue(0);
+        spTyLeBac3.getValueFactory().setValue(0);
 
         ArrayList<DonViQuyDoi> moRong = new ArrayList<>();
         for (DonViQuyDoi dv : danhSachDonVi) {
@@ -126,6 +136,7 @@ public class Dialog_SuaDonViQuyDoiController {
         if (!moRong.isEmpty()) {
             cbDonViBac2.setValue(moRong.get(0).getTenDonVi());
             spTyLeBac2.getValueFactory().setValue(moRong.get(0).getTyLeQuyDoi());
+            capNhatGoiYBac3();
         }
         if (moRong.size() > 1) {
             cbDonViBac3.setValue(moRong.get(1).getTenDonVi());
@@ -235,6 +246,97 @@ public class Dialog_SuaDonViQuyDoiController {
         return List.of("Viên", "Vỉ", "Hộp", "Chai", "Lọ", "Tuýp", "Gói", "Ống");
     }
 
+    private List<String> goiYDonViWithEmpty() {
+        ArrayList<String> danhSach = new ArrayList<>();
+        danhSach.add("--");
+        danhSach.addAll(goiYDonVi());
+        return danhSach;
+    }
+
+    private void capNhatGoiYBac2() {
+        List<String> goiY = locDonViTheoBac(txtDonViBac1.getText());
+        cbDonViBac2.setItems(FXCollections.observableArrayList(goiY));
+        if (cbDonViBac2.getValue() != null && !goiY.contains(cbDonViBac2.getValue())) {
+            cbDonViBac2.setValue(null);
+        }
+    }
+
+    private void capNhatGoiYBac3() {
+        String bacTruoc = normalize(cbDonViBac2.getValue());
+        if (bacTruoc.isBlank()) {
+            bacTruoc = txtDonViBac1.getText();
+        }
+        List<String> goiY = locDonViTheoBac(bacTruoc);
+        cbDonViBac3.setItems(FXCollections.observableArrayList(goiY));
+        if (cbDonViBac3.getValue() != null && !goiY.contains(cbDonViBac3.getValue())) {
+            cbDonViBac3.setValue(null);
+        }
+    }
+
+    private List<String> locDonViTheoBac(String donViHienTai) {
+        String normalized = normalize(donViHienTai);
+        ArrayList<String> danhSach = new ArrayList<>();
+
+        int viTri = -1;
+        List<String> goiY = goiYDonVi();
+        for (int i = 0; i < goiY.size(); i++) {
+            if (goiY.get(i).equalsIgnoreCase(normalized)) {
+                viTri = i;
+                break;
+            }
+        }
+
+        danhSach.add("--");
+
+        if (viTri >= 0) {
+            danhSach.addAll(goiY.subList(viTri + 1, goiY.size()));
+        } else {
+            danhSach.addAll(goiY);
+        }
+
+        if (!normalized.isBlank()) {
+            danhSach.removeIf(item -> item.equalsIgnoreCase(normalized));
+        }
+        return danhSach;
+    }
+
+    private void configureSpinnerTyping(Spinner<Integer> spinner, int min, int max) {
+        spinner.setEditable(true);
+        spinner.focusedProperty().addListener((obs, oldValue, newValue) -> {
+            if (!newValue) {
+                commitSpinnerText(spinner, min, max);
+            }
+        });
+        spinner.getEditor().setOnAction(event -> commitSpinnerText(spinner, min, max));
+    }
+
+    private void commitSpinnerText(Spinner<Integer> spinner, int min, int max) {
+        SpinnerValueFactory<Integer> valueFactory = spinner.getValueFactory();
+        if (valueFactory == null) {
+            return;
+        }
+
+        String text = spinner.getEditor().getText();
+        if (text == null || text.isBlank()) {
+            spinner.getEditor().setText(String.valueOf(valueFactory.getValue()));
+            return;
+        }
+
+        try {
+            int value = Integer.parseInt(text.trim());
+            if (value < min) {
+                value = min;
+            }
+            if (value > max) {
+                value = max;
+            }
+            valueFactory.setValue(value);
+            spinner.getEditor().setText(String.valueOf(value));
+        } catch (NumberFormatException ex) {
+            spinner.getEditor().setText(String.valueOf(valueFactory.getValue()));
+        }
+    }
+
     private void clearFormForAddMode() {
         thuocDangSua = null;
         txtMaThuoc.clear();
@@ -242,8 +344,8 @@ public class Dialog_SuaDonViQuyDoiController {
         txtDonViBac1.clear();
         cbDonViBac2.setValue(null);
         cbDonViBac3.setValue(null);
-        spTyLeBac2.getValueFactory().setValue(10);
-        spTyLeBac3.getValueFactory().setValue(100);
+        spTyLeBac2.getValueFactory().setValue(0);
+        spTyLeBac3.getValueFactory().setValue(0);
     }
 
     private void addDirtyTrackingListeners() {
@@ -312,7 +414,8 @@ public class Dialog_SuaDonViQuyDoiController {
         if (value == null) {
             return "";
         }
-        return value.trim();
+        String normalized = value.trim();
+        return "--".equals(normalized) ? "" : normalized;
     }
 
     private void close() {

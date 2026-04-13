@@ -170,6 +170,16 @@ public class GUI_DanhMucThuocController {
     @FXML void handleXoa() { checkAndOpenDialog("/gui/dialogs/Dialog_XoaThuoc.fxml", "Xóa Thuốc"); }
 
     @FXML
+    void handleMoQuyDoiDonVi() {
+        Thuoc selected = tableThuoc.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng chọn một loại thuốc trong bảng!");
+            return;
+        }
+        moCuaSoDonViQuyDoi(selected);
+    }
+
+    @FXML
     void handleRefresh() {
         txtTimKiem.clear();
         tableThuoc.getSelectionModel().clearSelection();
@@ -215,9 +225,10 @@ public class GUI_DanhMucThuocController {
             stage.setTitle("Quy đổi đơn vị - " + thuoc.getTenThuoc());
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
-            stage.show();
+            stage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể mở trang quy đổi đơn vị.");
         }
     }
 }
