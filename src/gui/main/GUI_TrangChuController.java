@@ -210,6 +210,11 @@ public class GUI_TrangChuController {
     }
 
     @FXML
+    void handleMoQuanLyDonViQuyDoi(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_DonViQuyDoi.fxml");
+    }
+
+    @FXML
     void handleMoQuanLyBanHangLapHoaDon(ActionEvent event) {
         switchPage("/gui/main/GUI_QuanLyBanHang.fxml");
     }
@@ -232,6 +237,11 @@ public class GUI_TrangChuController {
     @FXML
     void moTrangNhapKho(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_NhapKho.fxml");
+    }
+
+    @FXML
+    void moTrangXuLyDoiTra(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_XuLyDoiTra.fxml");
     }
 
     @FXML
@@ -270,6 +280,11 @@ public class GUI_TrangChuController {
     void handleMoQuanLyNguoiDung(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyNguoiDung.fxml");
         
+    }
+
+    @FXML
+    void handleMoLichSuGiaoDich(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_LichSuGiaoDich.fxml");
     }
 
     @FXML

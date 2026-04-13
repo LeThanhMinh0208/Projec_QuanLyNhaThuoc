@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 
 <VBox spacing="0" styleClass="dialog-root" stylesheets="@../../resources/css/BanHang.css" 
@@ -11,7 +12,7 @@
         <Label fx:id="lblTitle" text="THÊM THÔNG TIN ĐƠN THUỐC" styleClass="dialog-header-title" />
     </VBox>
 
-    <VBox spacing="15" styleClass="dialog-body" prefWidth="400">
+    <VBox spacing="15" styleClass="dialog-body" prefWidth="450">
         <VBox spacing="5">
             <Label text="Mã đơn thuốc (Tự động):" styleClass="dialog-label" />
             <TextField fx:id="txtMaDon" editable="false" styleClass="bh-input" style="-fx-background-color: #e2e8f0;"/>
@@ -32,6 +33,30 @@
         <VBox spacing="5">
             <Label text="Chẩn đoán bệnh:" styleClass="dialog-label" />
             <TextField fx:id="txtChanDoan" styleClass="bh-input" promptText="Nhập chẩn đoán..." />
+        </VBox>
+
+        <!-- ẢNH ĐƠN THUỐC (BẮT BUỘC) -->
+        <VBox spacing="5">
+            <Label text="Ảnh đơn thuốc (*)"
+                   style="-fx-font-weight: bold; -fx-text-fill: #d32f2f;"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <ImageView fx:id="imgPreviewDon"
+                           fitWidth="160" fitHeight="110"
+                           preserveRatio="true"
+                           style="-fx-border-color: #bdbdbd;
+                                  -fx-border-width: 1;
+                                  -fx-background-color: #f5f5f5;"/>
+                <VBox spacing="6">
+                    <Button text="📁  Chọn ảnh đơn thuốc"
+                            fx:id="btnChonAnhDon"
+                            onAction="#handleChonAnhDon"
+                            styleClass="dialog-btn-cancel"
+                            style="-fx-font-weight: bold;"/>
+                    <Label fx:id="lblTenAnhDon"
+                           text="⚠ Chưa chọn ảnh (bắt buộc)"
+                           style="-fx-text-fill: #e53935; -fx-font-size: 11px;"/>
+                </VBox>
+            </HBox>
         </VBox>
     </VBox>
 

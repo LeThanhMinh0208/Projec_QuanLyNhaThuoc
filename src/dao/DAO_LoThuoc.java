@@ -120,13 +120,15 @@ public class DAO_LoThuoc {
 
     public ArrayList<LoThuoc> getLoThuocBanDuocByMaThuoc(String maThuoc) {
         ArrayList<LoThuoc> ds = new ArrayList<>();
+        // Chỉ lấy lô thuộc KHO_BAN_HANG, còn hạn, còn tồn
         String sql = 
                 "SELECT * FROM LoThuoc " +
                 "WHERE maThuoc = ? " +
                 "  AND soLuongTon > 0 " +
                 "  AND trangThai = 1 " + 
+                "  AND viTriKho = 'KHO_BAN_HANG' " +
                 "  AND hanSuDung >= CAST(GETDATE() AS DATE) " +
-                "ORDER BY CASE WHEN viTriKho = 'KHO_BAN_HANG' THEN 0 ELSE 1 END, hanSuDung ASC";
+                "ORDER BY hanSuDung ASC";
         try (Connection con = ConnectDB.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setString(1, maThuoc);

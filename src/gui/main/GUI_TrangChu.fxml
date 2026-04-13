@@ -43,7 +43,7 @@
                            <VBox styleClass="dropdown-content">
                               <Button onAction="#handleMoQuanLyBanHangLapHoaDon" styleClass="sub-btn" text="Lập Hóa Đơn" />
                               <Button onAction="#handleMoDanhSachHoaDon" styleClass="sub-btn" text="Danh Sách Hóa Đơn" />
-                              <Button styleClass="sub-btn" text="Xử Lý Đổi Trả" />
+                     <Button onAction="#moTrangXuLyDoiTra" styleClass="sub-btn" text="Xử Lý Đổi Trả" />
                            </VBox>
                         </content>
                      </TitledPane>
@@ -73,6 +73,7 @@
                         <content>
                            <VBox styleClass="dropdown-content">
                               <Button onAction="#handleMoQuanLyDanhMucThuoc" styleClass="sub-btn" text="Danh Mục Thuốc" />
+                              <Button onAction="#handleMoQuanLyDonViQuyDoi" styleClass="sub-btn" text="Quản Lý Đơn Vị Quy Đổi" />
                               <Button onAction="#handleMoQuanLyLoThuoc" styleClass="sub-btn" text="Quản Lý Lô Thuốc" />
                            </VBox>
                         </content>
@@ -97,7 +98,7 @@
                         <content>
                            <VBox styleClass="dropdown-content">
                               <Button onAction="#handleMoQuanLyKhachHang" styleClass="sub-btn" text="Danh Mục Khách Hàng" />
-                              <Button styleClass="sub-btn" text="Lịch Sử Giao Dịch" />
+                              <Button onAction="#handleMoLichSuGiaoDich" styleClass="sub-btn" text="Lịch Sử Giao Dịch"/>                    
                            </VBox>
                         </content>
                      </TitledPane>
