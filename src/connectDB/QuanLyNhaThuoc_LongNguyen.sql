@@ -656,9 +656,9 @@ INSERT INTO ChiTietHoaDon (maHoaDon, maBangGia, maQuyDoi, maLoThuoc, soLuong, do
 GO
 
 INSERT INTO DonThuoc (maDonThuoc, maHoaDon, tenBacSi, chanDoan, hinhAnhDon, thongTinBenhNhan) VALUES
-('DT0005', 'HD0005', N'BS Lê Thu Thủy', N'Viêm họng cấp', 'url_hinh_anh', N'Bệnh nhân khám tại BV'),
-('DT0008', 'HD0008', N'BS Phạm Hữu Trí', N'Viêm họng cấp', 'url_hinh_anh', N'Bệnh nhân khám tại BV'),
-('DT0013', 'HD0013', N'BS Phạm Hữu Trí', N'Viêm họng cấp', 'url_hinh_anh', N'Bệnh nhân khám tại BV');
+('DT0005', 'HD0005', N'BS Lê Thu Thủy', N'Viêm họng cấp', 'DT0005.png', N'Bệnh nhân khám tại BV'),
+('DT0008', 'HD0008', N'BS Phạm Hữu Trí', N'Viêm họng cấp', 'DT0008.png', N'Bệnh nhân khám tại BV'),
+('DT0013', 'HD0013', N'BS Phạm Hữu Trí', N'Viêm họng cấp', 'DT0013.png', N'Bệnh nhân khám tại BV');
 GO
 
 INSERT INTO PhieuDoiTra (maPhieuDoiTra, maHoaDon, maNhanVien, ngayDoiTra, lyDo, hinhThucXuLy, phiPhat) VALUES

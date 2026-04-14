@@ -1,37 +1,57 @@
 package gui.main;
 
 import dao.DAO_DanhMucDonThuoc;
+import dao.DAO_HoaDon;
 import entity.DonThuoc;
+import entity.HoaDonView;
 import gui.dialogs.Dialog_DonThuocController;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class GUI_DanhMucDonThuocController implements Initializable {
 
-    @FXML private TableView<DonThuoc>           tableThuoc;
+    @FXML private TableView<DonThuoc>            tableThuoc;
     @FXML private TableColumn<DonThuoc, String> colMaDon;
     @FXML private TableColumn<DonThuoc, String> colMaHoaDon;
     @FXML private TableColumn<DonThuoc, String> colBacSi;
     @FXML private TableColumn<DonThuoc, String> colChanDoan;
     @FXML private TableColumn<DonThuoc, String> colBenhNhan;
-    @FXML private TableColumn<DonThuoc, String> colHinhAnh;
-    @FXML private TextField                      txtTimKiem;
-    @FXML private ComboBox<String>               cbLocDanhMuc;
+    
+    @FXML private TableColumn<DonThuoc, DonThuoc> colChiTietHoaDon; 
+    @FXML private TableColumn<DonThuoc, DonThuoc> colHinhAnh;
+    @FXML private TableColumn<DonThuoc, DonThuoc> colTaiLap; // 🚨 CỘT TÁI LẬP 🚨
+    @FXML private TableColumn<DonThuoc, DonThuoc> colXoa;
+    
+    @FXML private TextField                     txtTimKiem;
+    @FXML private ComboBox<String>              cbLocDanhMuc;
 
     private final DAO_DanhMucDonThuoc dao = new DAO_DanhMucDonThuoc();
-    private final ObservableList<DonThuoc> danhSach = FXCollections.observableArrayList();
+    private final DAO_HoaDon daoHoaDon = new DAO_HoaDon(); 
+    
+    private final ObservableList<DonThuoc> masterData = FXCollections.observableArrayList();
+    private FilteredList<DonThuoc> filteredData;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -39,23 +59,109 @@ public class GUI_DanhMucDonThuocController implements Initializable {
         colBacSi.setCellValueFactory(new PropertyValueFactory<>("tenBacSi"));
         colChanDoan.setCellValueFactory(new PropertyValueFactory<>("chanDoan"));
         colBenhNhan.setCellValueFactory(new PropertyValueFactory<>("thongTinBenhNhan"));
-        colHinhAnh.setCellValueFactory(new PropertyValueFactory<>("hinhAnhDon"));
         colMaHoaDon.setCellValueFactory(new PropertyValueFactory<>("maHoaDon"));
 
-        cbLocDanhMuc.setOnAction(e -> locTheoBacSi());
+        filteredData = new FilteredList<>(masterData, p -> true);
+        SortedList<DonThuoc> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(tableThuoc.comparatorProperty());
+        tableThuoc.setItems(sortedData);
 
-        txtTimKiem.textProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal.trim().isEmpty()) locTheoBacSi();
-            else {
-                danhSach.setAll(dao.timKiem(newVal.trim()));
-                tableThuoc.setItems(danhSach);
+        // NÚT CHI TIẾT
+        colChiTietHoaDon.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue()));
+        colChiTietHoaDon.setCellFactory(param -> new TableCell<>() {
+            private final Button btnChiTiet = new Button("📄 Chi Tiết");
+            {
+                btnChiTiet.getStyleClass().addAll("btn-action-table", "btn-soft-blue");
+                btnChiTiet.setOnAction(e -> {
+                    DonThuoc dt = getTableView().getItems().get(getIndex());
+                    if (dt.getMaHoaDon() != null && !dt.getMaHoaDon().trim().isEmpty()) {
+                        try {
+                            HoaDonView hdView = daoHoaDon.getHoaDonViewByMa(dt.getMaHoaDon());
+                            if (hdView != null) moDialogChiTiet(hdView);
+                            else showWarn("Lỗi: Không tìm thấy chi tiết hóa đơn!");
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    } else {
+                        showWarn("Đơn thuốc này chưa được thanh toán!");
+                    }
+                });
+            }
+            @Override
+            protected void updateItem(DonThuoc dt, boolean empty) {
+                super.updateItem(dt, empty);
+                setGraphic(empty || dt == null ? null : btnChiTiet);
             }
         });
 
-        // Double click mở form Cập Nhật
+        // NÚT XEM ẢNH
+        colHinhAnh.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue()));
+        colHinhAnh.setCellFactory(param -> new TableCell<>() {
+            private final Button btnXem = new Button("👁 Xem");
+            {
+                btnXem.getStyleClass().addAll("btn-action-table", "btn-soft-teal"); 
+                btnXem.setOnAction(e -> hienThiHinhAnh(getTableView().getItems().get(getIndex()).getHinhAnhDon()));
+            }
+            @Override
+            protected void updateItem(DonThuoc dt, boolean empty) {
+                super.updateItem(dt, empty);
+                setGraphic(empty || dt == null ? null : btnXem);
+            }
+        });
+
+        // =======================================================
+        // 🚨 NÚT TÁI LẬP (MỚI THÊM LẠI, CHƯA CÓ LOGIC) 🚨
+        // =======================================================
+        colTaiLap.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue()));
+        colTaiLap.setCellFactory(param -> new TableCell<>() {
+            private final Button btnTaiLap = new Button("♻ Tái Lập");
+            {
+                btnTaiLap.getStyleClass().addAll("btn-action-table", "btn-soft-amber");
+                btnTaiLap.setOnAction(e -> {
+                    DonThuoc dt = getTableView().getItems().get(getIndex());
+                    System.out.println("Đang chờ sếp set logic tái lập cho mã: " + dt.getMaDonThuoc());
+                });
+            }
+            @Override
+            protected void updateItem(DonThuoc dt, boolean empty) {
+                super.updateItem(dt, empty);
+                setGraphic(empty || dt == null ? null : btnTaiLap);
+            }
+        });
+
+        // NÚT XÓA MỀM
+        colXoa.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue()));
+        colXoa.setCellFactory(param -> new TableCell<>() {
+            private final Button btnXoa = new Button("✖ Xóa");
+            {
+                btnXoa.getStyleClass().addAll("btn-action-table", "btn-soft-red");
+                btnXoa.setOnAction(e -> {
+                    DonThuoc dt = getTableView().getItems().get(getIndex());
+                    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                        "Bạn có chắc muốn xóa đơn thuốc: " + dt.getMaDonThuoc() + "?",
+                        ButtonType.YES, ButtonType.NO);
+                    confirm.showAndWait().ifPresent(btn -> {
+                        if (btn == ButtonType.YES) {
+                            if (dao.xoa(dt.getMaDonThuoc())) {
+                                taiDuLieu(); 
+                                new Alert(Alert.AlertType.INFORMATION, "Đã xóa đơn thuốc!", ButtonType.OK).showAndWait();
+                            } else showWarn("Xóa thất bại!");
+                        }
+                    });
+                });
+            }
+            @Override
+            protected void updateItem(DonThuoc dt, boolean empty) {
+                super.updateItem(dt, empty);
+                setGraphic(empty || dt == null ? null : btnXoa);
+            }
+        });
+
+        cbLocDanhMuc.setOnAction(e -> locDuLieu());
+        txtTimKiem.textProperty().addListener((obs, oldVal, newVal) -> locDuLieu());
+
         tableThuoc.setRowFactory(tv -> {
             TableRow<DonThuoc> row = new TableRow<>();
-
             row.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
                 if (event.getClickCount() == 1 && (!row.isEmpty()) && row.isSelected()) {
                     tv.getSelectionModel().clearSelection();
@@ -64,104 +170,152 @@ public class GUI_DanhMucDonThuocController implements Initializable {
                     event.consume();
                 }
             });
-
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
-                    handleSua();
+                    moDialogSua(row.getItem());
                 }
             });
-
             return row;
         });
 
         taiDuLieu();
     }
 
+    private void locDuLieu() {
+        if (filteredData == null) return;
+        String selectedBacSi = cbLocDanhMuc.getValue();
+        String keyword = txtTimKiem.getText() == null ? "" : txtTimKiem.getText().trim().toLowerCase();
+
+        filteredData.setPredicate(dt -> {
+            boolean matchBacSi = true;
+            if (selectedBacSi != null && !selectedBacSi.equals("Tất cả bác sĩ") && !selectedBacSi.trim().isEmpty()) {
+                matchBacSi = dt.getTenBacSi() != null && dt.getTenBacSi().equals(selectedBacSi);
+            }
+
+            boolean matchKeyword = true;
+            if (!keyword.isEmpty()) {
+                String maDon = dt.getMaDonThuoc() == null ? "" : dt.getMaDonThuoc().toLowerCase();
+                String maHD = dt.getMaHoaDon() == null ? "" : dt.getMaHoaDon().toLowerCase();
+                String benhNhan = dt.getThongTinBenhNhan() == null ? "" : dt.getThongTinBenhNhan().toLowerCase();
+                String chanDoan = dt.getChanDoan() == null ? "" : dt.getChanDoan().toLowerCase();
+
+                matchKeyword = maDon.contains(keyword) 
+                            || maHD.contains(keyword)
+                            || benhNhan.contains(keyword)
+                            || chanDoan.contains(keyword);
+            }
+
+            return matchBacSi && matchKeyword;
+        });
+    }
+
     private void taiDuLieu() {
-        // Lưu lại bác sĩ đang chọn
         String bacSiDangChon = cbLocDanhMuc.getValue();
+        cbLocDanhMuc.setOnAction(null); 
 
-        // Reload combobox
-        cbLocDanhMuc.setOnAction(null); // tắt listener tạm để tránh trigger
-        cbLocDanhMuc.setItems(FXCollections.observableArrayList(dao.getDanhSachBacSi()));
+        List<String> listBacSi = dao.getDanhSachBacSi();
+        if (!listBacSi.contains("Tất cả bác sĩ")) {
+            listBacSi.add(0, "Tất cả bác sĩ");
+        }
+        cbLocDanhMuc.setItems(FXCollections.observableArrayList(listBacSi));
 
-        // Giữ lại lựa chọn cũ nếu còn tồn tại, không thì chọn "Tất cả bác sĩ"
         if (bacSiDangChon != null && cbLocDanhMuc.getItems().contains(bacSiDangChon)) {
             cbLocDanhMuc.setValue(bacSiDangChon);
         } else {
             cbLocDanhMuc.getSelectionModel().selectFirst();
         }
-        cbLocDanhMuc.setOnAction(e -> locTheoBacSi()); // bật lại listener
-
-        // Reload table
-        danhSach.setAll(dao.getAll());
-        tableThuoc.setItems(danhSach);
+        
+        cbLocDanhMuc.setOnAction(e -> locDuLieu()); 
+        masterData.setAll(dao.getAll());
+        locDuLieu();
     }
 
-    private void locTheoBacSi() {
-        String selected = cbLocDanhMuc.getValue();
-        if (selected == null || selected.equals("Tất cả bác sĩ")) {
-            danhSach.setAll(dao.getAll());
-        } else {
-            danhSach.setAll(dao.locTheoBacSi(selected)); // dùng method mới lọc chính xác
-        }
-        tableThuoc.setItems(danhSach);
-    }
-
-    @FXML
-    private void handleThem() {
-        openDialog(null);
-    }
-
-    @FXML
-    private void handleSua() {
-        DonThuoc selected = tableThuoc.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showWarn("Vui lòng chọn đơn thuốc cần cập nhật!");
-            return;
-        }
-        openDialog(selected);
-    }
-
-    @FXML
-    private void handleXoa() {
-        DonThuoc selected = tableThuoc.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showWarn("Vui lòng chọn đơn thuốc cần xóa!");
-            return;
-        }
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-            "Bạn có chắc muốn xóa đơn thuốc: " + selected.getMaDonThuoc() + "?",
-            ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Xác nhận xóa");
-        confirm.showAndWait().ifPresent(btn -> {
-            if (btn == ButtonType.YES) {
-                if (dao.xoa(selected.getMaDonThuoc())) {
-                    taiDuLieu(); // reload luôn cả combobox
-                    new Alert(Alert.AlertType.INFORMATION, "Xóa thành công!", ButtonType.OK).showAndWait();
-                } else {
-                    showWarn("Xóa thất bại!");
-                }
-            }
-        });
-    }
-
-    private void openDialog(DonThuoc donThuocSua) {
+    private void moDialogSua(DonThuoc donThuocSua) {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/gui/dialogs/Dialog_DonThuoc.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_DonThuoc.fxml"));
             Parent root = loader.load();
             Dialog_DonThuocController ctrl = loader.getController();
-            ctrl.setOnSuccess(this::taiDuLieu); // callback reload cả combobox lẫn table
+            ctrl.setOnSuccess(this::taiDuLieu); 
+            
             if (donThuocSua != null) ctrl.setDonThuocSua(donThuocSua);
 
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle(donThuocSua == null ? "Thêm Đơn Thuốc" : "Cập Nhật Đơn Thuốc");
+            stage.setTitle("Cập Nhật Đơn Thuốc");
             stage.setScene(new Scene(root));
             stage.showAndWait();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void moDialogChiTiet(HoaDonView hd) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ChiTietHoaDon.fxml"));
+            Parent root = loader.load();
+            gui.dialogs.Dialog_ChiTietHoaDonController ctrl = loader.getController();
+            ctrl.setHoaDon(hd);
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Chi Tiết Hóa Đơn — " + hd.getMaHoaDon());
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showWarn("Không thể mở form chi tiết hóa đơn!");
+        }
+    }
+
+    private void hienThiHinhAnh(String tenFileAnh) {
+        if (tenFileAnh == null || tenFileAnh.trim().isEmpty() || tenFileAnh.equals("url_hinh_anh")) {
+            showWarn("Đơn thuốc này chưa được cập nhật hình ảnh chụp thực tế!");
+            return;
+        }
+
+        try {
+            Image img = null;
+            String projectPath = System.getProperty("user.dir");
+            File file = new File(projectPath + "/src/resources/images/images_donthuoc/" + tenFileAnh);
+
+            if (file.exists()) {
+                img = new Image(file.toURI().toString(), false);
+            } else {
+                var stream = getClass().getResourceAsStream("/resources/images/images_donthuoc/" + tenFileAnh);
+                if (stream != null) img = new Image(stream);
+            }
+
+            if (img == null || img.isError()) {
+                showWarn("Không tìm thấy file ảnh: " + tenFileAnh + "\nĐã thử tìm tại: " + file.getAbsolutePath());
+                return; 
+            }
+
+            Stage stage = new Stage();
+            stage.setTitle("Hình Ảnh Đơn Thuốc: " + tenFileAnh);
+            
+            ImageView imageView = new ImageView(img);
+            imageView.setPreserveRatio(true);
+            imageView.setSmooth(true);
+
+            StackPane imageContainer = new StackPane(imageView);
+            imageContainer.setAlignment(Pos.CENTER);
+            imageContainer.setStyle("-fx-background-color: #f0f9ff; -fx-padding: 10;");
+
+            double windowWidth = Math.min(img.getWidth() + 40, 1200); 
+            double windowHeight = Math.min(img.getHeight() + 60, 800);
+
+            ScrollPane scrollPane = new ScrollPane(imageContainer);
+            scrollPane.setPannable(true);
+            scrollPane.setStyle("-fx-background-color: transparent;");
+
+            Scene scene = new Scene(scrollPane, windowWidth, windowHeight);
+            stage.setScene(scene);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showWarn("Lỗi hệ thống khi mở trình xem ảnh: " + e.getMessage());
         }
     }
 

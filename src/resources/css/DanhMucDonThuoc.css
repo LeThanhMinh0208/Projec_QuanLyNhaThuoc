@@ -78,3 +78,45 @@
 .combo-box .list-cell {
     -fx-text-fill: #0369a1;
 }
+/* ========================================================
+   CÁC NÚT THAO TÁC TRONG BẢNG (STYLE Y TẾ - PASTEL)
+   ======================================================== */
+.btn-action-table {
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 6px 14px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+    -fx-transition: all 0.2s ease;
+}
+
+.btn-action-table:hover {
+    -fx-translate-y: -1px;
+}
+
+/* 1. Nút Chi Tiết (Màu xanh dương nhạt - An toàn, thông tin) */
+.btn-soft-blue {
+    -fx-background-color: #e0f2fe;
+    -fx-text-fill: #0369a1;
+}
+.btn-soft-blue:hover { -fx-background-color: #bae6fd; }
+
+/* 2. Nút Xem Ảnh (Màu xanh ngọc / Mint - Mát mắt, y tế) */
+.btn-soft-teal {
+    -fx-background-color: #ccfbf1;
+    -fx-text-fill: #0f766e;
+}
+.btn-soft-teal:hover { -fx-background-color: #99f6e4; }
+
+/* 3. Nút Xóa Mềm (Màu đỏ cam nhạt - Cảnh báo nhẹ nhàng) */
+.btn-soft-red {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #b91c1c;
+}
+.btn-soft-red:hover { -fx-background-color: #fecaca; }
+/* 4. Nút Tái Lập (Màu vàng cam nhạt - Chuyển tiếp, tạo mới) */
+.btn-soft-amber {
+    -fx-background-color: #fef3c7;
+    -fx-text-fill: #d97706;
+}
+.btn-soft-amber:hover { -fx-background-color: #fde68a; }

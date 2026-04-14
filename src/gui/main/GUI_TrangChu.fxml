@@ -121,9 +121,8 @@
                            <VBox styleClass="dropdown-content">
                               <Button onAction="#handleMoQuanLyNguoiDung" styleClass="sub-btn" text="Danh Mục Người Dùng" />
                               <Button styleClass="sub-btn" text="Phân Quyền Người Dùng" />
-                              <Button styleClass="sub-btn" text="Quản Lý Ca Làm Việc" />
                               <Button styleClass="sub-btn" text="Nhật Ký Hoạt Động" />
-                              <Button styleClass="sub-btn" text="Đổi mật khẩu" />
+                              <Button onAction="#handleMoDoiMatKhau" styleClass="sub-btn" text="Đổi mật khẩu" />
                            </VBox>
                         </content>
                      </TitledPane>
