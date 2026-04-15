@@ -13,6 +13,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 public class Dialog_SuaThuocController {
@@ -41,6 +46,11 @@ public class Dialog_SuaThuocController {
     private DAO_Thuoc daoThuoc = new DAO_Thuoc();
     private DAO_DanhMucThuoc daoDM = new DAO_DanhMucThuoc();
     private ArrayList<DanhMucThuoc> dsDM;
+    private File selectedImageFile = null;
+
+    // Đường dẫn thư mục ảnh thuốc
+    private static final String THUOC_IMAGE_DIR =
+        "src/resources/images/images_thuoc/";
 
     @FXML 
     public void initialize() {
@@ -134,16 +144,34 @@ public class Dialog_SuaThuocController {
 
     @FXML
     private void handleChonAnh() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Chọn ảnh thuốc mới");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
-        
-        File selectedFile = fileChooser.showOpenDialog(imgPreview.getScene().getWindow());
-        if (selectedFile != null) {
-            imgPreview.setImage(new Image(selectedFile.toURI().toString()));
-            this.tenFileAnh = selectedFile.getName(); 
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Chọn ảnh thuốc mới");
+        fc.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter(
+                "Ảnh", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.webp")
+        );
+        File file = fc.showOpenDialog(imgPreview.getScene().getWindow());
+        if (file != null) {
+            selectedImageFile = file;
+            imgPreview.setImage(new Image(file.toURI().toString()));
             btnLuu.setDisable(false); // Thay đổi ảnh nên enable nút lưu
         }
+    }
+
+    private String copyAnhVaoThuMuc(File sourceFile, String maThuoc)
+            throws IOException {
+        Path destDir = Paths.get(THUOC_IMAGE_DIR);
+        Files.createDirectories(destDir);
+
+        String original = sourceFile.getName();
+        String ext = original.substring(original.lastIndexOf('.'));
+        String newFileName = maThuoc + ext;
+        Path destPath = destDir.resolve(newFileName);
+
+        Files.copy(sourceFile.toPath(), destPath,
+            StandardCopyOption.REPLACE_EXISTING);
+
+        return newFileName;
     }
 
     @FXML
@@ -247,7 +275,21 @@ public class Dialog_SuaThuocController {
         t.setCongDung(congDung);
         t.setTrieuChung(trieuChung);
         t.setTrangThai(TRANGTHAI_VALUE.get(trangThaiSelected));
-        t.setHinhAnh(tenFileAnh);
+
+        // Copy ảnh vào thư mục nếu đã chọn ảnh mới
+        if (selectedImageFile != null) {
+            try {
+                String tenAnh = copyAnhVaoThuMuc(selectedImageFile, txtMa.getText());
+                t.setHinhAnh(tenAnh);
+            } catch (IOException e) {
+                new Alert(Alert.AlertType.ERROR,
+                    "Không thể lưu ảnh: " + e.getMessage()).show();
+                return;
+            }
+        } else {
+            // Giữ nguyên giá trị hinhAnh đang có, không ghi đè
+            t.setHinhAnh(tenFileAnh);
+        }
 
         if (daoThuoc.capNhatThuoc(t)) {
             new Alert(Alert.AlertType.INFORMATION, "Cập nhật thành công!").show();

@@ -11,16 +11,19 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import utils.AlertUtils;
 import utils.DoiTraSession;
 import utils.SceneUtils;
 import utils.WindowUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 public class GUI_DanhMucThuocController {
@@ -172,6 +175,7 @@ public class GUI_DanhMucThuocController {
     @FXML void handleXoa() { checkAndOpenDialog("/gui/dialogs/Dialog_XoaThuoc.fxml", "Xóa Thuốc"); }
 
     @FXML
+<<<<<<< HEAD
     void handleDoiThuoc() {
         Thuoc selected = tableThuoc.getSelectionModel().getSelectedItem();
         if (selected == null) {
@@ -181,6 +185,15 @@ public class GUI_DanhMucThuocController {
         DoiTraSession.setThuocDoiDaChon(selected);
         DoiTraSession.setDangChonThuocDoi(false);
         SceneUtils.switchPage("/gui/main/GUI_ChiTietDoiTra.fxml");
+=======
+    void handleMoQuyDoiDonVi() {
+        Thuoc selected = tableThuoc.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng chọn một loại thuốc trong bảng!");
+            return;
+        }
+        moCuaSoDonViQuyDoi(selected);
+>>>>>>> main
     }
 
     @FXML
@@ -221,6 +234,7 @@ public class GUI_DanhMucThuocController {
             loadData();
         }
     }
+<<<<<<< HEAD
 
     private void setupExchangeMode() {
         boolean isExchangeMode = DoiTraSession.isDangChonThuocDoi();
@@ -253,3 +267,24 @@ public class GUI_DanhMucThuocController {
         node.setManaged(visible);
     }
 }
+=======
+    private void moCuaSoDonViQuyDoi(Thuoc thuoc) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/main/GUI_DonViQuyDoi.fxml"));
+            Parent root = loader.load();
+            
+            GUI_DonViQuyDoiController controller = loader.getController();
+            controller.setThuoc(thuoc); // Truyền đối tượng thuốc đang chọn sang
+            
+            Stage stage = new Stage();
+            stage.setTitle("Quy đổi đơn vị - " + thuoc.getTenThuoc());
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể mở trang quy đổi đơn vị.");
+        }
+    }
+}
+>>>>>>> main

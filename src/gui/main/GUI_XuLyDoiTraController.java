@@ -13,10 +13,22 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+<<<<<<< HEAD
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+=======
+<<<<<<< HEAD
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+>>>>>>> main
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+=======
+import javafx.scene.control.Button;
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -26,10 +38,19 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+<<<<<<< HEAD
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+<<<<<<< HEAD
+=======
+=======
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
+>>>>>>> main
 import utils.DoiTraSession;
 import utils.SceneUtils;
 
@@ -92,6 +113,19 @@ public class GUI_XuLyDoiTraController {
 
         txtTimKiem.textProperty().addListener((obs, oldVal, newVal) -> filterByKeyword(newVal.trim()));
         txtTimKiemPhieuDoiTra.textProperty().addListener((obs, oldVal, newVal) -> loadDanhSachPhieuDoiTra(newVal));
+<<<<<<< HEAD
+
+        tableHoaDon.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                HoaDonView selected = tableHoaDon.getSelectionModel().getSelectedItem();
+                if (selected != null) {
+                    moDialogChiTiet(selected);
+                }
+                event.consume();
+            }
+        });
+=======
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
     }
 
     private void setupTabs() {
@@ -116,14 +150,24 @@ public class GUI_XuLyDoiTraController {
     }
 
     private void setupComboBox() {
+<<<<<<< HEAD
+        cbHinhThuc.setItems(FXCollections.observableArrayList(
+                "Tất cả", "Tiền mặt", "Chuyển khoản", "Thẻ tín dụng"));
+=======
         cbHinhThuc.setItems(FXCollections.observableArrayList("Tất cả", "Tiền mặt", "Chuyển khoản", "Thẻ tín dụng"));
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
         cbHinhThuc.setValue("Tất cả");
     }
 
     private void setupTableHoaDon() {
         colMaHD.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getMaHoaDon()));
         colNgayLap.setCellValueFactory(d -> new SimpleStringProperty(
+<<<<<<< HEAD
+                d.getValue().getNgayLap() != null
+                        ? d.getValue().getNgayLap().toLocalDateTime().format(FMT) : ""));
+=======
                 d.getValue().getNgayLap() != null ? d.getValue().getNgayLap().toLocalDateTime().format(FMT) : ""));
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
         colKhachHang.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTenKhachHang()));
         colNhanVien.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTenNhanVien()));
         colTamTinh.setCellValueFactory(d -> new SimpleStringProperty(String.format("%,.0f VND", d.getValue().getTamTinh())));
@@ -165,7 +209,12 @@ public class GUI_XuLyDoiTraController {
         });
         colMaPhieuDoiTra.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getMaPhieuDoiTra()));
         colNgayDoiTra.setCellValueFactory(d -> new SimpleStringProperty(
+<<<<<<< HEAD
+                d.getValue().getNgayDoiTra() != null
+                        ? d.getValue().getNgayDoiTra().toLocalDateTime().format(FMT) : ""));
+=======
                 d.getValue().getNgayDoiTra() != null ? d.getValue().getNgayDoiTra().toLocalDateTime().format(FMT) : ""));
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
         colMaHoaDonPDT.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getMaHoaDon()));
         colKhachHangPDT.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTenKhachHang()));
         colNhanVienPDT.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTenNhanVien()));
@@ -215,6 +264,10 @@ public class GUI_XuLyDoiTraController {
         if (filteredData == null) {
             return;
         }
+<<<<<<< HEAD
+
+=======
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
         if (keyword == null || keyword.isEmpty()) {
             filteredData.setPredicate(hd -> true);
         } else {
@@ -234,7 +287,15 @@ public class GUI_XuLyDoiTraController {
 
     private void updateFooter() {
         int count = filteredData != null ? filteredData.size() : masterData.size();
+<<<<<<< HEAD
         lblTongHoaDon.setText("Tổng: " + count + " hóa đơn");
+=======
+<<<<<<< HEAD
+        lblTongHoaDon.setText("Tong: " + count + " hoa don");
+=======
+        lblTongHoaDon.setText("Tổng: " + count + " hóa đơn");
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
+>>>>>>> main
         double tongDT = (filteredData != null ? filteredData : masterData).stream().mapToDouble(HoaDonView::getTongSauVAT).sum();
         lblTongDoanhThu.setText(String.format("%,.0f VND", tongDT));
     }
@@ -246,8 +307,13 @@ public class GUI_XuLyDoiTraController {
 
     @FXML
     void handleXoaBoLoc(ActionEvent event) {
+<<<<<<< HEAD
         dpTuNgay.setValue(null);
         dpDenNgay.setValue(null);
+=======
+        dpTuNgay.setValue(LocalDate.now().withDayOfMonth(1));
+        dpDenNgay.setValue(LocalDate.now());
+>>>>>>> main
         cbHinhThuc.setValue("Tất cả");
         txtTimKiem.clear();
         loadHoaDon();
@@ -263,6 +329,7 @@ public class GUI_XuLyDoiTraController {
         DoiTraSession.setHoaDonDangXuLy(hd);
         SceneUtils.switchPage("/gui/main/GUI_ChiTietDoiTra.fxml");
     }
+<<<<<<< HEAD
 
     private void moChiTietPhieuDoiTra(PhieuDoiTraView pdt) {
         try {
@@ -274,10 +341,38 @@ public class GUI_XuLyDoiTraController {
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("Chi tiết phiếu đổi trả - " + pdt.getMaPhieuDoiTra());
+=======
+<<<<<<< HEAD
+
+    private void showAlert(Alert.AlertType type, String message) {
+        Alert alert = new Alert(type, message, ButtonType.OK);
+        alert.setHeaderText(null);
+        alert.showAndWait();
+    }
+
+    private void moDialogChiTiet(HoaDonView hd) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ChiTietHoaDon.fxml"));
+            Parent root = loader.load();
+            gui.dialogs.Dialog_ChiTietHoaDonController ctrl = loader.getController();
+            ctrl.setHoaDon(hd);
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Chi tiet hoa don - " + hd.getMaHoaDon());
+>>>>>>> main
             stage.setScene(new Scene(root));
             stage.showAndWait();
         } catch (Exception e) {
             e.printStackTrace();
+<<<<<<< HEAD
         }
     }
+=======
+            showAlert(Alert.AlertType.ERROR, "Không thể mở chi tiết: " + e.getMessage());
+        }
+    }
+=======
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
+>>>>>>> main
 }

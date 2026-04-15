@@ -19,30 +19,65 @@ public class DAO_HoaDon {
             pstHD.setString(1, hd.getMaHoaDon());
             pstHD.setString(2, hd.getKhachHang() != null ? hd.getKhachHang().getMaKhachHang() : null);
             pstHD.setString(3, hd.getNhanVien().getMaNhanVien());
-            pstHD.setDate(4, hd.getNgayLap());
+            pstHD.setTimestamp(4, hd.getNgayLap());
             pstHD.setDouble(5, hd.getThueVAT());
             pstHD.setString(6, hd.getHinhThucThanhToan());
             pstHD.setString(7, hd.getGhiChu());
             pstHD.executeUpdate();
 
-            // 2. Lưu ChiTietHoaDon (đủ 6 cột theo schema mới)
+            // 2. Lưu ChiTietHoaDon + trừ kho FIFO (gần hết hạn trước)
             String sqlCT = "INSERT INTO ChiTietHoaDon(maHoaDon, maBangGia, maQuyDoi, maLoThuoc, soLuong, donGia) VALUES(?,?,?,?,?,?)";
             PreparedStatement pstCT = con.prepareStatement(sqlCT);
-            for (ChiTietHoaDon ct : dsCT) {
-                pstCT.setString(1, hd.getMaHoaDon());
-                pstCT.setString(2, ct.getMaBangGia());
-                pstCT.setString(3, ct.getMaQuyDoi());
-                pstCT.setString(4, ct.getMaLoThuoc());
-                pstCT.setInt(5, ct.getSoLuong());
-                pstCT.setDouble(6, ct.getDonGia());
-                pstCT.executeUpdate();
 
-                // Cập nhật tồn kho theo lô (dùng soLuongTruKho = số lượng đơn vị cơ bản thực trừ)
-                String sqlUpdateLo = "UPDATE LoThuoc SET soLuongTon = soLuongTon - ? WHERE maLoThuoc = ?";
-                try (PreparedStatement pstUpdateLo = con.prepareStatement(sqlUpdateLo)) {
-                    pstUpdateLo.setInt(1, ct.getSoLuongTruKho());
-                    pstUpdateLo.setString(2, ct.getMaLoThuoc());
-                    pstUpdateLo.executeUpdate();
+            // Query lấy lô theo FIFO (HSD ASC) trong KHO_BAN_HANG
+            String sqlFetchLots = "SELECT maLoThuoc, soLuongTon FROM LoThuoc " +
+                "WHERE maThuoc = (SELECT maThuoc FROM DonViQuyDoi WHERE maQuyDoi = ?) " +
+                "  AND viTriKho = 'KHO_BAN_HANG' " +
+                "  AND soLuongTon > 0 " +
+                "  AND trangThai = 1 " +
+                "  AND hanSuDung >= CAST(GETDATE() AS DATE) " +
+                "ORDER BY hanSuDung ASC";
+            String sqlUpdateLo = "UPDATE LoThuoc SET soLuongTon = soLuongTon - ? WHERE maLoThuoc = ?";
+
+            for (ChiTietHoaDon ct : dsCT) {
+                int canTru = ct.getSoLuongTruKho(); // Đơn vị cơ bản cần trừ
+
+                // Lấy danh sách lô FIFO
+                PreparedStatement pstFetch = con.prepareStatement(sqlFetchLots);
+                pstFetch.setString(1, ct.getMaQuyDoi());
+                ResultSet rsLots = pstFetch.executeQuery();
+
+                boolean firstLot = true;
+                while (rsLots.next() && canTru > 0) {
+                    String maLo = rsLots.getString("maLoThuoc");
+                    int tonLo = rsLots.getInt("soLuongTon");
+                    int truTuLo = Math.min(canTru, tonLo);
+
+                    // Insert chi tiết cho lô này
+                    pstCT.setString(1, hd.getMaHoaDon());
+                    pstCT.setString(2, ct.getMaBangGia());
+                    pstCT.setString(3, ct.getMaQuyDoi());
+                    pstCT.setString(4, maLo);
+                    // Nếu lô đầu → ghi soLuong bán gốc, lô sau → ghi 0 (chỉ để trừ kho)
+                    pstCT.setInt(5, firstLot ? ct.getSoLuong() : 0);
+                    pstCT.setDouble(6, ct.getDonGia());
+                    pstCT.executeUpdate();
+
+                    // Trừ tồn kho
+                    try (PreparedStatement pstUpdate = con.prepareStatement(sqlUpdateLo)) {
+                        pstUpdate.setInt(1, truTuLo);
+                        pstUpdate.setString(2, maLo);
+                        pstUpdate.executeUpdate();
+                    }
+
+                    canTru -= truTuLo;
+                    firstLot = false;
+                }
+                rsLots.close();
+                pstFetch.close();
+
+                if (canTru > 0) {
+                    throw new SQLException("Không đủ hàng trong kho bán hàng cho maQuyDoi: " + ct.getMaQuyDoi());
                 }
             }
 
@@ -147,6 +182,43 @@ public class DAO_HoaDon {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public entity.HoaDonView getHoaDonViewByMa(String maHoaDon) {
+        String sql = 
+            "SELECT hd.maHoaDon, hd.ngayLap, kh.hoTen AS tenKhachHang, kh.sdt, " +
+            "       nv.hoTen AS tenNhanVien, hd.thueVAT, hd.hinhThucThanhToan, hd.ghiChu, " +
+            "       SUM(ct.soLuong * ct.donGia) AS tamTinh, " +
+            "       SUM(ct.soLuong * ct.donGia) * (1 + hd.thueVAT/100.0) AS tongSauVAT " +
+            "FROM HoaDon hd " +
+            "LEFT JOIN KhachHang kh ON hd.maKhachHang = kh.maKhachHang " +
+            "LEFT JOIN NhanVien nv ON hd.maNhanVien = nv.maNhanVien " +
+            "JOIN ChiTietHoaDon ct ON hd.maHoaDon = ct.maHoaDon " +
+            "WHERE hd.maHoaDon = ? " +
+            "GROUP BY hd.maHoaDon, hd.ngayLap, kh.hoTen, kh.sdt, nv.hoTen, hd.thueVAT, hd.hinhThucThanhToan, hd.ghiChu";
+
+        try (Connection con = ConnectDB.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, maHoaDon);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                entity.HoaDonView v = new entity.HoaDonView();
+                v.setMaHoaDon(rs.getString("maHoaDon"));
+                v.setNgayLap(rs.getTimestamp("ngayLap"));
+                v.setTenKhachHang(rs.getString("tenKhachHang"));
+                v.setSdt(rs.getString("sdt"));
+                v.setTenNhanVien(rs.getString("tenNhanVien"));
+                v.setThueVAT(rs.getDouble("thueVAT"));
+                v.setHinhThucThanhToan(rs.getString("hinhThucThanhToan"));
+                v.setGhiChu(rs.getString("ghiChu"));
+                v.setTamTinh(rs.getDouble("tamTinh"));
+                v.setTongSauVAT(rs.getDouble("tongSauVAT"));
+                return v;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

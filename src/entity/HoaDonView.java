@@ -31,7 +31,7 @@ public class HoaDonView {
     }
 
     public String getTenKhachHang() {
-        return tenKhachHang != null ? tenKhachHang : "Khach le";
+        return tenKhachHang != null ? tenKhachHang : "Khách lẻ";
     }
 
     public void setTenKhachHang(String tenKhachHang) {
@@ -96,15 +96,15 @@ public class HoaDonView {
 
     public String getHinhThucLabel() {
         if (hinhThucThanhToan == null) {
-            return "Tien mat";
+            return "Tiền mặt";
         }
         switch (hinhThucThanhToan) {
             case "CHUYEN_KHOAN":
-                return "Chuyen khoan";
+                return "Chuyển khoản";
             case "THE":
-                return "The tin dung";
+                return "Thẻ tín dụng";
             default:
-                return "Tien mat";
+                return "Tiền mặt";
         }
     }
 }

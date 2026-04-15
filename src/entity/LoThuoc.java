@@ -10,10 +10,15 @@ public class LoThuoc {
     private double giaNhap;
     private String viTriKho; 
     private Thuoc thuoc;
+    private int trangThai; 
+    private Date ngayNhapKho;
+    private NhaCungCap nhaCungCap;
+
+    private String ghiChuHienThi;
 
     public LoThuoc() {}
 
-    public LoThuoc(String maLoThuoc, Date ngaySanXuat, Date hanSuDung, int soLuongTon, double giaNhap, String viTriKho, Thuoc thuoc) {
+    public LoThuoc(String maLoThuoc, Date ngaySanXuat, Date hanSuDung, int soLuongTon, double giaNhap, String viTriKho, Thuoc thuoc, int trangThai) {
         this.maLoThuoc = maLoThuoc;
         this.ngaySanXuat = ngaySanXuat;
         this.hanSuDung = hanSuDung;
@@ -21,9 +26,8 @@ public class LoThuoc {
         this.giaNhap = giaNhap;
         this.viTriKho = viTriKho;
         this.thuoc = thuoc;
+        this.trangThai = trangThai;
     }
-
-    // Getters and Setters
     public String getMaLoThuoc() { return maLoThuoc; }
     public void setMaLoThuoc(String maLoThuoc) { this.maLoThuoc = maLoThuoc; }
 
@@ -44,4 +48,19 @@ public class LoThuoc {
 
     public Thuoc getThuoc() { return thuoc; }
     public void setThuoc(Thuoc thuoc) { this.thuoc = thuoc; }
+
+    public int getTrangThai() { return trangThai; }
+    public void setTrangThai(int trangThai) { this.trangThai = trangThai; }
+
+    public String getGhiChuHienThi() { return ghiChuHienThi; }
+    public void setGhiChuHienThi(String ghiChuHienThi) { this.ghiChuHienThi = ghiChuHienThi; }
+
+    public String getTenTrangThai() {
+        return this.trangThai == 1 ? "Đang Bán" : "Đã Khóa";
+    }
+    public Date getNgayNhapKho() { return ngayNhapKho; }
+    public void setNgayNhapKho(Date ngayNhapKho) { this.ngayNhapKho = ngayNhapKho; }
+
+    public NhaCungCap getNhaCungCap() { return nhaCungCap; }
+    public void setNhaCungCap(NhaCungCap nhaCungCap) { this.nhaCungCap = nhaCungCap; }
 }

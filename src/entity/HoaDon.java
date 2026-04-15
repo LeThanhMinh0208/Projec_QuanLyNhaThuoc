@@ -1,9 +1,9 @@
 package entity;
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class HoaDon {
     private String maHoaDon;
-    private Date ngayLap;
+    private Timestamp ngayLap;
     private double thueVAT;
     private String hinhThucThanhToan; // Enum: TIEN_MAT, CHUYEN_KHOAN, THE
     private String ghiChu;
@@ -12,7 +12,7 @@ public class HoaDon {
 
     public HoaDon() {}
 
-    public HoaDon(String maHoaDon, Date ngayLap, double thueVAT, String hinhThucThanhToan, String ghiChu, NhanVien nhanVien, KhachHang khachHang) {
+    public HoaDon(String maHoaDon, Timestamp ngayLap, double thueVAT, String hinhThucThanhToan, String ghiChu, NhanVien nhanVien, KhachHang khachHang) {
         this.maHoaDon = maHoaDon;
         this.ngayLap = ngayLap;
         this.thueVAT = thueVAT;
@@ -25,8 +25,8 @@ public class HoaDon {
     // Getters and Setters
     public String getMaHoaDon() { return maHoaDon; }
     public void setMaHoaDon(String maHoaDon) { this.maHoaDon = maHoaDon; }
-    public Date getNgayLap() { return ngayLap; }
-    public void setNgayLap(Date ngayLap) { this.ngayLap = ngayLap; }
+    public Timestamp getNgayLap() { return ngayLap; }
+    public void setNgayLap(Timestamp ngayLap) { this.ngayLap = ngayLap; }
     public double getThueVAT() { return thueVAT; }
     public void setThueVAT(double thueVAT) { this.thueVAT = thueVAT; }
     public String getHinhThucThanhToan() { return hinhThucThanhToan; }

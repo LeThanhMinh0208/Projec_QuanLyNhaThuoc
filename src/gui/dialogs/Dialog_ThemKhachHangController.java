@@ -21,6 +21,7 @@ public class Dialog_ThemKhachHangController {
     @FXML private Label lblErrDiaChi;
 
     private KhachHang resultKhachHang; // Result passed back
+    private boolean savedToDb = false; // Đánh dấu đã lưu DB thành công chưa
 
     public void setMaKhachHang(String nextIdSeq) {
         txtMa.setText(nextIdSeq);
@@ -35,6 +36,11 @@ public class Dialog_ThemKhachHangController {
 
     public KhachHang getResultKhachHang() {
         return resultKhachHang;
+    }
+
+    /** Trả về true nếu dialog đã tự insert vào DB thành công */
+    public boolean isSavedToDb() {
+        return savedToDb;
     }
 
     @FXML
@@ -100,14 +106,10 @@ public class Dialog_ThemKhachHangController {
             return;
         }
 
-        dao.DAO_KhachHang daoKh = new dao.DAO_KhachHang();
-        KhachHang newKh = new KhachHang(txtMa.getText(), ten, sdt, diaChi, 0);
-        if (daoKh.themKhachHang(newKh)) {
-            new Alert(Alert.AlertType.INFORMATION, "Thêm khách hàng thành công!").show();
-            this.resultKhachHang = newKh;
-        } else {
-            new Alert(Alert.AlertType.ERROR, "Thất bại khi thêm vào cơ sở dữ liệu!").show();
-        }
+        // Tạo entity — KHÔNG insert DB tại đây nữa
+        // Để controller gọi DAO riêng, tránh insert trùng
+        this.resultKhachHang = new KhachHang(txtMa.getText(), ten, sdt, diaChi, 0);
+        this.savedToDb = false;
         
         closeDialog();
     }

@@ -7,9 +7,38 @@
 }
 
 .bh-page-title {
-    -fx-font-size: 26px;
+    -fx-font-size: 34px;
     -fx-font-weight: 900;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: #0277bd; 
+    -fx-effect: dropshadow(gaussian, rgba(2, 119, 189, 0.25), 5, 0.3, 2, 2);
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* ========================================================
+   TABS ĐIỀU HƯỚNG BÁN HÀNG & CHUYỂN ĐỔI (Đồng bộ đổi trả)
+   ======================================================== */
+.tab-container {
+    -fx-background-color: #e2e8f0;
+    -fx-background-radius: 25px;
+    -fx-padding: 5px;
+    -fx-effect: innershadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+    -fx-max-height: 42px; /* Ngăn chặn HBox bị giãn dài dọc */
+}
+
+.tab-toggle-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #64748b;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 10px 25px;
+    -fx-background-radius: 20px;
+    -fx-cursor: hand;
+}
+
+.tab-toggle-button:selected {
+    -fx-background-color: linear-gradient(to right, #0ea5e9, #0284c7);
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(2, 132, 199, 0.4), 10, 0, 0, 3);
 }
 
 /* TAB PANE */
@@ -35,7 +64,11 @@
 }
 
 .bh-tab-pane>.tab-header-area {
-    -fx-background-color: transparent;
+    visibility: hidden;
+    -fx-pref-height: 0;
+    -fx-max-height: 0;
+    -fx-min-height: 0;
+    -fx-padding: 0;
 }
 
 .bh-tab-pane>.tab-content-area {

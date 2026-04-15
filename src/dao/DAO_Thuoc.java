@@ -87,6 +87,36 @@ public class DAO_Thuoc {
         return list;
     }
 
+    /**
+     * VĐ5A: Chỉ lấy thuốc DANG_BAN có ít nhất 1 lô ở KHO_BAN_HANG
+     * còn hạn sử dụng và còn tồn kho > 0.
+     * Dùng cho trang bán hàng.
+     */
+    public ArrayList<Thuoc> getAllThuocCoLoKhoBanHang() {
+        ArrayList<Thuoc> list = new ArrayList<>();
+        String sql = "SELECT DISTINCT t.*, d.tenDanhMuc AS tenDanhMucHienThi " +
+                     "FROM Thuoc t " +
+                     "LEFT JOIN DanhMucThuoc d ON t.maDanhMuc = d.maDanhMuc " +
+                     "INNER JOIN LoThuoc lo ON lo.maThuoc = t.maThuoc " +
+                     "WHERE t.trangThai = 'DANG_BAN' " +
+                     "  AND lo.viTriKho = 'KHO_BAN_HANG' " +
+                     "  AND lo.soLuongTon > 0 " +
+                     "  AND lo.trangThai = 1 " +
+                     "  AND lo.hanSuDung >= CAST(GETDATE() AS DATE)";
+        Connection con = ConnectDB.getConnection();
+        try {
+            try (PreparedStatement pst = con.prepareStatement(sql);
+                 ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapThuoc(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi SQL khi lấy thuốc có lô kho bán hàng: " + e.getMessage());
+        }
+        return list;
+    }
+
     /** Helper map ResultSet → Thuoc */
     private Thuoc mapThuoc(ResultSet rs) throws SQLException {
         Thuoc t = new Thuoc(
