@@ -1,44 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
 
-<VBox prefWidth="720.0" prefHeight="520.0" spacing="12.0"
-      stylesheets="@../../resources/css/TrangChu.css"
+<VBox prefWidth="780.0" prefHeight="600.0" spacing="0"
+      stylesheets="@../../resources/css/BanHang.css"
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="gui.dialogs.Dialog_ChonThuocController">
 
-    <padding>
-        <Insets top="15" right="15" bottom="15" left="15" />
-    </padding>
+    <stylesheets>
+        <URL value="@../../resources/css/TrangChu.css" />
+        <URL value="@../../resources/css/BanHang.css" />
+    </stylesheets>
 
-    <children>
-        <Label text="CHỌN THUỐC" styleClass="section-title" />
+    <!-- ── HEADER ── -->
+    <HBox styleClass="dialog-header" spacing="10" alignment="CENTER_LEFT">
+        <children>
+            <Label text="CHỌN THUỐC KÊ ĐƠN" styleClass="dialog-header-title"/>
+        </children>
+    </HBox>
 
-        <HBox alignment="CENTER_LEFT" prefHeight="45.0" styleClass="search-box">
+    <!-- ── BODY ── -->
+    <VBox spacing="12" styleClass="dialog-body" VBox.vgrow="ALWAYS">
+        <padding>
+            <Insets top="12" right="16" bottom="12" left="16" />
+        </padding>
+
+        <!-- Phần tìm kiếm + badge -->
+        <HBox spacing="8" alignment="CENTER_LEFT">
             <children>
-                <Label styleClass="search-icon" text="🔍" />
-                <TextField fx:id="txtTim" prefHeight="45.0" promptText="Tìm theo mã, tên, triệu chứng, công dụng..." styleClass="search-input" HBox.hgrow="ALWAYS" />
+                <HBox alignment="CENTER_LEFT" styleClass="search-box" prefHeight="42" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label styleClass="search-icon" text="🔍" />
+                        <TextField fx:id="txtTim" prefHeight="40"
+                                   promptText="Tìm tên thuốc, hoạt chất, mã thuốc..."
+                                   styleClass="search-input" HBox.hgrow="ALWAYS" />
+                    </children>
+                </HBox>
+                <Label fx:id="lblBadgeKeDon" text="🔵 Thuốc kê đơn = nền xanh"
+                       style="-fx-text-fill: #1565C0; -fx-font-size: 11px; -fx-font-style: italic;"/>
             </children>
         </HBox>
 
-        <TableView fx:id="tblThuoc" styleClass="table-view" VBox.vgrow="ALWAYS">
-            <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
-            <columns>
-                <TableColumn fx:id="colMa" prefWidth="90.0" text="Mã" />
-                <TableColumn fx:id="colTen" prefWidth="250.0" text="Tên thuốc" />
-                <TableColumn fx:id="colTrieuChung" prefWidth="260.0" text="Triệu chứng" />
-                <TableColumn fx:id="colKeDon" prefWidth="90.0" text="Kê đơn" />
-            </columns>
-        </TableView>
+        <!-- Phần danh sách thuốc — ListView với custom cell -->
+        <ListView fx:id="listThuoc" VBox.vgrow="ALWAYS"
+                  style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e2e8f0; -fx-border-width: 1;">
+        </ListView>
 
-        <HBox spacing="10.0" alignment="CENTER_RIGHT">
+        <!-- Phần nhập số lượng -->
+        <HBox spacing="12" alignment="CENTER"
+              style="-fx-background-color: #f0f9ff; -fx-background-radius: 10; -fx-padding: 12 16;">
             <children>
-                <Button text="Hủy" onAction="#handleHuy" prefWidth="90.0" />
-                <Button text="Chọn" onAction="#handleChon" prefWidth="110.0" />
+                <Label text="Số lượng:" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
+                <Spinner fx:id="spinnerSoLuong" prefWidth="100" prefHeight="36" editable="true"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblTonInfo" text="Tồn: —"
+                       style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                <Label fx:id="lblGiaInfo" text="Giá: —"
+                       style="-fx-text-fill: #16a34a; -fx-font-weight: bold; -fx-font-size: 13px;"/>
             </children>
         </HBox>
-    </children>
+    </VBox>
+
+    <!-- ── FOOTER ── -->
+    <HBox styleClass="dialog-footer" spacing="10" alignment="CENTER_RIGHT">
+        <children>
+            <Button text="Hủy" onAction="#handleHuy" styleClass="dialog-btn-cancel"
+                    prefWidth="100" prefHeight="42"/>
+            <Button fx:id="btnThemVaoGio" text="➕ Thêm vào giỏ" onAction="#handleChon"
+                    styleClass="dialog-btn-ok" prefWidth="160" prefHeight="42"
+                    style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 6px;"/>
+        </children>
+    </HBox>
 </VBox>
-

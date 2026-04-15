@@ -5,6 +5,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+<?import javafx.scene.image.ImageView?>
 
 <VBox styleClass="main-bg" stylesheets="@../../resources/css/BanHang.css"
       minWidth="1024" VBox.vgrow="ALWAYS"
@@ -20,7 +21,7 @@
 
     <children>
         <!-- ===== HEADER ===== -->
-        <HBox alignment="CENTER_LEFT" spacing="30.0" VBox.vgrow="NEVER" style="-fx-padding: 0 0 10 0;">
+        <HBox alignment="CENTER_LEFT" spacing="16" VBox.vgrow="NEVER" style="-fx-padding: 0 0 10 0;">
             <children>
                 <VBox spacing="5.0">
                     <children>
@@ -37,6 +38,28 @@
                         </ToggleButton>
                         <ToggleButton fx:id="btnDonThuoc" styleClass="tab-toggle-button" text="Bán Theo Đơn Thuốc" toggleGroup="$tabGroupBanHang" onAction="#onTabDonThuoc" />
                     </children>
+                </HBox>
+
+                <!-- VĐ4: Phân cách -->
+                <Region HBox.hgrow="ALWAYS"/>
+                <Separator orientation="VERTICAL" style="-fx-padding: 4 0;"/>
+
+                <!-- VĐ4: Thông tin khách hàng (compact) — Tab Bán Lẻ -->
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Label text="Khách hàng:" style="-fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtSdtKhachLe" promptText="SĐT khách hàng..."
+                               prefWidth="140" prefHeight="32"
+                               styleClass="bh-input"
+                               style="-fx-font-size: 12px;"/>
+                    <Button onAction="#handleTimKhachLe" text="Tìm"
+                            styleClass="bh-btn-primary" prefHeight="32" prefWidth="50"
+                            style="-fx-font-size: 11px; -fx-padding: 4 8;"/>
+                    <Label fx:id="lblTenKhachLe" text="Khách lẻ (vãng lai)"
+                           style="-fx-font-style: italic; -fx-text-fill: #666; -fx-font-size: 12px;"
+                           maxWidth="200"/>
+                    <Button fx:id="btnXoaKH" text="✕" onAction="#onXoaKhachHang"
+                            style="-fx-background-color: transparent; -fx-text-fill: #999; -fx-font-size: 11px; -fx-cursor: hand;"
+                            visible="false"/>
                 </HBox>
             </children>
         </HBox>
@@ -93,102 +116,77 @@
                         </VBox>
 
                         <!-- ── CỘT PHẢI: GIỎ HÀNG + THANH TOÁN (40%) ── -->
-                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
-                                    prefWidth="480" minWidth="460"
-                                    style="-fx-background-color:transparent; -fx-background:transparent; -fx-border-color:transparent;">
-                            <content>
-                                <VBox spacing="12" style="-fx-padding: 0 16 0 0;">
-                                    <children>
-                                        <!-- Khách hàng -->
-                                        <VBox styleClass="bh-panel" spacing="10">
-                                            <children>
-                                                <Label styleClass="bh-section-title" text="THÔNG TIN KHÁCH HÀNG" />
-                                                <HBox spacing="8" alignment="CENTER_LEFT">
-                                                    <children>
-                                                        <Label text="📱" style="-fx-font-size:16px;" />
-                                                        <TextField fx:id="txtSdtKhachLe" prefHeight="38"
-                                                                   promptText="Số điện thoại (không bắt buộc)"
-                                                                   styleClass="bh-input" HBox.hgrow="ALWAYS" />
-                                                        <Button onAction="#handleTimKhachLe" text="Tìm KH"
-                                                                styleClass="bh-btn-primary" prefHeight="38" prefWidth="80"/>
-                                                    </children>
-                                                </HBox>
-                                                <Label fx:id="lblTenKhachLe" text="👤  Khách lẻ (vãng lai)" styleClass="bh-customer-name" minWidth="300" maxWidth="Infinity" HBox.hgrow="ALWAYS" wrapText="false" />
-                                            </children>
-                                        </VBox>
+                        <!-- VĐ4: Bỏ ScrollPane, dùng VBox với VBox.vgrow để nút thanh toán luôn visible -->
+                        <VBox spacing="12" prefWidth="480" minWidth="460" style="-fx-padding: 0 16 0 0;">
+                            <!-- Giỏ hàng — chiếm toàn bộ chiều cao còn lại -->
+                            <VBox spacing="0" VBox.vgrow="ALWAYS" styleClass="bh-cart-wrapper">
+                                <children>
+                                    <HBox alignment="CENTER_LEFT" styleClass="bh-cart-title-bar">
+                                        <children>
+                                            <Label text="🛒  GIỎ HÀNG" styleClass="bh-cart-title-label" HBox.hgrow="ALWAYS"/>
+                                            <Button onAction="#handleHuyGioLe" text="✕  Xóa giỏ"
+                                                    styleClass="bh-btn-danger" prefHeight="28"
+                                                    style="-fx-font-size:11px; -fx-padding: 5 12;"/>
+                                        </children>
+                                    </HBox>
+                                    <TableView fx:id="tblGioHangLe" styleClass="table-view"
+                                               VBox.vgrow="ALWAYS" minHeight="140">
+                                        <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+                                        <placeholder>
+                                            <Label text="Giỏ trống — chọn thuốc để thêm vào" style="-fx-text-fill:#334155; -fx-font-size:13px;"/>
+                                        </placeholder>
+                                        <columns>
+                                            <TableColumn fx:id="colCartTenThuoc" text="Thuốc" />
+                                            <TableColumn fx:id="colCartDonVi" prefWidth="70" minWidth="70" maxWidth="70" text="ĐV" />
+                                            <TableColumn fx:id="colCartSoLuong" prefWidth="45" minWidth="45" maxWidth="45" text="SL" />
+                                            <TableColumn fx:id="colCartDonGia" prefWidth="90" minWidth="90" maxWidth="90" text="Đơn giá" />
+                                            <TableColumn fx:id="colCartThanhTien" prefWidth="100" minWidth="100" maxWidth="100" text="Thành tiền" />
+                                            <TableColumn fx:id="colCartHanSuDung" prefWidth="85" minWidth="85" maxWidth="85" text="HSD" />
+                                            <TableColumn fx:id="colCartXoa" prefWidth="40" minWidth="40" maxWidth="40" text="" />
+                                        </columns>
+                                    </TableView>
+                                </children>
+                            </VBox>
 
-                                        <!-- Giỏ hàng -->
-                                        <VBox spacing="0" prefHeight="350" styleClass="bh-cart-wrapper">
-                                            <children>
-                                                <HBox alignment="CENTER_LEFT" styleClass="bh-cart-title-bar">
-                                                    <children>
-                                                        <Label text="🛒  GIỎ HÀNG" styleClass="bh-cart-title-label" HBox.hgrow="ALWAYS"/>
-                                                        <Button onAction="#handleHuyGioLe" text="✕  Xóa giỏ"
-                                                                styleClass="bh-btn-danger" prefHeight="28"
-                                                                style="-fx-font-size:11px; -fx-padding: 5 12;"/>
-                                                    </children>
-                                                </HBox>
-                                                <TableView fx:id="tblGioHangLe" styleClass="table-view"
-                                                           VBox.vgrow="ALWAYS" minHeight="140">
-                                                    <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
-                                                    <placeholder>
-                                                        <Label text="Giỏ trống — chọn thuốc để thêm vào" style="-fx-text-fill:#334155; -fx-font-size:13px;"/>
-                                                    </placeholder>
-                                                    <columns>
-                                                        <TableColumn fx:id="colCartTenThuoc" text="Thuốc" />
-                                                        <TableColumn fx:id="colCartDonVi" prefWidth="70" minWidth="70" maxWidth="70" text="ĐV" />
-                                                        <TableColumn fx:id="colCartSoLuong" prefWidth="45" minWidth="45" maxWidth="45" text="SL" />
-                                                        <TableColumn fx:id="colCartDonGia" prefWidth="90" minWidth="90" maxWidth="90" text="Đơn giá" />
-                                                        <TableColumn fx:id="colCartThanhTien" prefWidth="100" minWidth="100" maxWidth="100" text="Thành tiền" />
-                                                        <TableColumn fx:id="colCartHanSuDung" prefWidth="85" minWidth="85" maxWidth="85" text="HSD" />
-                                                        <TableColumn fx:id="colCartXoa" prefWidth="40" minWidth="40" maxWidth="40" text="" />
-                                                    </columns>
-                                                </TableView>
-                                            </children>
-                                        </VBox>
-
-                                        <!-- Thanh toán -->
-                                        <VBox styleClass="bh-panel" spacing="12">
-                                            <children>
-                                                <Label styleClass="bh-section-title" text="THANH TOÁN" />
-                                                <HBox alignment="CENTER_LEFT" spacing="12">
-                                                    <children>
-                                                        <Label text="Hình thức:" styleClass="bh-label-key"
-                                                               style="-fx-text-fill: #64748b;" prefWidth="90"/>
-                                                        <ComboBox fx:id="cbHinhThucThanhToanLe" prefHeight="36"
-                                                                  styleClass="bh-combo" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                                                    </children>
-                                                </HBox>
-                                                <Separator style="-fx-opacity: 0.5;" />
-                                                <GridPane hgap="8" vgap="6">
-                                                    <columnConstraints>
-                                                        <ColumnConstraints minWidth="110" />
-                                                        <ColumnConstraints hgrow="ALWAYS" halignment="RIGHT" />
-                                                    </columnConstraints>
-                                                    <children>
-                                                        <Label text="Tạm tính:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" GridPane.rowIndex="0" />
-                                                        <Label fx:id="lblTongTienLe" text="0 ₫" style="-fx-text-fill:#1e293b; -fx-font-size:14px; -fx-font-weight:bold;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-                                                        <Label text="VAT (8%):" style="-fx-text-fill:#94a3b8; -fx-font-size:13px;" GridPane.rowIndex="1"/>
-                                                        <Label fx:id="lblVatLe" text="0 ₫" style="-fx-text-fill:#94a3b8; -fx-font-size:13px;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                                                    </children>
-                                                </GridPane>
-                                                <Separator />
-                                                <HBox alignment="CENTER_LEFT">
-                                                    <children>
-                                                        <Label text="TỔNG THANH TOÁN" style="-fx-font-size:13px; -fx-font-weight:900; -fx-text-fill:#64748b;" HBox.hgrow="ALWAYS"/>
-                                                        <Label fx:id="lblThanhTienLe" text=" 0 ₫" styleClass="bh-money-total" />
-                                                    </children>
-                                                </HBox>
-                                                <Button fx:id="btnThanhToanLe" onAction="#handleThanhToanLe"
-                                                        maxWidth="Infinity" prefHeight="50"
-                                                        styleClass="bh-btn-success"
-                                                        text="💳  THANH TOÁN" />
-                                            </children>
-                                        </VBox>
-                                    </children>
-                                </VBox>
-                            </content>
-                        </ScrollPane>
+                            <!-- Thanh toán — luôn ở dưới cùng, không bị khuất -->
+                            <VBox styleClass="bh-panel" spacing="12">
+                                <children>
+                                    <Label styleClass="bh-section-title" text="THANH TOÁN" />
+                                    <HBox alignment="CENTER_LEFT" spacing="12">
+                                        <children>
+                                            <Label text="Hình thức:" styleClass="bh-label-key"
+                                                   style="-fx-text-fill: #64748b;" prefWidth="90"/>
+                                            <ComboBox fx:id="cbHinhThucThanhToanLe" prefHeight="36"
+                                                      styleClass="bh-combo" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                        </children>
+                                    </HBox>
+                                    <Separator style="-fx-opacity: 0.5;" />
+                                    <GridPane hgap="8" vgap="6">
+                                        <columnConstraints>
+                                            <ColumnConstraints minWidth="110" />
+                                            <ColumnConstraints hgrow="ALWAYS" halignment="RIGHT" />
+                                        </columnConstraints>
+                                        <children>
+                                            <Label text="Tạm tính:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" GridPane.rowIndex="0" />
+                                            <Label fx:id="lblTongTienLe" text="0 ₫" style="-fx-text-fill:#1e293b; -fx-font-size:14px; -fx-font-weight:bold;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                                            <Label text="VAT (8%):" style="-fx-text-fill:#94a3b8; -fx-font-size:13px;" GridPane.rowIndex="1"/>
+                                            <Label fx:id="lblVatLe" text="0 ₫" style="-fx-text-fill:#94a3b8; -fx-font-size:13px;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                        </children>
+                                    </GridPane>
+                                    <Separator />
+                                    <HBox alignment="CENTER_LEFT">
+                                        <children>
+                                            <Label text="TỔNG THANH TOÁN" style="-fx-font-size:13px; -fx-font-weight:900; -fx-text-fill:#64748b;" HBox.hgrow="ALWAYS"/>
+                                            <Label fx:id="lblThanhTienLe" text=" 0 ₫" styleClass="bh-money-total" />
+                                        </children>
+                                    </HBox>
+                                    <Button fx:id="btnThanhToanLe" onAction="#handleThanhToanLe"
+                                            maxWidth="Infinity" prefHeight="50"
+                                            styleClass="bh-btn-success"
+                                            text="💳  THANH TOÁN" />
+                                </children>
+                            </VBox>
+                        </VBox>
                     </HBox>
                 </Tab>
 
@@ -200,145 +198,139 @@
                     <HBox spacing="16" VBox.vgrow="ALWAYS" fillHeight="true">
                         <padding><Insets top="16" /></padding>
 
-                        <!-- ── CỘT TRÁI: DANH SÁCH ĐƠN (35%) ── -->
+                        <!-- ── VĐ1: CỘT TRÁI: FORM THÔNG TIN ĐƠN THUỐC (thay cho danh sách đơn) ── -->
                         <VBox spacing="12" prefWidth="430" minWidth="380">
-                            <VBox styleClass="bh-panel" VBox.vgrow="ALWAYS" spacing="10">
-                                <children>
-                                    <Label styleClass="bh-section-title" text="DANH SÁCH ĐƠN THUỐC" />
-                                    <TableView fx:id="tblDonThuoc" styleClass="table-view"
-                                               VBox.vgrow="ALWAYS" minHeight="140">
-                                        <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
-                                        <columns>
-                                            <TableColumn fx:id="colDTMa" prefWidth="110" text="Mã đơn" />
-                                            <TableColumn fx:id="colDTBacSi" prefWidth="130" text="Bác sĩ" />
-                                            <TableColumn fx:id="colDTBenhNhan" prefWidth="190" text="Bệnh nhân" />
-                                        </columns>
-                                    </TableView>
+                            <VBox spacing="10" styleClass="bh-panel" style="-fx-padding: 16;">
 
-                                    <HBox spacing="8">
-                                        <children>
-                                            <Button onAction="#handleThemDonThuoc" text="➕ Thêm"
-                                                    styleClass="bh-btn-primary" prefHeight="36" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                                            <Button onAction="#handleSuaDonThuoc" text="✏️ Sửa"
-                                                    styleClass="bh-btn-secondary" prefHeight="36" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                                            <Button onAction="#handleXoaDonThuoc" text="🗑 Xóa"
-                                                    styleClass="bh-btn-danger" prefHeight="36" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                                        </children>
-                                    </HBox>
-                                </children>
-                            </VBox>
+                                <Label text="THÔNG TIN ĐƠN THUỐC"
+                                       style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #1e293b;"/>
 
-                            <!-- Chi tiết đơn -->
-                            <VBox styleClass="bh-panel" spacing="10">
-                                <children>
-                                    <Label styleClass="bh-section-title" text="CHI TIẾT ĐƠN ĐÃ CHỌN" />
-                                    <Label fx:id="lblDonThuocChiTiet" text="Chọn 1 đơn thuốc để xem chi tiết."
-                                           wrapText="true" style="-fx-text-fill:#64748b; -fx-font-size:13px; -fx-line-spacing:4;"/>
-                                    <Button onAction="#handleChuyenDonSangGio" text="📥  Chuyển đơn vào giỏ"
-                                            maxWidth="Infinity" prefHeight="38" styleClass="bh-btn-primary"/>
-                                </children>
+                                <HBox spacing="10">
+                                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                        <Label text="Bác sĩ kê đơn" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                        <TextField fx:id="txtBacSi" promptText="Nhập tên bác sĩ" styleClass="bh-input" prefHeight="36"/>
+                                    </VBox>
+                                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                        <Label text="Chẩn đoán" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                        <TextField fx:id="txtChanDoan" promptText="Nhập chẩn đoán" styleClass="bh-input" prefHeight="36"/>
+                                    </VBox>
+                                </HBox>
+
+                                <VBox spacing="6">
+                                    <Label text="Thông tin bệnh nhân" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                    <TextField fx:id="txtBenhNhan" promptText="Tên, tuổi, giới tính..." styleClass="bh-input" prefHeight="36"/>
+                                </VBox>
+
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                        <Label text="Hình ảnh đơn" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                        <TextField fx:id="txtHinhAnhDon" promptText="Đường dẫn hoặc chọn file..."
+                                                   editable="false" styleClass="bh-input" prefHeight="36"/>
+                                    </VBox>
+                                    <Button fx:id="btnChonAnh" text="📁 Chọn ảnh" onAction="#onChonAnhDon"
+                                            styleClass="bh-btn-secondary"
+                                            style="-fx-padding: 8 14;"/>
+                                </HBox>
+
+                                <!-- Preview ảnh đơn nếu có -->
+                                <ImageView fx:id="imgPreviewDon"
+                                           fitWidth="200" fitHeight="120"
+                                           preserveRatio="true" visible="false"/>
+
                             </VBox>
                         </VBox>
 
                         <!-- ── CỘT PHẢI: GIỎ HÀNG THEO ĐƠN + THANH TOÁN (65%) ── -->
-                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
-                                    HBox.hgrow="ALWAYS" prefWidth="480"
-                                    style="-fx-background-color:transparent; -fx-background:transparent; -fx-border-color:transparent;">
-                            <content>
-                                <VBox spacing="12" style="-fx-padding: 0 16 0 0;">
-                                    <children>
-                                        <!-- Khách hàng -->
-                                        <VBox styleClass="bh-panel" spacing="10">
-                                            <children>
-                                                <Label styleClass="bh-section-title" text="THÔNG TIN KHÁCH HÀNG" />
-                                                <HBox spacing="8" alignment="CENTER_LEFT">
-                                                    <children>
-                                                        <Label text="📱" style="-fx-font-size:16px;" />
-                                                        <TextField fx:id="txtSdtKhachDon" prefHeight="38"
-                                                                   promptText="Số điện thoại (không bắt buộc)"
-                                                                   styleClass="bh-input" HBox.hgrow="ALWAYS" />
-                                                        <Button onAction="#handleTimKhachDon" text="Tìm KH"
-                                                                styleClass="bh-btn-primary" prefHeight="38" prefWidth="80"/>
-                                                    </children>
-                                                </HBox>
-                                                <Label fx:id="lblTenKhachDon" text="👤  Khách lẻ (vãng lai)" styleClass="bh-customer-name" minWidth="300" maxWidth="Infinity" HBox.hgrow="ALWAYS" wrapText="false" />
-                                            </children>
-                                        </VBox>
+                        <VBox spacing="12" HBox.hgrow="ALWAYS" prefWidth="480" style="-fx-padding: 0 16 0 0;">
+                            <!-- Khách hàng -->
+                            <VBox styleClass="bh-panel" spacing="10">
+                                <children>
+                                    <Label styleClass="bh-section-title" text="THÔNG TIN KHÁCH HÀNG" />
+                                    <HBox spacing="8" alignment="CENTER_LEFT">
+                                        <children>
+                                            <Label text="📱" style="-fx-font-size:16px;" />
+                                            <TextField fx:id="txtSdtKhachDon" prefHeight="38"
+                                                       promptText="Số điện thoại (không bắt buộc)"
+                                                       styleClass="bh-input" HBox.hgrow="ALWAYS" />
+                                            <Button onAction="#handleTimKhachDon" text="Tìm KH"
+                                                    styleClass="bh-btn-primary" prefHeight="38" prefWidth="80"/>
+                                        </children>
+                                    </HBox>
+                                    <Label fx:id="lblTenKhachDon" text="👤  Khách lẻ (vãng lai)" styleClass="bh-customer-name" minWidth="300" maxWidth="Infinity" HBox.hgrow="ALWAYS" wrapText="false" />
+                                </children>
+                            </VBox>
 
-                                        <!-- Giỏ hàng theo đơn -->
-                                        <VBox spacing="0" prefHeight="350" styleClass="bh-cart-wrapper">
-                                            <children>
-                                                <HBox alignment="CENTER_LEFT" styleClass="bh-cart-title-bar" spacing="8">
-                                                    <children>
-                                                        <Label text="📋  GIỎ HÀNG (THEO ĐƠN)" styleClass="bh-cart-title-label" HBox.hgrow="ALWAYS"/>
-                                                        <Button onAction="#handleThemThuocDon" text="➕ Thêm thuốc"
-                                                                styleClass="bh-btn-primary" prefHeight="28"
-                                                                style="-fx-font-size:11px; -fx-padding: 5 12;"/>
-                                                        <Button onAction="#handleHuyGioDon" text="✕  Xóa giỏ"
-                                                                styleClass="bh-btn-danger" prefHeight="28"
-                                                                style="-fx-font-size:11px; -fx-padding: 5 12;"/>
-                                                    </children>
-                                                </HBox>
-                                                <TableView fx:id="tblGioHangDon" styleClass="table-view"
-                                                           VBox.vgrow="ALWAYS" minHeight="120">
-                                                    <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
-                                                    <placeholder>
-                                                        <Label text="Giỏ trống — chọn thuốc để thêm vào" style="-fx-text-fill:#334155; -fx-font-size:13px;"/>
-                                                    </placeholder>
-                                                    <columns>
-                                                        <TableColumn fx:id="colCartDonTenThuoc" text="Thuốc" />
-                                                        <TableColumn fx:id="colCartDonDonVi" prefWidth="70" minWidth="70" maxWidth="70" text="ĐV" />
-                                                        <TableColumn fx:id="colCartDonSoLuong" prefWidth="45" minWidth="45" maxWidth="45" text="SL" />
-                                                        <TableColumn fx:id="colCartDonDonGia" prefWidth="90" minWidth="90" maxWidth="90" text="Đơn giá" />
-                                                        <TableColumn fx:id="colCartDonThanhTien" prefWidth="100" minWidth="100" maxWidth="100" text="Thành tiền" />
-                                                        <TableColumn fx:id="colCartDonHanSuDung" prefWidth="85" minWidth="85" maxWidth="85" text="HSD" />
-                                                        <TableColumn fx:id="colCartDonXoa" prefWidth="40" minWidth="40" maxWidth="40" text="" />
-                                                    </columns>
-                                                </TableView>
-                                            </children>
-                                        </VBox>
+                            <!-- Giỏ hàng theo đơn -->
+                            <VBox spacing="0" VBox.vgrow="ALWAYS" styleClass="bh-cart-wrapper">
+                                <children>
+                                    <HBox alignment="CENTER_LEFT" styleClass="bh-cart-title-bar" spacing="8">
+                                        <children>
+                                            <Label text="📋  GIỎ HÀNG (THEO ĐƠN)" styleClass="bh-cart-title-label" HBox.hgrow="ALWAYS"/>
+                                            <Button onAction="#handleThemThuocDon" text="➕ Thêm thuốc"
+                                                    styleClass="bh-btn-primary" prefHeight="28"
+                                                    style="-fx-font-size:11px; -fx-padding: 5 12;"/>
+                                            <Button onAction="#handleHuyGioDon" text="✕  Xóa giỏ"
+                                                    styleClass="bh-btn-danger" prefHeight="28"
+                                                    style="-fx-font-size:11px; -fx-padding: 5 12;"/>
+                                        </children>
+                                    </HBox>
+                                    <TableView fx:id="tblGioHangDon" styleClass="table-view"
+                                               VBox.vgrow="ALWAYS" minHeight="120">
+                                        <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+                                        <placeholder>
+                                            <Label text="Giỏ trống — chọn thuốc để thêm vào" style="-fx-text-fill:#334155; -fx-font-size:13px;"/>
+                                        </placeholder>
+                                        <columns>
+                                            <TableColumn fx:id="colCartDonTenThuoc" text="Thuốc" />
+                                            <TableColumn fx:id="colCartDonDonVi" prefWidth="70" minWidth="70" maxWidth="70" text="ĐV" />
+                                            <TableColumn fx:id="colCartDonSoLuong" prefWidth="45" minWidth="45" maxWidth="45" text="SL" />
+                                            <TableColumn fx:id="colCartDonDonGia" prefWidth="90" minWidth="90" maxWidth="90" text="Đơn giá" />
+                                            <TableColumn fx:id="colCartDonThanhTien" prefWidth="100" minWidth="100" maxWidth="100" text="Thành tiền" />
+                                            <TableColumn fx:id="colCartDonHanSuDung" prefWidth="85" minWidth="85" maxWidth="85" text="HSD" />
+                                            <TableColumn fx:id="colCartDonXoa" prefWidth="40" minWidth="40" maxWidth="40" text="" />
+                                        </columns>
+                                    </TableView>
+                                </children>
+                            </VBox>
 
-                                        <!-- Thanh toán -->
-                                        <VBox styleClass="bh-panel" spacing="12">
-                                            <children>
-                                                <Label styleClass="bh-section-title" text="THANH TOÁN" />
-                                                <HBox alignment="CENTER_LEFT" spacing="12">
-                                                    <children>
-                                                        <Label text="Hình thức:" style="-fx-text-fill: #64748b; -fx-font-size:13px;" prefWidth="90"/>
-                                                        <ComboBox fx:id="cbHinhThucThanhToanDon" prefHeight="36"
-                                                                  styleClass="bh-combo" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                                                    </children>
-                                                </HBox>
-                                                <Separator style="-fx-opacity: 0.5;" />
-                                                <GridPane hgap="8" vgap="6">
-                                                    <columnConstraints>
-                                                        <ColumnConstraints minWidth="110" />
-                                                        <ColumnConstraints hgrow="ALWAYS" halignment="RIGHT" />
-                                                    </columnConstraints>
-                                                    <children>
-                                                        <Label text="Tạm tính:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" GridPane.rowIndex="0" />
-                                                        <Label fx:id="lblTongTienDon" text="0 ₫" style="-fx-text-fill:#1e293b; -fx-font-size:14px; -fx-font-weight:bold;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-                                                        <Label text="VAT (8%):" style="-fx-text-fill:#94a3b8; -fx-font-size:13px;" GridPane.rowIndex="1"/>
-                                                        <Label fx:id="lblVatDon" text="0 ₫" style="-fx-text-fill:#94a3b8; -fx-font-size:13px;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                                                    </children>
-                                                </GridPane>
-                                                <Separator />
-                                                <HBox alignment="CENTER_LEFT">
-                                                    <children>
-                                                        <Label text="TỔNG THANH TOÁN" style="-fx-font-size:13px; -fx-font-weight:900; -fx-text-fill:#64748b;" HBox.hgrow="ALWAYS"/>
-                                                        <Label fx:id="lblThanhTienDon" text=" 0 ₫" styleClass="bh-money-total" />
-                                                    </children>
-                                                </HBox>
-                                                <Button fx:id="btnThanhToanDon" onAction="#handleThanhToanDon"
-                                                        maxWidth="Infinity" prefHeight="50"
-                                                        styleClass="bh-btn-success"
-                                                        text="💳  THANH TOÁN THEO ĐƠN" />
-                                            </children>
-                                        </VBox>
-                                    </children>
-                                </VBox>
-                            </content>
-                        </ScrollPane>
+                            <!-- Thanh toán — luôn ở dưới cùng -->
+                            <VBox styleClass="bh-panel" spacing="12">
+                                <children>
+                                    <Label styleClass="bh-section-title" text="THANH TOÁN" />
+                                    <HBox alignment="CENTER_LEFT" spacing="12">
+                                        <children>
+                                            <Label text="Hình thức:" style="-fx-text-fill: #64748b; -fx-font-size:13px;" prefWidth="90"/>
+                                            <ComboBox fx:id="cbHinhThucThanhToanDon" prefHeight="36"
+                                                      styleClass="bh-combo" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                        </children>
+                                    </HBox>
+                                    <Separator style="-fx-opacity: 0.5;" />
+                                    <GridPane hgap="8" vgap="6">
+                                        <columnConstraints>
+                                            <ColumnConstraints minWidth="110" />
+                                            <ColumnConstraints hgrow="ALWAYS" halignment="RIGHT" />
+                                        </columnConstraints>
+                                        <children>
+                                            <Label text="Tạm tính:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" GridPane.rowIndex="0" />
+                                            <Label fx:id="lblTongTienDon" text="0 ₫" style="-fx-text-fill:#1e293b; -fx-font-size:14px; -fx-font-weight:bold;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                                            <Label text="VAT (8%):" style="-fx-text-fill:#94a3b8; -fx-font-size:13px;" GridPane.rowIndex="1"/>
+                                            <Label fx:id="lblVatDon" text="0 ₫" style="-fx-text-fill:#94a3b8; -fx-font-size:13px;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                        </children>
+                                    </GridPane>
+                                    <Separator />
+                                    <HBox alignment="CENTER_LEFT">
+                                        <children>
+                                            <Label text="TỔNG THANH TOÁN" style="-fx-font-size:13px; -fx-font-weight:900; -fx-text-fill:#64748b;" HBox.hgrow="ALWAYS"/>
+                                            <Label fx:id="lblThanhTienDon" text=" 0 ₫" styleClass="bh-money-total" />
+                                        </children>
+                                    </HBox>
+                                    <Button fx:id="btnThanhToanDon" onAction="#handleThanhToanDon"
+                                            maxWidth="Infinity" prefHeight="50"
+                                            styleClass="bh-btn-success"
+                                            text="💳  THANH TOÁN THEO ĐƠN" />
+                                </children>
+                            </VBox>
+                        </VBox>
                     </HBox>
                 </Tab>
 
