@@ -55,7 +55,7 @@ public class Dialog_SuaDonViQuyDoiController {
 
         configureThuocComboDisplay();
         configureSpinnerTyping(spTyLeBac2, 2, 10000);
-        configureSpinnerTyping(spTyLeBac3, 3, 100000);
+        configureSpinnerTyping(spTyLeBac3, 2, 100000);
 
         cbDonViBac2.setItems(FXCollections.observableArrayList(goiYDonViWithEmpty()));
         cbDonViBac3.setItems(FXCollections.observableArrayList(goiYDonViWithEmpty()));
@@ -212,31 +212,27 @@ public class Dialog_SuaDonViQuyDoiController {
 
     private String validateInput(String tenBac1, String tenBac2, String tenBac3, int tyLeBac2, int tyLeBac3) {
         if (tenBac1.isBlank()) {
-            return "Đơn vị bậc 1 không được để trống.";
-        }
-
-        if (!tenBac2.isBlank() && !tenBac3.isBlank() && tyLeBac2 == tyLeBac3) {
-            return "Tỷ lệ quy đổi của bậc 2 và bậc 3 không được trùng nhau.";
-        }
-
-        if (!tenBac3.isBlank() && tenBac2.isBlank()) {
-            return "Vui lòng nhập bậc 2 trước khi nhập bậc 3.";
+            return "Đơn vị 1 không được để trống.";
         }
 
         if (!tenBac2.isBlank() && tyLeBac2 <= 1) {
-            return "Tỷ lệ bậc 2 phải lớn hơn 1.";
+            return "Tỷ lệ quy đổi của đơn vị 2 phải lớn hơn 1.";
         }
 
-        if (!tenBac3.isBlank() && tyLeBac3 <= tyLeBac2) {
-            return "Tỷ lệ bậc 3 phải lớn hơn tỷ lệ bậc 2.";
+        if (!tenBac3.isBlank() && tyLeBac3 <= 1) {
+            return "Tỷ lệ quy đổi của đơn vị 3 phải lớn hơn 1.";
         }
 
         if (!tenBac2.isBlank() && tenBac1.equalsIgnoreCase(tenBac2)) {
-            return "Tên đơn vị bậc 2 không được trùng bậc 1.";
+            return "Tên đơn vị 2 không được trùng đơn vị 1.";
         }
 
-        if (!tenBac3.isBlank() && (tenBac1.equalsIgnoreCase(tenBac3) || tenBac2.equalsIgnoreCase(tenBac3))) {
-            return "Tên đơn vị bậc 3 không được trùng các bậc trước.";
+        if (!tenBac3.isBlank() && tenBac1.equalsIgnoreCase(tenBac3)) {
+            return "Tên đơn vị 3 không được trùng đơn vị 1.";
+        }
+
+        if (!tenBac2.isBlank() && !tenBac3.isBlank() && tenBac2.equalsIgnoreCase(tenBac3)) {
+            return "Tên đơn vị 2 và đơn vị 3 phải khác nhau.";
         }
 
         return null;
@@ -254,7 +250,9 @@ public class Dialog_SuaDonViQuyDoiController {
     }
 
     private void capNhatGoiYBac2() {
-        List<String> goiY = locDonViTheoBac(txtDonViBac1.getText());
+        String donVi1 = normalize(txtDonViBac1.getText());
+        String donVi3 = normalize(cbDonViBac3.getValue());
+        List<String> goiY = locDonViKhongTrung(donVi1, donVi3);
         cbDonViBac2.setItems(FXCollections.observableArrayList(goiY));
         if (cbDonViBac2.getValue() != null && !goiY.contains(cbDonViBac2.getValue())) {
             cbDonViBac2.setValue(null);
@@ -262,40 +260,29 @@ public class Dialog_SuaDonViQuyDoiController {
     }
 
     private void capNhatGoiYBac3() {
-        String bacTruoc = normalize(cbDonViBac2.getValue());
-        if (bacTruoc.isBlank()) {
-            bacTruoc = txtDonViBac1.getText();
-        }
-        List<String> goiY = locDonViTheoBac(bacTruoc);
+        String donVi1 = normalize(txtDonViBac1.getText());
+        String donVi2 = normalize(cbDonViBac2.getValue());
+        List<String> goiY = locDonViKhongTrung(donVi1, donVi2);
         cbDonViBac3.setItems(FXCollections.observableArrayList(goiY));
         if (cbDonViBac3.getValue() != null && !goiY.contains(cbDonViBac3.getValue())) {
             cbDonViBac3.setValue(null);
         }
     }
 
-    private List<String> locDonViTheoBac(String donViHienTai) {
-        String normalized = normalize(donViHienTai);
+    private List<String> locDonViKhongTrung(String... daChon) {
         ArrayList<String> danhSach = new ArrayList<>();
-
-        int viTri = -1;
-        List<String> goiY = goiYDonVi();
-        for (int i = 0; i < goiY.size(); i++) {
-            if (goiY.get(i).equalsIgnoreCase(normalized)) {
-                viTri = i;
-                break;
-            }
-        }
-
         danhSach.add("--");
-
-        if (viTri >= 0) {
-            danhSach.addAll(goiY.subList(viTri + 1, goiY.size()));
-        } else {
-            danhSach.addAll(goiY);
-        }
-
-        if (!normalized.isBlank()) {
-            danhSach.removeIf(item -> item.equalsIgnoreCase(normalized));
+        for (String goiY : goiYDonVi()) {
+            boolean trung = false;
+            for (String item : daChon) {
+                if (!normalize(item).isBlank() && goiY.equalsIgnoreCase(normalize(item))) {
+                    trung = true;
+                    break;
+                }
+            }
+            if (!trung) {
+                danhSach.add(goiY);
+            }
         }
         return danhSach;
     }
