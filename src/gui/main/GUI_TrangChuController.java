@@ -210,6 +210,11 @@ public class GUI_TrangChuController {
     }
 
     @FXML
+    void handleMoQuanLyDonViQuyDoi(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_DonViQuyDoi.fxml");
+    }
+
+    @FXML
     void handleMoQuanLyBanHangLapHoaDon(ActionEvent event) {
         switchPage("/gui/main/GUI_QuanLyBanHang.fxml");
     }
@@ -232,6 +237,11 @@ public class GUI_TrangChuController {
     @FXML
     void moTrangNhapKho(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_NhapKho.fxml");
+    }
+
+    @FXML
+    void moTrangXuLyDoiTra(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_XuLyDoiTra.fxml");
     }
 
     @FXML
@@ -262,6 +272,7 @@ public class GUI_TrangChuController {
     void handleMoDanhSachHoaDon(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_DanhSachHoaDon.fxml");
     }
+<<<<<<< HEAD
     
     @FXML
     void handleMoXuLyDoiTra(ActionEvent event) {
@@ -273,6 +284,22 @@ public class GUI_TrangChuController {
         switchPage("/gui/main/GUI_XuLyDoiTra.fxml");
     }
     
+=======
+    @FXML
+    void handleMoQuanLyLoThuoc(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyLoThuoc.fxml");
+    }
+    @FXML
+    void handleMoQuanLyNguoiDung(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyNguoiDung.fxml");
+        
+    }
+
+    @FXML
+    void handleMoLichSuGiaoDich(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_LichSuGiaoDich.fxml");
+    }
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
 
     @FXML
     void handleMoTaoBangGia(ActionEvent event) {

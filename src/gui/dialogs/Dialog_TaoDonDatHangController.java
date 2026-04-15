@@ -3,7 +3,6 @@ package gui.dialogs;
 import dao.DAO_DonDatHang;
 import dao.DAO_NhaCungCap;
 import dao.DAO_Thuoc;
-import dao.DAO_DonViQuyDoi;
 import entity.ChiTietDonDatHang;
 import entity.DonDatHang;
 import entity.DonViQuyDoi;
@@ -23,11 +22,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.util.StringConverter; // Thư viện để format ngày
 import utils.AlertUtils;
 
 import java.text.DecimalFormat;
 import java.time.LocalDate;
-import java.io.File;
+import java.time.format.DateTimeFormatter; // Thư viện định dạng ngày
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +40,9 @@ public class Dialog_TaoDonDatHangController {
     @FXML private TextField txtGhiChu;
     
     // UI Nhập thuốc
-    @FXML private TextField txtTimThuoc; // Thanh tìm kiếm mới
+    @FXML private TextField txtTimThuoc; 
     @FXML private ComboBox<Thuoc> cbThuoc;
-    @FXML private ComboBox<DonViQuyDoi> cbDonVi;
+    @FXML private TextField txtDonVi;
     @FXML private TextField txtSoLuong, txtGiaDuKien;
     
     @FXML private TableView<ChiTietDonDatHang> tableChiTiet;
@@ -54,21 +54,77 @@ public class Dialog_TaoDonDatHangController {
 
     // --- Khai báo biến toàn cục & DAO ---
     private ObservableList<ChiTietDonDatHang> listChiTiet = FXCollections.observableArrayList();
-    private ObservableList<Thuoc> masterListThuoc = FXCollections.observableArrayList(); // List gốc chứa toàn bộ thuốc
+    private ObservableList<Thuoc> masterListThuoc = FXCollections.observableArrayList(); 
     
     private DAO_DonDatHang daoDon = new DAO_DonDatHang();
     private DAO_NhaCungCap daoNcc = new DAO_NhaCungCap();
     private DAO_Thuoc daoThuoc = new DAO_Thuoc();
-    private DAO_DonViQuyDoi daoDonVi = new DAO_DonViQuyDoi();
+    private DonViQuyDoi donViDuocChon = null;
+    
     private DecimalFormat df = new DecimalFormat("#,### VNĐ");
+    private DecimalFormat dfInput = new DecimalFormat("#,###"); // Định dạng cho ô nhập liệu
 
     @FXML public void initialize() {
         setupTable();
         loadDataToComboBox();
-        setupSearchThuoc(); // Gọi hàm cài đặt tìm kiếm
+        setupSearchThuoc(); 
+        setupInputFormatting(); // Kích hoạt format ô nhập tiền
         
+        // 🚨 ĐỊNH DẠNG NGÀY GIAO THÀNH DD/MM/YYYY 🚨
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        dpNgayGiao.setConverter(new StringConverter<LocalDate>() {
+            @Override
+            public String toString(LocalDate date) {
+                if (date != null) {
+                    return dateFormatter.format(date);
+                } else {
+                    return "";
+                }
+            }
+            @Override
+            public LocalDate fromString(String string) {
+                if (string != null && !string.isEmpty()) {
+                    return LocalDate.parse(string, dateFormatter);
+                } else {
+                    return null;
+                }
+            }
+        });
+
         // Mặc định ngày giao dự kiến là ngày mai
         dpNgayGiao.setValue(LocalDate.now().plusDays(1));
+        
+        // 🚨 CHẶN NGƯỜI DÙNG CHỌN NGÀY TRONG QUÁ KHỨ 🚨
+        dpNgayGiao.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                LocalDate today = LocalDate.now();
+                // Disable (làm mờ và cấm click) những ngày trước hôm nay
+                setDisable(empty || date.compareTo(today) < 0);
+            }
+        });
+    }
+
+    // 🚨 FORMAT Ô NHẬP GIÁ TIỀN REAL-TIME 🚨
+    private void setupInputFormatting() {
+        txtGiaDuKien.textProperty().addListener((obs, oldV, newV) -> {
+            if (newV == null || newV.isEmpty()) return;
+            // Xóa tất cả các ký tự không phải số để lấy giá trị gốc
+            String cleanStr = newV.replaceAll("[^\\d]", "");
+            try {
+                if (!cleanStr.isEmpty()) {
+                    long val = Long.parseLong(cleanStr);
+                    // Ép dấu phân cách thành dấu chấm cho thân thiện với VN
+                    String formatted = dfInput.format(val).replace(',', '.'); 
+                    if (!newV.equals(formatted)) {
+                        txtGiaDuKien.setText(formatted);
+                    }
+                }
+            } catch (NumberFormatException e) {
+                txtGiaDuKien.setText(oldV);
+            }
+        });
     }
 
     private void setupTable() {
@@ -107,28 +163,20 @@ public class Dialog_TaoDonDatHangController {
     }
 
     private void loadDataToComboBox() {
-        // 1. Lấy danh sách Nhà cung cấp 
         List<NhaCungCap> dsNcc = daoNcc.getAllNhaCungCap(); 
         cbNhaCungCap.setItems(FXCollections.observableArrayList(dsNcc));
 
-        // 2. Lấy danh sách Thuốc đưa vào masterList
-        ArrayList<Thuoc> dsThuoc = daoThuoc.getAllThuoc(); 
+        ArrayList<Thuoc> dsThuoc = daoThuoc.getAllThuocTatCa(); 
         masterListThuoc.setAll(dsThuoc);
         cbThuoc.setItems(masterListThuoc);
 
-        // ==============================================================
-        // CODE HIỂN THỊ HÌNH ẢNH (DÙNG NATIVE TEXT & GRAPHIC ĐỂ KHÔNG MẤT CHỮ)
-        // ==============================================================
         javafx.util.Callback<ListView<Thuoc>, ListCell<Thuoc>> cellFactory = param -> new ListCell<Thuoc>() {
             private ImageView imageView = new ImageView();
-
             {
-                // Set kích thước ảnh
                 imageView.setFitWidth(35);
                 imageView.setFitHeight(35);
                 imageView.setPreserveRatio(true);
             }
-
             @Override
             protected void updateItem(Thuoc item, boolean empty) {
                 super.updateItem(item, empty);
@@ -136,9 +184,8 @@ public class Dialog_TaoDonDatHangController {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    // DÙNG TRỰC TIẾP setText CỦA CELL (Tránh bị ẩn chữ khi chọn)
                     setText(item.getTenThuoc());
-                    setStyle("-fx-font-weight: bold; -fx-text-fill: #1e293b;"); // Làm chữ đậm cho dễ nhìn
+                    setStyle("-fx-font-weight: bold; -fx-text-fill: #1e293b;"); 
                     
                     String fileAnh = item.getHinhAnh();
                     if (fileAnh != null && !fileAnh.trim().isEmpty()) {
@@ -146,7 +193,7 @@ public class Dialog_TaoDonDatHangController {
                             java.io.InputStream is = getClass().getResourceAsStream("/resources/images/images_thuoc/" + fileAnh.trim());
                             if (is != null) {
                                 imageView.setImage(new javafx.scene.image.Image(is));
-                                setGraphic(imageView); // DÙNG TRỰC TIẾP setGraphic CỦA CELL
+                                setGraphic(imageView); 
                             } else {
                                 setGraphic(null);
                             }
@@ -160,45 +207,35 @@ public class Dialog_TaoDonDatHangController {
             }
         };
 
-        // Áp dụng cho danh sách thả xuống
         cbThuoc.setCellFactory(cellFactory);
-        // Áp dụng cho ô đang hiển thị (ButtonCell)
         cbThuoc.setButtonCell(cellFactory.call(null)); 
         
-     // 3. Sự kiện: Khi chọn Thuốc -> Load Đơn vị và TÍNH GIÁ LUÔN
         cbThuoc.getSelectionModel().selectedItemProperty().addListener((obs, oldV, thuocDuocChon) -> {
             if (thuocDuocChon != null) {
-                ArrayList<DonViQuyDoi> dsDonVi = daoDonVi.getDonViByMaThuoc(thuocDuocChon.getMaThuoc());
-                cbDonVi.setItems(FXCollections.observableArrayList(dsDonVi));
+                DonViQuyDoi dvLonNhat = new dao.DAO_DonViQuyDoi().getDonViLonNhatCuaThuoc(thuocDuocChon.getMaThuoc());
                 
-                if (!dsDonVi.isEmpty()) {
-                    cbDonVi.getSelectionModel().selectFirst(); // Chọn đơn vị đầu tiên
+                if (dvLonNhat != null) {
+                    donViDuocChon = dvLonNhat; 
+                    txtDonVi.setText(dvLonNhat.getTenDonVi()); 
                     
-                    // ÉP TÍNH GIÁ NGAY LẬP TỨC:
-                    DonViQuyDoi dvDauTien = dsDonVi.get(0);
                     double giaGoc = daoThuoc.getGiaNhapGanNhat(thuocDuocChon.getMaThuoc());
-                    txtGiaDuKien.setText(String.valueOf(Math.round(giaGoc * dvDauTien.getTyLeQuyDoi())));
+                    long giaMoi = Math.round(giaGoc * dvLonNhat.getTyLeQuyDoi());
+                    // 🚨 Đẩy giá lên ô text có kèm format dấu chấm 🚨
+                    txtGiaDuKien.setText(dfInput.format(giaMoi).replace(',', '.'));
                 } else {
-                    txtGiaDuKien.setText("0"); 
+                    donViDuocChon = null;
+                    txtDonVi.setText("Lỗi ĐV");
+                    txtGiaDuKien.setText("0");
+                    AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi Dữ Liệu", "Thuốc chưa có Đơn vị trong DB!");
                 }
             } else {
-                cbDonVi.setItems(FXCollections.observableArrayList());
+                donViDuocChon = null;
+                txtDonVi.clear();
                 txtGiaDuKien.clear();
             }
         });
-
-        // 4. Sự kiện: Khi người dùng đổi Đơn Vị thủ công (ví dụ từ Viên sang Hộp)
-        cbDonVi.getSelectionModel().selectedItemProperty().addListener((obs, oldV, dvDuocChon) -> {
-            Thuoc thuocHienTai = cbThuoc.getSelectionModel().getSelectedItem();
-            if (dvDuocChon != null && thuocHienTai != null) {
-                double giaGoc = daoThuoc.getGiaNhapGanNhat(thuocHienTai.getMaThuoc());
-                txtGiaDuKien.setText(String.valueOf(Math.round(giaGoc * dvDuocChon.getTyLeQuyDoi())));
-            }
-        });
     }
-    // ==============================================================
-    // CHỨC NĂNG LỌC TÌM KIẾM THUỐC
-    // ==============================================================
+
     private void setupSearchThuoc() {
         txtTimThuoc.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null || newValue.trim().isEmpty()) {
@@ -208,14 +245,12 @@ public class Dialog_TaoDonDatHangController {
                 String keyword = newValue.toLowerCase();
                 
                 for (Thuoc t : masterListThuoc) {
-                    // Lọc theo tên thuốc (Có thể mở rộng lọc theo hoạt chất nếu muốn)
                     if (t.getTenThuoc() != null && t.getTenThuoc().toLowerCase().contains(keyword)) {
                         filteredList.add(t);
                     }
                 }
                 cbThuoc.setItems(filteredList);
                 
-                // Tự động bung ComboBox ra cho ngầu khi đang gõ chữ
                 if (!filteredList.isEmpty()) {
                     cbThuoc.show();
                 } else {
@@ -227,12 +262,14 @@ public class Dialog_TaoDonDatHangController {
 
     @FXML void handleThemThuoc(ActionEvent event) {
         Thuoc thuoc = cbThuoc.getSelectionModel().getSelectedItem();
-        DonViQuyDoi dv = cbDonVi.getSelectionModel().getSelectedItem();
+        DonViQuyDoi dv = donViDuocChon; 
+        
         String slStr = txtSoLuong.getText();
-        String giaStr = txtGiaDuKien.getText();
+        // 🚨 XÓA BỎ DẤU CHẤM TRƯỚC KHI PARSE ĐỂ KHÔNG BỊ VĂNG LỖI CHUỖI 🚨
+        String giaStr = txtGiaDuKien.getText().replaceAll("[^\\d]", "");
 
         if (thuoc == null || dv == null) {
-            AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Vui lòng chọn thuốc và đơn vị tính!"); return;
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Vui lòng chọn thuốc (Thuốc phải có đơn vị hợp lệ)!"); return;
         }
         if (slStr.isEmpty() || giaStr.isEmpty()) {
             AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Vui lòng nhập đầy đủ số lượng và giá dự kiến!"); return;
@@ -283,13 +320,16 @@ public class Dialog_TaoDonDatHangController {
     }
 
     private void resetFormThuoc() {
-        txtTimThuoc.clear(); // Xóa khung tìm kiếm
+        txtTimThuoc.clear(); 
         cbThuoc.getSelectionModel().clearSelection();
-        cbDonVi.getSelectionModel().clearSelection();
+        
+        txtDonVi.clear();
+        donViDuocChon = null;
+        
         txtSoLuong.clear();
         txtGiaDuKien.clear();
     }
-
+    
     @FXML void handleTaoDon(ActionEvent event) {
         NhaCungCap ncc = cbNhaCungCap.getSelectionModel().getSelectedItem();
         if (ncc == null) {

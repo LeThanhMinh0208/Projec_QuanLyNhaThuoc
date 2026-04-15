@@ -16,6 +16,7 @@ public class Dialog_SuaKhachHangController {
     @FXML private TextField txtDiaChi;
     @FXML private TextField txtDiem;
     @FXML private Button btnHuy;
+    @FXML private Button btnLuu;
 
     private DAO_KhachHang daoKhachHang = new DAO_KhachHang();
     private KhachHang khachHang;
@@ -28,7 +29,26 @@ public class Dialog_SuaKhachHangController {
             txtSdt.setText(kh.getSdt());
             txtDiaChi.setText(kh.getDiaChi());
             txtDiem.setText(String.valueOf(kh.getDiemTichLuy()));
+            setupChangeDetection();
         }
+    }
+
+    private void setupChangeDetection() {
+        String snapshot_ten = txtHoTen.getText();
+        String snapshot_sdt = txtSdt.getText();
+        String snapshot_diachi = txtDiaChi.getText();
+
+        Runnable checkChanged = () -> {
+            boolean changed = !txtHoTen.getText().equals(snapshot_ten) ||
+                              !txtSdt.getText().equals(snapshot_sdt) ||
+                              !txtDiaChi.getText().equals(snapshot_diachi);
+            btnLuu.setDisable(!changed);
+        };
+
+        txtHoTen.textProperty().addListener((o, ov, nv) -> checkChanged.run());
+        txtSdt.textProperty().addListener((o, ov, nv) -> checkChanged.run());
+        txtDiaChi.textProperty().addListener((o, ov, nv) -> checkChanged.run());
+        btnLuu.setDisable(true);
     }
 
     @FXML

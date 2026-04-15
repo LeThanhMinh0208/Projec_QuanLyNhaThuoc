@@ -5,7 +5,7 @@ import java.util.Date;
 public class PhieuChi {
     private String maPhieuChi;
     private NhaCungCap nhaCungCap; // Khóa ngoại trỏ sang Object NhaCungCap
-    private NhanVien nhanVien;     // Khóa ngoại trỏ sang Object NhanVien
+    private NhanVien nhanVien; // Khóa ngoại trỏ sang Object NhanVien
     private Date ngayChi;
     private double tongTienChi;
     private String hinhThucChi;
@@ -16,7 +16,8 @@ public class PhieuChi {
     }
 
     // Constructor đầy đủ
-    public PhieuChi(String maPhieuChi, NhaCungCap nhaCungCap, NhanVien nhanVien, Date ngayChi, double tongTienChi, String hinhThucChi, String ghiChu) {
+    public PhieuChi(String maPhieuChi, NhaCungCap nhaCungCap, NhanVien nhanVien, Date ngayChi, double tongTienChi,
+            String hinhThucChi, String ghiChu) {
         this.maPhieuChi = maPhieuChi;
         this.nhaCungCap = nhaCungCap;
         this.nhanVien = nhanVien;

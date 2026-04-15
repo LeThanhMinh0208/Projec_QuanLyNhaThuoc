@@ -1,6 +1,5 @@
 package gui.main;
 
-import dao.DAO_DanhMucThuoc;
 import dao.DAO_Thuoc;
 import entity.Thuoc;
 import gui.dialogs.*;
@@ -12,20 +11,21 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import utils.AlertUtils;
 import utils.WindowUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 public class GUI_DanhMucThuocController {
     @FXML private TableView<Thuoc> tableThuoc;
-    // @FXML private ComboBox<String> cbLocDanhMuc; // Bỏ theo yêu cầu người dùng
     
     @FXML private TableColumn<Thuoc, String> colMa, colHinhAnh, colTen, colDanhMuc, colHoatChat, colHangSX, colNuocSX, colCongDung, colTrangThai;
     @FXML private TableColumn<Thuoc, Boolean> colKeDon;
@@ -33,7 +33,6 @@ public class GUI_DanhMucThuocController {
     @FXML private TextField txtTimKiem;
 
     private DAO_Thuoc daoThuoc = new DAO_Thuoc();
-    private DAO_DanhMucThuoc daoDanhMuc = new DAO_DanhMucThuoc();
     private ObservableList<Thuoc> masterData = FXCollections.observableArrayList();
     private FilteredList<Thuoc> filteredData;
 
@@ -44,7 +43,6 @@ public class GUI_DanhMucThuocController {
     }
 
     private void setupTable() {
-        // Cấu hình các cột Text cơ bản
         colMa.setCellValueFactory(new PropertyValueFactory<>("maThuoc"));
         colTen.setCellValueFactory(new PropertyValueFactory<>("tenThuoc"));
         colDanhMuc.setCellValueFactory(new PropertyValueFactory<>("tenDanhMuc"));
@@ -53,71 +51,73 @@ public class GUI_DanhMucThuocController {
         colNuocSX.setCellValueFactory(new PropertyValueFactory<>("nuocSanXuat"));
         colCongDung.setCellValueFactory(new PropertyValueFactory<>("congDung"));
 
-        // 1. CỘT TRẠNG THÁI (Đã cạo trọc màu, chỉ dịch ngôn ngữ)
+        // Cột Trạng Thái
         colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
         colTrangThai.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
-                    setText(null);
+                    setText(null); setStyle("");
                 } else {
                     switch (item) {
-                        case "DANG_BAN": setText("Đang kinh doanh"); break;
-                        case "HET_HANG": setText("Hết hàng"); break;
-                        case "NGUNG_BAN": setText("Ngừng bán"); break;
-                        default: setText(item);
+                        case "DANG_BAN": setText("Đang kinh doanh"); setStyle(""); break;
+                        case "HET_HANG": setText("Hết hàng"); setStyle(""); break;
+                        default: setText(item); setStyle("");
                     }
                 }
             }
         });
 
-        // 2. CỘT KÊ ĐƠN (Đã cạo trọc màu)
+        // Cột Kê Đơn
         colKeDon.setCellValueFactory(new PropertyValueFactory<>("canKeDon"));
         colKeDon.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Boolean item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item ? "Có" : "Không");
-                }
+                setText(empty || item == null ? null : (item ? "Có" : "Không"));
             }
         });
 
-        // 3. CỘT HÌNH ẢNH (Giữ nguyên)
+        // Cột Hình Ảnh
         colHinhAnh.setCellValueFactory(new PropertyValueFactory<>("hinhAnh"));
         colHinhAnh.setCellFactory(column -> new TableCell<>() {
             private final ImageView iv = new ImageView();
+            private final javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(iv);
+            {
+                iv.setFitWidth(60);
+                iv.setFitHeight(60);
+                iv.setPreserveRatio(true);
+                iv.setSmooth(true);
+                box.setAlignment(Pos.CENTER);
+                box.setPrefHeight(72);
+            }
             @Override
             protected void updateItem(String file, boolean empty) {
                 super.updateItem(file, empty);
                 if (empty || file == null || file.trim().isEmpty()) {
-                    setGraphic(null);
+                    iv.setImage(null);
+                    setGraphic(empty ? null : box);
                 } else {
                     try {
                         InputStream is = getClass().getResourceAsStream("/resources/images/images_thuoc/" + file.trim());
                         if (is != null) {
-                            iv.setImage(new Image(is));
-                            iv.setFitWidth(60); iv.setFitHeight(45);
-                            iv.setPreserveRatio(true);
-                            setGraphic(iv); setAlignment(Pos.CENTER);
+                            iv.setImage(new Image(is, 60, 60, true, true));
                         } else {
-                            setGraphic(new Label("No image"));
+                            iv.setImage(null);
                         }
                     } catch (Exception e) {
-                        setGraphic(new Label("Error"));
+                        iv.setImage(null);
                     }
+                    setGraphic(box);
                 }
             }
         });
 
-        // --- 4. LOGIC CLICK CHUỘT THÔNG MINH (GIỐNG Y CHANG TRANG CHỦ) ---
+        // Row factory — Toggle Selection + Double Click Sửa
         tableThuoc.setRowFactory(tv -> {
             TableRow<Thuoc> row = new TableRow<>();
             
-            // Lắng nghe sự kiện click 1 lần (Toggle Selection & Xóa bóng ma Focus)
             row.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
                 if (event.getClickCount() == 1 && (!row.isEmpty()) && row.isSelected()) {
                     tv.getSelectionModel().clearSelection();
@@ -127,7 +127,6 @@ public class GUI_DanhMucThuocController {
                 }
             });
 
-            // Lắng nghe sự kiện Double Click (Mở form Sửa)
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     checkAndOpenDialog("/gui/dialogs/Dialog_SuaThuoc.fxml", "Sửa Thuốc");
@@ -171,6 +170,16 @@ public class GUI_DanhMucThuocController {
     @FXML void handleXoa() { checkAndOpenDialog("/gui/dialogs/Dialog_XoaThuoc.fxml", "Xóa Thuốc"); }
 
     @FXML
+    void handleMoQuyDoiDonVi() {
+        Thuoc selected = tableThuoc.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng chọn một loại thuốc trong bảng!");
+            return;
+        }
+        moCuaSoDonViQuyDoi(selected);
+    }
+
+    @FXML
     void handleRefresh() {
         txtTimKiem.clear();
         tableThuoc.getSelectionModel().clearSelection();
@@ -180,7 +189,6 @@ public class GUI_DanhMucThuocController {
     private void checkAndOpenDialog(String path, String title) {
         Thuoc selected = tableThuoc.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            // Dùng AlertUtils thay vì khởi tạo Alert thủ công
             AlertUtils.showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng chọn một loại thuốc trong bảng!");
             return;
         }
@@ -188,13 +196,11 @@ public class GUI_DanhMucThuocController {
     }
 
     private void openDialog(String path, String title, Thuoc data) {
-        // Sử dụng WindowUtils để bóc tách logic mở Modal
         FXMLLoader loader = WindowUtils.openModal(path, title);
         
         if (loader != null) {
             Object ctrl = loader.getController();
 
-            // Logic truyền dữ liệu vẫn giữ nguyên vẹn
             if (ctrl instanceof Dialog_SuaThuocController && data != null) {
                 ((Dialog_SuaThuocController) ctrl).setThuocData(data);
             } else if (ctrl instanceof Dialog_XoaThuocController && data != null) {
@@ -204,7 +210,25 @@ public class GUI_DanhMucThuocController {
             Stage stage = (Stage) ((Parent) loader.getRoot()).getScene().getWindow();
             stage.showAndWait();
             
-            loadData(); // Tải lại dữ liệu sau khi đóng Dialog
+            loadData();
+        }
+    }
+    private void moCuaSoDonViQuyDoi(Thuoc thuoc) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/main/GUI_DonViQuyDoi.fxml"));
+            Parent root = loader.load();
+            
+            GUI_DonViQuyDoiController controller = loader.getController();
+            controller.setThuoc(thuoc); // Truyền đối tượng thuốc đang chọn sang
+            
+            Stage stage = new Stage();
+            stage.setTitle("Quy đổi đơn vị - " + thuoc.getTenThuoc());
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể mở trang quy đổi đơn vị.");
         }
     }
 }

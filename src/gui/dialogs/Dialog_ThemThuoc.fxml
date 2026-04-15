@@ -44,7 +44,7 @@
                             </columnConstraints>
                             <children>
                                 <Label text="Mã Thuốc:" GridPane.rowIndex="0" />
-                                <TextField fx:id="txtMa" disable="true" prefHeight="40.0" promptText="Mã tự động" styleClass="ds-input, ds-input-readonly" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                                <TextField fx:id="txtMa" disable="true" opacity="0.5" prefHeight="40.0" promptText="Mã tự động" styleClass="ds-input, ds-input-readonly" GridPane.rowIndex="0" GridPane.columnIndex="1" />
                                 
                                 <Label text="Tên Thuốc:" GridPane.rowIndex="0" GridPane.columnIndex="2" />
                                 <TextField fx:id="txtTen" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="0" GridPane.columnIndex="3" />
@@ -59,7 +59,7 @@
                                 <TextField fx:id="txtHangSX" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="2" GridPane.columnIndex="1" />
                                 
                                 <Label text="Nước SX:" GridPane.rowIndex="2" GridPane.columnIndex="2" />
-                                <TextField fx:id="txtNuocSX" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="2" GridPane.columnIndex="3" />
+                                <ComboBox fx:id="cbNuocSX" editable="false" maxWidth="Infinity" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="2" GridPane.columnIndex="3" />
 
                                 <Label text="Hàm Lượng:" GridPane.rowIndex="3" />
                                 <TextField fx:id="txtHamLuong" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="3" GridPane.columnIndex="1" />

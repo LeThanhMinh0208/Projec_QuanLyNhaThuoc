@@ -40,7 +40,7 @@
                             </columnConstraints>
                             <children>
                                 <Label text="Mã Nhà Cung Cấp" GridPane.rowIndex="0" />
-                                <TextField fx:id="txtMa" disable="true" prefHeight="40.0" promptText="Mã tự động" 
+                                <TextField fx:id="txtMa" disable="true" opacity="0.5" prefHeight="40.0" promptText="Mã tự động" 
                                            styleClass="ds-input, ds-input-readonly" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
                                 <Label text="Tên Nhà Cung Cấp:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
@@ -56,7 +56,7 @@
                                            styleClass="ds-input" GridPane.columnIndex="3" GridPane.rowIndex="1" />
 
                                 <Label text="Công Nợ (VNĐ):" GridPane.rowIndex="2" />
-                                <TextField fx:id="txtCongNo" prefHeight="40.0" promptText="0 nếu không có công nợ" 
+                                <TextField  disable = "true" fx:id="txtCongNo" prefHeight="40.0" promptText="0" 
                                            styleClass="ds-input" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                             </children>
                             <rowConstraints>

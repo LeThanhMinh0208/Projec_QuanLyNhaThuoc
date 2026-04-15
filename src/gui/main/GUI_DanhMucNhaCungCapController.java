@@ -1,6 +1,6 @@
 package gui.main;
 
-import dao.DAO_NhaCungCap;  // Giả sử bạn đã tạo DAO này
+import dao.DAO_NhaCungCap;
 import entity.NhaCungCap;
 import gui.dialogs.*;
 import javafx.collections.FXCollections;
@@ -15,16 +15,13 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import utils.AlertUtils;
-import utils.WindowUtils;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 
 public class GUI_DanhMucNhaCungCapController {
 
     @FXML private TableView<NhaCungCap> tableNhaCungCap;
-    // @FXML private ComboBox<String> cbLocDanhMuc;  // Bỏ ô lọc theo yêu cầu người dùng
 
     @FXML private TableColumn<NhaCungCap, String> colMa, colTen, colSdt, colDiaChi;
     @FXML private TableColumn<NhaCungCap, Double> colCongNo;
@@ -35,7 +32,7 @@ public class GUI_DanhMucNhaCungCapController {
     private ObservableList<NhaCungCap> masterData = FXCollections.observableArrayList();
     private FilteredList<NhaCungCap> filteredData;
 
-    private final DecimalFormat df = new DecimalFormat("#,### VNĐ");  // Format công nợ
+    private final DecimalFormat df = new DecimalFormat("#,### VNĐ");
 
     @FXML
     public void initialize() {
@@ -44,6 +41,12 @@ public class GUI_DanhMucNhaCungCapController {
     }
 
     private void setupTable() {
+        tableNhaCungCap.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                handleSua();
+            }
+        });
+
         colMa.setCellValueFactory(new PropertyValueFactory<>("maNhaCungCap"));
         colTen.setCellValueFactory(new PropertyValueFactory<>("tenNhaCungCap"));
         colSdt.setCellValueFactory(new PropertyValueFactory<>("sdt"));
@@ -61,14 +64,11 @@ public class GUI_DanhMucNhaCungCapController {
                 } else {
                     setText(df.format(item));
                     if (item > 0) {
-                        // Mình đang nợ NCC -> Màu đỏ
                         setStyle("-fx-text-fill: #e11d48; -fx-font-weight: bold; -fx-alignment: CENTER-RIGHT;");
                     } else if (item == 0) {
-                        // Trắng nợ -> Màu xanh lá
                         setText("0 VNĐ");
                         setStyle("-fx-text-fill: #10b981; -fx-font-weight: bold; -fx-alignment: CENTER-RIGHT;");
                     } else {
-                        // NCC nợ ngược mình (Số âm) -> Màu xanh dương
                         setStyle("-fx-text-fill: #0ea5e9; -fx-font-weight: bold; -fx-alignment: CENTER-RIGHT;");
                     }
                 }
@@ -77,7 +77,7 @@ public class GUI_DanhMucNhaCungCapController {
     }
 
     private void loadData() {
-        masterData.setAll(daoNhaCungCap.getAllNhaCungCapFull()); 
+        masterData.setAll(daoNhaCungCap.getAllNhaCungCapFull());
 
         filteredData = new FilteredList<>(masterData, p -> true);
 
@@ -99,7 +99,6 @@ public class GUI_DanhMucNhaCungCapController {
             if (ncc.getSdt() != null && ncc.getSdt().toLowerCase().contains(keyword)) return true;
             if (ncc.getDiaChi() != null && ncc.getDiaChi().toLowerCase().contains(keyword)) return true;
 
-            // Tìm theo công nợ (chuyển số thành chuỗi)
             String congNoStr = df.format(ncc.getCongNo()).toLowerCase();
             return congNoStr.contains(keyword);
         });
@@ -139,25 +138,23 @@ public class GUI_DanhMucNhaCungCapController {
     private void openDialog(String path, String title, NhaCungCap data) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
-            Parent root = loader.load();  // load trả về Parent
+            Parent root = loader.load();
 
             Object ctrl = loader.getController();
 
-            // Truyền dữ liệu nếu cần (sửa/xóa)
             if (ctrl instanceof Dialog_SuaNhaCungCapController && data != null) {
                 ((Dialog_SuaNhaCungCapController) ctrl).setNhaCungCapData(data);
             } else if (ctrl instanceof Dialog_XoaNhaCungCapController && data != null) {
                 ((Dialog_XoaNhaCungCapController) ctrl).setNhaCungCapData(data);
             }
 
-            // Tạo Stage mới
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setTitle(title);
-            stage.setResizable(false);  // Tùy chọn
+            stage.setResizable(false);
             stage.showAndWait();
 
-            loadData();  // Refresh bảng sau dialog
+            loadData();
         } catch (IOException e) {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "Không mở được dialog: " + e.getMessage()).show();

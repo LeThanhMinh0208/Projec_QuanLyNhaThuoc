@@ -37,7 +37,11 @@ public class PhieuDoiTraView {
     }
 
     public String getTenKhachHang() {
+<<<<<<< HEAD
         return tenKhachHang != null ? tenKhachHang : "Khach le";
+=======
+        return tenKhachHang != null ? tenKhachHang : "Khách lẻ";
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
     }
 
     public void setTenKhachHang(String tenKhachHang) {
@@ -78,8 +82,14 @@ public class PhieuDoiTraView {
 
     public String getHinhThucXuLyLabel() {
         if ("DOI_SAN_PHAM".equals(hinhThucXuLy)) {
+<<<<<<< HEAD
             return "Doi san pham";
         }
         return "Hoan tien";
+=======
+            return "Đổi sản phẩm";
+        }
+        return "Hoàn tiền";
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
     }
 }

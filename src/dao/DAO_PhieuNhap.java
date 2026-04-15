@@ -49,10 +49,12 @@ public class DAO_PhieuNhap {
                 pstPhieuNhap.executeUpdate();
             }
 
-            // 2. Lưu trực tiếp vào bảng LoThuoc (Cấu trúc gốc)
+            // =========================================================================
+            // 2. LƯU VÀO BẢNG LÔ THUỐC (ĐÃ SỬA: THÊM NGÀY NHẬP KHO VÀ NHÀ CUNG CẤP)
+            // =========================================================================
             String sqlInsertLoThuoc = "IF NOT EXISTS (SELECT 1 FROM LoThuoc WHERE maLoThuoc=?) " + 
-                                      "INSERT INTO LoThuoc (maLoThuoc, maThuoc, ngaySanXuat, hanSuDung, soLuongTon, giaNhap, viTriKho) " +
-                                      "VALUES (?, ?, ?, ?, ?, ?, 'KHO_DU_TRU') " +
+                                      "INSERT INTO LoThuoc (maLoThuoc, maThuoc, ngaySanXuat, hanSuDung, soLuongTon, giaNhap, viTriKho, trangThai, ngayNhapKho, maNhaCungCap) " +
+                                      "VALUES (?, ?, ?, ?, ?, ?, 'KHO_DU_TRU', 1, ?, ?) " +
                                       "ELSE " +
                                       "UPDATE LoThuoc SET soLuongTon = soLuongTon + ? WHERE maLoThuoc=?";
                                       
@@ -72,27 +74,45 @@ public class DAO_PhieuNhap {
                         Date ngaySX = Date.valueOf(ChuyenDoiNgay(ct.getNgaySanXuatTemp()));
                         Date hanSD = Date.valueOf(ChuyenDoiNgay(ct.getHanSuDung()));
 
-                        // Bảng LoThuoc: Thêm mới hoặc cộng dồn
-                        pstLoThuoc.setString(1, ct.getMaLo()); // Param 1: IF NOT EXISTS
-                        pstLoThuoc.setString(2, ct.getMaLo()); // Param 2: Insert
-                        pstLoThuoc.setString(3, ct.getThuoc().getMaThuoc()); // Param 3: Insert
-                        pstLoThuoc.setDate(4, ngaySX); // Param 4: Insert
-                        pstLoThuoc.setDate(5, hanSD); // Param 5: Insert
-                        pstLoThuoc.setInt(6, ct.getSoLuongDaNhan()); // Param 6: Insert
-                        pstLoThuoc.setDouble(7, ct.getDonGiaDuKien()); // Param 7: Insert
-                        pstLoThuoc.setInt(8, ct.getSoLuongDaNhan()); // Param 8: Update
-                        pstLoThuoc.setString(9, ct.getMaLo()); // Param 9: Update
-                        pstLoThuoc.executeUpdate();
+                        // THUẬT TOÁN QUY ĐỔI ĐƠN VỊ TÍNH
+                        int tyLe = ct.getDonViQuyDoi().getTyLeQuyDoi();
+                        if (tyLe <= 0) tyLe = 1; 
+                        
+                        int soLuongThucTeVaoKho = ct.getSoLuongDaNhan() * tyLe;  
+                        double giaNhapThucTeVaoKho = ct.getDonGiaDuKien() / tyLe; 
 
-                        // Chi tiết Phiếu Nhập
+                        // -------------------------------------------------------------
+                        // CẬP NHẬT PARAMETER CHO CÂU LỆNH INSERT LÔ THUỐC MỚI
+                        // -------------------------------------------------------------
+                        pstLoThuoc.setString(1, ct.getMaLo()); // Param 1: Check EXISTS
+                        pstLoThuoc.setString(2, ct.getMaLo()); // Param 2: VALUES maLoThuoc
+                        pstLoThuoc.setString(3, ct.getThuoc().getMaThuoc()); 
+                        pstLoThuoc.setDate(4, ngaySX); 
+                        pstLoThuoc.setDate(5, hanSD); 
+                        
+                        pstLoThuoc.setInt(6, soLuongThucTeVaoKho);    
+                        pstLoThuoc.setDouble(7, giaNhapThucTeVaoKho); 
+                        
+                        // 🚨🚨 ĐÂY LÀ 2 DÒNG QUAN TRỌNG NHẤT VỪA THÊM VÀO 🚨🚨
+                        pstLoThuoc.setDate(8, new java.sql.Date(System.currentTimeMillis())); // Lấy ngày máy tính làm ngày nhập
+                        pstLoThuoc.setString(9, phieuNhap.getNhaCungCap().getMaNhaCungCap()); // Lấy mã NCC từ đối tượng PhieuNhap
+                        
+                        // Dịch 2 tham số của phần UPDATE xuống vị trí 10, 11
+                        pstLoThuoc.setInt(10, soLuongThucTeVaoKho);   
+                        pstLoThuoc.setString(11, ct.getMaLo()); 
+                        
+                        pstLoThuoc.executeUpdate();
+                        // -------------------------------------------------------------
+
+                        // 2. Chi tiết Phiếu Nhập (Giữ nguyên)
                         pstChiTietPN.setString(1, phieuNhap.getMaPhieuNhap());
                         pstChiTietPN.setString(2, ct.getDonViQuyDoi().getMaQuyDoi());
                         pstChiTietPN.setString(3, ct.getMaLo());
-                        pstChiTietPN.setInt(4, ct.getSoLuongDaNhan());
-                        pstChiTietPN.setDouble(5, ct.getDonGiaDuKien());
+                        pstChiTietPN.setInt(4, ct.getSoLuongDaNhan()); 
+                        pstChiTietPN.setDouble(5, ct.getDonGiaDuKien()); 
                         pstChiTietPN.executeUpdate();
 
-                        // Cập nhật Đơn đặt hàng gốc
+                        // 3. Cập nhật Đơn đặt hàng gốc (Giữ nguyên)
                         pstUpdateCTDon.setInt(1, ct.getSoLuongDaNhan()); 
                         pstUpdateCTDon.setDouble(2, ct.getDonGiaDuKien()); 
                         pstUpdateCTDon.setString(3, ct.getMaLo());

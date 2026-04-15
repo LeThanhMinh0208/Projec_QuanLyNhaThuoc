@@ -11,57 +11,111 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="C:/Users/ASUS/Downloads/openjfx-25.0.2_windows-x64_bin-sdk/javafx-sdk-25.0.2/lib/javafx.base.jar">
+=======
+	<classpathentry kind="lib" path="E:/Download/javafx-sdk-25.0.2/lib/itext-asian-5.2.0.jar">
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="C:/Users/ASUS/Downloads/openjfx-25.0.2_windows-x64_bin-sdk/javafx-sdk-25.0.2/lib/javafx.controls.jar">
+=======
+	<classpathentry kind="lib" path="E:/Download/javafx-sdk-25.0.2/lib/itextpdf-5.5.13.jar">
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="C:/Users/ASUS/Downloads/openjfx-25.0.2_windows-x64_bin-sdk/javafx-sdk-25.0.2/lib/javafx.fxml.jar">
+=======
+	<classpathentry kind="lib" path="E:/Download/javafx-sdk-25.0.2/lib/javafx.base.jar">
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="C:/Users/ASUS/Downloads/openjfx-25.0.2_windows-x64_bin-sdk/javafx-sdk-25.0.2/lib/javafx.graphics.jar">
+=======
+	<classpathentry kind="lib" path="E:/Download/javafx-sdk-25.0.2/lib/javafx.controls.jar">
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="C:/Users/ASUS/Downloads/openjfx-25.0.2_windows-x64_bin-sdk/javafx-sdk-25.0.2/lib/javafx.media.jar">
+=======
+	<classpathentry kind="lib" path="E:/Download/javafx-sdk-25.0.2/lib/javafx.fxml.jar">
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="C:/Users/ASUS/Downloads/openjfx-25.0.2_windows-x64_bin-sdk/javafx-sdk-25.0.2/lib/javafx.swing.jar">
+=======
+	<classpathentry kind="lib" path="E:/Download/javafx-sdk-25.0.2/lib/javafx.graphics.jar">
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="C:/Users/ASUS/Downloads/openjfx-25.0.2_windows-x64_bin-sdk/javafx-sdk-25.0.2/lib/javafx.web.jar">
+=======
+	<classpathentry kind="lib" path="E:/Download/javafx-sdk-25.0.2/lib/javafx.media.jar">
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="C:/Users/ASUS/Downloads/openjfx-25.0.2_windows-x64_bin-sdk/javafx-sdk-25.0.2/lib/javafx-swt.jar">
+=======
+	<classpathentry kind="lib" path="E:/Download/javafx-sdk-25.0.2/lib/javafx.swing.jar">
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="C:/Users/ASUS/Downloads/openjfx-25.0.2_windows-x64_bin-sdk/javafx-sdk-25.0.2/lib/jdk.jsobject.jar">
+=======
+	<classpathentry kind="lib" path="E:/Download/javafx-sdk-25.0.2/lib/javafx.web.jar">
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="C:/Users/ASUS/Downloads/openjfx-25.0.2_windows-x64_bin-sdk/javafx-sdk-25.0.2/lib/jfx.incubator.input.jar">
+=======
+	<classpathentry kind="lib" path="E:/Download/javafx-sdk-25.0.2/lib/javafx-swt.jar">
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="C:/Users/ASUS/Downloads/openjfx-25.0.2_windows-x64_bin-sdk/javafx-sdk-25.0.2/lib/jfx.incubator.richtext.jar">
+=======
+	<classpathentry kind="lib" path="E:/Download/javafx-sdk-25.0.2/lib/jdk.jsobject.jar">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="E:/Download/javafx-sdk-25.0.2/lib/jfx.incubator.input.jar">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="E:/Download/javafx-sdk-25.0.2/lib/jfx.incubator.richtext.jar">
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>

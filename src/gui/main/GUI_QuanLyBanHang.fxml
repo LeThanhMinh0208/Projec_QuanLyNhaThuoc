@@ -20,9 +20,24 @@
 
     <children>
         <!-- ===== HEADER ===== -->
-        <HBox alignment="CENTER_LEFT" spacing="16" style="-fx-padding: 0 0 16 0;">
+        <HBox alignment="CENTER_LEFT" spacing="30.0" VBox.vgrow="NEVER" style="-fx-padding: 0 0 10 0;">
             <children>
-                <Label styleClass="main-title" text="QUẢN LÝ BÁN HÀNG" />
+                <VBox spacing="5.0">
+                    <children>
+                        <Label styleClass="bh-page-title" text="QUẢN LÝ BÁN HÀNG" />
+                        <Region prefHeight="4.0" prefWidth="150.0" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+                    </children>
+                </VBox>
+                <HBox alignment="CENTER_LEFT" styleClass="tab-container">
+                    <children>
+                        <ToggleButton fx:id="btnBanLe" selected="true" styleClass="tab-toggle-button" text="Bán Lẻ" onAction="#onTabBanLe">
+                            <toggleGroup>
+                                <ToggleGroup fx:id="tabGroupBanHang" />
+                            </toggleGroup>
+                        </ToggleButton>
+                        <ToggleButton fx:id="btnDonThuoc" styleClass="tab-toggle-button" text="Bán Theo Đơn Thuốc" toggleGroup="$tabGroupBanHang" onAction="#onTabDonThuoc" />
+                    </children>
+                </HBox>
             </children>
         </HBox>
 
@@ -33,7 +48,8 @@
                 <!-- ══════════════════════════════════════════════
                      TAB 1: BÁN LẺ
                      ══════════════════════════════════════════════ -->
-                <Tab text="🛒 Bán Lẻ">
+                <!-- TAB 1: BÁN LẺ -->
+                <Tab>
                     <HBox spacing="16" VBox.vgrow="ALWAYS" fillHeight="true">
                         <padding><Insets top="16" /></padding>
 
@@ -54,7 +70,7 @@
                             <!-- Bảng danh sách thuốc -->
                             <VBox styleClass="bh-panel" VBox.vgrow="ALWAYS" spacing="8">
                                 <children>
-                                    <TableView fx:id="tblThuocLe" styleClass="table-view" VBox.vgrow="ALWAYS">
+                                    <TableView fx:id="tblThuocLe" styleClass="table-view" style="-fx-fixed-cell-size: 72;" VBox.vgrow="ALWAYS">
                                         <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
                                         <placeholder>
                                             <Label text="Không có thuốc nào phù hợp" style="-fx-text-fill:#94a3b8; -fx-font-size:14px;"/>
@@ -179,7 +195,8 @@
                 <!-- ══════════════════════════════════════════════
                      TAB 2: BÁN THEO ĐƠN
                      ══════════════════════════════════════════════ -->
-                <Tab text="📋  Bán Theo Đơn Thuốc">
+                <!-- TAB 2: BÁN THEO ĐƠN -->
+                <Tab>
                     <HBox spacing="16" VBox.vgrow="ALWAYS" fillHeight="true">
                         <padding><Insets top="16" /></padding>
 

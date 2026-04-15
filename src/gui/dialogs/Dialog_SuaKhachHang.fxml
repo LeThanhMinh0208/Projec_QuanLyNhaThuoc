@@ -37,7 +37,7 @@
                             </columnConstraints>
                             <children>
                                 <Label text="Mã Khách Hàng:" GridPane.rowIndex="0" />
-                                <TextField fx:id="txtMa" editable="false" prefHeight="40.0" styleClass="ds-input, ds-input-readonly" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                <TextField fx:id="txtMa" disable="true" opacity="0.5" prefHeight="40.0" styleClass="ds-input, ds-input-readonly" GridPane.columnIndex="1" GridPane.rowIndex="0" />
                                 
                                 <Label text="Họ Tên Khách Hàng:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
                                 <TextField fx:id="txtHoTen" prefHeight="40.0" styleClass="ds-input" GridPane.columnIndex="3" GridPane.rowIndex="0" />
@@ -49,7 +49,7 @@
                                 <TextField fx:id="txtDiaChi" prefHeight="40.0" styleClass="ds-input" GridPane.columnIndex="3" GridPane.rowIndex="1" />
 
                                 <Label text="Điểm Tích Lũy:" GridPane.rowIndex="2" />
-                                <TextField fx:id="txtDiem" editable="false" prefHeight="40.0" styleClass="ds-input, ds-input-readonly" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                <TextField fx:id="txtDiem" disable="true" opacity="0.5" prefHeight="40.0" styleClass="ds-input, ds-input-readonly" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                             </children>
                             <rowConstraints>
                                 <RowConstraints />
@@ -65,7 +65,7 @@
                 <HBox alignment="CENTER_RIGHT" spacing="20.0">
                     <children>
                         <Button fx:id="btnHuy" onAction="#handleHuy" prefHeight="50.0" prefWidth="160.0" styleClass="ds-btn-cancel" text="Hủy Thao Tác" />
-                        <Button onAction="#handleLuu" prefHeight="50.0" prefWidth="240.0" styleClass="ds-btn-save" text="LƯU THAY ĐỔI ✨" />
+                        <Button fx:id="btnLuu" onAction="#handleLuu" prefHeight="50.0" prefWidth="240.0" styleClass="ds-btn-save" text="LƯU THAY ĐỔI ✨" />
                     </children>
                 </HBox>
             </children>

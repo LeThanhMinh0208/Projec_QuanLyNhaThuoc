@@ -23,6 +23,7 @@ public class Dialog_ChonSoLuongDonViController {
     @FXML private ComboBox<DonViQuyDoi> cbDonVi;
     @FXML private Spinner<Integer> spSoLuong;
     @FXML private Label lblTon;
+    @FXML private Label lblTonUnit;  // VĐ6: hiện tên đơn vị tùy chọn
     @FXML private Label lblCanhBao;
     @FXML private Label lblDonGia;   // label hiển thị giá tự động
     @FXML private Button btnDongY;
@@ -77,6 +78,11 @@ public class Dialog_ChonSoLuongDonViController {
                 .stream().mapToInt(LoThuoc::getSoLuongTon).sum();
         soLuongToiDaTheoDonVi = (dv.getTyLeQuyDoi() <= 0) ? 0 : tongTonCoBan / dv.getTyLeQuyDoi();
         lblTon.setText(String.valueOf(soLuongToiDaTheoDonVi));
+
+        // VĐ6: Cập nhật tên đơn vị tùy theo ComboBox
+        if (lblTonUnit != null && dv.getTenDonVi() != null) {
+            lblTonUnit.setText(dv.getTenDonVi());
+        }
 
         // --- Lấy giá từ BangGia ---
         Object[] giaInfo = daoBangGia.getGiaVaMaBangGia(dv.getMaQuyDoi());

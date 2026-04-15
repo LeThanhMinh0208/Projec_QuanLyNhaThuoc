@@ -12,6 +12,7 @@ public class Dialog_XoaKhachHangController {
 
     @FXML private Label lblTenKhachHang;
     @FXML private Button btnHuy;
+    @FXML private Button btnXoa;
 
     private DAO_KhachHang daoKhachHang = new DAO_KhachHang();
     private KhachHang khachHangCanXoa;
@@ -20,29 +21,23 @@ public class Dialog_XoaKhachHangController {
         this.khachHangCanXoa = kh;
         if (kh != null) {
             lblTenKhachHang.setText(kh.getHoTen());
-        } else {
-            lblTenKhachHang.setText("[Không có dữ liệu]");
         }
     }
 
     @FXML
     private void handleXoa() {
         if (khachHangCanXoa == null) {
-            new Alert(Alert.AlertType.WARNING, "Không có khách hàng nào được chọn để xóa!").show();
             closeDialog();
             return;
         }
 
-        boolean xoaThanhCong = daoKhachHang.xoaKhachHang(khachHangCanXoa.getMaKhachHang());
+        boolean thanhCong = daoKhachHang.xoaKhachHang(khachHangCanXoa.getMaKhachHang());
 
-        if (xoaThanhCong) {
-            new Alert(Alert.AlertType.INFORMATION, "Đã xóa khách hàng thành công!").show();
+        if (thanhCong) {
+            new Alert(Alert.AlertType.INFORMATION, "Đã xóa thành công.").showAndWait();
         } else {
-            new Alert(Alert.AlertType.ERROR, 
-                      "Không thể xóa khách hàng!\n" +
-                      "Có thể khách hàng này đang có dữ liệu hóa đơn giao dịch, không thể xóa!").show();
+            new Alert(Alert.AlertType.ERROR, "Có lỗi xảy ra! Vui lòng thử lại.").showAndWait();
         }
-        
         closeDialog();
     }
 

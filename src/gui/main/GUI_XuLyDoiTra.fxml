@@ -47,6 +47,7 @@
                 <children>
                     <VBox spacing="15.0" styleClass="box-nhap-lieu" VBox.vgrow="NEVER">
                         <children>
+<<<<<<< HEAD
                             <HBox alignment="CENTER_LEFT" spacing="12">
                                 <children>
                                     <Label prefWidth="70" styleClass="input-label-title" text="Từ ngày" />
@@ -70,6 +71,32 @@
                                     <Button onAction="#handleXoaBoLoc" prefHeight="45.0" prefWidth="140.0" styleClass="btn-cancel" text="Xoa bo loc" />
                                 </children>
                             </HBox>
+=======
+                            <Label styleClass="label-header" text="Bộ lọc hóa đơn" />
+                            <Region prefHeight="1.0" style="-fx-background-color: #bae6fd;" />
+                            <VBox styleClass="bh-panel" spacing="10" VBox.vgrow="NEVER">
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Từ ngày:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" prefWidth="70" />
+            <DatePicker fx:id="dpTuNgay" prefWidth="150" />
+            <Label text="Đến ngày:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" prefWidth="80" />
+            <DatePicker fx:id="dpDenNgay" prefWidth="150" />
+            <Label text="Hình thức TT:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" />
+            <ComboBox fx:id="cbHinhThuc" prefWidth="160" promptText="Tất cả" />
+        </HBox>
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Tìm kiếm:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" prefWidth="70" />
+            <HBox alignment="CENTER_LEFT" styleClass="search-box" HBox.hgrow="ALWAYS">
+                <Label styleClass="search-icon" text="🔍" />
+                <TextField fx:id="txtTimKiem" promptText="Mã HĐ, tên/SĐT khách hàng..."
+                           styleClass="search-input" HBox.hgrow="ALWAYS" />
+            </HBox>
+            <Button text="🔍 Tìm kiếm" onAction="#handleTimKiem"
+                    styleClass="bh-btn-primary" prefHeight="38" prefWidth="120" />
+            <Button text="✕ Xóa bộ lọc" onAction="#handleXoaBoLoc"
+                    styleClass="bh-btn-secondary" prefHeight="38" prefWidth="120" />
+        </HBox>
+    </VBox>
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
                         </children>
                     </VBox>
 
@@ -98,6 +125,7 @@
                         </children>
                     </VBox>
 
+<<<<<<< HEAD
                     <HBox alignment="CENTER_LEFT" spacing="30" style="-fx-padding:12 0 0 0;" VBox.vgrow="NEVER">
                         <children>
                             <Label fx:id="lblTongHoaDon" styleClass="input-label-title" text="Tổng: 0 hóa đơn" />
@@ -106,6 +134,17 @@
                             <Label fx:id="lblTongDoanhThu" styleClass="text-total-price" text="0 VND" />
                         </children>
                     </HBox>
+=======
+                    <HBox alignment="CENTER_LEFT" spacing="30" VBox.vgrow="NEVER"
+          style="-fx-padding:12 0 0 0;">
+        <Label fx:id="lblTongHoaDon" text="Tổng: 0 hóa đơn"
+               style="-fx-text-fill:#64748b; -fx-font-size:13px;" />
+        <HBox HBox.hgrow="ALWAYS" />
+        <Label text="Tổng doanh thu:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" />
+        <Label fx:id="lblTongDoanhThu" text="0 ₫"
+               style="-fx-text-fill:#16a34a; -fx-font-size:16px; -fx-font-weight:bold;" />
+    </HBox>
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
                 </children>
             </VBox>
 
@@ -116,15 +155,26 @@
                 <children>
                     <HBox alignment="CENTER_LEFT" spacing="20.0">
                         <children>
+<<<<<<< HEAD
                             <Label styleClass="label-header" text="Danh muc cac phieu doi tra" />
+=======
+                            <Label styleClass="label-header" text="Danh mục các phiếu đổi trả" />
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
                             <Region HBox.hgrow="ALWAYS" />
                             <HBox alignment="CENTER_LEFT" styleClass="nk-search-wrapper" HBox.hgrow="ALWAYS">
                                 <children>
                                     <Label style="-fx-font-size: 16px; -fx-text-fill: #0ea5e9;" text="🔍" />
+<<<<<<< HEAD
                                     <TextField fx:id="txtTimKiemPhieuDoiTra" prefHeight="45.0" promptText="Ma phieu, ma hoa don, khach hang, nhan vien..." styleClass="nk-search-field" HBox.hgrow="ALWAYS" />
                                 </children>
                             </HBox>
                             <Button onAction="#handleLamMoiDanhSachPhieu" prefHeight="45.0" prefWidth="120.0" styleClass="btn-cancel" text="Lam moi" />
+=======
+                                    <TextField fx:id="txtTimKiemPhieuDoiTra" prefHeight="45.0" promptText="Mã phiếu, tên khách hàng,..." styleClass="nk-search-field" HBox.hgrow="ALWAYS" />
+                                </children>
+                            </HBox>
+                            <Button onAction="#handleLamMoiDanhSachPhieu" prefHeight="45.0" prefWidth="120.0" styleClass="btn-cancel" text="Làm mới" />
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
                         </children>
                     </HBox>
 
@@ -136,6 +186,7 @@
                             <Label style="-fx-text-fill:#94a3b8; -fx-font-size:14px;" text="Chưa có phiếu đổi trả nào" />
                         </placeholder>
                         <columns>
+<<<<<<< HEAD
                             <TableColumn fx:id="colMaPhieuDoiTra" prefWidth="120" text="Ma phieu" />
                             <TableColumn fx:id="colNgayDoiTra" prefWidth="150" text="Ngay doi tra" />
                             <TableColumn fx:id="colMaHoaDonPDT" prefWidth="110" text="Ma hoa don" />
@@ -144,6 +195,16 @@
                             <TableColumn fx:id="colHinhThucXuLyPDT" prefWidth="140" text="Hinh thuc" />
                             <TableColumn fx:id="colPhiPhatPDT" prefWidth="110" text="Phi phat" />
                             <TableColumn fx:id="colLyDoPDT" prefWidth="220" text="Ly do" />
+=======
+                            <TableColumn fx:id="colMaPhieuDoiTra" prefWidth="120" text="Mã phiếu" />
+                            <TableColumn fx:id="colNgayDoiTra" prefWidth="150" text="Ngày đổi trả" />
+                            <TableColumn fx:id="colMaHoaDonPDT" prefWidth="110" text="Mã hóa đơn" />
+                            <TableColumn fx:id="colKhachHangPDT" prefWidth="180" text="Khách hàng" />
+                            <TableColumn fx:id="colNhanVienPDT" prefWidth="160" text="Nhân viên" />
+                            <TableColumn fx:id="colHinhThucXuLyPDT" prefWidth="140" text="Hình thức" />
+                            <TableColumn fx:id="colPhiPhatPDT" prefWidth="110" text="Phí phạt" />
+                            <TableColumn fx:id="colLyDoPDT" prefWidth="220" text="Lý do" />
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
                         </columns>
                     </TableView>
                 </children>

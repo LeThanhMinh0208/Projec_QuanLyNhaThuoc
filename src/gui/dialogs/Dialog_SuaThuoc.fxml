@@ -44,7 +44,7 @@
                             </columnConstraints>
                             <children>
                                 <Label text="Mã Thuốc:" GridPane.rowIndex="0" />
-                                <TextField fx:id="txtMa" editable="false" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                                <TextField fx:id="txtMa" disable="true" opacity="0.5" prefHeight="40.0" styleClass="ds-input, ds-input-readonly" GridPane.rowIndex="0" GridPane.columnIndex="1" />
                                 
                                 <Label text="Tên Thuốc:" GridPane.rowIndex="0" GridPane.columnIndex="2" />
                                 <TextField fx:id="txtTen" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="0" GridPane.columnIndex="3" />
@@ -61,7 +61,7 @@
                                 <Label text="Hãng SX:" GridPane.rowIndex="3" />
                                 <TextField fx:id="txtHangSX" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="3" GridPane.columnIndex="1" />
                                 <Label text="Nước SX:" GridPane.rowIndex="3" GridPane.columnIndex="2" />
-                                <TextField fx:id="txtNuocSX" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="3" GridPane.columnIndex="3" />
+                                <ComboBox fx:id="cbNuocSX" editable="false" maxWidth="Infinity" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="3" GridPane.columnIndex="3" />
                                 
                                 <Label text="Hàm Lượng:" GridPane.rowIndex="4" />
                                 <TextField fx:id="txtHamLuong" prefHeight="40.0" styleClass="ds-input" GridPane.rowIndex="4" GridPane.columnIndex="1" />
@@ -95,7 +95,7 @@
                 <HBox alignment="CENTER_RIGHT" spacing="20.0">
                     <children>
                         <Button fx:id="btnHuy" onAction="#handleHuy" prefHeight="50.0" prefWidth="160.0" text="Hủy Thao Tác" styleClass="ds-btn-cancel" />
-                        <Button onAction="#handleLuu" prefHeight="50.0" prefWidth="240.0" text="LƯU THAY ĐỔI ✨" styleClass="ds-btn-save" />
+                        <Button fx:id="btnLuu" onAction="#handleLuu" prefHeight="50.0" prefWidth="240.0" text="LƯU THAY ĐỔI ✨" styleClass="ds-btn-save" />
                     </children>
                 </HBox>
             </children>

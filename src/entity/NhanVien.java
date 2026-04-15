@@ -8,11 +8,11 @@ public class NhanVien {
     private String chucVu;
     private String caLamViec;
     private String sdt;
+    private int trangThai; // 1: Hoạt động, 2: Bị khóa, 0: Đã xóa
 
-    public NhanVien() {
-    }
+    public NhanVien() { }
 
-    public NhanVien(String maNhanVien, String tenDangNhap, String matKhau, String hoTen, String chucVu, String caLamViec, String sdt) {
+    public NhanVien(String maNhanVien, String tenDangNhap, String matKhau, String hoTen, String chucVu, String caLamViec, String sdt, int trangThai) {
         this.maNhanVien = maNhanVien;
         this.tenDangNhap = tenDangNhap;
         this.matKhau = matKhau;
@@ -20,6 +20,7 @@ public class NhanVien {
         this.chucVu = chucVu;
         this.caLamViec = caLamViec;
         this.sdt = sdt;
+        this.trangThai = trangThai;
     }
 
     public String getMaNhanVien() { return maNhanVien; }
@@ -42,4 +43,7 @@ public class NhanVien {
 
     public String getSdt() { return sdt; }
     public void setSdt(String sdt) { this.sdt = sdt; }
+
+    public int getTrangThai() { return trangThai; }
+    public void setTrangThai(int trangThai) { this.trangThai = trangThai; }
 }

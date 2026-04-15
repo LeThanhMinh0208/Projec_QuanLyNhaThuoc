@@ -13,21 +13,44 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 public class Dialog_SuaThuocController {
 
-    @FXML private TextField txtMa, txtTen, txtHoatChat, txtHangSX, txtNuocSX, txtHamLuong;
-    @FXML private ComboBox<String> cbDanhMuc, cbTrangThai, cbDonVi; // Đổi txtDonVi thành cbDonVi
+    @FXML private TextField txtMa, txtTen, txtHoatChat, txtHangSX, txtHamLuong;
+    @FXML private ComboBox<String> cbDanhMuc, cbTrangThai, cbDonVi, cbNuocSX; // Đổi txtDonVi thành cbDonVi
     @FXML private CheckBox chkKeDon;
     @FXML private TextArea txtCongDung, txtTrieuChung;
     @FXML private ImageView imgPreview;
     @FXML private Button btnHuy;
+    @FXML private Button btnLuu;
+
+    private static final java.util.Map<String, String> TRANGTHAI_DISPLAY = java.util.Map.of(
+        "DANG_BAN",  "Đang bán",
+        "NGUNG_BAN", "Ngưng bán",
+        "HET_HANG",  "Hết hàng"
+    );
+
+    private static final java.util.Map<String, String> TRANGTHAI_VALUE = java.util.Map.of(
+        "Đang bán",  "DANG_BAN",
+        "Ngưng bán", "NGUNG_BAN",
+        "Hết hàng",  "HET_HANG"
+    );
 
     private String tenFileAnh;
     private DAO_Thuoc daoThuoc = new DAO_Thuoc();
     private DAO_DanhMucThuoc daoDM = new DAO_DanhMucThuoc();
     private ArrayList<DanhMucThuoc> dsDM;
+    private File selectedImageFile = null;
+
+    // Đường dẫn thư mục ảnh thuốc
+    private static final String THUOC_IMAGE_DIR =
+        "src/resources/images/images_thuoc/";
 
     @FXML 
     public void initialize() {
@@ -36,10 +59,39 @@ public class Dialog_SuaThuocController {
         for (DanhMucThuoc dm : dsDM) cbDanhMuc.getItems().add(dm.getTenDanhMuc());
 
         // Nạp trạng thái và đơn vị tính
-        cbTrangThai.getItems().setAll("DANG_BAN", "HET_HANG", "NGUNG_BAN");
+        cbTrangThai.getItems().setAll("Đang bán", "Ngưng bán", "Hết hàng");
         cbDonVi.setItems(FXCollections.observableArrayList("Hộp", "Vỉ", "Viên", "Tuýp", "Chai"));
 
+        // Nạp Nước Sản Xuất
+        cbNuocSX.getItems().setAll(
+            "Việt Nam", "Mỹ", "Pháp", "Đức", "Nhật Bản",
+            "Hàn Quốc", "Ấn Độ", "Trung Quốc", "Anh",
+            "Thụy Sĩ", "Ý", "Tây Ban Nha", "Úc", "Canada",
+            "Singapore", "Thái Lan", "Indonesia"
+        );
+
         kichHoatTuDongXoaLoi();
+        setupChangeDetection();
+    }
+
+    private void setupChangeDetection() {
+        Runnable checkChanged = () -> {
+            boolean changed = true; // Sẽ check khi form load xong
+            if (txtTen.getText() != null) btnLuu.setDisable(false);
+        };
+        txtTen.textProperty().addListener((o, ov, nv) -> btnLuu.setDisable(false));
+        txtHoatChat.textProperty().addListener((o, ov, nv) -> btnLuu.setDisable(false));
+        txtHangSX.textProperty().addListener((o, ov, nv) -> btnLuu.setDisable(false));
+        cbNuocSX.valueProperty().addListener((o, ov, nv) -> btnLuu.setDisable(false));
+        txtHamLuong.textProperty().addListener((o, ov, nv) -> btnLuu.setDisable(false));
+        cbDonVi.valueProperty().addListener((o, ov, nv) -> btnLuu.setDisable(false));
+        cbDanhMuc.valueProperty().addListener((o, ov, nv) -> btnLuu.setDisable(false));
+        cbTrangThai.valueProperty().addListener((o, ov, nv) -> btnLuu.setDisable(false));
+        chkKeDon.selectedProperty().addListener((o, ov, nv) -> btnLuu.setDisable(false));
+        txtCongDung.textProperty().addListener((o, ov, nv) -> btnLuu.setDisable(false));
+        txtTrieuChung.textProperty().addListener((o, ov, nv) -> btnLuu.setDisable(false));
+        
+        // Sẽ gọi init sau khi setThuocData.
     }
 
     // --- HỆ THỐNG BÔI ĐỎ BÁO LỖI ---
@@ -56,7 +108,7 @@ public class Dialog_SuaThuocController {
     }
 
     private void kichHoatTuDongXoaLoi() {
-        Control[] danhSachO = {txtTen, txtHoatChat, txtHangSX, txtNuocSX, txtHamLuong, cbDonVi, cbDanhMuc, txtCongDung, txtTrieuChung, cbTrangThai};
+        Control[] danhSachO = {txtTen, txtHoatChat, txtHangSX, cbNuocSX, txtHamLuong, cbDonVi, cbDanhMuc, txtCongDung, txtTrieuChung, cbTrangThai};
         for (Control c : danhSachO) {
             c.focusedProperty().addListener((obs, oldVal, newVal) -> {
                 if (newVal) xoaLoi(c);
@@ -72,11 +124,11 @@ public class Dialog_SuaThuocController {
         txtTen.setText(t.getTenThuoc());
         txtHoatChat.setText(t.getHoatChat());
         txtHangSX.setText(t.getHangSanXuat());
-        txtNuocSX.setText(t.getNuocSanXuat());
+        cbNuocSX.setValue(t.getNuocSanXuat());
         txtHamLuong.setText(t.getHamLuong());
         cbDonVi.setValue(t.getDonViCoBan()); // Set value cho ComboBox
         cbDanhMuc.setValue(t.getTenDanhMuc());
-        cbTrangThai.setValue(t.getTrangThai());
+        cbTrangThai.setValue(TRANGTHAI_DISPLAY.get(t.getTrangThai()));
         chkKeDon.setSelected(t.isCanKeDon());
         txtCongDung.setText(t.getCongDung());
         txtTrieuChung.setText(t.getTrieuChung());
@@ -86,26 +138,47 @@ public class Dialog_SuaThuocController {
             Image img = new Image(getClass().getResourceAsStream(path));
             imgPreview.setImage(img);
         } catch (Exception e) {}
+        
+        btnLuu.setDisable(true); // Vừa mới mở lên chưa có gì thay đổi
     }
 
     @FXML
     private void handleChonAnh() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Chọn ảnh thuốc mới");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
-        
-        File selectedFile = fileChooser.showOpenDialog(imgPreview.getScene().getWindow());
-        if (selectedFile != null) {
-            imgPreview.setImage(new Image(selectedFile.toURI().toString()));
-            this.tenFileAnh = selectedFile.getName(); 
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Chọn ảnh thuốc mới");
+        fc.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter(
+                "Ảnh", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.webp")
+        );
+        File file = fc.showOpenDialog(imgPreview.getScene().getWindow());
+        if (file != null) {
+            selectedImageFile = file;
+            imgPreview.setImage(new Image(file.toURI().toString()));
+            btnLuu.setDisable(false); // Thay đổi ảnh nên enable nút lưu
         }
+    }
+
+    private String copyAnhVaoThuMuc(File sourceFile, String maThuoc)
+            throws IOException {
+        Path destDir = Paths.get(THUOC_IMAGE_DIR);
+        Files.createDirectories(destDir);
+
+        String original = sourceFile.getName();
+        String ext = original.substring(original.lastIndexOf('.'));
+        String newFileName = maThuoc + ext;
+        Path destPath = destDir.resolve(newFileName);
+
+        Files.copy(sourceFile.toPath(), destPath,
+            StandardCopyOption.REPLACE_EXISTING);
+
+        return newFileName;
     }
 
     @FXML
     private void handleLuu() {
         boolean hopLe = true;
 
-        Control[] danhSachO = {txtTen, txtHoatChat, txtHangSX, txtNuocSX, txtHamLuong, cbDonVi, cbDanhMuc, cbTrangThai, txtCongDung, txtTrieuChung};
+        Control[] danhSachO = {txtTen, txtHoatChat, txtHangSX, cbNuocSX, txtHamLuong, cbDonVi, cbDanhMuc, cbTrangThai, txtCongDung, txtTrieuChung};
         for (Control c : danhSachO) xoaLoi(c);
 
         // --- QUÉT RÀNG BUỘC RỖNG & ĐỘ DÀI ---
@@ -145,11 +218,8 @@ public class Dialog_SuaThuocController {
 
         if (!utils.ValidationUtils.isValidHangSanXuat(hangSX)) { setLoi(txtHangSX, "Hãng sản xuất phải từ 2-100 ký tự và chứa ít nhất 1 chữ cái!"); hopLe = false; }
 
-        String nuocSX = txtNuocSX.getText();
-        nuocSX = utils.ValidationUtils.capitalizeName(nuocSX);
-        txtNuocSX.setText(nuocSX);
-
-        if (!utils.ValidationUtils.isValidHangSanXuat(nuocSX)) { setLoi(txtNuocSX, "Nước sản xuất phải từ 2-100 ký tự và chứa ít nhất 1 chữ cái!"); hopLe = false; }
+        String nuocSX = cbNuocSX.getValue();
+        if (nuocSX == null || nuocSX.trim().isEmpty()) { setLoi(cbNuocSX, "Chưa chọn nước sản xuất!"); hopLe = false; }
 
         String hamLuong = txtHamLuong.getText();
         hamLuong = utils.ValidationUtils.normalizeString(hamLuong);
@@ -204,8 +274,22 @@ public class Dialog_SuaThuocController {
         t.setCanKeDon(chkKeDon.isSelected());
         t.setCongDung(congDung);
         t.setTrieuChung(trieuChung);
-        t.setTrangThai(trangThaiSelected);
-        t.setHinhAnh(tenFileAnh);
+        t.setTrangThai(TRANGTHAI_VALUE.get(trangThaiSelected));
+
+        // Copy ảnh vào thư mục nếu đã chọn ảnh mới
+        if (selectedImageFile != null) {
+            try {
+                String tenAnh = copyAnhVaoThuMuc(selectedImageFile, txtMa.getText());
+                t.setHinhAnh(tenAnh);
+            } catch (IOException e) {
+                new Alert(Alert.AlertType.ERROR,
+                    "Không thể lưu ảnh: " + e.getMessage()).show();
+                return;
+            }
+        } else {
+            // Giữ nguyên giá trị hinhAnh đang có, không ghi đè
+            t.setHinhAnh(tenFileAnh);
+        }
 
         if (daoThuoc.capNhatThuoc(t)) {
             new Alert(Alert.AlertType.INFORMATION, "Cập nhật thành công!").show();

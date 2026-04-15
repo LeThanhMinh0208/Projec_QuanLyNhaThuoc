@@ -26,7 +26,11 @@
     <padding><Insets bottom="20.0" left="30.0" right="30.0" top="20.0" /></padding>
 
     <HBox alignment="CENTER_LEFT" spacing="16" VBox.vgrow="NEVER" style="-fx-padding:0 0 10 0;">
+<<<<<<< HEAD
         <Button text="Quay lai" onAction="#handleQuayLai" styleClass="bh-btn-secondary" prefHeight="38" prefWidth="110" />
+=======
+        <Button text="Quay lại" onAction="#handleQuayLai" styleClass="bh-btn-secondary" prefHeight="38" prefWidth="110" />
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
         <Label styleClass="main-title" text="CHI TIẾT ĐỔI TRẢ" />
     </HBox>
 
@@ -34,7 +38,11 @@
         <content>
             <VBox prefWidth="1180" spacing="16" style="-fx-padding: 0 0 10 0;">
                 <VBox styleClass="bh-panel" spacing="10">
+<<<<<<< HEAD
                     <Label text="THONG TIN HOA DON DOI TRA" styleClass="bh-section-title" />
+=======
+                    <Label text="THÔNG TIN HÓA ĐƠN ĐỔI TRẢ" styleClass="bh-section-title" />
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
                     <GridPane hgap="20" vgap="8">
                         <columnConstraints>
                             <ColumnConstraints prefWidth="130" />
@@ -64,7 +72,11 @@
                     <TableView fx:id="tableCoTheDoiTra" prefHeight="260" style="-fx-text-background-color:#0f172a; -fx-control-inner-background:white; -fx-table-cell-border-color:#e2e8f0;">
                         <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
                         <placeholder>
+<<<<<<< HEAD
                             <Label text="Khong tim thay chi tiet hoa don" style="-fx-text-fill:#64748b; -fx-font-size:14px;" />
+=======
+                            <Label text="Không tìm thấy chi tiết hóa đơn" style="-fx-text-fill:#64748b; -fx-font-size:14px;" />
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
                         </placeholder>
                         <columns>
                             <TableColumn fx:id="colHangTenThuoc" text="Tên thuốc" prefWidth="220" />

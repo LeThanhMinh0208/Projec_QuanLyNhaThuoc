@@ -9,9 +9,8 @@
       
       <GridPane hgap="20.0" vgap="15.0" style="-fx-background-color: #f8fafc; -fx-padding: 15; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
          <columnConstraints>
-            <ColumnConstraints percentWidth="33.3" />
-            <ColumnConstraints percentWidth="33.3" />
-            <ColumnConstraints percentWidth="33.3" />
+            <ColumnConstraints percentWidth="40.0" />
+            <ColumnConstraints percentWidth="60.0" />
          </columnConstraints>
          <children>
             <VBox spacing="5.0" GridPane.columnIndex="0">
@@ -19,12 +18,8 @@
                <TextField fx:id="txtNguoiLap" disable="true" editable="false" prefHeight="40.0" styleClass="input-field, input-field-readonly" />
             </VBox>
             <VBox spacing="5.0" GridPane.columnIndex="1">
-               <Label styleClass="input-label-title" text="Nhà Cung Cấp (*):" />
+               <Label styleClass="input-label-title" style="-fx-text-fill: #0ea5e9;" text="Chọn Nhà Cung Cấp cần xuất trả (*):" />
                <ComboBox fx:id="cbNhaCungCap" prefHeight="40.0" maxWidth="Infinity" promptText="-- Chọn nhà cung cấp --" styleClass="input-field" />
-            </VBox>
-            <VBox spacing="5.0" GridPane.columnIndex="2">
-               <Label styleClass="input-label-title" text="Kho Xuất Trả (*):" />
-               <ComboBox fx:id="cbKhoXuat" prefHeight="40.0" maxWidth="Infinity" promptText="-- Chọn kho xuất --" styleClass="input-field" />
             </VBox>
          </children>
       </GridPane>
@@ -37,19 +32,19 @@
                     <TextField fx:id="txtTimNhanhThuoc" prefHeight="40.0" promptText="Nhập tên hoặc mã..." styleClass="input-field" />
                 </VBox>
                 <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                    <Label styleClass="input-label-title" text="💊 Danh sách Thuốc:" />
-                    <ComboBox fx:id="cbChonThuoc" prefHeight="40.0" maxWidth="Infinity" promptText="-- Chọn thuốc --" styleClass="input-field" />
+                    <Label styleClass="input-label-title" text="💊 Danh sách Thuốc (Lọc theo NCC):" />
+                    <ComboBox fx:id="cbChonThuoc" prefHeight="40.0" maxWidth="Infinity" promptText="-- Vui lòng chọn NCC trước --" styleClass="input-field" />
                 </VBox>
              </HBox>
 
              <HBox spacing="15.0" alignment="BOTTOM_LEFT">
-                <VBox spacing="5.0" prefWidth="400.0">
-                    <Label styleClass="input-label-title" text="📦 Lô thuốc đang tồn:" />
-                    <ComboBox fx:id="cbChonLo" prefHeight="40.0" prefWidth="400.0" promptText="-- Chọn Lô --" styleClass="input-field" />
+                <VBox spacing="5.0" prefWidth="450.0">
+                    <Label styleClass="input-label-title" text="📦 Chọn Lô đang tồn trong hệ thống (*):" />
+                    <ComboBox fx:id="cbChonLo" prefHeight="40.0" maxWidth="Infinity" promptText="-- Chọn Lô --" styleClass="input-field" />
                 </VBox>
                 <VBox spacing="5.0" prefWidth="150.0">
-                    <Label styleClass="input-label-title" text="SL Trả:" />
-                    <TextField fx:id="txtSoLuongTra" prefHeight="40.0" promptText="Số lượng" styleClass="input-field" />
+                    <Label styleClass="input-label-title" text="SL Xuất Trả (*):" />
+                    <TextField fx:id="txtSoLuongTra" prefHeight="40.0" promptText="VD: 50" styleClass="input-field" alignment="CENTER" />
                 </VBox>
                 <Region HBox.hgrow="ALWAYS" />
                 <Button onAction="#handleThemThuoc" minWidth="180.0" prefHeight="45.0" styleClass="btn-success" text="+ THÊM VÀO BẢNG" />
@@ -70,7 +65,7 @@
       </TableView>
 
       <VBox spacing="5.0">
-          <Label styleClass="input-label-title" text="Lý do trả hàng:" />
+          <Label styleClass="input-label-title" text="Lý do xuất trả hàng:" />
           <TextField fx:id="txtGhiChu" prefHeight="40.0" promptText="Nhập lý do trả (VD: Hàng cận date, lỗi bao bì...)" styleClass="input-field" />
       </VBox>
 

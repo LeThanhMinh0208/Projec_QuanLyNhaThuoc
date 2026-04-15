@@ -16,6 +16,7 @@ public class Dialog_SuaNhaCungCapController {
     @FXML private TextField txtDiaChi;
     @FXML private TextField txtCongNo;
     @FXML private Button btnHuy;
+    @FXML private Button btnLuu;
 
     private DAO_NhaCungCap daoNCC = new DAO_NhaCungCap();
     private NhaCungCap nhaCungCap;
@@ -35,7 +36,28 @@ public class Dialog_SuaNhaCungCapController {
             // Khóa mã không cho sửa
             txtMa.setEditable(false);
             txtMa.setDisable(true);
+            txtCongNo.setTooltip(new javafx.scene.control.Tooltip("Công nợ được cập nhật tự động từ phiếu nhập hàng"));
+            
+            setupChangeDetection();
         }
+    }
+
+    private void setupChangeDetection() {
+        String snapshot_ten = txtTen.getText();
+        String snapshot_sdt = txtSdt.getText();
+        String snapshot_diachi = txtDiaChi.getText();
+
+        Runnable checkChanged = () -> {
+            boolean changed = !txtTen.getText().equals(snapshot_ten) ||
+                              !txtSdt.getText().equals(snapshot_sdt) ||
+                              !txtDiaChi.getText().equals(snapshot_diachi);
+            btnLuu.setDisable(!changed);
+        };
+
+        txtTen.textProperty().addListener((o, ov, nv) -> checkChanged.run());
+        txtSdt.textProperty().addListener((o, ov, nv) -> checkChanged.run());
+        txtDiaChi.textProperty().addListener((o, ov, nv) -> checkChanged.run());
+        btnLuu.setDisable(true);
     }
 
     @FXML
@@ -49,12 +71,10 @@ public class Dialog_SuaNhaCungCapController {
         ten = utils.ValidationUtils.normalizeString(ten);
         sdt = utils.ValidationUtils.normalizeString(sdt);
         diaChi = utils.ValidationUtils.normalizeString(diaChi);
-        congNoStr = utils.ValidationUtils.normalizeString(congNoStr);
         
         txtTen.setText(ten);
         txtSdt.setText(sdt);
         txtDiaChi.setText(diaChi);
-        txtCongNo.setText(congNoStr);
 
         StringBuilder err = new StringBuilder();
         if (!utils.ValidationUtils.isValidTenNhaCungCap(ten)) err.append("- Tên nhà cung cấp phải từ 2-150 ký tự và chứa ít nhất 1 chữ cái.\n");
@@ -71,20 +91,11 @@ public class Dialog_SuaNhaCungCapController {
             return;
         }
 
-        // Validate công nợ là số
-        double congNo;
-        try {
-            congNo = Double.parseDouble(congNoStr);
-        } catch (NumberFormatException e) {
-            new Alert(Alert.AlertType.ERROR, "Công nợ phải là số hợp lệ!").show();
-            return;
-        }
-
         // 2. Cập nhật dữ liệu vào object
         nhaCungCap.setTenNhaCungCap(ten);
         nhaCungCap.setSdt(sdt);
         nhaCungCap.setDiaChi(diaChi);
-        nhaCungCap.setCongNo(congNo);
+        // Bỏ qua công nợ, để DAO chỉ update các field khác
 
         // 3. Gọi DAO cập nhật (bạn cần implement hàm này trong DAO)
         if (daoNCC.capNhatNhaCungCap(nhaCungCap)) {

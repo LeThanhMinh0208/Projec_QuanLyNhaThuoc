@@ -2,7 +2,8 @@ package gui.main;
 
 import dao.DAO_KhachHang;
 import entity.KhachHang;
-
+import javafx.scene.Parent;
+import gui.dialogs.Dialog_LichSuGiaoDichController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -11,18 +12,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
-
 import javafx.stage.Stage;
-
-
-
 
 public class GUI_QuanLyKhachHangController {
 
@@ -51,13 +44,14 @@ public class GUI_QuanLyKhachHangController {
         colDiaChi.setCellValueFactory(new PropertyValueFactory<>("diaChi"));
         colDiem.setCellValueFactory(new PropertyValueFactory<>("diemTichLuy"));
 
-        tableKhachHang.setOnMouseClicked((MouseEvent event) -> {
-            if (event.getClickCount() == 2) {
-                KhachHang selected = tableKhachHang.getSelectionModel().getSelectedItem();
-                if (selected != null) {
+        tableKhachHang.setRowFactory(tv -> {
+            TableRow<KhachHang> row = new TableRow<>();
+            row.setOnMouseClicked((MouseEvent event) -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
                     handleSua(null);
                 }
-            }
+            });
+            return row;
         });
     }
 
@@ -106,7 +100,29 @@ public class GUI_QuanLyKhachHangController {
     void handleThem(ActionEvent event) {
         openDialog("/gui/dialogs/Dialog_ThemKhachHang.fxml", "Thêm Khách Hàng Mới", null);
     }
+    @FXML
+    void handleXemLichSu(ActionEvent event) {
+        KhachHang selected = tableKhachHang.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng chọn một khách hàng!");
+            return;
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/gui/dialogs/Dialog_LichSuGiaoDich.fxml"));
+            Parent root = loader.load();
+            Dialog_LichSuGiaoDichController ctrl = loader.getController();
+            ctrl.setKhachHang(selected);
 
+            Stage stage = new Stage();
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            stage.setTitle("Lịch Sử Giao Dịch — " + selected.getHoTen());
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     @FXML
     void handleSua(ActionEvent event) {
         checkAndOpenDialog("/gui/dialogs/Dialog_SuaKhachHang.fxml", "Cập Nhật Thông Tin Khách Hàng");
@@ -147,7 +163,23 @@ public class GUI_QuanLyKhachHangController {
             stage.setResizable(false);
             stage.showAndWait();
 
+            // Xử lý thêm khách hàng sau khi dialog đóng
+            if (ctrl instanceof gui.dialogs.Dialog_ThemKhachHangController) {
+                gui.dialogs.Dialog_ThemKhachHangController themCtrl =
+                    (gui.dialogs.Dialog_ThemKhachHangController) ctrl;
+                KhachHang newKh = themCtrl.getResultKhachHang();
+                if (newKh != null) {
+                    boolean saved = daoKhachHang.themKhachHang(newKh);
+                    if (saved) {
+                        showAlert(Alert.AlertType.INFORMATION, "Thành công", "Thêm khách hàng thành công!");
+                    } else {
+                        showAlert(Alert.AlertType.ERROR, "Thất bại", "Lỗi khi thêm khách hàng vào cơ sở dữ liệu!");
+                    }
+                }
+            }
+
             loadData();
+            setupSearch();
         } catch (java.io.IOException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Lỗi Giao Diện", "Không thể mở hộp thoại: " + e.getMessage());

@@ -79,6 +79,7 @@ public class ChiTietDoiTraView {
     public int getSoLuongConLai() {
         return Math.max(0, soLuongDaMua - soLuongDaTra);
     }
+<<<<<<< HEAD
 
     public String getMoTaHienThi() {
         String hsd = hanSuDung != null ? hanSuDung.toString() : "--";
@@ -90,4 +91,6 @@ public class ChiTietDoiTraView {
     public String toString() {
         return getMoTaHienThi();
     }
+=======
+>>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
 }

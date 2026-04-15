@@ -36,7 +36,7 @@ public class ConnectDB {
             catch (SQLException e) { e.printStackTrace(); }
         }
     }
-    
+
     public static Connection getConnection() {
         try {
             if (con == null || con.isClosed()) {

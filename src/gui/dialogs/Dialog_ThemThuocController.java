@@ -13,13 +13,18 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 public class Dialog_ThemThuocController {
 
     @FXML private ImageView imgPreview;
-    @FXML private TextField txtMa, txtTen, txtHoatChat, txtHangSX, txtNuocSX, txtHamLuong;
-    @FXML private ComboBox<String> cbDanhMuc, cbDonVi; 
+    @FXML private TextField txtMa, txtTen, txtHoatChat, txtHangSX, txtHamLuong;
+    @FXML private ComboBox<String> cbDanhMuc, cbDonVi, cbNuocSX; 
     @FXML private CheckBox chkKeDon;
     @FXML private TextArea txtCongDung, txtTrieuChung;
 
@@ -27,6 +32,11 @@ public class Dialog_ThemThuocController {
     private DAO_Thuoc daoThuoc = new DAO_Thuoc();
     private String tenFileAnh = "default.png";
     private ArrayList<DanhMucThuoc> dsDanhMucToanBo;
+    private File selectedImageFile = null;
+
+    // Đường dẫn thư mục ảnh thuốc — đọc tương đối từ root project
+    private static final String THUOC_IMAGE_DIR =
+        "src/resources/images/images_thuoc/";
 
     @FXML
     public void initialize() {
@@ -42,7 +52,15 @@ public class Dialog_ThemThuocController {
         cbDanhMuc.getItems().setAll(dsTenDM);
 
         // Nạp Đơn Vị Tính
-        cbDonVi.setItems(FXCollections.observableArrayList("Hộp", "Vỉ", "Viên", "Tuýp", "Chai"));
+        cbDonVi.setItems(FXCollections.observableArrayList( "Lọ", "Viên", "Tuýp", "Chai"));
+
+        // Nạp Nước Sản Xuất
+        cbNuocSX.getItems().setAll(
+            "Việt Nam", "Mỹ", "Pháp", "Đức", "Nhật Bản",
+            "Hàn Quốc", "Ấn Độ", "Trung Quốc", "Anh",
+            "Thụy Sĩ", "Ý", "Tây Ban Nha", "Úc", "Canada",
+            "Singapore", "Thái Lan", "Indonesia"
+        );
 
         // KÍCH HOẠT TÍNH NĂNG: Click vào ô nào là ô đó tự xóa màu đỏ báo lỗi
         kichHoatTuDongXoaLoi();
@@ -65,7 +83,7 @@ public class Dialog_ThemThuocController {
     }
 
     private void kichHoatTuDongXoaLoi() {
-        Control[] danhSachO = {txtTen, txtHoatChat, txtHangSX, txtNuocSX, txtHamLuong, cbDonVi, cbDanhMuc, txtCongDung, txtTrieuChung};
+        Control[] danhSachO = {txtTen, txtHoatChat, txtHangSX, cbNuocSX, txtHamLuong, cbDonVi, cbDanhMuc, txtCongDung, txtTrieuChung};
         for (Control c : danhSachO) {
             // Lắng nghe sự kiện: Chỉ cần click chuột vào (Focus) là tự động xóa báo lỗi đỏ
             c.focusedProperty().addListener((obs, oldVal, newVal) -> {
@@ -76,17 +94,35 @@ public class Dialog_ThemThuocController {
 
     @FXML
     private void handleChonAnh() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Chọn ảnh thuốc");
-        fileChooser.getExtensionFilters().add(
-            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg")
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Chọn ảnh thuốc");
+        fc.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter(
+                "Ảnh", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.webp")
         );
-        
-        File file = fileChooser.showOpenDialog(imgPreview.getScene().getWindow());
+        File file = fc.showOpenDialog(imgPreview.getScene().getWindow());
         if (file != null) {
+            selectedImageFile = file;
+            // Preview ngay
             imgPreview.setImage(new Image(file.toURI().toString()));
-            tenFileAnh = file.getName(); 
         }
+    }
+
+    private String copyAnhVaoThuMuc(File sourceFile, String maThuoc)
+            throws IOException {
+        Path destDir = Paths.get(THUOC_IMAGE_DIR);
+        Files.createDirectories(destDir);
+
+        String original = sourceFile.getName();
+        String ext = original.substring(original.lastIndexOf('.'));
+        // Tên file = maThuoc.ext — nhất quán với cách load ảnh hiện tại
+        String newFileName = maThuoc + ext;
+        Path destPath = destDir.resolve(newFileName);
+
+        Files.copy(sourceFile.toPath(), destPath,
+            StandardCopyOption.REPLACE_EXISTING);
+
+        return newFileName;
     }
 
     @FXML
@@ -94,7 +130,7 @@ public class Dialog_ThemThuocController {
         boolean hopLe = true;
 
         // Xóa sạch các báo lỗi đỏ cũ trước khi kiểm tra lại
-        Control[] danhSachO = {txtTen, txtHoatChat, txtHangSX, txtNuocSX, txtHamLuong, cbDonVi, cbDanhMuc, txtCongDung, txtTrieuChung};
+        Control[] danhSachO = {txtTen, txtHoatChat, txtHangSX, cbNuocSX, txtHamLuong, cbDonVi, cbDanhMuc, txtCongDung, txtTrieuChung};
         for (Control c : danhSachO) xoaLoi(c);
 
         // --- KIỂM TRA TỪNG Ô (RỖNG VÀ ĐỘ DÀI) ---
@@ -135,12 +171,9 @@ public class Dialog_ThemThuocController {
             hopLe = false;
         }
 
-        String nuocSX = txtNuocSX.getText();
-        nuocSX = utils.ValidationUtils.capitalizeName(nuocSX);
-        txtNuocSX.setText(nuocSX);
-
-        if (!utils.ValidationUtils.isValidHangSanXuat(nuocSX)) {
-            setLoi(txtNuocSX, "Nước sản xuất phải từ 2-100 ký tự và chứa ít nhất 1 chữ cái!");
+        String nuocSX = cbNuocSX.getValue();
+        if (nuocSX == null || nuocSX.trim().isEmpty()) {
+            setLoi(cbNuocSX, "Vui lòng chọn Nước sản xuất!");
             hopLe = false;
         }
 
@@ -214,7 +247,20 @@ public class Dialog_ThemThuocController {
         t.setCanKeDon(chkKeDon.isSelected());
         t.setCongDung(congDung);
         t.setTrieuChung(trieuChung);
-        t.setHinhAnh(tenFileAnh);
+
+        // Copy ảnh vào thư mục nếu đã chọn
+        if (selectedImageFile != null) {
+            try {
+                String tenAnh = copyAnhVaoThuMuc(selectedImageFile, txtMa.getText());
+                t.setHinhAnh(tenAnh);
+            } catch (IOException e) {
+                new Alert(Alert.AlertType.ERROR,
+                    "Không thể lưu ảnh: " + e.getMessage()).show();
+                return;
+            }
+        } else {
+            t.setHinhAnh(tenFileAnh);
+        }
         t.setTrangThai("DANG_BAN");
 
         if (daoThuoc.themThuoc(t)) {
