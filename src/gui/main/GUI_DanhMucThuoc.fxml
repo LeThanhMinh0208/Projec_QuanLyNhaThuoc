@@ -31,12 +31,10 @@
          </columnConstraints>
          <children>
             <Button fx:id="btnThem" maxWidth="Infinity" minHeight="40" prefHeight="40" style="-fx-font-size: 13px;" onAction="#handleThem" styleClass="top-card, card-green, btn-action" text="＋ Thêm mới" textFill="WHITE" GridPane.columnIndex="0" />
-            
-            <Button fx:id="btnSua" maxWidth="Infinity" minHeight="40" prefHeight="40" style="-fx-font-size: 13px;" onAction="#handleSua" styleClass="top-card, card-blue, btn-action" text="✎ Cập nhật" textFill="WHITE" GridPane.columnIndex="1" />
-            
-            <Button fx:id="btnQuyDoi" maxWidth="Infinity" minHeight="40" prefHeight="40" style="-fx-font-size: 13px;" onAction="#handleMoQuyDoiDonVi" styleClass="top-card, card-blue, btn-action" text="⇄ Quy đổi đơn vị" textFill="WHITE" GridPane.columnIndex="2" />
 
-            <Button fx:id="btnXoa" maxWidth="Infinity" minHeight="40" prefHeight="40" style="-fx-font-size: 13px;" onAction="#handleXoa" styleClass="top-card, card-orange, btn-action" text="✖ Xóa" textFill="WHITE" GridPane.columnIndex="3" />
+            <Button fx:id="btnSua" maxWidth="Infinity" minHeight="40" prefHeight="40" style="-fx-font-size: 13px;" onAction="#handleSua" styleClass="top-card, card-blue, btn-action" text="✎ Cập nhật" textFill="WHITE" GridPane.columnIndex="1" />
+
+            <Button fx:id="btnXoa" maxWidth="Infinity" minHeight="40" prefHeight="40" style="-fx-font-size: 13px;" onAction="#handleXoa" styleClass="top-card, card-orange, btn-action" text="✖ Xóa" textFill="WHITE" GridPane.columnIndex="2" />
          </children>
       </GridPane>
 

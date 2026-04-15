@@ -50,7 +50,7 @@
 
         <VBox fx:id="boxDonViBac1" spacing="10.0" styleClass="section-card">
             <children>
-                <Label styleClass="section-title-strong" text="ĐƠN VỊ CƠ BẢN (BẬC 1)" />
+                <Label styleClass="section-title-strong" text="ĐƠN VỊ 1 (CƠ BẢN)" />
                 <GridPane hgap="12.0" vgap="10.0">
                     <columnConstraints>
                         <ColumnConstraints percentWidth="45" />
@@ -69,7 +69,7 @@
 
         <VBox spacing="10.0" styleClass="section-card">
             <children>
-                <Label styleClass="section-title-strong" text="ĐƠN VỊ QUY ĐỔI KHÁC (TÙY CHỌN)" />
+                <Label styleClass="section-title-strong" text="ĐƠN VỊ 2 VÀ 3 (TÙY CHỌN)" />
 
                 <GridPane hgap="12.0" vgap="10.0">
                     <columnConstraints>
@@ -78,17 +78,17 @@
                         <ColumnConstraints percentWidth="35" />
                     </columnConstraints>
                     <children>
-                        <Label text="Bậc 2" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <Label text="Đơn vị 2" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                         <ComboBox fx:id="cbDonViBac2" editable="false" promptText="Chọn đơn vị" GridPane.columnIndex="1" GridPane.rowIndex="0" />
                         <Spinner fx:id="spTyLeBac2" editable="true" prefWidth="160.0" GridPane.columnIndex="2" GridPane.rowIndex="0" />
 
-                        <Label text="Bậc 3" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <Label text="Đơn vị 3" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                         <ComboBox fx:id="cbDonViBac3" editable="false" promptText="Chọn đơn vị" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <Spinner fx:id="spTyLeBac3" editable="true" prefWidth="160.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                     </children>
                 </GridPane>
 
-                <Label styleClass="hint-text" text="Gợi ý: Bậc 2 và Bậc 3 là tùy chọn. Tỷ lệ quy đổi phải lớn hơn 1 và bậc sau lớn hơn bậc trước." />
+                <Label styleClass="hint-text" text="Gợi ý: Tối đa 3 đơn vị khác nhau. Đơn vị 2 và 3 là tùy chọn, tỷ lệ quy đổi phải lớn hơn 1." />
             </children>
             <padding>
                 <Insets bottom="10.0" left="12.0" right="12.0" top="10.0" />

@@ -170,16 +170,6 @@ public class GUI_DanhMucThuocController {
     @FXML void handleXoa() { checkAndOpenDialog("/gui/dialogs/Dialog_XoaThuoc.fxml", "Xóa Thuốc"); }
 
     @FXML
-    void handleMoQuyDoiDonVi() {
-        Thuoc selected = tableThuoc.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng chọn một loại thuốc trong bảng!");
-            return;
-        }
-        moCuaSoDonViQuyDoi(selected);
-    }
-
-    @FXML
     void handleRefresh() {
         txtTimKiem.clear();
         tableThuoc.getSelectionModel().clearSelection();
@@ -197,7 +187,7 @@ public class GUI_DanhMucThuocController {
 
     private void openDialog(String path, String title, Thuoc data) {
         FXMLLoader loader = WindowUtils.openModal(path, title);
-        
+
         if (loader != null) {
             Object ctrl = loader.getController();
 
@@ -209,26 +199,8 @@ public class GUI_DanhMucThuocController {
 
             Stage stage = (Stage) ((Parent) loader.getRoot()).getScene().getWindow();
             stage.showAndWait();
-            
+
             loadData();
-        }
-    }
-    private void moCuaSoDonViQuyDoi(Thuoc thuoc) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/main/GUI_DonViQuyDoi.fxml"));
-            Parent root = loader.load();
-            
-            GUI_DonViQuyDoiController controller = loader.getController();
-            controller.setThuoc(thuoc); // Truyền đối tượng thuốc đang chọn sang
-            
-            Stage stage = new Stage();
-            stage.setTitle("Quy đổi đơn vị - " + thuoc.getTenThuoc());
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
-        } catch (IOException e) {
-            e.printStackTrace();
-            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể mở trang quy đổi đơn vị.");
         }
     }
 }

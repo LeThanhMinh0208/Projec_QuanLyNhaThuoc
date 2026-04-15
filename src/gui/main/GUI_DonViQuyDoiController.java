@@ -177,7 +177,7 @@ public class GUI_DonViQuyDoiController {
 
     private void xoaDonViMoRong(DonViQuyDoiRow row) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Xóa toàn bộ đơn vị bậc 2/bậc 3 của thuốc " + row.getTenThuoc() + "?",
+            "Xóa toàn bộ đơn vị quy đổi thêm của thuốc " + row.getTenThuoc() + "?",
                 ButtonType.YES, ButtonType.NO);
         confirm.setTitle("Xác nhận xóa");
         confirm.setHeaderText(null);
