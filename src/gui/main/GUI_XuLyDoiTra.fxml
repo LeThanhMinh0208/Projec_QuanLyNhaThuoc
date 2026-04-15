@@ -24,8 +24,7 @@
         <children>
             <VBox spacing="5.0">
                 <children>
-                    <Label styleClass="nk-page-title" text="LẬP PHIẾU ĐỔI TRẢ" />
-                    <Region prefHeight="4.0" prefWidth="150.0" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+                    <Label styleClass="nk-page-title" text="ĐỔI TRẢ THUỐC" />
                 </children>
             </VBox>
             <HBox alignment="CENTER_LEFT" styleClass="tab-container">
@@ -47,28 +46,23 @@
                 <children>
                     <VBox spacing="15.0" styleClass="box-nhap-lieu" VBox.vgrow="NEVER">
                         <children>
-                            <Label styleClass="label-header" text="Bộ lọc hóa đơn" />
-                            <Region prefHeight="1.0" style="-fx-background-color: #bae6fd;" />
-                            <VBox styleClass="bh-panel" spacing="10" VBox.vgrow="NEVER">
-        <HBox spacing="12" alignment="CENTER_LEFT">
-            <Label text="Từ ngày:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" prefWidth="70" />
+                            <VBox spacing="10" styleClass="bh-panel" VBox.vgrow="NEVER">
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <Label prefWidth="70" style="-fx-text-fill:#64748b; -fx-font-size:13px;" text="Từ ngày:" />
             <DatePicker fx:id="dpTuNgay" prefWidth="150" />
-            <Label text="Đến ngày:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" prefWidth="80" />
+            <Label prefWidth="80" style="-fx-text-fill:#64748b; -fx-font-size:13px;" text="Đến ngày:" />
             <DatePicker fx:id="dpDenNgay" prefWidth="150" />
-            <Label text="Hình thức TT:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" />
+            <Label style="-fx-text-fill:#64748b; -fx-font-size:13px;" text="Hình thức TT:" />
             <ComboBox fx:id="cbHinhThuc" prefWidth="160" promptText="Tất cả" />
         </HBox>
-        <HBox spacing="12" alignment="CENTER_LEFT">
-            <Label text="Tìm kiếm:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" prefWidth="70" />
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <Label prefWidth="70" style="-fx-text-fill:#64748b; -fx-font-size:13px;" text="Tìm kiếm:" />
             <HBox alignment="CENTER_LEFT" styleClass="search-box" HBox.hgrow="ALWAYS">
                 <Label styleClass="search-icon" text="🔍" />
-                <TextField fx:id="txtTimKiem" promptText="Mã HĐ, tên/SĐT khách hàng..."
-                           styleClass="search-input" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="txtTimKiem" promptText="Mã HĐ, tên/SĐT khách hàng..." styleClass="search-input" HBox.hgrow="ALWAYS" />
             </HBox>
-            <Button text="🔍 Tìm kiếm" onAction="#handleTimKiem"
-                    styleClass="bh-btn-primary" prefHeight="38" prefWidth="120" />
-            <Button text="✕ Xóa bộ lọc" onAction="#handleXoaBoLoc"
-                    styleClass="bh-btn-secondary" prefHeight="38" prefWidth="120" />
+            <Button onAction="#handleTimKiem" prefHeight="38" prefWidth="120" styleClass="bh-btn-primary" text="🔍 Tìm kiếm" />
+            <Button onAction="#handleXoaBoLoc" prefHeight="38" prefWidth="120" styleClass="bh-btn-secondary" text="✕ Xóa bộ lọc" />
         </HBox>
     </VBox>
                         </children>
@@ -76,7 +70,6 @@
 
                     <VBox styleClass="nk-card" VBox.vgrow="ALWAYS">
                         <children>
-                            <Label style="-fx-padding: 15 15 5 15;" styleClass="label-header" text="Danh sách hóa đơn có thể đổi trả: " />
                             <TableView fx:id="tableHoaDon" styleClass="nk-table" VBox.vgrow="ALWAYS">
                                 <columnResizePolicy>
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -99,14 +92,11 @@
                         </children>
                     </VBox>
 
-                    <HBox alignment="CENTER_LEFT" spacing="30" VBox.vgrow="NEVER"
-          style="-fx-padding:12 0 0 0;">
-        <Label fx:id="lblTongHoaDon" text="Tổng: 0 hóa đơn"
-               style="-fx-text-fill:#64748b; -fx-font-size:13px;" />
+                    <HBox alignment="CENTER_LEFT" spacing="30" style="-fx-padding:12 0 0 0;" VBox.vgrow="NEVER">
+        <Label fx:id="lblTongHoaDon" style="-fx-text-fill:#64748b; -fx-font-size:13px;" text="Tổng: 0 hóa đơn" />
         <HBox HBox.hgrow="ALWAYS" />
-        <Label text="Tổng doanh thu:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" />
-        <Label fx:id="lblTongDoanhThu" text="0 ₫"
-               style="-fx-text-fill:#16a34a; -fx-font-size:16px; -fx-font-weight:bold;" />
+        <Label style="-fx-text-fill:#64748b; -fx-font-size:13px;" text="Tổng doanh thu:" />
+        <Label fx:id="lblTongDoanhThu" style="-fx-text-fill:#16a34a; -fx-font-size:16px; -fx-font-weight:bold;" text="0 ₫" />
     </HBox>
                 </children>
             </VBox>
@@ -144,8 +134,9 @@
                             <TableColumn fx:id="colKhachHangPDT" prefWidth="180" text="Khách hàng" />
                             <TableColumn fx:id="colNhanVienPDT" prefWidth="160" text="Nhân viên" />
                             <TableColumn fx:id="colHinhThucXuLyPDT" prefWidth="140" text="Hình thức" />
-                            <TableColumn fx:id="colPhiPhatPDT" prefWidth="110" text="Phí phạt" />
-                            <TableColumn fx:id="colLyDoPDT" prefWidth="220" text="Lý do" />
+                            <TableColumn fx:id="colPhiPhatPDT" prefWidth="165" text="Phí phạt" />
+                            <TableColumn fx:id="colLyDoPDT" prefWidth="140" text="Lý do" />
+                            <TableColumn fx:id="colChiTietPDT" prefWidth="90" text="Chi tiết" />
                         </columns>
                     </TableView>
                 </children>

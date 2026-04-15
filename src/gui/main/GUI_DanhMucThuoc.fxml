@@ -20,7 +20,7 @@
    <children>
       <!-- Header -->
       <HBox alignment="CENTER_LEFT" spacing="20">
-          <Label styleClass="main-title" text="QUẢN LÝ DANH MỤC THUỐC" />
+          <Label fx:id="lblTitle" styleClass="main-title" text="QUẢN LÝ DANH MỤC THUỐC" />
       </HBox>
       
       <GridPane hgap="8" maxWidth="Infinity">
@@ -37,6 +37,12 @@
             <Button fx:id="btnXoa" maxWidth="Infinity" minHeight="40" prefHeight="40" style="-fx-font-size: 13px;" onAction="#handleXoa" styleClass="top-card, card-orange, btn-action" text="✖ Xóa" textFill="WHITE" GridPane.columnIndex="2" />
          </children>
       </GridPane>
+
+      <HBox alignment="CENTER_RIGHT" spacing="12.0">
+         <children>
+            <Button fx:id="btnDoiThuoc" managed="false" minHeight="40" onAction="#handleDoiThuoc" prefHeight="40" prefWidth="180" styleClass="top-card, card-blue, btn-action" text="Đổi thuốc" textFill="WHITE" visible="false" />
+         </children>
+      </HBox>
 
       <HBox alignment="CENTER_LEFT" spacing="20.0">
          <children>

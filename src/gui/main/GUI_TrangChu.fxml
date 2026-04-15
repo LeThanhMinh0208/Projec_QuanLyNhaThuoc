@@ -166,7 +166,7 @@
                               <Label layoutX="20.0" layoutY="25.0" styleClass="card-title" text="BÁN THUỐC" />
                            </children>
                         </AnchorPane>
-                        <AnchorPane prefHeight="80.0" prefWidth="380.0" styleClass="top-card, card-orange" HBox.hgrow="ALWAYS">
+                        <AnchorPane onMouseClicked="#handleMoXuLyDoiTraCard" prefHeight="80.0" prefWidth="380.0" styleClass="top-card, card-orange" HBox.hgrow="ALWAYS">
                            <children>
                               <Label layoutX="20.0" layoutY="25.0" styleClass="card-title" text="ĐỔI / TRẢ" />
                            </children>

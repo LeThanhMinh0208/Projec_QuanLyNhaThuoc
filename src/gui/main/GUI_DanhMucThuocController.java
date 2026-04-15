@@ -17,17 +17,21 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import utils.AlertUtils;
+import utils.DoiTraSession;
+import utils.SceneUtils;
 import utils.WindowUtils;
 
 import java.io.InputStream;
 
 public class GUI_DanhMucThuocController {
     @FXML private TableView<Thuoc> tableThuoc;
+    @FXML private Label lblTitle;
     
     @FXML private TableColumn<Thuoc, String> colMa, colHinhAnh, colTen, colDanhMuc, colHoatChat, colHangSX, colNuocSX, colCongDung, colTrangThai;
     @FXML private TableColumn<Thuoc, Boolean> colKeDon;
     
     @FXML private TextField txtTimKiem;
+    @FXML private Button btnThem, btnSua, btnXoa, btnDoiThuoc;
 
     private DAO_Thuoc daoThuoc = new DAO_Thuoc();
     private ObservableList<Thuoc> masterData = FXCollections.observableArrayList();
@@ -37,6 +41,7 @@ public class GUI_DanhMucThuocController {
     public void initialize() {
         setupTable();
         loadData();
+        setupExchangeMode();
     }
 
     private void setupTable() {
@@ -167,6 +172,18 @@ public class GUI_DanhMucThuocController {
     @FXML void handleXoa() { checkAndOpenDialog("/gui/dialogs/Dialog_XoaThuoc.fxml", "Xóa Thuốc"); }
 
     @FXML
+    void handleDoiThuoc() {
+        Thuoc selected = tableThuoc.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng chọn một thuốc để đổi.");
+            return;
+        }
+        DoiTraSession.setThuocDoiDaChon(selected);
+        DoiTraSession.setDangChonThuocDoi(false);
+        SceneUtils.switchPage("/gui/main/GUI_ChiTietDoiTra.fxml");
+    }
+
+    @FXML
     void handleRefresh() {
         txtTimKiem.clear();
         tableThuoc.getSelectionModel().clearSelection();
@@ -174,6 +191,10 @@ public class GUI_DanhMucThuocController {
     }
 
     private void checkAndOpenDialog(String path, String title) {
+        if (DoiTraSession.isDangChonThuocDoi()) {
+            return;
+        }
+
         Thuoc selected = tableThuoc.getSelectionModel().getSelectedItem();
         if (selected == null) {
             AlertUtils.showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng chọn một loại thuốc trong bảng!");
@@ -199,5 +220,36 @@ public class GUI_DanhMucThuocController {
             
             loadData();
         }
+    }
+
+    private void setupExchangeMode() {
+        boolean isExchangeMode = DoiTraSession.isDangChonThuocDoi();
+
+        if (lblTitle != null) {
+            lblTitle.setText(isExchangeMode ? "CHỌN THUỐC ĐỔI" : "QUẢN LÝ DANH MỤC THUỐC");
+        }
+
+        setNodeVisible(btnThem, !isExchangeMode);
+        setNodeVisible(btnSua, !isExchangeMode);
+        setNodeVisible(btnXoa, !isExchangeMode);
+        setNodeVisible(btnDoiThuoc, isExchangeMode);
+
+        if (btnDoiThuoc != null) {
+            btnDoiThuoc.setDisable(tableThuoc.getSelectionModel().getSelectedItem() == null);
+        }
+
+        tableThuoc.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (btnDoiThuoc != null) {
+                btnDoiThuoc.setDisable(!isExchangeMode || newVal == null);
+            }
+        });
+    }
+
+    private void setNodeVisible(javafx.scene.Node node, boolean visible) {
+        if (node == null) {
+            return;
+        }
+        node.setVisible(visible);
+        node.setManaged(visible);
     }
 }

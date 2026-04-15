@@ -116,6 +116,40 @@ public class DAO_PhieuDoiTra {
         return list;
     }
 
+    public List<Object[]> getChiTietByMaPhieuDoiTra(String maPhieuDoiTra) {
+        List<Object[]> list = new ArrayList<>();
+        String sql =
+                "SELECT t.tenThuoc, dv.tenDonVi, ct.maLoThuoc, lo.hanSuDung, ct.soLuong, " +
+                "       hdct.donGia, (ct.soLuong * hdct.donGia) AS thanhTien " +
+                "FROM ChiTietDoiTra ct " +
+                "JOIN DonViQuyDoi dv ON dv.maQuyDoi = ct.maQuyDoi " +
+                "JOIN Thuoc t ON t.maThuoc = dv.maThuoc " +
+                "JOIN LoThuoc lo ON lo.maLoThuoc = ct.maLoThuoc " +
+                "JOIN PhieuDoiTra pdt ON pdt.maPhieuDoiTra = ct.maPhieuDoiTra " +
+                "JOIN ChiTietHoaDon hdct ON hdct.maHoaDon = pdt.maHoaDon AND hdct.maQuyDoi = ct.maQuyDoi AND hdct.maLoThuoc = ct.maLoThuoc " +
+                "WHERE ct.maPhieuDoiTra = ? " +
+                "ORDER BY t.tenThuoc";
+        try (Connection con = ConnectDB.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, maPhieuDoiTra);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                list.add(new Object[]{
+                        rs.getString("tenThuoc"),
+                        rs.getString("tenDonVi"),
+                        rs.getString("maLoThuoc"),
+                        rs.getDate("hanSuDung"),
+                        rs.getInt("soLuong"),
+                        rs.getDouble("donGia"),
+                        rs.getDouble("thanhTien")
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     public boolean lapPhieuDoiTra(PhieuDoiTra pdt, List<ChiTietDoiTra> dsChiTiet) {
         if (pdt == null || pdt.getHoaDon() == null || pdt.getNhanVien() == null || dsChiTiet == null || dsChiTiet.isEmpty()) {
             return false;
