@@ -1,22 +1,25 @@
 package utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import entity.DonViQuyDoi;
 import entity.HinhThucDoiTra;
 import entity.HoaDonView;
 import entity.Thuoc;
 
 public class DoiTraSession {
     private static HoaDonView hoaDonDangXuLy;
-    private static boolean dangChonThuocDoi;
     private static String lyDoTam = "";
     private static String phiPhatTam = "0";
     private static HinhThucDoiTra hinhThucXuLyTam = HinhThucDoiTra.HOAN_TIEN;
-    private static Thuoc thuocDoiDaChon;
-    private static DonViDoiTamData donViDoiDaChon;
     private static final List<ChiTietDoiTraTamData> dsChiTietTam = new ArrayList<>();
+    private static Thuoc thuocDoiDaChon;
+    private static DonViDoiData donViDoiDaChon;
+    private static boolean dangChonThuocDoi;
+
+    private DoiTraSession() {
+    }
 
     public static HoaDonView getHoaDonDangXuLy() {
         return hoaDonDangXuLy;
@@ -26,56 +29,32 @@ public class DoiTraSession {
         hoaDonDangXuLy = hoaDon;
     }
 
-    public static boolean isDangChonThuocDoi() {
-        return dangChonThuocDoi;
-    }
-
-    public static void setDangChonThuocDoi(boolean dangChonThuocDoi) {
-        DoiTraSession.dangChonThuocDoi = dangChonThuocDoi;
-    }
-
     public static String getLyDoTam() {
         return lyDoTam;
     }
 
-    public static void setLyDoTam(String lyDoTam) {
-        DoiTraSession.lyDoTam = lyDoTam != null ? lyDoTam : "";
+    public static void setLyDoTam(String lyDo) {
+        lyDoTam = lyDo != null ? lyDo : "";
     }
 
     public static String getPhiPhatTam() {
         return phiPhatTam;
     }
 
-    public static void setPhiPhatTam(String phiPhatTam) {
-        DoiTraSession.phiPhatTam = (phiPhatTam == null || phiPhatTam.trim().isEmpty()) ? "0" : phiPhatTam.trim();
+    public static void setPhiPhatTam(String phiPhat) {
+        phiPhatTam = (phiPhat == null || phiPhat.isBlank()) ? "0" : phiPhat.trim();
     }
 
     public static HinhThucDoiTra getHinhThucXuLyTam() {
-        return hinhThucXuLyTam;
+        return hinhThucXuLyTam != null ? hinhThucXuLyTam : HinhThucDoiTra.HOAN_TIEN;
     }
 
-    public static void setHinhThucXuLyTam(HinhThucDoiTra hinhThucXuLyTam) {
-        DoiTraSession.hinhThucXuLyTam = hinhThucXuLyTam != null ? hinhThucXuLyTam : HinhThucDoiTra.HOAN_TIEN;
-    }
-
-    public static Thuoc getThuocDoiDaChon() {
-        return thuocDoiDaChon;
-    }
-
-    public static void setThuocDoiDaChon(Thuoc thuocDoiDaChon) {
-        DoiTraSession.thuocDoiDaChon = thuocDoiDaChon;
-    }
-
-    public static DonViDoiTamData getDonViDoiDaChon() {
-        return donViDoiDaChon;
-    }
-
-    public static void setDonViDoiDaChon(DonViDoiTamData donViDoiDaChon) {
-        DoiTraSession.donViDoiDaChon = donViDoiDaChon;
+    public static void setHinhThucXuLyTam(HinhThucDoiTra hinhThuc) {
+        hinhThucXuLyTam = hinhThuc != null ? hinhThuc : HinhThucDoiTra.HOAN_TIEN;
     }
 
     public static List<ChiTietDoiTraTamData> getDsChiTietTam() {
-        return new ArrayList<>(dsChiTietTam);
+        return Collections.unmodifiableList(dsChiTietTam);
     }
 
     public static void setDsChiTietTam(List<ChiTietDoiTraTamData> data) {
@@ -85,14 +64,38 @@ public class DoiTraSession {
         }
     }
 
+    public static Thuoc getThuocDoiDaChon() {
+        return thuocDoiDaChon;
+    }
+
+    public static void setThuocDoiDaChon(Thuoc thuoc) {
+        thuocDoiDaChon = thuoc;
+    }
+
+    public static DonViDoiData getDonViDoiDaChon() {
+        return donViDoiDaChon;
+    }
+
+    public static void setDonViDoiDaChon(DonViDoiData donVi) {
+        donViDoiDaChon = donVi;
+    }
+
+    public static boolean isDangChonThuocDoi() {
+        return dangChonThuocDoi;
+    }
+
+    public static void setDangChonThuocDoi(boolean dangChon) {
+        dangChonThuocDoi = dangChon;
+    }
+
     public static void clearDraft() {
-        dangChonThuocDoi = false;
         lyDoTam = "";
         phiPhatTam = "0";
         hinhThucXuLyTam = HinhThucDoiTra.HOAN_TIEN;
+        dsChiTietTam.clear();
         thuocDoiDaChon = null;
         donViDoiDaChon = null;
-        dsChiTietTam.clear();
+        dangChonThuocDoi = false;
     }
 
     public static void clear() {
@@ -109,7 +112,7 @@ public class DoiTraSession {
         private final double thanhTienHoan;
 
         public ChiTietDoiTraTamData(String maQuyDoi, String maLoThuoc, String tenThuoc,
-                                    String tenDonVi, int soLuongTra, double thanhTienHoan) {
+                String tenDonVi, int soLuongTra, double thanhTienHoan) {
             this.maQuyDoi = maQuyDoi;
             this.maLoThuoc = maLoThuoc;
             this.tenThuoc = tenThuoc;
@@ -143,29 +146,17 @@ public class DoiTraSession {
         }
     }
 
-    public static class DonViDoiTamData {
+    public static class DonViDoiData {
         private final String maQuyDoi;
         private final String tenDonVi;
         private final int soLuong;
         private final double donGia;
-        private final String maBangGia;
 
-        public DonViDoiTamData(String maQuyDoi, String tenDonVi, int soLuong, double donGia, String maBangGia) {
+        public DonViDoiData(String maQuyDoi, String tenDonVi, int soLuong, double donGia) {
             this.maQuyDoi = maQuyDoi;
             this.tenDonVi = tenDonVi;
             this.soLuong = soLuong;
             this.donGia = donGia;
-            this.maBangGia = maBangGia;
-        }
-
-        public DonViDoiTamData(DonViQuyDoi donVi, int soLuong, double donGia, String maBangGia) {
-            this(
-                    donVi != null ? donVi.getMaQuyDoi() : null,
-                    donVi != null ? donVi.getTenDonVi() : "",
-                    soLuong,
-                    donGia,
-                    maBangGia
-            );
         }
 
         public String getMaQuyDoi() {
@@ -182,10 +173,6 @@ public class DoiTraSession {
 
         public double getDonGia() {
             return donGia;
-        }
-
-        public String getMaBangGia() {
-            return maBangGia;
         }
 
         public double getThanhTien() {

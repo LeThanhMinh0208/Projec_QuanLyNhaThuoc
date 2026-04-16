@@ -3,9 +3,6 @@ package entity;
 import java.sql.Timestamp;
 
 public class PhieuDoiTraView {
-    private static final String THUOC_TRA_PREFIX = " | Thuốc trả: ";
-    private static final String THUOC_DOI_PREFIX = " | Thuốc đổi: ";
-    private static final String KET_QUA_DOI_PREFIX = " | Kết quả đổi: ";
     private String maPhieuDoiTra;
     private Timestamp ngayDoiTra;
     private String maHoaDon;
@@ -40,15 +37,7 @@ public class PhieuDoiTraView {
     }
 
     public String getTenKhachHang() {
-<<<<<<< HEAD
         return tenKhachHang != null ? tenKhachHang : "Khách lẻ";
-=======
-<<<<<<< HEAD
-        return tenKhachHang != null ? tenKhachHang : "Khach le";
-=======
-        return tenKhachHang != null ? tenKhachHang : "Khách lẻ";
->>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
->>>>>>> main
     }
 
     public void setTenKhachHang(String tenKhachHang) {
@@ -88,121 +77,65 @@ public class PhieuDoiTraView {
     }
 
     public String getHinhThucXuLyLabel() {
-        if ("DOI_SAN_PHAM".equals(hinhThucXuLy)) {
-<<<<<<< HEAD
-            return "Đổi sản phẩm";
-        }
-        return "Hoàn tiền";
+        return isDoiSanPham() ? "Đổi sản phẩm" : "Hoàn tiền";
     }
 
     public boolean isDoiSanPham() {
         return "DOI_SAN_PHAM".equals(hinhThucXuLy);
     }
 
-    public double getSoTienChenhLech() {
-        return Math.abs(phiPhat);
+    public String getLyDoHienThi() {
+        return extractSegment("ly do");
+    }
+
+    public String getThongTinThuocTra() {
+        return extractSegment("thuoc tra");
+    }
+
+    public String getThongTinThuocDoi() {
+        return extractSegment("thuoc doi");
     }
 
     public String getMoTaChenhLechDoiSanPham() {
         if (!isDoiSanPham()) {
             return String.format("%,.0f VND", phiPhat);
         }
-
-        String ketQuaDoi = getKetQuaDoiSanPham();
-        if ("BU_TIEN".equals(ketQuaDoi)) {
-            return "Bù thêm: " + String.format("%,.0f VND", Math.abs(phiPhat));
-        }
-        if ("HOAN_TIEN".equals(ketQuaDoi)) {
-            return "Hoàn lại: " + String.format("%,.0f VND", Math.abs(phiPhat));
-        }
-        if ("KHONG_CHENH_LECH".equals(ketQuaDoi)) {
-            return "Không chênh lệch";
-        }
-
         if (phiPhat > 0) {
-            return "Bù thêm: " + String.format("%,.0f VND", phiPhat);
+            return "Bù: " + String.format("%,.0f VND", phiPhat);
         }
         if (phiPhat < 0) {
-            return "Hoàn lại: " + String.format("%,.0f VND", Math.abs(phiPhat));
+            return "Hoàn: " + String.format("%,.0f VND", Math.abs(phiPhat));
         }
         return "Không chênh lệch";
     }
 
-    public String getLyDoHienThi() {
+    private String extractSegment(String label) {
         if (lyDo == null || lyDo.isBlank()) {
             return "";
         }
 
-        int idxThuocTra = lyDo.indexOf(THUOC_TRA_PREFIX);
-        int idxThuocDoi = lyDo.indexOf(THUOC_DOI_PREFIX);
-        int idxKetQua = lyDo.indexOf(KET_QUA_DOI_PREFIX);
-        int idx = timViTriMetadataDauTien(idxThuocTra, idxThuocDoi, idxKetQua);
-        if (idx >= 0) {
-            return lyDo.substring(0, idx).trim();
-        }
-        return lyDo;
-    }
-
-    public String getThongTinThuocTra() {
-        return extractMetadataValue(THUOC_TRA_PREFIX, THUOC_DOI_PREFIX, KET_QUA_DOI_PREFIX);
-    }
-
-    public String getThongTinThuocDoi() {
-        return extractMetadataValue(THUOC_DOI_PREFIX, KET_QUA_DOI_PREFIX);
-    }
-
-    public String getKetQuaDoiSanPham() {
-        if (lyDo == null || lyDo.isBlank()) {
-            return "";
-        }
-
-        int idx = lyDo.indexOf(KET_QUA_DOI_PREFIX);
-        if (idx >= 0) {
-            return lyDo.substring(idx + KET_QUA_DOI_PREFIX.length()).trim();
-        }
-        return "";
-    }
-
-    private int timViTriMetadataDauTien(int... indexes) {
-        int min = -1;
-        for (int idx : indexes) {
-            if (idx >= 0 && (min < 0 || idx < min)) {
-                min = idx;
+        for (String part : lyDo.split("\\|")) {
+            String trimmed = part.trim();
+            int idx = trimmed.indexOf(':');
+            if (idx < 0) {
+                if ("ly do".equals(label)) {
+                    return trimmed;
+                }
+                continue;
             }
-        }
-        return min;
-    }
 
-    private String extractMetadataValue(String prefix, String... nextPrefixes) {
-        if (lyDo == null || lyDo.isBlank()) {
-            return "";
-        }
-
-        int idx = lyDo.indexOf(prefix);
-        if (idx < 0) {
-            return "";
-        }
-
-        int start = idx + prefix.length();
-        int end = -1;
-        for (String nextPrefix : nextPrefixes) {
-            int nextIdx = lyDo.indexOf(nextPrefix, start);
-            if (nextIdx >= 0 && (end < 0 || nextIdx < end)) {
-                end = nextIdx;
+            String key = normalize(trimmed.substring(0, idx).trim());
+            if (key.equals(label)) {
+                return trimmed.substring(idx + 1).trim();
             }
         }
 
-        return (end >= 0 ? lyDo.substring(start, end) : lyDo.substring(start)).trim();
-=======
-<<<<<<< HEAD
-            return "Doi san pham";
-        }
-        return "Hoan tien";
-=======
-            return "Đổi sản phẩm";
-        }
-        return "Hoàn tiền";
->>>>>>> 372975594d8f1063277fa68b18264d82aa24f969
->>>>>>> main
+        return "ly do".equals(label) ? lyDo.trim() : "";
+    }
+
+    private String normalize(String value) {
+        return value == null ? "" : value.toLowerCase()
+                .replace("ý", "y")
+                .replace("đ", "d");
     }
 }
