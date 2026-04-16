@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox styleClass="main-bg" stylesheets="@../../resources/css/DoiMatKhau.css" 
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="gui.main.GUI_DoiMatKhauController" 
+      prefHeight="720.0" prefWidth="1080.0">
+
+    <children>
+        <VBox styleClass="card-form" maxWidth="600.0" spacing="20.0">
+            <children>
+                <Label text="🔒 ĐỔI MẬT KHẨU BẢO MẬT" styleClass="title-header" maxWidth="Infinity" alignment="CENTER"/>
+
+                <GridPane hgap="20" vgap="25">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="35" />
+                        <ColumnConstraints percentWidth="65" />
+                    </columnConstraints>
+                    <children>
+                        <Label text="Họ Tên:" styleClass="input-label" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                        <TextField fx:id="txtHoTen" disable="true" styleClass="input-field, input-readonly" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                        <Label text="Tài Khoản:" styleClass="input-label" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                        <TextField fx:id="txtTaiKhoan" disable="true" styleClass="input-field, input-readonly" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+                        <Separator GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="2" />
+
+                        <Label text="SĐT Xác Thực (*):" styleClass="input-label" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                        <TextField fx:id="txtSdt" promptText="Nhập SĐT của bạn để xác thực..." styleClass="input-field" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+                        <Label text="Mật Khẩu Cũ (*):" styleClass="input-label" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+                        <PasswordField fx:id="txtMatKhauCu" promptText="Nhập mật khẩu hiện tại..." styleClass="input-field" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+
+                        <Label text="Mật Khẩu Mới (*):" styleClass="input-label" GridPane.rowIndex="5" GridPane.columnIndex="0" />
+                        <PasswordField fx:id="txtMatKhauMoi" promptText="Nhập mật khẩu mới..." styleClass="input-field" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+
+                        <Label text="Xác Nhận Mật Khẩu:" styleClass="input-label" GridPane.rowIndex="6" GridPane.columnIndex="0" />
+                        <PasswordField fx:id="txtXacNhanMatKhau" promptText="Nhập lại mật khẩu mới..." styleClass="input-field" GridPane.rowIndex="6" GridPane.columnIndex="1" />
+                    </children>
+                </GridPane>
+
+                <HBox alignment="CENTER_RIGHT" spacing="20" style="-fx-padding: 20 0 0 0;">
+                    <Button text="Làm Mới Form" onAction="#handleLamMoi" prefWidth="150" styleClass="btn-cancel" />
+                    <Button text="💾 XÁC NHẬN ĐỔI" onAction="#handleLuuThayDoi" prefWidth="180" styleClass="btn-save" />
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</VBox>

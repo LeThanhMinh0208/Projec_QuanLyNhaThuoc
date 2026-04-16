@@ -4,6 +4,59 @@
     -fx-font-family: "Segoe UI";
 }
 
+.dvqd-page {
+    -fx-background-color: linear-gradient(to bottom, #f6fbff, #eef5fb);
+}
+
+.dvqd-hero {
+    -fx-background-color: linear-gradient(to right, #2563eb, #3b82f6, #60a5fa);
+    -fx-background-radius: 14;
+    -fx-border-color: #bfdbfe;
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(three-pass-box, rgba(37, 99, 235, 0.22), 14, 0, 0, 4);
+}
+
+.dvqd-hero-title {
+    -fx-text-fill: white;
+    -fx-font-size: 30px;
+    -fx-font-weight: 900;
+    -fx-letter-spacing: 0.8px;
+}
+
+.dvqd-search-card {
+    -fx-background-color: linear-gradient(to bottom, #eff7ff, #e8f3ff);
+    -fx-background-radius: 14;
+    -fx-border-color: #bfdbfe;
+    -fx-border-radius: 14;
+    -fx-border-width: 1.2;
+}
+
+.dvqd-page .search-box {
+    -fx-background-color: #f8fcff;
+    -fx-background-radius: 12;
+    -fx-border-color: #b6d9ff;
+    -fx-border-radius: 12;
+    -fx-border-width: 1.2;
+}
+
+.dvqd-content-card {
+    -fx-background-color: #fafdff;
+    -fx-background-radius: 16;
+    -fx-border-color: #bcd8f7;
+    -fx-border-radius: 16;
+    -fx-border-width: 1.2;
+    -fx-effect: dropshadow(three-pass-box, rgba(15, 92, 150, 0.09), 10, 0, 0, 2);
+}
+
+.dvqd-table {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-border-color: #c8def5;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+}
+
 .dialog-title {
     -fx-font-size: 21px;
     -fx-font-weight: 900;
@@ -40,15 +93,38 @@
 }
 
 .dvqd-table .column-header-background {
-    -fx-background-color: linear-gradient(to right, #0ea5e9, #06b6d4);
+    -fx-background-color: linear-gradient(to right, #34a8df, #2797da, #157fcf);
+    -fx-background-radius: 12 12 0 0;
+}
+
+.dvqd-table .column-header,
+.dvqd-table .filler {
+    -fx-size: 52;
+    -fx-background-color: transparent;
+}
+
+.dvqd-table .column-header .label {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+}
+
+.dvqd-table .table-cell {
+    -fx-font-size: 14px;
+    -fx-text-fill: #1e3a5f;
+    -fx-padding: 10 8;
 }
 
 .dvqd-table .table-row-cell:filled:hover {
-    -fx-background-color: #ecfeff;
+    -fx-background-color: #ebf6ff;
 }
 
 .dvqd-table .table-row-cell:filled:selected {
-    -fx-background-color: #38bdf8;
+    -fx-background-color: #cfe8ff;
+}
+
+.dvqd-table .table-row-cell:filled:selected .text {
+    -fx-text-fill: #0f3f70;
 }
 
 .dvqd-btn-save {
