@@ -12,7 +12,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DAO_PhieuDoiTra {
     public String generateMaPhieuDoiTra() {
@@ -116,8 +118,48 @@ public class DAO_PhieuDoiTra {
         return list;
     }
 
+    public List<Object[]> getChiTietByMaPhieuDoiTra(String maPhieuDoiTra) {
+        List<Object[]> list = new ArrayList<>();
+        String sql =
+                "SELECT t.tenThuoc, dv.tenDonVi, ct.maLoThuoc, lo.hanSuDung, SUM(ct.soLuong) AS soLuong, " +
+                "       MAX(hdct.donGia) AS donGia, SUM(ct.soLuong * hdct.donGia) AS thanhTien " +
+                "FROM ChiTietDoiTra ct " +
+                "JOIN DonViQuyDoi dv ON dv.maQuyDoi = ct.maQuyDoi " +
+                "JOIN Thuoc t ON t.maThuoc = dv.maThuoc " +
+                "JOIN LoThuoc lo ON lo.maLoThuoc = ct.maLoThuoc " +
+                "JOIN PhieuDoiTra pdt ON pdt.maPhieuDoiTra = ct.maPhieuDoiTra " +
+                "JOIN ChiTietHoaDon hdct ON hdct.maHoaDon = pdt.maHoaDon AND hdct.maQuyDoi = ct.maQuyDoi AND hdct.maLoThuoc = ct.maLoThuoc " +
+                "WHERE ct.maPhieuDoiTra = ? " +
+                "GROUP BY t.tenThuoc, dv.tenDonVi, ct.maLoThuoc, lo.hanSuDung " +
+                "ORDER BY t.tenThuoc";
+        try (Connection con = ConnectDB.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, maPhieuDoiTra);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                list.add(new Object[]{
+                        rs.getString("tenThuoc"),
+                        rs.getString("tenDonVi"),
+                        rs.getString("maLoThuoc"),
+                        rs.getDate("hanSuDung"),
+                        rs.getInt("soLuong"),
+                        rs.getDouble("donGia"),
+                        rs.getDouble("thanhTien")
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     public boolean lapPhieuDoiTra(PhieuDoiTra pdt, List<ChiTietDoiTra> dsChiTiet) {
         if (pdt == null || pdt.getHoaDon() == null || pdt.getNhanVien() == null || dsChiTiet == null || dsChiTiet.isEmpty()) {
+            return false;
+        }
+
+        List<ChiTietDoiTra> chiTietHopLe = gopChiTiet(dsChiTiet);
+        if (chiTietHopLe.isEmpty()) {
             return false;
         }
 
@@ -142,7 +184,7 @@ public class DAO_PhieuDoiTra {
             String sqlChiTiet = "INSERT INTO ChiTietDoiTra(maPhieuDoiTra, maQuyDoi, maLoThuoc, soLuong, tinhTrang) VALUES(?,?,?,?,?)";
             String sqlUpdateLo = "UPDATE LoThuoc SET soLuongTon = soLuongTon + ? WHERE maLoThuoc = ?";
 
-            for (ChiTietDoiTra ct : dsChiTiet) {
+            for (ChiTietDoiTra ct : chiTietHopLe) {
                 int soLuongConLai = getSoLuongConLaiCoTheDoi(con, pdt.getHoaDon().getMaHoaDon(), ct.getMaQuyDoi(), ct.getMaLoThuoc());
                 if (ct.getSoLuong() <= 0 || ct.getSoLuong() > soLuongConLai) {
                     con.rollback();
@@ -227,5 +269,33 @@ public class DAO_PhieuDoiTra {
             }
         }
         return 1;
+    }
+
+    private List<ChiTietDoiTra> gopChiTiet(List<ChiTietDoiTra> dsChiTiet) {
+        Map<String, ChiTietDoiTra> map = new LinkedHashMap<>();
+        for (ChiTietDoiTra item : dsChiTiet) {
+            if (item == null || item.getMaQuyDoi() == null || item.getMaLoThuoc() == null || item.getSoLuong() <= 0) {
+                continue;
+            }
+
+            String key = item.getMaQuyDoi() + "|" + item.getMaLoThuoc();
+            ChiTietDoiTra existing = map.get(key);
+            if (existing == null) {
+                ChiTietDoiTra copy = new ChiTietDoiTra();
+                copy.setMaPhieuDoiTra(item.getMaPhieuDoiTra());
+                copy.setMaQuyDoi(item.getMaQuyDoi());
+                copy.setMaLoThuoc(item.getMaLoThuoc());
+                copy.setSoLuong(item.getSoLuong());
+                copy.setTinhTrang(item.getTinhTrang());
+                map.put(key, copy);
+            } else {
+                existing.setSoLuong(existing.getSoLuong() + item.getSoLuong());
+                if ((existing.getTinhTrang() == null || existing.getTinhTrang().isBlank())
+                        && item.getTinhTrang() != null && !item.getTinhTrang().isBlank()) {
+                    existing.setTinhTrang(item.getTinhTrang());
+                }
+            }
+        }
+        return new ArrayList<>(map.values());
     }
 }

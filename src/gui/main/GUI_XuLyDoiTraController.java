@@ -13,6 +13,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -25,6 +28,8 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import utils.DoiTraSession;
 import utils.SceneUtils;
 
@@ -57,6 +62,7 @@ public class GUI_XuLyDoiTraController {
 
     @FXML private TextField txtTimKiemPhieuDoiTra;
     @FXML private TableView<PhieuDoiTraView> tablePhieuDoiTra;
+    @FXML private TableColumn<PhieuDoiTraView, Void> colChiTietPDT;
     @FXML private TableColumn<PhieuDoiTraView, String> colMaPhieuDoiTra;
     @FXML private TableColumn<PhieuDoiTraView, String> colNgayDoiTra;
     @FXML private TableColumn<PhieuDoiTraView, String> colMaHoaDonPDT;
@@ -80,8 +86,8 @@ public class GUI_XuLyDoiTraController {
         setupTableHoaDon();
         setupTablePhieuDoiTra();
 
-        dpTuNgay.setValue(LocalDate.now().withDayOfMonth(1));
-        dpDenNgay.setValue(LocalDate.now());
+        dpTuNgay.setValue(null);
+        dpDenNgay.setValue(null);
         loadHoaDon();
 
         txtTimKiem.textProperty().addListener((obs, oldVal, newVal) -> filterByKeyword(newVal.trim()));
@@ -144,6 +150,19 @@ public class GUI_XuLyDoiTraController {
     }
 
     private void setupTablePhieuDoiTra() {
+        colChiTietPDT.setCellFactory(col -> new TableCell<>() {
+            private final Button btnChiTiet = new Button("Chi tiết");
+            {
+                btnChiTiet.setStyle("-fx-background-color:#2563eb;-fx-text-fill:white;-fx-font-size:12px;-fx-padding:4 10;-fx-cursor:hand;");
+                btnChiTiet.setOnAction(e -> moChiTietPhieuDoiTra(getTableView().getItems().get(getIndex())));
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : btnChiTiet);
+            }
+        });
         colMaPhieuDoiTra.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getMaPhieuDoiTra()));
         colNgayDoiTra.setCellValueFactory(d -> new SimpleStringProperty(
                 d.getValue().getNgayDoiTra() != null ? d.getValue().getNgayDoiTra().toLocalDateTime().format(FMT) : ""));
@@ -151,8 +170,11 @@ public class GUI_XuLyDoiTraController {
         colKhachHangPDT.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTenKhachHang()));
         colNhanVienPDT.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTenNhanVien()));
         colHinhThucXuLyPDT.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getHinhThucXuLyLabel()));
-        colPhiPhatPDT.setCellValueFactory(d -> new SimpleStringProperty(String.format("%,.0f VND", d.getValue().getPhiPhat())));
-        colLyDoPDT.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getLyDo() != null ? d.getValue().getLyDo() : ""));
+        colPhiPhatPDT.setCellValueFactory(d -> new SimpleStringProperty(
+                d.getValue().isDoiSanPham()
+                        ? d.getValue().getMoTaChenhLechDoiSanPham()
+                        : String.format("%,.0f VND", d.getValue().getPhiPhat())));
+        colLyDoPDT.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getLyDoHienThi()));
         tablePhieuDoiTra.setItems(dsPhieuDoiTra);
     }
 
@@ -224,8 +246,8 @@ public class GUI_XuLyDoiTraController {
 
     @FXML
     void handleXoaBoLoc(ActionEvent event) {
-        dpTuNgay.setValue(LocalDate.now().withDayOfMonth(1));
-        dpDenNgay.setValue(LocalDate.now());
+        dpTuNgay.setValue(null);
+        dpDenNgay.setValue(null);
         cbHinhThuc.setValue("Tất cả");
         txtTimKiem.clear();
         loadHoaDon();
@@ -238,7 +260,25 @@ public class GUI_XuLyDoiTraController {
     }
 
     private void xuLyDoiTra(HoaDonView hd) {
+        DoiTraSession.clear();
         DoiTraSession.setHoaDonDangXuLy(hd);
         SceneUtils.switchPage("/gui/main/GUI_ChiTietDoiTra.fxml");
+    }
+
+    private void moChiTietPhieuDoiTra(PhieuDoiTraView pdt) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ChiTietPhieuDoiTra.fxml"));
+            Parent root = loader.load();
+            gui.dialogs.Dialog_ChiTietPhieuDoiTraController controller = loader.getController();
+            controller.setPhieuDoiTra(pdt);
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Chi tiết phiếu đổi trả - " + pdt.getMaPhieuDoiTra());
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

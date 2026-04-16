@@ -23,7 +23,7 @@ public class GUI_DangNhapController {
         String taiKhoan = txtTenDangNhap.getText().trim();
         String matKhau  = txtMatKhau.getText();
 
-        // 1. Kiểm tra trống (Dùng logic đơn giản hoặc Validator Utils)
+        // 1. Kiểm tra rỗng
         if (taiKhoan.isEmpty() || matKhau.isEmpty()) {
             AlertUtils.showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng nhập đầy đủ tài khoản và mật khẩu!");
             return;
@@ -33,7 +33,13 @@ public class GUI_DangNhapController {
         NhanVien nv = nhanVienDao.dangNhap(taiKhoan, matKhau);
 
         if (nv != null) {
-            // 3. Lưu nhân viên vào Session dùng chung cho toàn App
+            // 🚨 KIỂM TRA TRẠNG THÁI: NẾU BỊ KHÓA THÌ CHẶN LẠI NGAY 🚨
+            if (nv.getTrangThai() == 2) {
+                AlertUtils.showAlert(Alert.AlertType.ERROR, "Tài khoản bị khóa", "Tài khoản của bạn đã bị khóa!\nVui lòng liên hệ Quản lý để được hỗ trợ.");
+                return; // Dừng hàm, không cho đăng nhập
+            }
+
+            // 3. Nếu trạng thái bình thường (1) -> Lưu Session dùng chung
             UserSession.getInstance().setUser(nv);
 
             // 4. Đóng cửa sổ đăng nhập
@@ -54,7 +60,7 @@ public class GUI_DangNhapController {
             }
             
         } else {
-            // 6. Xử lý khi đăng nhập thất bại
+            // 6. Xử lý khi đăng nhập thất bại (Sai pass hoặc Sai user)
             AlertUtils.showAlert(Alert.AlertType.ERROR, "Đăng nhập thất bại", "Tài khoản hoặc mật khẩu không đúng!");
             txtMatKhau.clear();
             txtMatKhau.requestFocus();

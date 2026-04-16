@@ -15,12 +15,18 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+
 import java.io.InputStream;
 
 public class GUI_TrangChuController {
@@ -36,8 +42,8 @@ public class GUI_TrangChuController {
     @FXML
     private BorderPane mainBorderPane;
 
-    private DAO_Thuoc daoThuoc = new DAO_Thuoc();
-    private ObservableList<Thuoc> masterData = FXCollections.observableArrayList();
+    private final DAO_Thuoc daoThuoc = new DAO_Thuoc();
+    private final ObservableList<Thuoc> masterData = FXCollections.observableArrayList();
     private static NhanVien nhanVienDangNhap;
     private Node noiDungTrangChuGoc;
 
@@ -75,7 +81,7 @@ public class GUI_TrangChuController {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    setText(item ? "CÃƒÂ³" : "KhÃƒÂ´ng");
+                    setText(item ? "Co" : "Khong");
                     getStyleClass().add(item ? "text-do" : "text-xanh-la");
                 }
             }
@@ -91,13 +97,13 @@ public class GUI_TrangChuController {
                     setText(null);
                 } else {
                     if ("DANG_BAN".equals(item)) {
-                        setText("Ã„Âang BÃƒÂ¡n");
+                        setText("Dang Ban");
                         getStyleClass().add("text-xanh-bien");
                     } else if ("HET_HANG".equals(item)) {
-                        setText("HÃ¡ÂºÂ¿t HÃƒÂ ng");
+                        setText("Het Hang");
                         getStyleClass().add("text-vang-cam");
                     } else if ("NGUNG_BAN".equals(item)) {
-                        setText("NgÃ¡Â»Â«ng BÃƒÂ¡n");
+                        setText("Ngung Ban");
                         getStyleClass().add("text-do");
                     } else {
                         setText(item);
@@ -109,6 +115,7 @@ public class GUI_TrangChuController {
         colHinhAnh.setCellValueFactory(new PropertyValueFactory<>("hinhAnh"));
         colHinhAnh.setCellFactory(column -> new TableCell<>() {
             private final ImageView iv = new ImageView();
+
             @Override
             protected void updateItem(String file, boolean empty) {
                 super.updateItem(file, empty);
@@ -137,7 +144,7 @@ public class GUI_TrangChuController {
         tableThuoc.setRowFactory(tv -> {
             TableRow<Thuoc> row = new TableRow<>();
             row.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
-                if (event.getClickCount() == 1 && (!row.isEmpty()) && row.isSelected()) {
+                if (event.getClickCount() == 1 && !row.isEmpty() && row.isSelected()) {
                     tv.getSelectionModel().clearSelection();
                     tv.getFocusModel().focus(-1);
                     tableThuoc.getParent().requestFocus();
@@ -156,7 +163,9 @@ public class GUI_TrangChuController {
         FilteredList<Thuoc> filteredData = new FilteredList<>(masterData, p -> true);
         txtTimKiem.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(thuoc -> {
-                if (newValue == null || newValue.isEmpty()) return true;
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
                 String filter = newValue.toLowerCase();
 
                 if (thuoc.getTrieuChung() != null && thuoc.getTrieuChung().toLowerCase().contains(filter)) return true;
@@ -166,8 +175,8 @@ public class GUI_TrangChuController {
                 if (thuoc.getHoatChat() != null && thuoc.getHoatChat().toLowerCase().contains(filter)) return true;
                 if (thuoc.getHangSanXuat() != null && thuoc.getHangSanXuat().toLowerCase().contains(filter)) return true;
                 if (thuoc.getNuocSanXuat() != null && thuoc.getNuocSanXuat().toLowerCase().contains(filter)) return true;
-                
-                String keDonString = thuoc.isCanKeDon() ? "cÃƒÂ³ kÃƒÂª Ã„â€˜Ã†Â¡n" : "khÃƒÂ´ng kÃƒÂª Ã„â€˜Ã†Â¡n";
+
+                String keDonString = thuoc.isCanKeDon() ? "co ke don" : "khong ke don";
                 return keDonString.contains(filter);
             });
         });
@@ -193,7 +202,7 @@ public class GUI_TrangChuController {
             Parent root = FXMLLoader.load(getClass().getResource("GUI_DangNhap.fxml"));
             Stage loginStage = new Stage();
             loginStage.setScene(new Scene(root));
-            loginStage.setTitle("Ã„ÂÃ„Æ’ng nhÃ¡ÂºÂ­p");
+            loginStage.setTitle("Dang nhap");
             loginStage.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -246,6 +255,16 @@ public class GUI_TrangChuController {
     }
 
     @FXML
+    void handleMoXuLyDoiTra(ActionEvent event) {
+        switchPage("/gui/main/GUI_XuLyDoiTra.fxml");
+    }
+
+    @FXML
+    void handleMoXuLyDoiTraCard(javafx.scene.input.MouseEvent event) {
+        switchPage("/gui/main/GUI_XuLyDoiTra.fxml");
+    }
+
+    @FXML
     void moTrangXuatKho(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_XuatKho.fxml");
     }
@@ -259,6 +278,7 @@ public class GUI_TrangChuController {
     void handleMoQuanLyDanhMucNhaCungCap(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucNhaCungCap.fxml");
     }
+
     @FXML
     void handleMoQuanLyCongNo(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyCongNo.fxml");
@@ -273,9 +293,15 @@ public class GUI_TrangChuController {
     void handleMoDanhSachHoaDon(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_DanhSachHoaDon.fxml");
     }
+
     @FXML
     void handleMoQuanLyLoThuoc(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyLoThuoc.fxml");
+    }
+
+    @FXML
+    void handleMoQuanLyNguoiDung(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyNguoiDung.fxml");
     }
 
     @FXML
@@ -286,16 +312,15 @@ public class GUI_TrangChuController {
     @FXML
     void handleMoTaoBangGia(ActionEvent event) {
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                    getClass().getResource("/gui/main/GUI_QuanLyBangGia.fxml"));
-            javafx.scene.Parent root = loader.load();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/main/GUI_QuanLyBangGia.fxml"));
+            Parent root = loader.load();
             Object controller = loader.getController();
             if (controller instanceof GUI_QuanLyBangGiaController) {
                 ((GUI_QuanLyBangGiaController) controller).handleThemBangGiaMoi();
             }
             mainBorderPane.setCenter(root);
         } catch (Exception e) {
-            System.err.println("LÃ¡Â»â€”i mÃ¡Â»Å¸ TÃ¡ÂºÂ¡o BÃ¡ÂºÂ£ng GiÃƒÂ¡: " + e.getMessage());
+            System.err.println("Loi mo Tao Bang Gia: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -313,7 +338,7 @@ public class GUI_TrangChuController {
             }
             mainBorderPane.setCenter(root);
         } catch (Exception e) {
-            System.err.println("LÃ¡Â»â€”i nÃ¡ÂºÂ¡p file FXML: " + fxmlPath);
+            System.err.println("Loi nap file FXML: " + fxmlPath);
             e.printStackTrace();
         }
     }

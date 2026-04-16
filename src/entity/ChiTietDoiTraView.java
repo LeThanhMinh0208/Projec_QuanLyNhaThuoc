@@ -79,4 +79,15 @@ public class ChiTietDoiTraView {
     public int getSoLuongConLai() {
         return Math.max(0, soLuongDaMua - soLuongDaTra);
     }
+
+    public String getMoTaHienThi() {
+        String hsd = hanSuDung != null ? hanSuDung.toString() : "--";
+        return String.format("%s | %s | Lo %s | Con lai %d | HSD %s",
+                tenThuoc, tenDonVi, maLoThuoc, getSoLuongConLai(), hsd);
+    }
+
+    @Override
+    public String toString() {
+        return getMoTaHienThi();
+    }
 }
