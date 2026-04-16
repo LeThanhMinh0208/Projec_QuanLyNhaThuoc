@@ -200,7 +200,6 @@ CREATE TABLE HoaDon (
     thueVAT DECIMAL(5,2) DEFAULT 0,
     hinhThucThanhToan VARCHAR(20) DEFAULT 'TIEN_MAT',
     ghiChu NVARCHAR(255),
-    -- ✅ Phân loại hóa đơn: bán lẻ hoặc bán theo đơn thuốc
     loaiBan VARCHAR(20) DEFAULT 'BAN_LE',
 
     FOREIGN KEY (maKhachHang) REFERENCES KhachHang(maKhachHang),
