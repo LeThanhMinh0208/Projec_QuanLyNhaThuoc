@@ -1,13 +1,18 @@
 package gui.main;
 
-import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import dao.DAO_DonThuoc;
 import dao.DAO_HoaDon;
 import dao.DAO_KhachHang;
 import dao.DAO_LoThuoc;
@@ -46,6 +51,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -57,11 +64,15 @@ public class GUI_QuanLyBanHangController {
 
     @FXML
     private void onTabBanLe() {
+        btnBanLe.setSelected(true);
+        btnDonThuoc.setSelected(false);
         if (tabPaneBanHang != null) tabPaneBanHang.getSelectionModel().select(0);
     }
     
     @FXML
     private void onTabDonThuoc() {
+        btnDonThuoc.setSelected(true);
+        btnBanLe.setSelected(false);
         if (tabPaneBanHang != null) tabPaneBanHang.getSelectionModel().select(1);
     }
 
@@ -75,8 +86,10 @@ public class GUI_QuanLyBanHangController {
     @FXML private TableColumn<Thuoc, Boolean> colThuocKeDon;
     @FXML private Button btnThemVaoGioLe;
 
+    // VĐ4: Thông tin khách hàng - đã chuyển lên header
     @FXML private TextField txtSdtKhachLe;
     @FXML private Label lblTenKhachLe;
+    @FXML private Button btnXoaKH;
 
     @FXML private TableView<CartItem> tblGioHangLe;
     @FXML private TableColumn<CartItem, String> colCartTenThuoc;
@@ -84,7 +97,6 @@ public class GUI_QuanLyBanHangController {
     @FXML private TableColumn<CartItem, Integer> colCartSoLuong;
     @FXML private TableColumn<CartItem, String> colCartDonGia;
     @FXML private TableColumn<CartItem, String> colCartThanhTien;
-    @FXML private TableColumn<CartItem, String> colCartHanSuDung;
     @FXML private TableColumn<CartItem, Void> colCartXoa;
 
     @FXML private ComboBox<String> cbHinhThucThanhToanLe;
@@ -136,10 +148,18 @@ public class GUI_QuanLyBanHangController {
         cbHinhThucThanhToanLe.getItems().addAll("Tiền mặt", "Chuyển khoản", "Thẻ tín dụng");
         cbHinhThucThanhToanLe.getSelectionModel().selectFirst();
         
-        setupTableDonThuoc();
+        // TAB 2: Bán theo đơn
+        setupTableThuocDon();
         setupTableCartDon();
+        loadDataThuocDon();
+        setupSearchLogicDon();
         cbHinhThucThanhToanDon.getItems().addAll("Tiền mặt", "Chuyển khoản", "Thẻ tín dụng");
         cbHinhThucThanhToanDon.getSelectionModel().selectFirst();
+        
+        // VĐ1: Disable nút "Thêm vào giỏ" tab đơn khi chưa có đơn thuốc
+        if (btnThemVaoGioDon != null) btnThemVaoGioDon.setDisable(true);
+        // VĐ1-card: Ẩn paneThongTinDon khi khởi tạo
+        if (paneThongTinDon != null) { paneThongTinDon.setVisible(false); paneThongTinDon.setManaged(false); }
         
         // Keyboard navigation
         setupKeyboardNavigation();
@@ -156,6 +176,17 @@ public class GUI_QuanLyBanHangController {
 
     private void setupTableThuocLe() {
         colThuocMa.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("maThuoc"));
+        colThuocMa.setCellFactory(col -> {
+            TableCell<Thuoc, String> cell = new TableCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty || item == null ? null : item);
+                }
+            };
+            cell.setAlignment(javafx.geometry.Pos.CENTER);
+            return cell;
+        });
         
         colThuocAnh.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("hinhAnh"));
         colThuocAnh.setCellFactory(column -> new TableCell<Thuoc, String>() {
@@ -192,11 +223,24 @@ public class GUI_QuanLyBanHangController {
         });
         
         colThuocTen.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("tenThuoc"));
+        colThuocTen.setCellFactory(col -> {
+            TableCell<Thuoc, String> cell = new TableCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty || item == null ? null : item);
+                }
+            };
+            cell.setAlignment(javafx.geometry.Pos.CENTER);
+            return cell;
+        });
         colThuocTrieuChung.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("trieuChung"));
-        // colThuocTrangThai removed - no longer in FXML
         
         colThuocKeDon.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("canKeDon"));
         colThuocKeDon.setCellFactory(column -> new TableCell<Thuoc, Boolean>() {
+            {
+                setAlignment(javafx.geometry.Pos.CENTER);
+            }
             @Override
             protected void updateItem(Boolean item, boolean empty) {
                 super.updateItem(item, empty);
@@ -219,16 +263,12 @@ public class GUI_QuanLyBanHangController {
 
     private void setupTableCartLe() {
         tblGioHangLe.setItems(cartDataLe);
+        tblGioHangLe.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         colCartTenThuoc.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().thuoc.getTenThuoc()));
         colCartDonVi.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().donVi.getTenDonVi()));
         colCartSoLuong.setCellValueFactory(cd -> new SimpleIntegerProperty(cd.getValue().soLuong).asObject());
         colCartDonGia.setCellValueFactory(cd -> new SimpleStringProperty(String.format("%,.0f ₫", cd.getValue().donGia)));
         colCartThanhTien.setCellValueFactory(cd -> new SimpleStringProperty(String.format("%,.0f ₫", cd.getValue().thanhTien)));
-        colCartHanSuDung.setCellValueFactory(cd -> {
-            CartItem it = cd.getValue();
-            if (it.hanSuDung != null) return new SimpleStringProperty(it.hanSuDung.toLocalDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            return new SimpleStringProperty("FEFO");
-        });
         
         colCartXoa.setCellFactory(column -> new TableCell<CartItem, Void>() {
             private final Button btn = new Button("✕");
@@ -248,9 +288,9 @@ public class GUI_QuanLyBanHangController {
         });
     }
 
+    // VĐ3: Chỉ hiện thuốc KHÔNG kê đơn cho tab bán lẻ
     private void loadDataThuocLe() {
-        // VĐ5A: Chỉ hiện thuốc có lô ở KHO_BAN_HANG, còn hạn, còn tồn
-        List<Thuoc> filtered = daoThuoc.getAllThuocCoLoKhoBanHang();
+        List<Thuoc> filtered = daoThuoc.getAllThuocKhongKeDonKhoBanHang();
         masterDataLe.setAll(filtered);
         tblThuocLe.setItems(masterDataLe);
     }
@@ -276,6 +316,7 @@ public class GUI_QuanLyBanHangController {
     @FXML void handleLamMoiLe(ActionEvent event) {
         txtTimKiemThuocLe.clear();
         loadDataThuocLe();
+        setupSearchLogic();
     }
 
     @FXML void handleThemVaoGioLe(ActionEvent event) {
@@ -285,6 +326,7 @@ public class GUI_QuanLyBanHangController {
             return;
         }
 
+        // VĐ3: Tab bán lẻ đã lọc chỉ thuốc không kê đơn, nhưng vẫn double-check
         if (selectedThuoc.isCanKeDon()) {
             showAlert(AlertType.ERROR, "Lỗi Kê Đơn", "Thuốc này CẦN KÊ ĐƠN!\nVui lòng chuyển sang Tab 'Bán Theo Đơn Thuốc'.");
             return;
@@ -344,13 +386,15 @@ public class GUI_QuanLyBanHangController {
         String sdt = txtSdtKhachLe.getText().trim();
         if (sdt.isEmpty()) {
             currentKhachHang = null;
-            lblTenKhachLe.setText("👤 Khách lẻ (vãng lai)");
+            lblTenKhachLe.setText("Khách lẻ (vãng lai)");
+            if (btnXoaKH != null) btnXoaKH.setVisible(false);
             return;
         }
         KhachHang kh = daoKhachHang.getBySdt(sdt);
         if (kh != null) {
             currentKhachHang = kh;
             lblTenKhachLe.setText("👤 " + kh.getHoTen() + " (Điểm: " + kh.getDiemTichLuy() + ")");
+            if (btnXoaKH != null) btnXoaKH.setVisible(true);
         } else {
             Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Không tìm thấy khách hàng với SĐT: " + sdt + ".\nBạn có muốn thêm khách hàng mới không?", ButtonType.YES, ButtonType.NO);
             confirm.showAndWait();
@@ -390,16 +434,17 @@ public class GUI_QuanLyBanHangController {
                             currentKhachHang = result;
                             lblTenKhachLe.setText("👤 " + result.getHoTen() + " (Điểm: 0)");
                             txtSdtKhachLe.setText(result.getSdt());
+                            if (btnXoaKH != null) btnXoaKH.setVisible(true);
                             showAlert(Alert.AlertType.INFORMATION, "Thành công", "Thêm khách hàng thành công! Mã: " + result.getMaKhachHang());
                         } else {
                             showAlert(Alert.AlertType.ERROR, "Thất bại", "Lỗi cơ sở dữ liệu khi lưu khách hàng. Vui lòng thử lại.");
                             currentKhachHang = null;
-                            lblTenKhachLe.setText("👤 Khách lẻ (vãng lai)");
+                            lblTenKhachLe.setText("Khách lẻ (vãng lai)");
                         }
                     } else {
                         // User hủy dialog → không làm gì, giữ Khách lẻ
                         currentKhachHang = null;
-                        lblTenKhachLe.setText("👤 Khách lẻ (vãng lai)");
+                        lblTenKhachLe.setText("Khách lẻ (vãng lai)");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -407,17 +452,23 @@ public class GUI_QuanLyBanHangController {
                 }
             } else {
                 currentKhachHang = null;
-                lblTenKhachLe.setText("👤 Không tìm thấy khách hàng: " + sdt);
+                lblTenKhachLe.setText("Không tìm thấy: " + sdt);
             }
         }
+    }
+
+    // VĐ4: Xóa khách hàng đã chọn
+    @FXML void onXoaKhachHang(ActionEvent event) {
+        currentKhachHang = null;
+        txtSdtKhachLe.clear();
+        lblTenKhachLe.setText("Khách lẻ (vãng lai)");
+        if (btnXoaKH != null) btnXoaKH.setVisible(false);
     }
 
     @FXML void handleHuyGioLe(ActionEvent event) {
         cartDataLe.clear();
         tinhTongTienLe();
-        currentKhachHang = null;
-        txtSdtKhachLe.clear();
-        lblTenKhachLe.setText("👤 Khách lẻ (vãng lai)");
+        // VĐ3: CHỈ xóa giỏ, KHÔNG reset khách hàng
     }
 
     @FXML void handleThanhToanLe(ActionEvent event) {
@@ -440,7 +491,7 @@ public class GUI_QuanLyBanHangController {
         
         NhanVien user = GUI_TrangChuController.getNhanVienDangNhap();
         if (user == null) {
-            user = new NhanVien("NV001", "testuser", "123", "—", "Nhân viên", "Ca 1", "0123"); // Fallback for debugging
+            user = new NhanVien("NV001", "testuser", "123", "Nhân Viên Test", "Nhân viên", "Ca 1", "0123",1); 
         }
         
         // Tao Hoa don
@@ -452,6 +503,7 @@ public class GUI_QuanLyBanHangController {
         // --- FIX thueVAT: DB lưu 8.0 = 8%, KHÔNG phải 0.08 ---
         HoaDon hd = new HoaDon(maHD, Timestamp.valueOf(LocalDateTime.now()), 8.0, 
                 dbHinhThuc, "", user, currentKhachHang);
+        hd.setLoaiBan("BAN_LE"); // Tường minh set BAN_LE
         
         // Tạo danh sách ChiTietHoaDon – mỗi sản phẩm 1 lô FEFO (strict)
         List<ChiTietHoaDon> dsCT = new ArrayList<>();
@@ -474,8 +526,6 @@ public class GUI_QuanLyBanHangController {
             dsCT.add(ct);
         }
         
-        // Lưu Hóa Đơn (Phần DAO_HoaDon hiện đang deduct bằng soLuong, nên sẽ lỗi logic tỷ lệ quy đổi nếu ta không sửa DAO_HoaDon)
-        // Note: For now we proceed...
         boolean ok = daoHoaDon.thanhToan(hd, dsCT);
         if (ok) {
             // Tích điểm
@@ -483,7 +533,7 @@ public class GUI_QuanLyBanHangController {
                 int diemCong = (int) ((tongTienLe + thueVatLe) / 1000);
                 daoKhachHang.capNhatDiemTichLuy(currentKhachHang.getMaKhachHang(), currentKhachHang.getDiemTichLuy() + diemCong);
             }
-            // ── VĐ3: Hỏi in hóa đơn sau khi thanh toán thành công ──
+            // ── Hỏi in hóa đơn sau khi thanh toán thành công ──
             Alert confirmPrint = new Alert(AlertType.CONFIRMATION);
             confirmPrint.setTitle("Thanh toán thành công");
             confirmPrint.setHeaderText("✅ Hóa đơn " + maHD + " đã được lưu!");
@@ -498,7 +548,6 @@ public class GUI_QuanLyBanHangController {
                 try {
                     List<Object[]> chiTiet = daoHoaDon.getChiTietByMaHoaDon(maHD);
 
-                    // VĐ1: Reload từ DB để lấy thông tin JOIN (tên nhân viên)
                     HoaDonView hdView = daoHoaDon.getHoaDonViewByMa(maHD);
                     if (hdView == null) {
                         throw new Exception("Lỗi: không reload được hóa đơn từ DB để in PDF.");
@@ -517,6 +566,9 @@ public class GUI_QuanLyBanHangController {
             }
 
             handleHuyGioLe(null);
+            // Reload lại danh sách thuốc (tồn kho đã thay đổi)
+            loadDataThuocLe();
+            setupSearchLogic();
         } else {
             showAlert(AlertType.ERROR, "Lỗi", "Thanh toán thất bại. Vui lòng thử lại!");
         }
@@ -539,49 +591,390 @@ public class GUI_QuanLyBanHangController {
         a.showAndWait();
     }
 
-    // --- TAB 2 UI Elements ---
-    @FXML private TableView<DonThuoc> tblDonThuoc;
-    @FXML private TableColumn<DonThuoc, String> colDTMa, colDTBacSi, colDTBenhNhan;
-    @FXML private Label lblDonThuocChiTiet;
-    @FXML private TextField txtSdtKhachDon;
-    @FXML private Label lblTenKhachDon;
+    // ═══════════════════════════════════════════════════════════════════
+    // TAB 2: BÁN THEO ĐƠN — Bảng thuốc + Card đơn thuốc + Giỏ hàng
+    // ═══════════════════════════════════════════════════════════════════
+
+    // Bảng thuốc tab đơn
+    @FXML private TextField txtTimKiemThuocDon;
+    @FXML private TableView<Thuoc> tblThuocDon;
+    @FXML private TableColumn<Thuoc, String> colThuocDonMa;
+    @FXML private TableColumn<Thuoc, String> colThuocDonAnh;
+    @FXML private TableColumn<Thuoc, String> colThuocDonTen;
+    @FXML private TableColumn<Thuoc, String> colThuocDonTrieuChung;
+    @FXML private TableColumn<Thuoc, Boolean> colThuocDonKeDon;
+    @FXML private Button btnThemVaoGioDon;
+
+    // Card đơn thuốc
+    @FXML private Label lblTrangThaiDon;
+    @FXML private Button btnThemDon;
+    @FXML private Button btnXemSuaDon;
+    @FXML private Button btnDatLaiDon;
+
+    // Pane chứa nội dung đơn thuốc (visible/managed control)
+    @FXML private javafx.scene.layout.VBox paneThongTinDon;
+
+    // Giỏ hàng + thanh toán tab đơn
     @FXML private TableView<CartItem> tblGioHangDon;
     @FXML private TableColumn<CartItem, String> colCartDonTenThuoc, colCartDonDonVi;
     @FXML private TableColumn<CartItem, Integer> colCartDonSoLuong;
-    @FXML private TableColumn<CartItem, String> colCartDonDonGia, colCartDonThanhTien, colCartDonHanSuDung;
+    @FXML private TableColumn<CartItem, String> colCartDonDonGia, colCartDonThanhTien;
     @FXML private TableColumn<CartItem, Void> colCartDonXoa;
     @FXML private ComboBox<String> cbHinhThucThanhToanDon;
     @FXML private Label lblTongTienDon, lblVatDon, lblThanhTienDon;
     @FXML private Button btnThanhToanDon;
 
-    private ObservableList<DonThuoc> dsDonThuocPendings = FXCollections.observableArrayList();
+    private ObservableList<Thuoc> masterDataDon = FXCollections.observableArrayList();
     private ObservableList<CartItem> cartDataDon = FXCollections.observableArrayList();
     private KhachHang currentKhachHangDon = null;
-    private DonThuoc currentDonThuoc = null;
     private double tongTienDon = 0;
     private double thueVatDon = 0;
-    private final dao.DAO_DonThuoc daoDonThuoc = new dao.DAO_DonThuoc();
+    private final DAO_DonThuoc daoDonThuoc = new DAO_DonThuoc();
 
-    private void setupTableDonThuoc() {
-        colDTMa.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("maDonThuoc"));
-        colDTBacSi.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("tenBacSi"));
-        colDTBenhNhan.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("thongTinBenhNhan"));
-        tblDonThuoc.setItems(dsDonThuocPendings);
-        tblDonThuoc.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                lblDonThuocChiTiet.setText("Bác sĩ: " + newSelection.getTenBacSi() + "\nBệnh nhân: " + newSelection.getThongTinBenhNhan() + "\nChẩn đoán: " + newSelection.getChanDoan());
-            } else {
-                lblDonThuocChiTiet.setText("Chọn 1 đơn thuốc để xem chi tiết.");
+    // Object tạm cho đơn thuốc — chỉ INSERT vào DB khi thanh toán
+    private DonThuoc donThuocTemp = null;
+
+    // --- BẢNG THUỐC TAB ĐƠN ---
+
+    private void setupTableThuocDon() {
+        colThuocDonMa.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("maThuoc"));
+        colThuocDonMa.setCellFactory(col -> {
+            TableCell<Thuoc, String> cell = new TableCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty || item == null ? null : item);
+                }
+            };
+            cell.setAlignment(javafx.geometry.Pos.CENTER);
+            return cell;
+        });
+
+        // Ảnh thuốc (giống tab lẻ)
+        colThuocDonAnh.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("hinhAnh"));
+        colThuocDonAnh.setCellFactory(column -> new TableCell<Thuoc, String>() {
+            private final javafx.scene.image.ImageView imageView = new javafx.scene.image.ImageView();
+            private final javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(imageView);
+            {
+                imageView.setFitWidth(60);
+                imageView.setFitHeight(60);
+                imageView.setPreserveRatio(true);
+                imageView.setSmooth(true);
+                box.setAlignment(javafx.geometry.Pos.CENTER);
+                box.setPrefHeight(72);
+            }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null || item.trim().isEmpty()) {
+                    imageView.setImage(null);
+                    setGraphic(empty ? null : box);
+                } else {
+                    try {
+                        java.io.InputStream is = getClass().getResourceAsStream("/resources/images/images_thuoc/" + item.trim());
+                        if (is != null) {
+                            imageView.setImage(new javafx.scene.image.Image(is, 60, 60, true, true));
+                        } else {
+                            imageView.setImage(null);
+                        }
+                    } catch (Exception e) {
+                        imageView.setImage(null);
+                    }
+                    setGraphic(box);
+                }
+            }
+        });
+
+        colThuocDonTen.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("tenThuoc"));
+        colThuocDonTen.setCellFactory(col -> {
+            TableCell<Thuoc, String> cell = new TableCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty || item == null ? null : item);
+                }
+            };
+            cell.setAlignment(javafx.geometry.Pos.CENTER);
+            return cell;
+        });
+        colThuocDonTrieuChung.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("trieuChung"));
+
+        // Cột kê đơn — highlight thuốc kê đơn
+        colThuocDonKeDon.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("canKeDon"));
+        colThuocDonKeDon.setCellFactory(column -> new TableCell<Thuoc, Boolean>() {
+            {
+                setAlignment(javafx.geometry.Pos.CENTER);
+            }
+            @Override
+            protected void updateItem(Boolean item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item ? "Kê đơn" : "Không");
+                    setStyle(item ? "-fx-text-fill: #1565C0; -fx-font-weight: bold;" : "-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+                }
+            }
+        });
+
+        // VĐ2: Row factory — highlight dòng thuốc kê đơn bằng nền #E3F2FD nhưng tôn trọng style khi selected
+        tblThuocDon.setRowFactory(tv -> {
+            javafx.scene.control.TableRow<Thuoc> row = new javafx.scene.control.TableRow<>();
+            
+            row.itemProperty().addListener((obs, oldItem, newItem) -> {
+                if (newItem == null) {
+                    row.setStyle("");
+                } else if (newItem.isCanKeDon() && !row.isSelected()) {
+                    row.setStyle("-fx-background-color: #E3F2FD;");
+                } else if (!row.isSelected()) {
+                    row.setStyle("");
+                }
+            });
+            
+            row.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+                if (isNowSelected) {
+                    row.setStyle("");
+                } else {
+                    Thuoc item = row.getItem();
+                    if (item != null && item.isCanKeDon()) {
+                        row.setStyle("-fx-background-color: #E3F2FD;");
+                    } else {
+                        row.setStyle("");
+                    }
+                }
+            });
+            return row;
+        });
+
+        // Double-click → thêm vào giỏ
+        tblThuocDon.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && tblThuocDon.getSelectionModel().getSelectedItem() != null) {
+                handleThemVaoGioDon(null);
             }
         });
     }
 
+    // VĐ2: Load TẤT CẢ thuốc DANG_BAN ở KHO_BAN_HANG (không lọc canKeDon)
+    private void loadDataThuocDon() {
+        List<Thuoc> all = daoThuoc.getAllThuocCoLoKhoBanHang();
+        masterDataDon.setAll(all);
+        tblThuocDon.setItems(masterDataDon);
+    }
+
+    private void setupSearchLogicDon() {
+        FilteredList<Thuoc> filteredData = new FilteredList<>(masterDataDon, p -> true);
+        txtTimKiemThuocDon.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(thuoc -> {
+                if (newValue == null || newValue.isEmpty()) return true;
+                String lowerCaseFilter = newValue.toLowerCase();
+                if (thuoc.getTenThuoc().toLowerCase().contains(lowerCaseFilter)) return true;
+                if (thuoc.getMaThuoc().toLowerCase().contains(lowerCaseFilter)) return true;
+                if (thuoc.getHoatChat() != null && thuoc.getHoatChat().toLowerCase().contains(lowerCaseFilter)) return true;
+                if (thuoc.getCongDung() != null && thuoc.getCongDung().toLowerCase().contains(lowerCaseFilter)) return true;
+                if (thuoc.getTrieuChung() != null && thuoc.getTrieuChung().toLowerCase().contains(lowerCaseFilter)) return true;
+                return false;
+            });
+        });
+        SortedList<Thuoc> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(tblThuocDon.comparatorProperty());
+        tblThuocDon.setItems(sortedData);
+    }
+
+    @FXML void handleLamMoiDon(ActionEvent event) {
+        txtTimKiemThuocDon.clear();
+        loadDataThuocDon();
+        setupSearchLogicDon();
+    }
+
+    // Thêm thuốc từ bảng vào giỏ hàng đơn (giống tab lẻ, nhưng KHÔNG chặn kê đơn)
+    @FXML void handleThemVaoGioDon(ActionEvent event) {
+        // VĐ1: Bắt buộc nhập đơn thuốc trước khi thêm sản phẩm
+        if (donThuocTemp == null) {
+            showAlert(AlertType.WARNING, "Thông báo",
+                "Vui lòng nhập thông tin đơn thuốc trước khi thêm sản phẩm.");
+            return;
+        }
+
+        Thuoc selectedThuoc = tblThuocDon.getSelectionModel().getSelectedItem();
+        if (selectedThuoc == null) {
+            showAlert(AlertType.WARNING, "Cảnh báo", "Vui lòng chọn thuốc để thêm vào giỏ!");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ChonSoLuongDonVi.fxml"));
+            Parent root = loader.load();
+            Dialog_ChonSoLuongDonViController controller = loader.getController();
+            controller.setThuoc(selectedThuoc);
+            
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.setTitle("Chọn Số Lượng");
+            stage.showAndWait();
+
+            DonViQuyDoi dv  = controller.getDonViChon();
+            int  sl         = controller.getSoLuongChon();
+            double donGia   = controller.getDonGiaChon();
+            String maBangGia = controller.getMaBangGiaChon();
+
+            if (dv != null && sl > 0 && maBangGia != null) {
+                boolean found = false;
+                for (CartItem item : cartDataDon) {
+                    if (item.thuoc.getMaThuoc().equals(selectedThuoc.getMaThuoc())
+                            && item.donVi.getMaQuyDoi().equals(dv.getMaQuyDoi())) {
+                        item.soLuong   += sl;
+                        item.thanhTien  = item.soLuong * item.donGia;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    CartItem ci = new CartItem(selectedThuoc, dv, sl, donGia, maBangGia);
+                    String maLo = daoLoThuoc.getLoFEFO(selectedThuoc.getMaThuoc());
+                    if (maLo != null) {
+                        ci.maLoThuoc = maLo;
+                        daoLoThuoc.getLoThuocBanDuocByMaThuoc(selectedThuoc.getMaThuoc()).stream()
+                            .filter(l -> l.getMaLoThuoc().equals(maLo)).findFirst()
+                            .ifPresent(l -> ci.hanSuDung = l.getHanSuDung());
+                    }
+                    cartDataDon.add(ci);
+                }
+                tblGioHangDon.refresh();
+                tinhTongTienDon();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // --- CARD ĐƠN THUỐC: 3 NÚT ---
+
+    @FXML void onThemDonThuoc(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ThemDonThuoc.fxml"));
+            Scene scene = new Scene(loader.load());
+            gui.dialogs.Dialog_ThemDonThuocController controller = loader.getController();
+
+            // Sinh mã đơn thuốc tạm
+            int maxMaDT = daoDonThuoc.getMaxMaDonThuoc();
+            String nextMa = String.format("DT%04d", maxMaDT + 1);
+            controller.setDonThuoc(null, nextMa);
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Thêm Thông Tin Đơn Thuốc");
+            stage.setScene(scene);
+            stage.showAndWait();
+
+            DonThuoc result = controller.getResultDonThuoc();
+            if (result != null) {
+                donThuocTemp = result;
+                updateCardDonThuoc();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert(AlertType.ERROR, "Lỗi", "Không thể mở dialog đơn thuốc: " + e.getMessage());
+        }
+    }
+
+    @FXML void onXemSuaDonThuoc(ActionEvent event) {
+        if (donThuocTemp == null) return;
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ThemDonThuoc.fxml"));
+            Scene scene = new Scene(loader.load());
+            gui.dialogs.Dialog_ThemDonThuocController controller = loader.getController();
+
+            // Điền sẵn dữ liệu đã nhập
+            controller.setDonThuoc(donThuocTemp, donThuocTemp.getMaDonThuoc());
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Xem / Sửa Thông Tin Đơn Thuốc");
+            stage.setScene(scene);
+            stage.showAndWait();
+
+            DonThuoc result = controller.getResultDonThuoc();
+            if (result != null) {
+                donThuocTemp = result;
+                updateCardDonThuoc();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert(AlertType.ERROR, "Lỗi", "Không thể mở dialog đơn thuốc: " + e.getMessage());
+        }
+    }
+
+    @FXML void onDatLaiDonThuoc(ActionEvent event) {
+        Alert confirm = new Alert(AlertType.CONFIRMATION, "Xóa thông tin đơn thuốc? Giỏ hàng vẫn giữ.", ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Xác nhận");
+        confirm.showAndWait();
+        if (confirm.getResult() == ButtonType.YES) {
+            donThuocTemp = null;
+            resetCardDonThuoc();
+        }
+    }
+
+    /** Cập nhật card đơn thuốc sau khi thêm/sửa */
+    private void updateCardDonThuoc() {
+        if (donThuocTemp == null) {
+            resetCardDonThuoc();
+            return;
+        }
+        // VĐ1: Hiển thị nhiều dòng KHÔNG có emoji
+        String bacSi = donThuocTemp.getTenBacSi();
+        String benhNhan = donThuocTemp.getThongTinBenhNhan();
+        String chanDoan = donThuocTemp.getChanDoan();
+
+        StringBuilder tomTat = new StringBuilder();
+        if (bacSi != null && !bacSi.isBlank())
+            tomTat.append("BS: ").append(bacSi).append("\n");
+        if (benhNhan != null && !benhNhan.isBlank())
+            tomTat.append("BN: ").append(benhNhan).append("\n");
+        if (chanDoan != null && !chanDoan.isBlank())
+            tomTat.append("Chẩn đoán: ").append(chanDoan);
+
+        lblTrangThaiDon.setText(tomTat.toString().trim());
+        // Hiện paneThongTinDon và cho nó chiếm không gian
+        if (paneThongTinDon != null) {
+            paneThongTinDon.setVisible(true);
+            paneThongTinDon.setManaged(true);
+        }
+        lblTrangThaiDon.setStyle("-fx-text-fill: #1565C0; -fx-font-weight: bold; -fx-font-size: 11px; -fx-line-spacing: 2;");
+        btnThemDon.setVisible(false);
+        btnXemSuaDon.setVisible(true);
+        btnDatLaiDon.setVisible(true);
+        // VĐ1: Enable nút "Thêm vào giỏ" khi đã có đơn
+        if (btnThemVaoGioDon != null) btnThemVaoGioDon.setDisable(false);
+    }
+
+    /** Reset card đơn thuốc về trạng thái "Chưa có đơn" */
+    private void resetCardDonThuoc() {
+        donThuocTemp = null;
+        lblTrangThaiDon.setText("");
+        // Ẩn paneThongTinDon và KHÔNG chiếm không gian
+        if (paneThongTinDon != null) {
+            paneThongTinDon.setVisible(false);
+            paneThongTinDon.setManaged(false);
+        }
+        btnThemDon.setVisible(true);
+        btnXemSuaDon.setVisible(false);
+        btnDatLaiDon.setVisible(false);
+        // VĐ1: Disable nút "Thêm vào giỏ" khi không có đơn
+        if (btnThemVaoGioDon != null) btnThemVaoGioDon.setDisable(true);
+    }
+
+    // --- GIỎ HÀNG + THANH TOÁN TAB ĐƠN ---
+
     private void setupTableCartDon() {
         colCartDonTenThuoc.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().thuoc.getTenThuoc()));
         colCartDonDonVi.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().donVi.getTenDonVi()));
-        colCartDonSoLuong.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("soLuong"));
+        colCartDonSoLuong.setCellValueFactory(cd -> new SimpleIntegerProperty(cd.getValue().soLuong).asObject());
         colCartDonDonGia.setCellValueFactory(cellData -> new SimpleStringProperty(String.format("%,.0f", cellData.getValue().donGia)));
         colCartDonThanhTien.setCellValueFactory(cellData -> new SimpleStringProperty(String.format("%,.0f", cellData.getValue().thanhTien)));
+        
+        tblGioHangDon.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         
         colCartDonXoa.setCellFactory(param -> new TableCell<>() {
             private final Button btnXoa = new Button("🗑");
@@ -611,221 +1004,16 @@ public class GUI_QuanLyBanHangController {
         lblThanhTienDon.setText(String.format("%,.0f ₫", th));
     }
 
-    @FXML void handleThemDonThuoc(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ThemDonThuoc.fxml"));
-            Scene scene = new Scene(loader.load());
-            gui.dialogs.Dialog_ThemDonThuocController controller = loader.getController();
-            
-            int maxDB = daoDonThuoc.getMaxMaDonThuoc();
-            int maxPending = 0;
-            for (DonThuoc p : dsDonThuocPendings) {
-                try {
-                    if (p.getMaDonThuoc() != null && p.getMaDonThuoc().startsWith("DT")) {
-                        int pNum = Integer.parseInt(p.getMaDonThuoc().substring(2));
-                        if (pNum > maxPending) maxPending = pNum;
-                    }
-                } catch(Exception ex) {}
-            }
-            int nextNum = Math.max(maxDB, maxPending) + 1;
-            String nextMa = String.format("DT%04d", nextNum);
-            
-            controller.setDonThuoc(null, nextMa);
-            
-            Stage stg = new Stage();
-            stg.initModality(Modality.APPLICATION_MODAL);
-            stg.setTitle("Thêm Đơn Thuốc");
-            stg.setScene(scene);
-            stg.showAndWait();
-            
-            DonThuoc res = controller.getResultDonThuoc();
-            if (res != null) {
-                dsDonThuocPendings.add(res);
-                tblDonThuoc.getSelectionModel().select(res);
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-    }
-
-    @FXML void handleSuaDonThuoc(ActionEvent event) {
-        DonThuoc dt = tblDonThuoc.getSelectionModel().getSelectedItem();
-        if (dt == null) return;
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ThemDonThuoc.fxml"));
-            Scene scene = new Scene(loader.load());
-            gui.dialogs.Dialog_ThemDonThuocController controller = loader.getController();
-            
-            controller.setDonThuoc(dt, null);
-            
-            Stage stg = new Stage();
-            stg.initModality(Modality.APPLICATION_MODAL);
-            stg.setTitle("Sửa Đơn Thuốc");
-            stg.setScene(scene);
-            stg.showAndWait();
-            
-            DonThuoc res = controller.getResultDonThuoc();
-            if (res != null) {
-                int idx = dsDonThuocPendings.indexOf(dt);
-                dsDonThuocPendings.set(idx, res);
-                tblDonThuoc.getSelectionModel().select(res);
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-    }
-
-    @FXML void handleXoaDonThuoc(ActionEvent event) {
-        DonThuoc dt = tblDonThuoc.getSelectionModel().getSelectedItem();
-        if (dt == null) {
-            showAlert(AlertType.WARNING, "Chưa Chọn", "Vui lòng chọn đơn thuốc cần xóa!");
-            return;
-        }
-        
-        Alert confirm = new Alert(AlertType.CONFIRMATION, "Bạn có chắn chắn muốn xóa bỏ đơn thuốc đang chờ này?", ButtonType.YES, ButtonType.NO);
-        confirm.showAndWait();
-        if (confirm.getResult() == ButtonType.YES) {
-            dsDonThuocPendings.remove(dt);
-            if(currentDonThuoc == dt) {
-                currentDonThuoc = null;
-                cartDataDon.clear();
-                tinhTongTienDon();
-            }
-        }
-    }
-
-    @FXML void handleChuyenDonSangGio(ActionEvent event) {
-        DonThuoc dt = tblDonThuoc.getSelectionModel().getSelectedItem();
-        if (dt == null) {
-            showAlert(AlertType.WARNING, "Lỗi", "Hãy chọn 1 đơn thuốc bên trái!");
-            return;
-        }
-        currentDonThuoc = dt;
-        cartDataDon.clear();
-        tinhTongTienDon();
-        showAlert(AlertType.INFORMATION, "Chuyển Đơn", "Đã chọn đơn thuốc " + dt.getMaDonThuoc() + ". Vui lòng thêm thuốc vào giỏ!");
-    }
-
-    @FXML void handleTimKhachDon(ActionEvent event) {
-        String sdt = txtSdtKhachDon.getText().trim();
-        if (sdt.isEmpty()) {
-            currentKhachHangDon = null;
-            lblTenKhachDon.setText("👤 Khách lẻ (vãng lai)");
-            return;
-        }
-        KhachHang kh = daoKhachHang.getBySdt(sdt);
-        if (kh != null) {
-            currentKhachHangDon = kh;
-            lblTenKhachDon.setText("👤 " + kh.getHoTen() + " (Điểm: " + kh.getDiemTichLuy() + ")");
-        } else {
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Phát hiện khách mới, bạn có muốn thêm KH?", ButtonType.YES, ButtonType.NO);
-            confirm.showAndWait();
-            if (confirm.getResult() == ButtonType.YES) {
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ThemKhachHang.fxml"));
-                    Scene scene = new Scene(loader.load());
-                    gui.dialogs.Dialog_ThemKhachHangController controller = loader.getController();
-                    int max = 0;
-                    for (KhachHang khach : daoKhachHang.getAllKhachHang()) {
-                        if (khach.getMaKhachHang().startsWith("KH")) {
-                            try {
-                                int num = Integer.parseInt(khach.getMaKhachHang().substring(2));
-                                if (num > max) max = num;
-                            } catch (Exception e) {}
-                        }
-                    }
-                    controller.setMaKhachHang(String.format("KH%03d", max + 1));
-                    controller.setSdt(sdt);
-                    Stage stg = new Stage();
-                    stg.initModality(Modality.APPLICATION_MODAL);
-                    stg.setScene(scene);
-                    stg.showAndWait();
-
-                    KhachHang res = controller.getResultKhachHang();
-                    if (res != null && daoKhachHang.themKhachHang(res)) {
-                        currentKhachHangDon = res;
-                        lblTenKhachDon.setText("👤 " + res.getHoTen() + " (Điểm: 0)");
-                        txtSdtKhachDon.setText(res.getSdt());
-                        showAlert(AlertType.INFORMATION, "Thành công", "Thêm khách hàng thành công!");
-                    } else {
-                        currentKhachHangDon = null;
-                        lblTenKhachDon.setText("👤 Không tìm thấy khách hàng: " + sdt);
-                    }
-                } catch (Exception e) { e.printStackTrace(); }
-            } else {
-                currentKhachHangDon = null;
-                lblTenKhachDon.setText("👤 Không tìm thấy khách hàng: " + sdt);
-            }
-        }
-    }
-
-    @FXML void handleThemThuocDon(ActionEvent event) {
-        if (currentDonThuoc == null) {
-            showAlert(AlertType.WARNING, "Cảnh báo", "Hãy chọn 1 đơn thuốc và bấm Chuyển đơn vào giỏ trước khi kê thuốc!");
-            return;
-        }
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ChonThuoc.fxml"));
-            Scene scene = new Scene(loader.load());
-            gui.dialogs.Dialog_ChonThuocController controller = loader.getController();
-            
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Chọn Thuốc Kê Đơn");
-            stage.setScene(scene);
-            stage.showAndWait();
-            
-            Thuoc selectedThuoc = controller.getThuocChon();
-            if (selectedThuoc != null) {
-                FXMLLoader loader2 = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ChonSoLuongDonVi.fxml"));
-                Scene scene2 = new Scene(loader2.load());
-                Dialog_ChonSoLuongDonViController controller2 = loader2.getController();
-                controller2.setThuoc(selectedThuoc);
-                
-                Stage stage2 = new Stage();
-                stage2.initModality(Modality.APPLICATION_MODAL);
-                stage2.setTitle("Nhập Số Lượng");
-                stage2.setScene(scene2);
-                stage2.showAndWait();
-                
-                int sl = controller2.getSoLuongChon();
-                DonViQuyDoi dv = controller2.getDonViChon();
-                
-                if (sl > 0 && dv != null && controller2.getMaBangGiaChon() != null) {
-                    CartItem existing = cartDataDon.stream()
-                        .filter(i -> i.thuoc.getMaThuoc().equals(selectedThuoc.getMaThuoc())
-                                  && i.donVi.getMaQuyDoi().equals(dv.getMaQuyDoi()))
-                        .findFirst().orElse(null);
-                    if (existing != null) {
-                        existing.soLuong   += sl;
-                        existing.thanhTien  = existing.soLuong * existing.donGia;
-                    } else {
-                        CartItem ci = new CartItem(selectedThuoc, dv, sl,
-                                controller2.getDonGiaChon(), controller2.getMaBangGiaChon());
-                        String maLo = daoLoThuoc.getLoFEFO(selectedThuoc.getMaThuoc());
-                        if (maLo != null) {
-                            ci.maLoThuoc = maLo;
-                            daoLoThuoc.getLoThuocBanDuocByMaThuoc(selectedThuoc.getMaThuoc()).stream()
-                                .filter(l -> l.getMaLoThuoc().equals(maLo)).findFirst()
-                                .ifPresent(l -> ci.hanSuDung = l.getHanSuDung());
-                        }
-                        cartDataDon.add(ci);
-                    }
-                    tblGioHangDon.refresh();
-                    tinhTongTienDon();
-                }
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-    }
-
     @FXML void handleHuyGioDon(ActionEvent event) {
+        // VĐ3: CHỈ xóa giỏ hàng, KHÔNG reset đơn thuốc
         cartDataDon.clear();
         tinhTongTienDon();
-        currentDonThuoc = null;
-        currentKhachHangDon = null;
-        txtSdtKhachDon.clear();
-        lblTenKhachDon.setText("👤 Khách lẻ (vãng lai)");
     }
 
+    // Thanh toán theo đơn — INSERT DonThuoc nếu donThuocTemp != null
     @FXML void handleThanhToanDon(ActionEvent event) {
-        if (cartDataDon.isEmpty() || currentDonThuoc == null) {
-            showAlert(AlertType.WARNING, "Cảnh báo", "Giỏ hàng theo đơn hiện đang rỗng hoặc chưa chọn Đơn thuốc!");
+        if (cartDataDon.isEmpty()) {
+            showAlert(AlertType.WARNING, "Cảnh báo", "Giỏ hàng theo đơn hiện đang rỗng!");
             return;
         }
 
@@ -835,7 +1023,7 @@ public class GUI_QuanLyBanHangController {
         
         NhanVien user = GUI_TrangChuController.getNhanVienDangNhap();
         if (user == null) {
-            user = new NhanVien("NV001", "testuser", "123", "—", "Nhân viên", "Ca 1", "0123"); // Fallback for debugging
+            user = new NhanVien("NV001", "testuser", "123", "Nhân Viên Test", "Nhân viên", "Ca 1", "0123",1);
         }
         
         String maHD = daoHoaDon.generateMaHoaDon();
@@ -845,6 +1033,7 @@ public class GUI_QuanLyBanHangController {
 
         // --- FIX thueVAT: DB lưu 8.0 = 8%, KHÔNG phải 0.08 ---
         HoaDon hd = new HoaDon(maHD, Timestamp.valueOf(LocalDateTime.now()), 8.0, dbHinhThuc, "Bán hóa đơn theo đơn thuốc", user, currentKhachHangDon);
+        hd.setLoaiBan("BAN_THEO_DON"); // Tường minh set BAN_THEO_DON
         
         List<ChiTietHoaDon> dsCT = new ArrayList<>();
         for (CartItem item : cartDataDon) {
@@ -868,19 +1057,17 @@ public class GUI_QuanLyBanHangController {
         
         boolean ok = daoHoaDon.thanhToan(hd, dsCT);
         if (ok) {
-            // Chèn đơn thuốc
-            String oldMa = currentDonThuoc.getMaDonThuoc();
-            currentDonThuoc.setMaHoaDon(maHD);
-            daoDonThuoc.themDonThuoc(currentDonThuoc);
-            
-            // Xóa Đơn Thuốc Peding
-            dsDonThuocPendings.removeIf(d -> d.getMaDonThuoc().equals(oldMa));
+            // INSERT DonThuoc nếu donThuocTemp != null
+            if (donThuocTemp != null) {
+                donThuocTemp.setMaHoaDon(maHD);
+                daoDonThuoc.themDonThuoc(donThuocTemp);
+            }
             
             if (currentKhachHangDon != null) {
                 int diemCong = (int) ((tongTienDon + thueVatDon) / 1000);
                 daoKhachHang.capNhatDiemTichLuy(currentKhachHangDon.getMaKhachHang(), currentKhachHangDon.getDiemTichLuy() + diemCong);
             }
-            // ── VĐ3: Hỏi in hóa đơn sau thanh toán đơn thuốc ──
+            // ── Hỏi in hóa đơn sau thanh toán đơn thuốc ──
             Alert confirmPrint = new Alert(AlertType.CONFIRMATION);
             confirmPrint.setTitle("Thanh toán thành công");
             confirmPrint.setHeaderText("✅ Hóa đơn " + maHD + " đã được lưu!");
@@ -895,7 +1082,6 @@ public class GUI_QuanLyBanHangController {
                 try {
                     List<Object[]> chiTiet = daoHoaDon.getChiTietByMaHoaDon(maHD);
 
-                    // VĐ1: Reload từ DB để lấy thông tin JOIN (tên nhân viên)
                     HoaDonView hdView = daoHoaDon.getHoaDonViewByMa(maHD);
                     if (hdView == null) {
                         throw new Exception("Lỗi: không reload được hóa đơn từ DB để in PDF.");
@@ -913,7 +1099,15 @@ public class GUI_QuanLyBanHangController {
                 }
             }
 
-            handleHuyGioDon(null);
+            // Reset toàn bộ giỏ hàng + card đơn thuốc
+            cartDataDon.clear();
+            tinhTongTienDon();
+            currentKhachHangDon = null;
+            resetCardDonThuoc();
+
+            // Reload lại danh sách thuốc (tồn kho đã thay đổi)
+            loadDataThuocDon();
+            setupSearchLogicDon();
         } else {
             showAlert(AlertType.ERROR, "Lỗi CSDL", "Thanh toán theo đơn thất bại!");
         }
@@ -953,11 +1147,25 @@ public class GUI_QuanLyBanHangController {
             }
         });
 
-        // Tab đơn - Ô tìm SĐT khách: ENTER → tìm kiếm
-        txtSdtKhachDon.setOnKeyPressed(event -> {
+        // Tab đơn - Ô tìm kiếm thuốc: ENTER → focus xuống TableView
+        txtTimKiemThuocDon.setOnKeyPressed(event -> {
             if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
-                handleTimKhachDon(null);
+                tblThuocDon.requestFocus();
+                if (!tblThuocDon.getItems().isEmpty()) {
+                    tblThuocDon.getSelectionModel().selectFirst();
+                }
                 event.consume();
+            }
+        });
+
+        // Tab đơn - TableView thuốc: ENTER hoặc Space → thêm vào giỏ
+        tblThuocDon.setOnKeyPressed(event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.ENTER ||
+                event.getCode() == javafx.scene.input.KeyCode.SPACE) {
+                if (!tblThuocDon.getSelectionModel().isEmpty()) {
+                    handleThemVaoGioDon(null);
+                    event.consume();
+                }
             }
         });
     }

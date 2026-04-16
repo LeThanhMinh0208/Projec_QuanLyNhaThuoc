@@ -1,4 +1,5 @@
 package gui.main;
+import gui.main.GUI_QuanLyBangGiaController;
 
 import dao.DAO_Thuoc;
 import entity.NhanVien;

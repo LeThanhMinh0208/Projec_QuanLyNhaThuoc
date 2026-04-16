@@ -177,7 +177,7 @@ public class GUI_XuLyDoiTraController {
             }
         }
 
-        List<HoaDonView> list = daoHoaDon.getDanhSach(tu, den, hinhThuc, null);
+        List<HoaDonView> list = daoHoaDon.getDanhSach(tu, den, hinhThuc, null, null);
         masterData.setAll(list);
         filteredData = new javafx.collections.transformation.FilteredList<>(masterData, hd -> true);
         tableHoaDon.setItems(filteredData);

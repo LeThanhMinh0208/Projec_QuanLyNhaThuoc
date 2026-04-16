@@ -3,6 +3,8 @@ package utils;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.DottedLineSeparator;
+import dao.DAO_DonThuoc;
+import entity.DonThuoc;
 import entity.HoaDonView;
 
 import java.io.*;
@@ -94,6 +96,7 @@ public class HoaDonPdfExporter {
         Font fSub = getFont(9, Font.ITALIC, BaseColor.DARK_GRAY);
         Font fHead = getFont(10, Font.BOLD, BaseColor.WHITE); // Chữ trắng cho nổi bật header
         Font fNormal = getFont(10, Font.NORMAL);
+        Font fBold = getFont(10, Font.BOLD);
         Font fTotalLabel = getFont(12, Font.BOLD, new BaseColor(192, 0, 0));
         Font fTotal = getFont(12, Font.BOLD, BaseColor.RED); // Tổng tiền màu đỏ cho máu
 
@@ -125,6 +128,11 @@ public class HoaDonPdfExporter {
         String tenNV = hd.getTenNhanVien() != null ? hd.getTenNhanVien() : "—";
         String hinhThuc = hd.getHinhThucLabel() != null ? hd.getHinhThucLabel() : "Tiền mặt";
 
+        // VĐ4: Loại bán
+        String loaiHienThi = "BAN_THEO_DON".equals(hd.getLoaiBan())
+                ? "Bán theo đơn thuốc"
+                : "Bán lẻ";
+
         PdfPTable infoTable = new PdfPTable(2);
         infoTable.setWidthPercentage(100);
         infoTable.setWidths(new float[] { 3f, 7f }); // Tỉ lệ 3:7 siêu chuẩn
@@ -135,18 +143,45 @@ public class HoaDonPdfExporter {
         addInfoRow(infoTable, "Khách hàng", tenKH, fNormal);
         addInfoRow(infoTable, "Thu ngân", tenNV, fNormal);
         addInfoRow(infoTable, "Hình thức", hinhThuc, fNormal);
+        addInfoRow(infoTable, "Loại", loaiHienThi, fNormal);
         doc.add(infoTable);
 
-        // ── BẢNG CHI TIẾT ──
-        PdfPTable table = new PdfPTable(5);
+        // ── VĐ4: THÔNG TIN ĐƠN THUỐC (nếu BAN_THEO_DON) ──
+        if ("BAN_THEO_DON".equals(hd.getLoaiBan())) {
+            try {
+                DAO_DonThuoc daoDT = new DAO_DonThuoc();
+                DonThuoc dt = daoDT.getByMaHoaDon(hd.getMaHoaDon());
+                if (dt != null) {
+                    Paragraph dtTitle = new Paragraph("THÔNG TIN ĐƠN THUỐC", fBold);
+                    dtTitle.setSpacingBefore(5);
+                    dtTitle.setSpacingAfter(5);
+                    doc.add(dtTitle);
+
+                    PdfPTable dtTable = new PdfPTable(2);
+                    dtTable.setWidthPercentage(100);
+                    dtTable.setWidths(new float[] { 3f, 7f });
+                    dtTable.setSpacingAfter(15);
+
+                    addInfoRow(dtTable, "Bác sĩ kê đơn", dt.getTenBacSi(), fNormal);
+                    addInfoRow(dtTable, "Chẩn đoán", dt.getChanDoan(), fNormal);
+                    addInfoRow(dtTable, "Bệnh nhân", dt.getThongTinBenhNhan(), fNormal);
+                    doc.add(dtTable);
+                }
+            } catch (Exception ignored) {
+                // Không có DonThuoc → bỏ qua
+            }
+        }
+
+        // ── BẢNG CHI TIẾT (VĐ4: thêm cột Đơn giá) ──
+        PdfPTable table = new PdfPTable(6);
         table.setWidthPercentage(100);
-        // Chỉnh lại tỉ lệ cột: Tên thuốc dài ra, STT với ĐVT ngắn lại
-        table.setWidths(new float[] { 0.8f, 4.0f, 1.2f, 0.8f, 2.2f });
+        // STT | Tên thuốc | ĐVT | Đơn giá | SL | Thành tiền
+        table.setWidths(new float[] { 0.7f, 3.5f, 1.0f, 1.8f, 0.7f, 2.0f });
         table.setHeaderRows(1); // Dòng header xanh lặp lại đầu mỗi trang
 
         // Header bảng — Xanh dương đậm, chữ trắng nhìn cực pro
         BaseColor headerBg = new BaseColor(41, 128, 185);
-        String[] headers = { "STT", "Tên thuốc", "ĐVT", "SL", "Thành tiền" };
+        String[] headers = { "STT", "Tên thuốc", "ĐVT", "Đơn giá", "SL", "Thành tiền" };
         for (String h : headers) {
             PdfPCell cell = new PdfPCell(new Phrase(h, fHead));
             cell.setNoWrap(true);
@@ -161,7 +196,7 @@ public class HoaDonPdfExporter {
         int stt = 1;
         if (chiTietList == null || chiTietList.isEmpty()) {
             PdfPCell empty = new PdfPCell(new Phrase("Không có sản phẩm", fNormal));
-            empty.setColspan(5);
+            empty.setColspan(6);
             empty.setHorizontalAlignment(Element.ALIGN_CENTER);
             empty.setPadding(10);
             table.addCell(empty);
@@ -170,6 +205,7 @@ public class HoaDonPdfExporter {
                 String tenThuoc = ct[0] != null ? (String) ct[0] : "—";
                 String tenDonVi = ct[1] != null ? (String) ct[1] : "—";
                 int soLuong = ((Number) ct[4]).intValue();
+                double donGia = ((Number) ct[5]).doubleValue();
                 double thanhTien = ((Number) ct[6]).doubleValue();
 
                 boolean evenRow = (stt % 2 == 0);
@@ -186,6 +222,7 @@ public class HoaDonPdfExporter {
 
                 addCell(table, tenThuoc, fNormal, Element.ALIGN_LEFT, rowBg);
                 addCell(table, tenDonVi, fNormal, Element.ALIGN_CENTER, rowBg);
+                addCell(table, String.format("%,.0f", donGia), fNormal, Element.ALIGN_RIGHT, rowBg);
                 addCell(table, String.valueOf(soLuong), fNormal, Element.ALIGN_CENTER, rowBg);
                 addCell(table, String.format("%,.0f", thanhTien), fNormal, Element.ALIGN_RIGHT, rowBg);
             }

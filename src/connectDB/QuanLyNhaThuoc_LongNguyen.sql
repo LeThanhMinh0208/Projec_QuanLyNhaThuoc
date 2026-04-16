@@ -45,8 +45,10 @@ CREATE TABLE NhanVien (
     hoTen NVARCHAR(100) NOT NULL,
     chucVu NVARCHAR(50),
     caLamViec NVARCHAR(50),
-    sdt VARCHAR(15)
+    sdt VARCHAR(15),
+    trangThai INT DEFAULT 1
 );
+GO
 
 CREATE TABLE DanhMucThuoc (
     maDanhMuc VARCHAR(20) PRIMARY KEY,
@@ -67,11 +69,11 @@ CREATE TABLE Thuoc (
     nuocSanXuat NVARCHAR(50),
     congDung NVARCHAR(255),
     trieuChung NVARCHAR(255),
-    donViCoBan NVARCHAR(20) NOT NULL, 
+    donViCoBan NVARCHAR(20) NOT NULL,
     hinhAnh VARCHAR(255),
-    canKeDon BIT DEFAULT 0, 
-    trangThai VARCHAR(20) DEFAULT 'DANG_BAN', 
-    
+    canKeDon BIT DEFAULT 0,
+    trangThai VARCHAR(20) DEFAULT 'DANG_BAN',
+
     FOREIGN KEY (maDanhMuc) REFERENCES DanhMucThuoc(maDanhMuc),
     CONSTRAINT CHK_TrangThai CHECK (trangThai IN ('DANG_BAN', 'NGUNG_BAN', 'HET_HANG'))
 );
@@ -90,24 +92,24 @@ CREATE TABLE LoThuoc (
     maThuoc VARCHAR(20) NOT NULL,
     ngaySanXuat DATE,
     hanSuDung DATE NOT NULL,
-    soLuongTon INT DEFAULT 0, 
+    soLuongTon INT DEFAULT 0,
     giaNhap DECIMAL(18,2),
     viTriKho VARCHAR(50) DEFAULT 'KHO_BAN_HANG',
-    trangThai INT DEFAULT 1, 
-    
+    trangThai INT DEFAULT 1,
+
     ngayNhapKho DATE,
     maNhaCungCap VARCHAR(20),
 
     FOREIGN KEY (maThuoc) REFERENCES Thuoc(maThuoc) ON DELETE CASCADE,
-    FOREIGN KEY (maNhaCungCap) REFERENCES NhaCungCap(maNhaCungCap), 
+    FOREIGN KEY (maNhaCungCap) REFERENCES NhaCungCap(maNhaCungCap),
     CONSTRAINT CHK_ViTriKho CHECK (viTriKho IN ('KHO_BAN_HANG', 'KHO_DU_TRU')),
     CONSTRAINT CHK_LoThuoc_SoLuong_Gia CHECK (soLuongTon >= 0 AND (giaNhap IS NULL OR giaNhap > 0))
 );
 
 CREATE TABLE BangGia (
     maBangGia VARCHAR(20) PRIMARY KEY,
-    tenBangGia NVARCHAR(100) NOT NULL, 
-    loaiBangGia VARCHAR(20) NOT NULL,  
+    tenBangGia NVARCHAR(100) NOT NULL,
+    loaiBangGia VARCHAR(20) NOT NULL,
     ngayBatDau DATE NOT NULL,
     ngayKetThuc DATE NULL,
     moTa NVARCHAR(255),
@@ -135,7 +137,7 @@ CREATE TABLE DonDatHang (
     ngayDat DATETIME DEFAULT GETDATE(),
     ngayGiaoDuKien DATETIME,
     tongTienDuTinh DECIMAL(18,2) DEFAULT 0,
-    trangThai VARCHAR(50) DEFAULT 'CHO_GIAO', 
+    trangThai VARCHAR(50) DEFAULT 'CHO_GIAO',
     ghiChu NVARCHAR(255),
 
     FOREIGN KEY (maNhaCungCap) REFERENCES NhaCungCap(maNhaCungCap),
@@ -146,8 +148,8 @@ CREATE TABLE DonDatHang (
 CREATE TABLE ChiTietDonDatHang (
     maDonDatHang VARCHAR(20) NOT NULL,
     maQuyDoi VARCHAR(20) NOT NULL,
-    soLuongDat INT NOT NULL,        
-    soLuongDaNhan INT DEFAULT 0,    
+    soLuongDat INT NOT NULL,
+    soLuongDaNhan INT DEFAULT 0,
     donGiaDuKien DECIMAL(18,2) NOT NULL,
     maLo VARCHAR(20),
     ngaySanXuat DATE,
@@ -163,11 +165,11 @@ CREATE TABLE ChiTietDonDatHang (
 -- ========================================================
 CREATE TABLE PhieuNhap (
     maPhieuNhap VARCHAR(20) PRIMARY KEY,
-    maDonDatHang VARCHAR(20), 
+    maDonDatHang VARCHAR(20),
     maNhaCungCap VARCHAR(20) NOT NULL,
     maNhanVien VARCHAR(20) NOT NULL,
     ngayNhap DATETIME DEFAULT GETDATE(),
-    
+
     FOREIGN KEY (maNhaCungCap) REFERENCES NhaCungCap(maNhaCungCap),
     FOREIGN KEY (maNhanVien) REFERENCES NhanVien(maNhanVien),
     FOREIGN KEY (maDonDatHang) REFERENCES DonDatHang(maDonDatHang)
@@ -192,21 +194,24 @@ CREATE TABLE ChiTietPhieuNhap (
 -- ========================================================
 CREATE TABLE HoaDon (
     maHoaDon VARCHAR(20) PRIMARY KEY,
-    maKhachHang VARCHAR(20), 
+    maKhachHang VARCHAR(20),
     maNhanVien VARCHAR(20) NOT NULL,
     ngayLap DATETIME DEFAULT GETDATE(),
-    thueVAT DECIMAL(5,2) DEFAULT 0, 
+    thueVAT DECIMAL(5,2) DEFAULT 0,
     hinhThucThanhToan VARCHAR(20) DEFAULT 'TIEN_MAT',
     ghiChu NVARCHAR(255),
+    -- ✅ Phân loại hóa đơn: bán lẻ hoặc bán theo đơn thuốc
+    loaiBan VARCHAR(20) DEFAULT 'BAN_LE',
 
     FOREIGN KEY (maKhachHang) REFERENCES KhachHang(maKhachHang),
     FOREIGN KEY (maNhanVien) REFERENCES NhanVien(maNhanVien),
-    CONSTRAINT CHK_ThanhToan CHECK (hinhThucThanhToan IN ('TIEN_MAT', 'CHUYEN_KHOAN', 'THE'))
+    CONSTRAINT CHK_ThanhToan CHECK (hinhThucThanhToan IN ('TIEN_MAT', 'CHUYEN_KHOAN', 'THE')),
+    CONSTRAINT CHK_LoaiBan CHECK (loaiBan IN ('BAN_LE', 'BAN_THEO_DON'))
 );
 
 CREATE TABLE DonThuoc (
     maDonThuoc VARCHAR(20) PRIMARY KEY,
-    maHoaDon VARCHAR(20) UNIQUE NOT NULL, 
+    maHoaDon VARCHAR(20) UNIQUE NOT NULL,
     tenBacSi NVARCHAR(100),
     chanDoan NVARCHAR(255),
     hinhAnhDon VARCHAR(255),
@@ -217,11 +222,11 @@ CREATE TABLE DonThuoc (
 
 CREATE TABLE ChiTietHoaDon (
     maHoaDon VARCHAR(20) NOT NULL,
-    maBangGia VARCHAR(20) NOT NULL, 
+    maBangGia VARCHAR(20) NOT NULL,
     maQuyDoi VARCHAR(20) NOT NULL,
     maLoThuoc VARCHAR(20) NOT NULL,
     soLuong INT NOT NULL,
-    donGia DECIMAL(18,2) NOT NULL, 
+    donGia DECIMAL(18,2) NOT NULL,
 
     PRIMARY KEY (maHoaDon, maQuyDoi, maLoThuoc),
     FOREIGN KEY (maHoaDon) REFERENCES HoaDon(maHoaDon) ON DELETE CASCADE,
@@ -233,7 +238,7 @@ CREATE TABLE ChiTietHoaDon (
 
 CREATE TABLE PhieuDoiTra (
     maPhieuDoiTra VARCHAR(20) PRIMARY KEY,
-    maHoaDon VARCHAR(20) NOT NULL, 
+    maHoaDon VARCHAR(20) NOT NULL,
     maNhanVien VARCHAR(20) NOT NULL,
     ngayDoiTra DATETIME DEFAULT GETDATE(),
     lyDo NVARCHAR(255),
@@ -248,9 +253,9 @@ CREATE TABLE PhieuDoiTra (
 CREATE TABLE ChiTietDoiTra (
     maPhieuDoiTra VARCHAR(20) NOT NULL,
     maQuyDoi VARCHAR(20) NOT NULL,
-    maLoThuoc VARCHAR(20) NOT NULL, 
+    maLoThuoc VARCHAR(20) NOT NULL,
     soLuong INT NOT NULL,
-    tinhTrang NVARCHAR(100), 
+    tinhTrang NVARCHAR(100),
 
     PRIMARY KEY (maPhieuDoiTra, maQuyDoi, maLoThuoc),
     FOREIGN KEY (maPhieuDoiTra) REFERENCES PhieuDoiTra(maPhieuDoiTra) ON DELETE CASCADE,
@@ -293,22 +298,22 @@ CREATE TABLE PhieuXuat (
     ngayXuat DATETIME DEFAULT GETDATE(),
     maNhanVien VARCHAR(20) NOT NULL,
     loaiPhieu INT NOT NULL,
-    maNhaCungCap VARCHAR(20) NULL, 
-    khoNhan NVARCHAR(100) NULL,    
+    maNhaCungCap VARCHAR(20) NULL,
+    khoNhan NVARCHAR(100) NULL,
     tongTien DECIMAL(18,2) DEFAULT 0,
     ghiChu NVARCHAR(255),
-    
+
     FOREIGN KEY (maNhanVien) REFERENCES NhanVien(maNhanVien),
     FOREIGN KEY (maNhaCungCap) REFERENCES NhaCungCap(maNhaCungCap)
 );
 
 CREATE TABLE ChiTietPhieuXuat (
     maPhieuXuat VARCHAR(20),
-    maLoThuoc VARCHAR(20),  
+    maLoThuoc VARCHAR(20),
     soLuong INT NOT NULL,
-    donGia DECIMAL(18,2), 
+    donGia DECIMAL(18,2),
     thanhTien DECIMAL(18,2),
-    
+
     PRIMARY KEY (maPhieuXuat, maLoThuoc),
     FOREIGN KEY (maPhieuXuat) REFERENCES PhieuXuat(maPhieuXuat),
     FOREIGN KEY (maLoThuoc) REFERENCES LoThuoc(maLoThuoc)
@@ -318,6 +323,7 @@ GO
 PRINT N'Đã tạo xong Database cấu trúc mới!';
 GO
 
+
 -- ==========================================
 -- DỮ LIỆU KHỞI TẠO (DATA FULL GỐC 100%)
 -- ==========================================
@@ -325,15 +331,10 @@ GO
 INSERT INTO NhanVien (maNhanVien, tenDangNhap, matKhau, hoTen, chucVu, caLamViec, sdt) VALUES
 ('NV001', 'admin', '123456', N'Lê Trọng Nghĩa', N'Quản Lý', N'Hành Chính', '0987654321'),
 ('NV002', 'lethanhminh', '123456', N'Lê Thanh Minh', N'Nhân Viên', N'Ca Sáng', '0912345678'),
-('NV003', 'nguyenvanan', '123456', N'Nguyễn Văn An', N'Nhân Viên', N'Ca Chiều', '0933112233'),
-('NV004', 'phamminhtuan', '123456', N'Phạm Minh Tuấn', N'Nhân Viên', N'Ca Sáng', '0944556677'),
-('NV005', 'lythimyduyen', '123456', N'Lý Thị Mỹ Duyên', N'Nhân Viên', N'Ca Tối', '0901889900'),
-('NV006', 'hoangquocviet', '123456', N'Hoàng Quốc Việt', N'Nhân Viên', N'Ca Chiều', '0977223344'),
-('NV007', 'vungocbich', '123456', N'Vũ Ngọc Bích', N'Nhân Viên', N'Ca Sáng', '0966445566'),
-('NV008', 'dangthanhson', '123456', N'Đặng Thanh Sơn', N'Nhân Viên', N'Ca Tối', '0922667788'),
-('NV009', 'buithicamtu', '123456', N'Bùi Thị Cẩm Tú', N'Nhân Viên', N'Ca Chiều', '0955889911'),
-('NV010', 'dothaibao', '123456', N'Đỗ Thái Bảo', N'Nhân Viên', N'Ca Sáng', '0988112244'),
-('NV011', 'hokimyen', '123456', N'Hồ Kim Yến', N'Nhân Viên', N'Ca Tối', '0933778899');
+('NV003', 'nguyenhoanglong', '123456', N'Nguyễn Hoàng Long', N'Nhân Viên', N'Ca Chiều', '0933112233'),
+('NV004', 'tatuankiet', '123456', N'Tạ Tuấn Kiệt', N'Nhân Viên', N'Ca Sáng', '0944556677'),
+('NV005', 'nguyenminhkhoi', '123456', N'Nguyễn Minh Khôi', N'Nhân Viên', N'Ca Tối', '0901889900'),
+('NV006', 'tranducnguyen', '123456', N'Trần Đức Nguyên', N'Nhân Viên', N'Ca Chiều', '0977223344');
 GO
 
 INSERT INTO KhachHang (maKhachHang, hoTen, sdt, diaChi, diemTichLuy) VALUES
@@ -659,9 +660,14 @@ INSERT INTO ChiTietHoaDon (maHoaDon, maBangGia, maQuyDoi, maLoThuoc, soLuong, do
 GO
 
 INSERT INTO DonThuoc (maDonThuoc, maHoaDon, tenBacSi, chanDoan, hinhAnhDon, thongTinBenhNhan) VALUES
-('DT0005', 'HD0005', N'BS Lê Thu Thủy', N'Viêm họng cấp', 'url_hinh_anh', N'Bệnh nhân khám tại BV'),
-('DT0008', 'HD0008', N'BS Phạm Hữu Trí', N'Viêm họng cấp', 'url_hinh_anh', N'Bệnh nhân khám tại BV'),
-('DT0013', 'HD0013', N'BS Phạm Hữu Trí', N'Viêm họng cấp', 'url_hinh_anh', N'Bệnh nhân khám tại BV');
+('DT0005', 'HD0005', N'BS Lê Thu Thủy', N'Viêm họng cấp', 'DT0005.png', N'Bệnh nhân khám tại BV'),
+('DT0008', 'HD0008', N'BS Phạm Hữu Trí', N'Viêm họng cấp', 'DT0008.png', N'Bệnh nhân khám tại BV'),
+('DT0013', 'HD0013', N'BS Phạm Hữu Trí', N'Viêm họng cấp', 'DT0013.png', N'Bệnh nhân khám tại BV');
+GO
+
+UPDATE HoaDon
+SET loaiBan = 'BAN_THEO_DON'
+WHERE maHoaDon IN (SELECT maHoaDon FROM DonThuoc);
 GO
 
 INSERT INTO PhieuDoiTra (maPhieuDoiTra, maHoaDon, maNhanVien, ngayDoiTra, lyDo, hinhThucXuLy, phiPhat) VALUES
