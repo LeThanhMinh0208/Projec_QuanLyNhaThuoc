@@ -55,6 +55,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 
 public class GUI_QuanLyBanHangController {
 
@@ -142,7 +144,7 @@ public class GUI_QuanLyBanHangController {
     public void initialize() {
         setupTableThuocLe();
         setupTableCartLe();
-        loadDataThuocLe();
+        loadDataLeAsync(); // Thay đổi ở đây
         setupSearchLogic();
 
         cbHinhThucThanhToanLe.getItems().addAll("Tiền mặt", "Chuyển khoản", "Thẻ tín dụng");
@@ -151,7 +153,7 @@ public class GUI_QuanLyBanHangController {
         // TAB 2: Bán theo đơn
         setupTableThuocDon();
         setupTableCartDon();
-        loadDataThuocDon();
+        loadDataDonAsync(); // Thay đổi ở đây
         setupSearchLogicDon();
         cbHinhThucThanhToanDon.getItems().addAll("Tiền mặt", "Chuyển khoản", "Thẻ tín dụng");
         cbHinhThucThanhToanDon.getSelectionModel().selectFirst();
@@ -289,10 +291,18 @@ public class GUI_QuanLyBanHangController {
     }
 
     // VĐ3: Chỉ hiện thuốc KHÔNG kê đơn cho tab bán lẻ
-    private void loadDataThuocLe() {
-        List<Thuoc> filtered = daoThuoc.getAllThuocKhongKeDonKhoBanHang();
-        masterDataLe.setAll(filtered);
-        tblThuocLe.setItems(masterDataLe);
+    private void loadDataLeAsync() {
+        Task<List<Thuoc>> task = new Task<>() {
+            @Override
+            protected List<Thuoc> call() throws Exception {
+                return daoThuoc.getAllThuocKhongKeDonKhoBanHang();
+            }
+        };
+        task.setOnSucceeded(e -> {
+            masterDataLe.setAll(task.getValue());
+            tblThuocLe.setItems(masterDataLe);
+        });
+        new Thread(task).start();
     }
 
     private void setupSearchLogic() {
@@ -315,7 +325,7 @@ public class GUI_QuanLyBanHangController {
 
     @FXML void handleLamMoiLe(ActionEvent event) {
         txtTimKiemThuocLe.clear();
-        loadDataThuocLe();
+        loadDataLeAsync();
         setupSearchLogic();
     }
 
@@ -567,7 +577,7 @@ public class GUI_QuanLyBanHangController {
 
             handleHuyGioLe(null);
             // Reload lại danh sách thuốc (tồn kho đã thay đổi)
-            loadDataThuocLe();
+            loadDataLeAsync();
             setupSearchLogic();
         } else {
             showAlert(AlertType.ERROR, "Lỗi", "Thanh toán thất bại. Vui lòng thử lại!");
@@ -756,10 +766,18 @@ public class GUI_QuanLyBanHangController {
     }
 
     // VĐ2: Load TẤT CẢ thuốc DANG_BAN ở KHO_BAN_HANG (không lọc canKeDon)
-    private void loadDataThuocDon() {
-        List<Thuoc> all = daoThuoc.getAllThuocCoLoKhoBanHang();
-        masterDataDon.setAll(all);
-        tblThuocDon.setItems(masterDataDon);
+    private void loadDataDonAsync() {
+        Task<List<Thuoc>> task = new Task<>() {
+            @Override
+            protected List<Thuoc> call() throws Exception {
+                return daoThuoc.getAllThuocCoLoKhoBanHang();
+            }
+        };
+        task.setOnSucceeded(e -> {
+            masterDataDon.setAll(task.getValue());
+            tblThuocDon.setItems(masterDataDon);
+        });
+        new Thread(task).start();
     }
 
     private void setupSearchLogicDon() {
@@ -783,7 +801,7 @@ public class GUI_QuanLyBanHangController {
 
     @FXML void handleLamMoiDon(ActionEvent event) {
         txtTimKiemThuocDon.clear();
-        loadDataThuocDon();
+        loadDataDonAsync();
         setupSearchLogicDon();
     }
 
@@ -1106,7 +1124,7 @@ public class GUI_QuanLyBanHangController {
             resetCardDonThuoc();
 
             // Reload lại danh sách thuốc (tồn kho đã thay đổi)
-            loadDataThuocDon();
+            loadDataDonAsync();
             setupSearchLogicDon();
         } else {
             showAlert(AlertType.ERROR, "Lỗi CSDL", "Thanh toán theo đơn thất bại!");

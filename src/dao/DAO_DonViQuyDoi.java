@@ -224,6 +224,25 @@ public class DAO_DonViQuyDoi {
         return lastError;
     }
 
+    /**
+     * Lấy TẤT CẢ đơn vị quy đổi của tất cả các thuốc trong 1 lần query.
+     * Giúp tối ưu hiệu năng cho trang Danh mục đơn vị quy đổi (tránh N+1 query).
+     */
+    public ArrayList<DonViQuyDoi> getAllDonViQuyDoi() {
+        ArrayList<DonViQuyDoi> list = new ArrayList<>();
+        String sql = "SELECT * FROM DonViQuyDoi ORDER BY maThuoc, tyLeQuyDoi ASC";
+        try (Connection con = ConnectDB.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql);
+             ResultSet rs = pst.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapDonVi(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     private DonViQuyDoi mapDonVi(ResultSet rs) throws SQLException {
         return new DonViQuyDoi(
                 rs.getString("maQuyDoi"),

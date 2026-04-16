@@ -19,6 +19,9 @@ import javafx.scene.image.ImageView;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import utils.AlertUtils;
+import utils.SceneUtils;
+
 public class GUI_DanhMucKhoController implements Initializable {
 
     @FXML private ComboBox<String> cmbViTriKho;
@@ -136,7 +139,9 @@ public class GUI_DanhMucKhoController implements Initializable {
         });
     }
 
-    @FXML void moTrangNhapKho(ActionEvent event) { utils.SceneUtils.switchPage("/gui/main/GUI_NhapKho.fxml"); }
-    @FXML void handleChuyenTrangXuatKho(ActionEvent event) { utils.SceneUtils.switchPage("/gui/main/GUI_XuatKho.fxml"); }
-    @FXML void handleChuyenTrangKiemKe(ActionEvent event) { utils.SceneUtils.switchPage("/gui/main/GUI_KiemKe.fxml"); }
+    @FXML void moTrangNhapKho(ActionEvent event) { SceneUtils.switchPage("/gui/main/GUI_NhapKho.fxml"); }
+    @FXML void handleChuyenTrangXuatKho(ActionEvent event) { SceneUtils.switchPage("/gui/main/GUI_XuatKho.fxml"); }
+    @FXML void handleChuyenTrangKiemKe(ActionEvent event) { 
+        AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Tính năng đang phát triển", "Tính năng kiểm kê kho sẽ được cập nhật trong phiên bản tiếp theo.");
+    }
 }

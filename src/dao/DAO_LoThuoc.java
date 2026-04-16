@@ -63,12 +63,12 @@ public class DAO_LoThuoc {
         return list;
     }
 
-    public boolean themLoThuoc(entity.LoThuoc lo) {
+    public boolean themLoThuoc(LoThuoc lo) {
         // Đã cập nhật câu INSERT có thêm ngayNhapKho và maNhaCungCap
         String sql = "INSERT INTO LoThuoc (MaLoThuoc, MaThuoc, NgaySanXuat, HanSuDung, SoLuongTon, GiaNhap, ViTriKho, trangThai, ngayNhapKho, maNhaCungCap) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?)";
         
-        try (Connection con = connectDB.ConnectDB.getInstance().getConnection();
+        try (Connection con = ConnectDB.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
              
             stmt.setString(1, lo.getMaLoThuoc());
@@ -96,16 +96,16 @@ public class DAO_LoThuoc {
         }
     }
 
-    public List<entity.LoThuoc> getLoThuocTheoFEFO(String maThuoc, String viTriKho) {
-        List<entity.LoThuoc> list = new ArrayList<>();
+    public List<LoThuoc> getLoThuocTheoFEFO(String maThuoc, String viTriKho) {
+        List<LoThuoc> list = new ArrayList<>();
         String sql = "SELECT * FROM LoThuoc WHERE maThuoc = ? AND viTriKho = ? AND soLuongTon > 0 AND trangThai = 1 ORDER BY hanSuDung ASC";
-        try (Connection con = connectDB.ConnectDB.getInstance().getConnection();
+        try (Connection con = ConnectDB.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setString(1, maThuoc);
             pst.setString(2, viTriKho);
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
-                entity.LoThuoc lo = new entity.LoThuoc();
+                LoThuoc lo = new LoThuoc();
                 lo.setMaLoThuoc(rs.getString("maLoThuoc"));
                 lo.setSoLuongTon(rs.getInt("soLuongTon"));
                 lo.setHanSuDung(rs.getDate("hanSuDung"));
@@ -198,7 +198,7 @@ public class DAO_LoThuoc {
              
                 String maNCC = rs.getString("maNhaCungCap");
                 if (maNCC != null) {
-                    entity.NhaCungCap ncc = new entity.NhaCungCap();
+                    NhaCungCap ncc = new NhaCungCap();
                     ncc.setMaNhaCungCap(maNCC);
                     lo.setNhaCungCap(ncc);
                 }
@@ -292,7 +292,7 @@ public class DAO_LoThuoc {
                 
                 String maNCC = rs.getString("maNhaCungCap");
                 if (maNCC != null) {
-                    entity.NhaCungCap ncc = new entity.NhaCungCap();
+                    NhaCungCap ncc = new NhaCungCap();
                     ncc.setMaNhaCungCap(maNCC);
                     lo.setNhaCungCap(ncc);
                 }

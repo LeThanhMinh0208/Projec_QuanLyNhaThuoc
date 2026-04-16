@@ -115,25 +115,34 @@ public class GUI_DonViQuyDoiController {
 
     private void loadData() {
         masterData.clear();
+        
+        // 1. Lấy tất cả thuốc (1 query)
         List<Thuoc> dsThuoc = daoThuoc.getAllThuocTatCa();
+        
+        // 2. Lấy tất cả đơn vị quy đổi (1 query)
+        List<DonViQuyDoi> allUnits = daoDonViQuyDoi.getAllDonViQuyDoi();
+        
+        // 3. Nhóm đơn vị quy đổi theo maThuoc bằng Map để tra cứu nhanh O(1)
+        java.util.Map<String, ArrayList<DonViQuyDoi>> unitMap = new java.util.HashMap<>();
+        for (DonViQuyDoi dv : allUnits) {
+            unitMap.computeIfAbsent(dv.getMaThuoc(), k -> new ArrayList<>()).add(dv);
+        }
+
+        // 4. Sắp xếp danh sách thuốc
         dsThuoc.sort((a, b) -> {
-            String maA = a == null ? null : a.getMaThuoc();
-            String maB = b == null ? null : b.getMaThuoc();
-            if (Objects.equals(maA, maB)) {
-                return 0;
-            }
-            if (maA == null) {
-                return 1;
-            }
-            if (maB == null) {
-                return -1;
-            }
+            String maA = a == null ? "" : a.getMaThuoc();
+            String maB = b == null ? "" : b.getMaThuoc();
             return maB.compareTo(maA);
         });
 
+        // 5. Build dữ liệu cho table
         int stt = 1;
         for (Thuoc thuoc : dsThuoc) {
-            ArrayList<DonViQuyDoi> donVi = daoDonViQuyDoi.getDonViByMaThuocOrderAsc(thuoc.getMaThuoc());
+            ArrayList<DonViQuyDoi> donVi = unitMap.getOrDefault(thuoc.getMaThuoc(), new ArrayList<>());
+            
+            // Đảm bảo list donVi được sắp xếp theo tyLeQuyDoi ASC (đã sort ở SQL nhưng check lại cho chắc)
+            donVi.sort(java.util.Comparator.comparingInt(DonViQuyDoi::getTyLeQuyDoi));
+
             String bac1 = formatBac1(thuoc, donVi);
             String bac2 = "--";
             String bac3 = "--";
