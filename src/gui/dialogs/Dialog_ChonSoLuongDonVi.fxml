@@ -85,8 +85,8 @@
         <!-- ── FOOTER ── -->
         <HBox styleClass="dialog-footer" spacing="10" alignment="CENTER_RIGHT">
             <children>
-                <Button text="Hủy" onAction="#handleHuy" styleClass="dialog-btn-cancel" prefWidth="100" prefHeight="44"/>
-                <Button fx:id="btnDongY" text="Thêm vào giỏ" onAction="#handleDongY" styleClass="dialog-btn-ok" prefWidth="160" prefHeight="44"/>
+                <Button text="Hủy" onAction="#handleHuy" styleClass="dialog-btn-cancel" prefWidth="120" prefHeight="44"/>
+                <Button fx:id="btnDongY" text="Thêm vào giỏ" onAction="#handleDongY" styleClass="dialog-btn-ok" prefWidth="180" prefHeight="44"/>
             </children>
         </HBox>
     </children>

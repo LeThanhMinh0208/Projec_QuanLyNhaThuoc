@@ -13,6 +13,7 @@ public class HoaDonView {
     private double tongSauVAT;
     private String hinhThucThanhToan;
     private String ghiChu;
+    private String loaiBan;
 
     public String getMaHoaDon() {
         return maHoaDon;
@@ -94,6 +95,14 @@ public class HoaDonView {
         this.ghiChu = ghiChu;
     }
 
+    public String getLoaiBan() {
+        return loaiBan;
+    }
+
+    public void setLoaiBan(String loaiBan) {
+        this.loaiBan = loaiBan;
+    }
+
     public String getHinhThucLabel() {
         if (hinhThucThanhToan == null) {
             return "Tiền mặt";
@@ -106,5 +115,12 @@ public class HoaDonView {
             default:
                 return "Tiền mặt";
         }
+    }
+
+    public String getLoaiBanLabel() {
+        if ("BAN_THEO_DON".equals(loaiBan)) {
+            return "Theo đơn";
+        }
+        return "Bán lẻ";
     }
 }

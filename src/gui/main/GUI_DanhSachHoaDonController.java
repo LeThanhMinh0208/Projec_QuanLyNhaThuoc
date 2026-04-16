@@ -23,6 +23,7 @@ public class GUI_DanhSachHoaDonController {
     @FXML private DatePicker dpTuNgay;
     @FXML private DatePicker dpDenNgay;
     @FXML private ComboBox<String> cbHinhThuc;
+    @FXML private ComboBox<String> cbLoaiBan;
     @FXML private TextField txtTimKiem;
 
     @FXML private TableView<HoaDonView> tableHoaDon;
@@ -30,6 +31,7 @@ public class GUI_DanhSachHoaDonController {
     @FXML private TableColumn<HoaDonView, String> colNgayLap;
     @FXML private TableColumn<HoaDonView, String> colKhachHang;
     @FXML private TableColumn<HoaDonView, String> colNhanVien;
+    @FXML private TableColumn<HoaDonView, String> colLoaiBan;
     @FXML private TableColumn<HoaDonView, String> colTamTinh;
     @FXML private TableColumn<HoaDonView, String> colVAT;
     @FXML private TableColumn<HoaDonView, String> colTongSauVAT;
@@ -69,6 +71,10 @@ public class GUI_DanhSachHoaDonController {
         cbHinhThuc.setItems(FXCollections.observableArrayList(
                 "Tất cả", "Tiền mặt", "Chuyển khoản", "Thẻ tín dụng"));
         cbHinhThuc.setValue("Tất cả");
+
+        cbLoaiBan.setItems(FXCollections.observableArrayList(
+                "Tất cả", "Bán lẻ", "Bán theo đơn"));
+        cbLoaiBan.setValue("Tất cả");
     }
 
     private void setupTable() {
@@ -85,6 +91,26 @@ public class GUI_DanhSachHoaDonController {
         colTongSauVAT.setCellValueFactory(d -> new SimpleStringProperty(
                 String.format("%,.0f ₫", d.getValue().getTongSauVAT())));
         colHinhThuc  .setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getHinhThucLabel()));
+
+        // Cột loại bán — hiển thị màu khác nhau
+        colLoaiBan.setCellValueFactory(d -> new SimpleStringProperty(
+                d.getValue().getLoaiBan() != null ? d.getValue().getLoaiBan() : "BAN_LE"));
+        colLoaiBan.setCellFactory(col -> new TableCell<HoaDonView, String>() {
+            @Override
+            protected void updateItem(String val, boolean empty) {
+                super.updateItem(val, empty);
+                if (empty || val == null) {
+                    setText(null);
+                    setStyle("");
+                } else if ("BAN_THEO_DON".equals(val)) {
+                    setText("Theo đơn");
+                    setStyle("-fx-text-fill: #1565C0; -fx-font-weight: bold;");
+                } else {
+                    setText("Bán lẻ");
+                    setStyle("-fx-text-fill: #2E7D32;");
+                }
+            }
+        });
 
         colHanhDong.setCellFactory(col -> new TableCell<>() {
             private final Button btn = new Button("👁 Chi tiết");
@@ -113,8 +139,19 @@ public class GUI_DanhSachHoaDonController {
                 default: hinhThuc = null;
             }
         }
+
+        // Lọc loại bán
+        String loaiBan = null;
+        if (cbLoaiBan.getValue() != null) {
+            switch (cbLoaiBan.getValue()) {
+                case "Bán lẻ":       loaiBan = "BAN_LE";       break;
+                case "Bán theo đơn": loaiBan = "BAN_THEO_DON"; break;
+                default: loaiBan = null;
+            }
+        }
+
         // Load tất cả vào masterData (không gửi keyword xuống DB)
-        List<HoaDonView> list = dao.getDanhSach(tu, den, hinhThuc, null);
+        List<HoaDonView> list = dao.getDanhSach(tu, den, hinhThuc, null, loaiBan);
         masterData.setAll(list);
 
         // Wrap bằng FilteredList để filter keyword local
@@ -155,7 +192,13 @@ public class GUI_DanhSachHoaDonController {
 
     @FXML
     void handleTimKiem(ActionEvent event) {
-        // Lại load data từ DB (xài filter ngày/hình thức) rồi filter local
+        // Lại load data từ DB (xài filter ngày/hình thức/loại bán) rồi filter local
+        loadData();
+    }
+
+    @FXML
+    void onFilterLoaiBan(ActionEvent event) {
+        // Khi thay đổi ComboBox loại bán → reload data từ DB
         loadData();
     }
 
@@ -164,6 +207,7 @@ public class GUI_DanhSachHoaDonController {
         dpTuNgay.setValue(LocalDate.now().withDayOfMonth(1));
         dpDenNgay.setValue(LocalDate.now());
         cbHinhThuc.setValue("Tất cả");
+        cbLoaiBan.setValue("Tất cả");
         txtTimKiem.clear();
         loadData();
     }

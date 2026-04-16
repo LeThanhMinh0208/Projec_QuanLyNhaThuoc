@@ -591,3 +591,11 @@
 .spinner .decrement-arrow-button:hover .decrement-arrow {
     -fx-background-color: white;
 }
+
+/* ─── HIDE HORIZONTAL SCROLLBAR (giỏ hàng) ─────────────── */
+.table-view .scroll-bar:horizontal {
+    -fx-pref-height: 0;
+    -fx-max-height: 0;
+    -fx-min-height: 0;
+    -fx-opacity: 0;
+}

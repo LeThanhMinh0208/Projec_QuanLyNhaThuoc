@@ -30,6 +30,8 @@
             <DatePicker fx:id="dpDenNgay" prefWidth="150" />
             <Label text="Hình thức TT:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" />
             <ComboBox fx:id="cbHinhThuc" prefWidth="160" promptText="Tất cả" />
+            <Label text="Loại hóa đơn:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" />
+            <ComboBox fx:id="cbLoaiBan" prefWidth="160" onAction="#onFilterLoaiBan" />
         </HBox>
         <HBox spacing="12" alignment="CENTER_LEFT">
             <Label text="Tìm kiếm:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" prefWidth="70" />
@@ -39,9 +41,11 @@
                            styleClass="search-input" HBox.hgrow="ALWAYS" />
             </HBox>
             <Button text="🔍 Tìm kiếm" onAction="#handleTimKiem"
-                    styleClass="bh-btn-primary" prefHeight="38" prefWidth="120" />
+                    styleClass="bh-btn-primary" prefHeight="38"
+                    style="-fx-padding: 8 16;"/>
             <Button text="✕ Xóa bộ lọc" onAction="#handleXoaBoLoc"
-                    styleClass="bh-btn-secondary" prefHeight="38" prefWidth="120" />
+                    styleClass="bh-btn-secondary" prefHeight="38"
+                    style="-fx-padding: 8 16;"/>
         </HBox>
     </VBox>
 
@@ -59,6 +63,7 @@
                 <TableColumn fx:id="colNgayLap"    text="Ngày Lập"      prefWidth="140" />
                 <TableColumn fx:id="colKhachHang"  text="Khách Hàng"    prefWidth="150" />
                 <TableColumn fx:id="colNhanVien"   text="Nhân Viên"     prefWidth="140" />
+                <TableColumn fx:id="colLoaiBan"    text="Loại"          prefWidth="110" />
                 <TableColumn fx:id="colTamTinh"    text="Tạm Tính"      prefWidth="120" />
                 <TableColumn fx:id="colVAT"        text="VAT"           prefWidth="60" />
                 <TableColumn fx:id="colTongSauVAT" text="Tổng Sau VAT"  prefWidth="130" />

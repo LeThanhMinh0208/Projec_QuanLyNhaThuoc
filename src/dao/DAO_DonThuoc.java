@@ -108,4 +108,22 @@ public class DAO_DonThuoc {
         }
         return 0;
     }
+
+    /**
+     * Lấy đơn thuốc theo mã hóa đơn — dùng cho xuất PDF.
+     */
+    public DonThuoc getByMaHoaDon(String maHoaDon) {
+        String sql = "SELECT * FROM DonThuoc WHERE maHoaDon = ?";
+        try (Connection con = ConnectDB.getConnection();
+                PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, maHoaDon);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                return map(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

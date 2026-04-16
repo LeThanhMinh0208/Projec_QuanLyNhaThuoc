@@ -9,6 +9,7 @@ public class HoaDon {
     private String ghiChu;
     private NhanVien nhanVien;
     private KhachHang khachHang;
+    private String loaiBan; // BAN_LE hoặc BAN_THEO_DON
 
     public HoaDon() {}
 
@@ -20,6 +21,7 @@ public class HoaDon {
         this.ghiChu = ghiChu;
         this.nhanVien = nhanVien;
         this.khachHang = khachHang;
+        this.loaiBan = "BAN_LE"; // default
     }
 
     // Getters and Setters
@@ -37,4 +39,6 @@ public class HoaDon {
     public void setNhanVien(NhanVien nhanVien) { this.nhanVien = nhanVien; }
     public KhachHang getKhachHang() { return khachHang; }
     public void setKhachHang(KhachHang khachHang) { this.khachHang = khachHang; }
+    public String getLoaiBan() { return loaiBan; }
+    public void setLoaiBan(String loaiBan) { this.loaiBan = loaiBan; }
 }
