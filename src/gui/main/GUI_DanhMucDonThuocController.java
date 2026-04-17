@@ -109,8 +109,8 @@ public class GUI_DanhMucDonThuocController implements Initializable {
             }
         });
 
-        // =======================================================
-        // 🚨 NÚT TÁI LẬP (MỚI THÊM LẠI, CHƯA CÓ LOGIC) 🚨
+     // =======================================================
+        // 🚨 NÚT TÁI LẬP
         // =======================================================
         colTaiLap.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue()));
         colTaiLap.setCellFactory(param -> new TableCell<>() {
@@ -119,7 +119,23 @@ public class GUI_DanhMucDonThuocController implements Initializable {
                 btnTaiLap.getStyleClass().addAll("btn-action-table", "btn-soft-amber");
                 btnTaiLap.setOnAction(e -> {
                     DonThuoc dt = getTableView().getItems().get(getIndex());
-                    System.out.println("Đang chờ sếp set logic tái lập cho mã: " + dt.getMaDonThuoc());
+                    if (dt.getMaHoaDon() == null || dt.getMaHoaDon().trim().isEmpty()) {
+                        showWarn("Đơn thuốc này chưa được thanh toán (chưa lưu hóa đơn), không thể sao chép dữ liệu!");
+                        return;
+                    }
+
+                    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                        "Bạn muốn tái lập toa thuốc: " + dt.getMaDonThuoc() + "?\nHệ thống sẽ tự động chuyển sang trang Bán Hàng.",
+                        ButtonType.YES, ButtonType.NO);
+                    confirm.showAndWait().ifPresent(btn -> {
+                        if (btn == ButtonType.YES) {
+                            // 1. Set data vào bộ nhớ đệm
+                            gui.main.GUI_QuanLyBanHangController.setTaiLapData(dt);
+                            
+                            // 2. Chuyển trang (Sử dụng SceneUtils của hệ thống sếp)
+                            utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyBanHang.fxml");
+                        }
+                    });
                 });
             }
             @Override

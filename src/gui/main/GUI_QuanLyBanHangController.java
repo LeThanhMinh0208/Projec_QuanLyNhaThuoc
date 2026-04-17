@@ -119,6 +119,13 @@ public class GUI_QuanLyBanHangController {
     private KhachHang currentKhachHang = null;
     private double tongTienLe = 0;
     private double thueVatLe = 0;
+    
+ // 🚨 BIẾN STATIC ĐỂ NHẬN DỮ LIỆU TÁI LẬP TỪ MÀN HÌNH KHÁC
+    private static GUI_QuanLyBanHangController instance;
+    private static DonThuoc donThuocTaiLapPending = null;
+
+    public static GUI_QuanLyBanHangController getInstance() { return instance; }
+    public static void setTaiLapData(DonThuoc dt) { donThuocTaiLapPending = dt; }
 
     public class CartItem {
         public Thuoc     thuoc;
@@ -142,6 +149,7 @@ public class GUI_QuanLyBanHangController {
 
     @FXML
     public void initialize() {
+    	instance = this;
         setupTableThuocLe();
         setupTableCartLe();
         loadDataLeAsync(); // Thay đổi ở đây
@@ -165,6 +173,12 @@ public class GUI_QuanLyBanHangController {
         
         // Keyboard navigation
         setupKeyboardNavigation();
+        javafx.application.Platform.runLater(() -> {
+            if (donThuocTaiLapPending != null) {
+                xuLyTaiLapDonThuoc(donThuocTaiLapPending);
+                donThuocTaiLapPending = null;
+            }
+        });
     }
 
     public void chonTabBanLe() {
@@ -1184,6 +1198,70 @@ public class GUI_QuanLyBanHangController {
                     handleThemVaoGioDon(null);
                     event.consume();
                 }
+            }
+        });
+    }
+ // =======================================================
+    // 🚨 HÀM XỬ LÝ NGHIỆP VỤ TÁI LẬP ĐƠN THUỐC (FULL LOGIC)
+    // =======================================================
+    public void xuLyTaiLapDonThuoc(DonThuoc dtCu) {
+        javafx.application.Platform.runLater(() -> {
+            onTabDonThuoc(); // Chuyển sang tab Đơn thuốc
+
+            // 1. Gán lại thông tin thẻ Đơn Thuốc
+            this.donThuocTemp = new DonThuoc();
+            this.donThuocTemp.setTenBacSi(dtCu.getTenBacSi());
+            this.donThuocTemp.setThongTinBenhNhan(dtCu.getThongTinBenhNhan());
+            this.donThuocTemp.setChanDoan(dtCu.getChanDoan());
+
+            try {
+                int maxMaDT = daoDonThuoc.getMaxMaDonThuoc();
+                this.donThuocTemp.setMaDonThuoc(String.format("DT%04d", maxMaDT + 1));
+            } catch(Exception ex) {
+                this.donThuocTemp.setMaDonThuoc("DT_NEW");
+            }
+            updateCardDonThuoc();
+
+            // 2. Xóa sạch giỏ hàng cũ trước khi nạp đồ mới
+            cartDataDon.clear();
+
+            // 3. Nạp thuốc vào giỏ (Tự động tìm lô FEFO mới nhất)
+            try {
+                List<Object[]> listCT = daoHoaDon.getChiTietRebuildCart(dtCu.getMaHoaDon());
+                for (Object[] row : listCT) {
+                    String maThuoc = (String) row[0];
+                    String maQuyDoi = (String) row[1];
+                    int soLuong = (int) row[2];
+                    double donGia = (double) row[3];
+                    String maBangGia = (String) row[4];
+                    String tenDonVi = (String) row[5];
+
+                    Thuoc thuoc = daoThuoc.getThuocByMa(maThuoc);
+                    if (thuoc != null) {
+                        DonViQuyDoi dv = new DonViQuyDoi();
+                        dv.setMaQuyDoi(maQuyDoi);
+                        dv.setMaThuoc(maThuoc);
+                        dv.setTenDonVi(tenDonVi);
+                        
+                        CartItem item = new CartItem(thuoc, dv, soLuong, donGia, maBangGia);
+                        
+                        // Cực quan trọng: Chọn lại lô FEFO hiện tại, bỏ qua lô của đơn cũ
+                        String maLo = daoLoThuoc.getLoFEFO(maThuoc);
+                        if (maLo != null) {
+                            item.maLoThuoc = maLo;
+                            daoLoThuoc.getLoThuocBanDuocByMaThuoc(maThuoc).stream()
+                                .filter(l -> l.getMaLoThuoc().equals(maLo)).findFirst()
+                                .ifPresent(l -> item.hanSuDung = l.getHanSuDung());
+                        }
+                        cartDataDon.add(item);
+                    }
+                }
+                tblGioHangDon.refresh();
+                tinhTongTienDon();
+                showAlert(AlertType.INFORMATION, "Tái lập thành công", "Đã nạp toàn bộ toa thuốc cũ vào giỏ hàng. Bạn có thể thay đổi số lượng hoặc thanh toán ngay!");
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert(AlertType.WARNING, "Cảnh báo", "Đã tái lập thông tin đơn, nhưng gặp lỗi khi lấy thuốc vào giỏ!");
             }
         });
     }
