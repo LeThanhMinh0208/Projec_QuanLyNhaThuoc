@@ -11,6 +11,8 @@ public class PhieuDoiTraView {
     private String hinhThucXuLy;
     private double phiPhat;
     private String lyDo;
+    private String ketQuaDoiSanPham;
+    private String danhSachThuocDoi;
 
     public String getMaPhieuDoiTra() {
         return maPhieuDoiTra;
@@ -76,12 +78,41 @@ public class PhieuDoiTraView {
         this.lyDo = lyDo;
     }
 
+    public String getKetQuaDoiSanPham() {
+        return ketQuaDoiSanPham;
+    }
+
+    public void setKetQuaDoiSanPham(String ketQuaDoiSanPham) {
+        this.ketQuaDoiSanPham = ketQuaDoiSanPham;
+    }
+
+    public String getDanhSachThuocDoi() {
+        return danhSachThuocDoi;
+    }
+
+    public void setDanhSachThuocDoi(String danhSachThuocDoi) {
+        this.danhSachThuocDoi = danhSachThuocDoi;
+    }
+
     public String getHinhThucXuLyLabel() {
         return isDoiSanPham() ? "Đổi sản phẩm" : "Hoàn tiền";
     }
 
     public boolean isDoiSanPham() {
         return "DOI_SAN_PHAM".equals(hinhThucXuLy);
+    }
+
+    public String getMoTaChenhLechDoiSanPham() {
+        if (!isDoiSanPham()) {
+            return String.format("%,.0f VND", phiPhat);
+        }
+        if ("BU_TIEN".equals(ketQuaDoiSanPham)) {
+            return "Khách bù: " + String.format("%,.0f VND", phiPhat);
+        }
+        if ("HOAN_TIEN".equals(ketQuaDoiSanPham)) {
+            return "Hoàn lại: " + String.format("%,.0f VND", phiPhat);
+        }
+        return "Không chênh lệch";
     }
 
     public String getLyDoHienThi() {
@@ -94,19 +125,6 @@ public class PhieuDoiTraView {
 
     public String getThongTinThuocDoi() {
         return extractSegment("thuoc doi");
-    }
-
-    public String getMoTaChenhLechDoiSanPham() {
-        if (!isDoiSanPham()) {
-            return String.format("%,.0f VND", phiPhat);
-        }
-        if (phiPhat > 0) {
-            return "Bù: " + String.format("%,.0f VND", phiPhat);
-        }
-        if (phiPhat < 0) {
-            return "Hoàn: " + String.format("%,.0f VND", Math.abs(phiPhat));
-        }
-        return "Không chênh lệch";
     }
 
     private String extractSegment(String label) {

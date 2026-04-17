@@ -50,12 +50,10 @@
                   style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e2e8f0; -fx-border-width: 1;">
         </ListView>
 
-        <!-- Phần nhập số lượng -->
+        <!-- Phần thông tin thuốc -->
         <HBox spacing="12" alignment="CENTER"
               style="-fx-background-color: #f0f9ff; -fx-background-radius: 10; -fx-padding: 12 16;">
             <children>
-                <Label text="Số lượng:" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
-                <Spinner fx:id="spinnerSoLuong" prefWidth="100" prefHeight="36" editable="true"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <Label fx:id="lblTonInfo" text="Tồn: —"
                        style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
@@ -70,7 +68,7 @@
         <children>
             <Button text="Hủy" onAction="#handleHuy" styleClass="dialog-btn-cancel"
                     prefWidth="100" prefHeight="42"/>
-            <Button fx:id="btnThemVaoGio" text="➕ Thêm vào giỏ" onAction="#handleChon"
+            <Button fx:id="btnThemVaoGio" text="✔️ Chọn thuốc" onAction="#handleChon"
                     styleClass="dialog-btn-ok" prefWidth="160" prefHeight="42"
                     style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 6px;"/>
         </children>

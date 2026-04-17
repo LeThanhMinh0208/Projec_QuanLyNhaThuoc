@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefWidth="820" prefHeight="620" spacing="16"
+<VBox prefWidth="820" prefHeight="700" spacing="16"
       style="-fx-background-color:#f8fafc; -fx-padding:24;"
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="gui.dialogs.Dialog_ChiTietPhieuDoiTraController">
@@ -49,16 +49,12 @@
 
             <Label text="Lý do:" style="-fx-text-fill:#64748b;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
             <Label fx:id="lblLyDo" wrapText="true" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
-            <Label text="Thuốc trả:" style="-fx-text-fill:#64748b;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-            <Label fx:id="lblThuocTra" wrapText="true" GridPane.rowIndex="4" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
-            <Label text="Thuốc đổi:" style="-fx-text-fill:#64748b;" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-            <Label fx:id="lblThuocDoi" wrapText="true" GridPane.rowIndex="5" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
         </GridPane>
     </VBox>
 
     <VBox styleClass="bh-panel" VBox.vgrow="ALWAYS" spacing="8">
         <Label text="CHI TIẾT ĐỔI TRẢ" styleClass="bh-section-title" />
-        <TableView fx:id="tableChiTiet" VBox.vgrow="ALWAYS">
+        <TableView fx:id="tableChiTiet" VBox.vgrow="ALWAYS" minHeight="250">
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
             </columnResizePolicy>
@@ -75,6 +71,23 @@
         </TableView>
     </VBox>
 
+    <VBox fx:id="boxKhachNhan" styleClass="bh-panel" VBox.vgrow="ALWAYS" spacing="8" managed="false" visible="false">
+        <Label text="THUỐC KHÁCH NHẬN ĐỔI" styleClass="bh-section-title" />
+        <TableView fx:id="tableThuocDoi" VBox.vgrow="ALWAYS" minHeight="150" prefHeight="150">
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+            <columns>
+                <TableColumn fx:id="colDoiSTT" text="STT" prefWidth="45" />
+                <TableColumn fx:id="colDoiTen" text="Tên thuốc" prefWidth="220" />
+                <TableColumn fx:id="colDoiDonVi" text="Đơn vị" prefWidth="90" />
+                <TableColumn fx:id="colDoiSoLuong" text="SL nhận" prefWidth="70" />
+                <TableColumn fx:id="colDoiDonGia" text="Đơn giá" prefWidth="110" />
+                <TableColumn fx:id="colDoiThanhTien" text="Thành tiền" prefWidth="120" />
+            </columns>
+        </TableView>
+    </VBox>
+
     <VBox styleClass="bh-panel" spacing="8">
         <HBox alignment="CENTER_LEFT">
             <Label text="Phí phạt:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" HBox.hgrow="ALWAYS"/>
@@ -86,6 +99,7 @@
         </HBox>
         <Separator />
         <HBox alignment="CENTER_RIGHT" spacing="12">
+            <Button text="In Phiếu" onAction="#handleInPhieu" styleClass="bh-btn-secondary" prefHeight="40" prefWidth="100" />
             <Button text="Đóng" onAction="#handleDong" styleClass="bh-btn-primary" prefHeight="40" prefWidth="100" />
         </HBox>
     </VBox>

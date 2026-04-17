@@ -28,6 +28,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -65,7 +66,6 @@ public class Dialog_ChiTietDoiTraController {
     @FXML private TableColumn<ChiTietDoiTraTam, Void> colCTHanhDong;
 
     @FXML private TextField txtSoLuongTra;
-    @FXML private TextField txtPhiPhat;
     @FXML private TextField txtTinhTrang;
     @FXML private TextArea txtLyDo;
     @FXML private ComboBox<HinhThucDoiTra> cbHinhThucXuLy;
@@ -79,9 +79,9 @@ public class Dialog_ChiTietDoiTraController {
 
     @FXML
     public void initialize() {
-        cbHinhThucXuLy.setItems(FXCollections.observableArrayList(HinhThucDoiTra.values()));
+        // [3] Chỉ cho chọn HOAN_TIEN
+        cbHinhThucXuLy.setItems(FXCollections.observableArrayList(HinhThucDoiTra.HOAN_TIEN));
         cbHinhThucXuLy.setValue(HinhThucDoiTra.HOAN_TIEN);
-        txtPhiPhat.setText("0");
         setupAvailableTable();
         setupReturnTable();
         initialized = true;
@@ -106,8 +106,9 @@ public class Dialog_ChiTietDoiTraController {
         lblTongHoaDon.setText(String.format("%,.0f VND", hoaDon.getTongSauVAT()));
         lblHinhThuc.setText(hoaDon.getHinhThucLabel());
 
+        // [10] Hiển thị TẤT CẢ hàng, không filter soLuongConLai > 0
         dsCoTheDoiTra.setAll(daoPhieuDoiTra.getChiTietCoTheDoiTra(hoaDon.getMaHoaDon()));
-        tableCoTheDoiTra.setItems(dsCoTheDoiTra.filtered(item -> item.getSoLuongConLai() > 0));
+        tableCoTheDoiTra.setItems(dsCoTheDoiTra);
         tableCoTheDoiTra.refresh();
         capNhatTong();
     }
@@ -121,6 +122,21 @@ public class Dialog_ChiTietDoiTraController {
         colHangDaTra.setCellValueFactory(d -> new SimpleStringProperty(String.valueOf(d.getValue().getSoLuongDaTra())));
         colHangConLai.setCellValueFactory(d -> new SimpleStringProperty(String.valueOf(d.getValue().getSoLuongConLai())));
         colHangDonGia.setCellValueFactory(d -> new SimpleStringProperty(String.format("%,.0f VND", d.getValue().getDonGia())));
+
+        // [10] Row factory: hiển thị tất cả, disable hàng đã trả hết
+        tableCoTheDoiTra.setRowFactory(tv -> new TableRow<ChiTietDoiTraView>() {
+            @Override
+            protected void updateItem(ChiTietDoiTraView item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null && item.getSoLuongConLai() <= 0) {
+                    setDisable(true);
+                    setStyle("-fx-opacity: 0.4;");
+                } else {
+                    setDisable(false);
+                    setStyle("");
+                }
+            }
+        });
     }
 
     private void setupReturnTable() {
@@ -131,7 +147,7 @@ public class Dialog_ChiTietDoiTraController {
         colCTTinhTrang.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().tinhTrang));
         colCTThanhTien.setCellValueFactory(d -> new SimpleStringProperty(String.format("%,.0f VND", d.getValue().thanhTienHoan)));
         colCTHanhDong.setCellFactory(col -> new TableCell<>() {
-            private final Button btnXoa = new Button("Xoa");
+            private final Button btnXoa = new Button("Xóa");
             {
                 btnXoa.setStyle("-fx-background-color:#dc2626;-fx-text-fill:white;-fx-font-size:12px;-fx-padding:4 10;-fx-cursor:hand;");
                 btnXoa.setOnAction(e -> xoaDongTam(getTableView().getItems().get(getIndex())));
@@ -149,7 +165,12 @@ public class Dialog_ChiTietDoiTraController {
     void handleThemChiTiet(ActionEvent event) {
         ChiTietDoiTraView selected = tableCoTheDoiTra.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showAlert(Alert.AlertType.WARNING, "Chon mot mat hang trong bang co the doi tra.");
+            showAlert(Alert.AlertType.WARNING, "Chọn một mặt hàng trong bảng có thể đổi trả.");
+            return;
+        }
+
+        if (selected.getSoLuongConLai() <= 0) {
+            showAlert(Alert.AlertType.WARNING, "Mặt hàng này đã được đổi trả hết.");
             return;
         }
 
@@ -157,18 +178,24 @@ public class Dialog_ChiTietDoiTraController {
         try {
             soLuongTra = Integer.parseInt(txtSoLuongTra.getText().trim());
         } catch (Exception e) {
-            showAlert(Alert.AlertType.WARNING, "So luong tra khong hop le.");
+            showAlert(Alert.AlertType.WARNING, "Số lượng trả không hợp lệ.");
             return;
         }
 
         if (soLuongTra <= 0 || soLuongTra > selected.getSoLuongConLai()) {
-            showAlert(Alert.AlertType.WARNING, "So luong tra phai > 0 va <= so luong con lai.");
+            showAlert(Alert.AlertType.WARNING, "Số lượng trả phải > 0 và <= số lượng còn lại.");
             return;
         }
 
         String tinhTrang = txtTinhTrang.getText() != null ? txtTinhTrang.getText().trim() : "";
         if (tinhTrang.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Nhap tinh trang thuoc.");
+            showAlert(Alert.AlertType.WARNING, "Nhập tình trạng thuốc.");
+            return;
+        }
+
+        // [5] Kiểm tra hư hỏng
+        if ("Hư hỏng".equalsIgnoreCase(tinhTrang)) {
+            showAlert(Alert.AlertType.WARNING, "Thuốc không đủ điều kiện đổi trả theo quy định.");
             return;
         }
 
@@ -184,28 +211,25 @@ public class Dialog_ChiTietDoiTraController {
     @FXML
     void handleLuu(ActionEvent event) {
         if (hoaDon == null) {
-            showAlert(Alert.AlertType.ERROR, "Khong co hoa don de lap phieu doi tra.");
+            showAlert(Alert.AlertType.ERROR, "Không có hóa đơn để lập phiếu đổi trả.");
             return;
         }
+
+        // [4] Kiểm tra thời hạn đổi trả 30 ngày
+        long millisPerDay = 86_400_000L;
+        long soNgay = (System.currentTimeMillis() - hoaDon.getNgayLap().getTime()) / millisPerDay;
+        if (soNgay > 30) {
+            showAlert(Alert.AlertType.WARNING, "Hóa đơn đã quá 30 ngày, không thể lập phiếu đổi trả.");
+            return;
+        }
+
         if (dsTam.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Chua co chi tiet doi tra nao.");
+            showAlert(Alert.AlertType.WARNING, "Chưa có chi tiết đổi trả nào.");
             return;
         }
         String lyDo = txtLyDo.getText() != null ? txtLyDo.getText().trim() : "";
         if (lyDo.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Nhap ly do doi tra.");
-            return;
-        }
-
-        double phiPhat;
-        try {
-            phiPhat = Double.parseDouble(txtPhiPhat.getText().trim());
-        } catch (Exception e) {
-            showAlert(Alert.AlertType.WARNING, "Phi phat khong hop le.");
-            return;
-        }
-        if (phiPhat < 0) {
-            showAlert(Alert.AlertType.WARNING, "Phi phat khong duoc am.");
+            showAlert(Alert.AlertType.WARNING, "Nhập lý do đổi trả.");
             return;
         }
 
@@ -214,7 +238,7 @@ public class Dialog_ChiTietDoiTraController {
             nhanVien = GUI_TrangChuController.getNhanVienDangNhap();
         }
         if (nhanVien == null) {
-            showAlert(Alert.AlertType.ERROR, "Khong xac dinh duoc nhan vien dang nhap.");
+            showAlert(Alert.AlertType.ERROR, "Không xác định được nhân viên đăng nhập.");
             return;
         }
 
@@ -228,7 +252,8 @@ public class Dialog_ChiTietDoiTraController {
         pdt.setNgayDoiTra(new java.util.Date());
         pdt.setLyDo(lyDo);
         pdt.setHinhThucXuLy(cbHinhThucXuLy.getValue());
-        pdt.setPhiPhat(phiPhat);
+        pdt.setPhiPhat(0);
+        pdt.setKetQuaDoiSanPham(null);
 
         List<ChiTietDoiTra> chiTiet = new ArrayList<>();
         for (ChiTietDoiTraTam item : dsTam) {
@@ -242,7 +267,7 @@ public class Dialog_ChiTietDoiTraController {
         }
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Xac nhan luu phieu doi tra " + pdt.getMaPhieuDoiTra() + "?",
+                "Xác nhận lưu phiếu đổi trả " + pdt.getMaPhieuDoiTra() + "?",
                 ButtonType.YES, ButtonType.NO);
         Optional<ButtonType> rs = confirm.showAndWait();
         if (rs.isEmpty() || rs.get() != ButtonType.YES) {
@@ -251,10 +276,10 @@ public class Dialog_ChiTietDoiTraController {
 
         boolean ok = daoPhieuDoiTra.lapPhieuDoiTra(pdt, chiTiet);
         if (ok) {
-            showAlert(Alert.AlertType.INFORMATION, "Lap phieu doi tra thanh cong. Ma phieu: " + pdt.getMaPhieuDoiTra());
+            showAlert(Alert.AlertType.INFORMATION, "Lập phiếu đổi trả thành công. Mã phiếu: " + pdt.getMaPhieuDoiTra());
             handleDong(null);
         } else {
-            showAlert(Alert.AlertType.ERROR, "Lap phieu doi tra that bai.");
+            showAlert(Alert.AlertType.ERROR, "Lập phiếu đổi trả thất bại.");
         }
     }
 
