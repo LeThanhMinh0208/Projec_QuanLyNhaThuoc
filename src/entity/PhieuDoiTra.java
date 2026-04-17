@@ -8,6 +8,8 @@ public class PhieuDoiTra {
     private String lyDo;
     private HinhThucDoiTra hinhThucXuLy; // Đã chuyển sang Enum
     private double phiPhat;
+    private String ketQuaDoiSanPham;
+    private String danhSachThuocDoi;
     
     // Sử dụng Object thay vì String để đúng quan hệ trong sơ đồ lớp
     private HoaDon hoaDon; 
@@ -55,4 +57,10 @@ public class PhieuDoiTra {
 
     public double getPhiPhat() { return phiPhat; }
     public void setPhiPhat(double phiPhat) { this.phiPhat = phiPhat; }
+
+    public String getKetQuaDoiSanPham() { return ketQuaDoiSanPham; }
+    public void setKetQuaDoiSanPham(String ketQuaDoiSanPham) { this.ketQuaDoiSanPham = ketQuaDoiSanPham; }
+
+    public String getDanhSachThuocDoi() { return danhSachThuocDoi; }
+    public void setDanhSachThuocDoi(String danhSachThuocDoi) { this.danhSachThuocDoi = danhSachThuocDoi; }
 }

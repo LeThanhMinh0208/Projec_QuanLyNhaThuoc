@@ -28,7 +28,6 @@ public class Dialog_ChonThuocController {
     @FXML private TextField txtTim;
     @FXML private ListView<Thuoc> listThuoc;
     @FXML private Label lblBadgeKeDon;
-    @FXML private Spinner<Integer> spinnerSoLuong;
     @FXML private Label lblTonInfo;
     @FXML private Label lblGiaInfo;
     @FXML private Button btnThemVaoGio;
@@ -51,9 +50,6 @@ public class Dialog_ChonThuocController {
         // VĐ2: Load thuốc theo điều kiện — KHO_BAN_HANG, tồn > 0, DANG_BAN
         // Không lọc canKeDon — bán theo đơn được phép bán cả thuốc kê đơn
         dsThuoc.setAll(daoThuoc.getAllThuocCoLoKhoBanHang());
-
-        // Setup spinner
-        spinnerSoLuong.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 9999, 1));
 
         // Custom cell factory cho ListView
         listThuoc.setCellFactory(lv -> new ThuocListCell());

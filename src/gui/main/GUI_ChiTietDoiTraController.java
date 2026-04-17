@@ -35,6 +35,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -55,7 +56,6 @@ public class GUI_ChiTietDoiTraController {
     @FXML private javafx.scene.control.Label lblHinhThuc;
     @FXML private javafx.scene.control.Label lblTongDong;
     @FXML private javafx.scene.control.Label lblTongTienHoan;
-    @FXML private javafx.scene.control.Label lblThuocDoi;
     @FXML private TableView<ChiTietDoiTraView> tableCoTheDoiTra;
     @FXML private TableColumn<ChiTietDoiTraView, String> colHangTenThuoc;
     @FXML private TableColumn<ChiTietDoiTraView, String> colHangDonVi;
@@ -75,14 +75,24 @@ public class GUI_ChiTietDoiTraController {
     @FXML private TableColumn<ChiTietDoiTraTam, String> colCTThanhTien;
     @FXML private TableColumn<ChiTietDoiTraTam, Void> colCTHanhDong;
 
+    // Bảng thuốc nhận đổi
+    @FXML private TableView<DoiTraSession.DonViDoiData> tableThuocNhan;
+    @FXML private TableColumn<DoiTraSession.DonViDoiData, String> colNhanTenThuoc;
+    @FXML private TableColumn<DoiTraSession.DonViDoiData, String> colNhanDonVi;
+    @FXML private TableColumn<DoiTraSession.DonViDoiData, String> colNhanSoLuong;
+    @FXML private TableColumn<DoiTraSession.DonViDoiData, String> colNhanDonGia;
+    @FXML private TableColumn<DoiTraSession.DonViDoiData, String> colNhanThanhTien;
+    @FXML private TableColumn<DoiTraSession.DonViDoiData, Void> colNhanXoa;
+
     @FXML private Spinner<Integer> spSoLuongTra;
-    @FXML private TextField txtPhiPhat;
-    @FXML private TextArea txtLyDo;
+    @FXML private ComboBox<String> cbLyDo;
+    @FXML private TextField txtLyDo;
     @FXML private ComboBox<HinhThucDoiTra> cbHinhThucXuLy;
 
     private final DAO_PhieuDoiTra daoPhieuDoiTra = new DAO_PhieuDoiTra();
     private final ObservableList<ChiTietDoiTraView> dsChiTietHoaDon = FXCollections.observableArrayList();
     private final ObservableList<ChiTietDoiTraTam> dsTam = FXCollections.observableArrayList();
+    private final ObservableList<DoiTraSession.DonViDoiData> dsThuocNhan = FXCollections.observableArrayList();
     private final DateTimeFormatter dateTimeFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private HoaDonView hoaDon;
 
@@ -90,13 +100,16 @@ public class GUI_ChiTietDoiTraController {
     public void initialize() {
         cbHinhThucXuLy.setItems(FXCollections.observableArrayList(HinhThucDoiTra.values()));
         cbHinhThucXuLy.setValue(HinhThucDoiTra.HOAN_TIEN);
-        txtPhiPhat.setText("0");
-        txtPhiPhat.setEditable(false);
-        txtPhiPhat.setFocusTraversable(false);
+        cbHinhThucXuLy.valueProperty().addListener((obs, oldVal, newVal) -> xuLyThayDoiHinhThuc(oldVal, newVal));
+
+        cbLyDo.setItems(FXCollections.observableArrayList(
+                "Khách hàng muốn hoàn", "Lỗi từ nhà sản xuất"));
+        cbLyDo.setValue("Khách hàng muốn hoàn");
 
         setupSoLuongSpinner();
         setupAvailableTable();
         setupReturnTable();
+        setupThuocNhanTable();
 
         tableCoTheDoiTra.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldVal, newVal) -> {
@@ -150,12 +163,17 @@ public class GUI_ChiTietDoiTraController {
         tableCoTheDoiTra.setItems(dsChiTietHoaDon);
         tableCoTheDoiTra.refresh();
         capNhatSpinnerSoLuong(tableCoTheDoiTra.getSelectionModel().getSelectedItem());
+        xuLyThayDoiHinhThuc(null, cbHinhThucXuLy.getValue());
         capNhatTong();
     }
 
     private void khoiPhucDuLieuTam() {
-        txtLyDo.setText(DoiTraSession.getLyDoTam());
-        txtPhiPhat.setText(DoiTraSession.getPhiPhatTam());
+        String lyDoTam = DoiTraSession.getLyDoTam();
+        if (DoiTraSession.getHinhThucXuLyTam() == HinhThucDoiTra.DOI_SAN_PHAM) {
+             txtLyDo.setText(lyDoTam);
+        } else {
+             cbLyDo.setValue(lyDoTam != null && !lyDoTam.isEmpty() ? lyDoTam : "Khách hàng muốn hoàn");
+        }
         cbHinhThucXuLy.setValue(DoiTraSession.getHinhThucXuLyTam());
 
         dsTam.clear();
@@ -169,15 +187,17 @@ public class GUI_ChiTietDoiTraController {
             }
         }
 
+        // Khôi phục danh sách thuốc nhận đổi
+        dsThuocNhan.setAll(DoiTraSession.getDsThuocDoi());
+
         tableCoTheDoiTra.refresh();
         tableChiTietDoiTra.refresh();
         capNhatTong();
-        capNhatThongTinThuocDoi();
     }
 
     private void luuDuLieuTamVaoSession() {
-        DoiTraSession.setLyDoTam(txtLyDo.getText());
-        DoiTraSession.setPhiPhatTam(txtPhiPhat.getText());
+        String lyDo = cbHinhThucXuLy.getValue() == HinhThucDoiTra.DOI_SAN_PHAM ? txtLyDo.getText() : cbLyDo.getValue();
+        DoiTraSession.setLyDoTam(lyDo);
         DoiTraSession.setHinhThucXuLyTam(cbHinhThucXuLy.getValue());
 
         List<DoiTraSession.ChiTietDoiTraTamData> data = new ArrayList<>();
@@ -185,35 +205,33 @@ public class GUI_ChiTietDoiTraController {
             data.add(item.toSessionData());
         }
         DoiTraSession.setDsChiTietTam(data);
+
+        // Lưu danh sách thuốc nhận đổi
+        DoiTraSession.clearThuocDoi();
+        for (DoiTraSession.DonViDoiData item : dsThuocNhan) {
+            DoiTraSession.addThuocDoi(item);
+        }
     }
 
     private void xuLyThayDoiHinhThuc(HinhThucDoiTra oldVal, HinhThucDoiTra newVal) {
-        if (newVal == null || newVal == oldVal) {
+        if (newVal == null) {
             return;
         }
 
-        colCTThanhTien.setText(newVal == HinhThucDoiTra.DOI_SAN_PHAM ? "Giá trị đổi" : "Tiền hoàn");
+        boolean isDoi = (newVal == HinhThucDoiTra.DOI_SAN_PHAM);
+        cbLyDo.setVisible(!isDoi);
+        cbLyDo.setManaged(!isDoi);
+        txtLyDo.setVisible(isDoi);
+        txtLyDo.setManaged(isDoi);
+
+        // Nếu chuyển sang hoàn tiền -> Xóa danh sách thuốc đổi đã chọn
+        if (newVal == HinhThucDoiTra.HOAN_TIEN) {
+            dsThuocNhan.clear();
+            DoiTraSession.clearThuocDoi();
+        }
+
+        colCTThanhTien.setText(isDoi ? "Giá trị đổi" : "Tiền hoàn");
         capNhatTong();
-        capNhatThongTinThuocDoi();
-    }
-
-    private void capNhatThongTinThuocDoi() {
-        if (lblThuocDoi == null) {
-            return;
-        }
-
-        if (cbHinhThucXuLy.getValue() != HinhThucDoiTra.DOI_SAN_PHAM) {
-            lblThuocDoi.setText("Không áp dụng");
-            return;
-        }
-
-        if (DoiTraSession.getThuocDoiDaChon() == null) {
-            lblThuocDoi.setText("Chưa chọn thuốc đổi");
-            return;
-        }
-
-        double giaTriThuocDoi = tinhGiaTriThuocDoi();
-        lblThuocDoi.setText(buildThongTinThuocDoiHienThi(giaTriThuocDoi));
     }
 
     private void setupAvailableTable() {
@@ -226,6 +244,21 @@ public class GUI_ChiTietDoiTraController {
         colHangConLai.setCellValueFactory(d -> new SimpleStringProperty(String.valueOf(d.getValue().getSoLuongConLai())));
         colHangDonGia.setCellValueFactory(d -> new SimpleStringProperty(String.format("%,.0f VND", d.getValue().getDonGia())));
         colHangTrangThai.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getSoLuongConLai() > 0 ? "Có thể đổi trả" : "Đã trả hết"));
+
+        // [10] Row factory: hiển thị tất cả, disable hàng đã trả hết
+        tableCoTheDoiTra.setRowFactory(tv -> new TableRow<ChiTietDoiTraView>() {
+            @Override
+            protected void updateItem(ChiTietDoiTraView item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null && item.getSoLuongConLai() <= 0) {
+                    setDisable(true);
+                    setStyle("-fx-opacity: 0.4;");
+                } else {
+                    setDisable(false);
+                    setStyle("");
+                }
+            }
+        });
     }
 
     private void setupReturnTable() {
@@ -253,6 +286,35 @@ public class GUI_ChiTietDoiTraController {
         tableChiTietDoiTra.setItems(dsTam);
     }
 
+    private void setupThuocNhanTable() {
+        colNhanTenThuoc.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTenThuoc()));
+        colNhanDonVi.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTenDonVi()));
+        colNhanSoLuong.setCellValueFactory(d -> new SimpleStringProperty(String.valueOf(d.getValue().getSoLuong())));
+        colNhanDonGia.setCellValueFactory(d -> new SimpleStringProperty(String.format("%,.0f VND", d.getValue().getDonGia())));
+        colNhanThanhTien.setCellValueFactory(d -> new SimpleStringProperty(String.format("%,.0f VND", d.getValue().getThanhTien())));
+
+        colNhanXoa.setCellFactory(col -> new TableCell<>() {
+            private final Button btnXoa = new Button("Xóa");
+
+            {
+                btnXoa.setStyle("-fx-background-color:#dc2626;-fx-text-fill:white;-fx-font-size:12px;-fx-padding:4 10;-fx-cursor:hand;");
+                btnXoa.setOnAction(e -> {
+                    DoiTraSession.DonViDoiData item = getTableView().getItems().get(getIndex());
+                    dsThuocNhan.remove(item);
+                    capNhatTong();
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : btnXoa);
+            }
+        });
+
+        tableThuocNhan.setItems(dsThuocNhan);
+    }
+
     @FXML
     void handleThemChiTiet(ActionEvent event) {
         ChiTietDoiTraView selected = tableCoTheDoiTra.getSelectionModel().getSelectedItem();
@@ -265,6 +327,8 @@ public class GUI_ChiTietDoiTraController {
             capNhatSpinnerSoLuong(selected);
             return;
         }
+
+        // Bỏ kiểm tra tình trạng hư hỏng vì không còn combobox tình trạng
 
         int soLuongTra;
         try {
@@ -281,9 +345,11 @@ public class GUI_ChiTietDoiTraController {
             return;
         }
 
+        String tinhTrang = null;
+
         ChiTietDoiTraTam item = timChiTietTam(selected.getMaQuyDoi(), selected.getMaLoThuoc());
         if (item == null) {
-            dsTam.add(new ChiTietDoiTraTam(selected, soLuongTra));
+            dsTam.add(new ChiTietDoiTraTam(selected, soLuongTra, tinhTrang));
         } else {
             item.addSoLuong(soLuongTra, selected.getDonGia());
             tableChiTietDoiTra.refresh();
@@ -311,17 +377,22 @@ public class GUI_ChiTietDoiTraController {
             return;
         }
 
-        DoiTraSession.setThuocDoiDaChon(thuoc);
-        DoiTraSession.setDonViDoiDaChon(donViDoi);
-        capNhatThongTinThuocDoi();
+        dsThuocNhan.add(donViDoi);
+        DoiTraSession.addThuocDoi(donViDoi);
         capNhatTong();
     }
 
     @FXML
     void handleBoThuocDoi(ActionEvent event) {
-        DoiTraSession.setThuocDoiDaChon(null);
-        DoiTraSession.setDonViDoiDaChon(null);
-        capNhatThongTinThuocDoi();
+        DoiTraSession.DonViDoiData selected = tableThuocNhan.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            // Nếu không chọn dòng cụ thể, xóa hết
+            dsThuocNhan.clear();
+            DoiTraSession.clearThuocDoi();
+        } else {
+            dsThuocNhan.remove(selected);
+            DoiTraSession.removeThuocDoi(selected);
+        }
         capNhatTong();
     }
 
@@ -331,25 +402,33 @@ public class GUI_ChiTietDoiTraController {
             showAlert(Alert.AlertType.ERROR, "Không có hóa đơn để lập phiếu đổi trả.");
             return;
         }
+
+        // [4] Kiểm tra thời hạn đổi trả 30 ngày
+        long millisPerDay = 86_400_000L;
+        long soNgay = (System.currentTimeMillis() - hoaDon.getNgayLap().getTime()) / millisPerDay;
+        if (soNgay > 30) {
+            showAlert(Alert.AlertType.WARNING, "Hóa đơn đã quá 30 ngày, không thể lập phiếu đổi trả.");
+            return;
+        }
+
         if (dsTam.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Chưa có phiếu đổi trả nào.");
             return;
         }
 
-        String lyDo = txtLyDo.getText() != null ? txtLyDo.getText().trim() : "";
+        boolean isDoi = (cbHinhThucXuLy.getValue() == HinhThucDoiTra.DOI_SAN_PHAM);
+        String lyDo = isDoi ? txtLyDo.getText().trim() : (cbLyDo.getValue() != null ? cbLyDo.getValue().trim() : "");
         if (lyDo.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Nhập lý do đổi trả.");
+            showAlert(Alert.AlertType.WARNING, "Vui lòng nhập lý do đổi trả.");
+            if (isDoi) txtLyDo.requestFocus();
             return;
         }
 
-        double phiPhat = 0;
-
         if (cbHinhThucXuLy.getValue() == HinhThucDoiTra.DOI_SAN_PHAM) {
-            if (DoiTraSession.getThuocDoiDaChon() == null) {
+            if (dsThuocNhan.isEmpty()) {
                 showAlert(Alert.AlertType.WARNING, "Chưa có thông tin thuốc đổi cho phiếu đổi sản phẩm.");
                 return;
             }
-            phiPhat = tinhChenhLechDoiSanPham();
         }
 
         NhanVien nhanVien = UserSession.getInstance().getUser();
@@ -369,9 +448,24 @@ public class GUI_ChiTietDoiTraController {
         pdt.setHoaDon(hd);
         pdt.setNhanVien(nhanVien);
         pdt.setNgayDoiTra(new java.util.Date());
-        pdt.setLyDo(boSungThongTinThuocDoi(buildLyDoLuu(lyDo)));
+        pdt.setLyDo(lyDo);
         pdt.setHinhThucXuLy(cbHinhThucXuLy.getValue());
-        pdt.setPhiPhat(phiPhat);
+
+        // [2] Tính phiPhat và ketQuaDoiSanPham
+        if (cbHinhThucXuLy.getValue() == HinhThucDoiTra.DOI_SAN_PHAM) {
+            double chenhLech = tinhChenhLechDoiSanPham();
+            pdt.setPhiPhat(Math.abs(chenhLech));
+            pdt.setKetQuaDoiSanPham(chenhLech > 0 ? "BU_TIEN" : chenhLech < 0 ? "HOAN_TIEN" : "KHONG_CHENH_LECH");
+        } else {
+            if ("Khách hàng muốn hoàn".equals(lyDo)) {
+                 double tongTienHoan = 0;
+                 for (ChiTietDoiTraTam t : dsTam) tongTienHoan += t.thanhTienHoan; // Sử dụng thanhTienHoan
+                 pdt.setPhiPhat(tongTienHoan * 0.3);
+            } else {
+                 pdt.setPhiPhat(0);
+            }
+            pdt.setKetQuaDoiSanPham(null);
+        }
 
         List<ChiTietDoiTra> chiTiet = new ArrayList<>();
         for (ChiTietDoiTraTam item : dsTam) {
@@ -380,7 +474,7 @@ public class GUI_ChiTietDoiTraController {
             ct.setMaQuyDoi(item.maQuyDoi);
             ct.setMaLoThuoc(item.maLoThuoc);
             ct.setSoLuong(item.soLuongTra);
-            ct.setTinhTrang("KHACH_TRA");
+            ct.setTinhTrang(item.tinhTrang);
             chiTiet.add(ct);
         }
 
@@ -392,13 +486,19 @@ public class GUI_ChiTietDoiTraController {
             return;
         }
 
-        boolean ok = daoPhieuDoiTra.lapPhieuDoiTra(pdt, chiTiet);
+        // Truyền dsThuocDoi vào DAO
+        List<DoiTraSession.DonViDoiData> dsThuocDoiParam =
+                cbHinhThucXuLy.getValue() == HinhThucDoiTra.DOI_SAN_PHAM
+                        ? new ArrayList<>(dsThuocNhan)
+                        : null;
+
+        boolean ok = daoPhieuDoiTra.lapPhieuDoiTra(pdt, chiTiet, dsThuocDoiParam);
         if (ok) {
             showAlert(Alert.AlertType.INFORMATION, "Lập phiếu đổi trả thành công. Mã phiếu: " + pdt.getMaPhieuDoiTra());
             DoiTraSession.clear();
             SceneUtils.switchPage("/gui/main/GUI_XuLyDoiTra.fxml");
         } else {
-            showAlert(Alert.AlertType.ERROR, "Lập phiếu đổi trả thất bại.");
+            showAlert(Alert.AlertType.ERROR, "Lập phiếu đổi trả thất bại. Có thể tồn kho thuốc đổi không đủ.");
         }
     }
 
@@ -472,7 +572,8 @@ public class GUI_ChiTietDoiTraController {
                     donVi.getMaQuyDoi(),
                     donVi.getTenDonVi(),
                     controller.getSoLuongChon(),
-                    controller.getDonGiaChon());
+                    controller.getDonGiaChon(),
+                    thuoc.getTenThuoc());
         } catch (Exception e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Không thể chọn đơn vị thuốc đổi.");
@@ -533,23 +634,35 @@ public class GUI_ChiTietDoiTraController {
         }
     }
 
+    // [7] capNhatTong với 2 label thay vì txtPhiPhat
     private void capNhatTong() {
         lblTongDong.setText(String.valueOf(dsTam.size()));
-        double tong = tinhTongGiaTriHienThi();
+        double tongTra = tinhTongGiaTriThuocTra();
+
         if (cbHinhThucXuLy.getValue() == HinhThucDoiTra.DOI_SAN_PHAM) {
-            if (DoiTraSession.getThuocDoiDaChon() == null) {
-                txtPhiPhat.setText("0");
-                lblTongTienHoan.setText("Chưa chọn thuốc đổi");
+            if (dsThuocNhan.isEmpty()) {
+                lblTongTienHoan.setText("Chưa chọn thuốc nhận");
+                lblTongTienHoan.setStyle("-fx-text-fill:#64748b; -fx-font-size:18px; -fx-font-weight:bold;");
             } else {
                 double chenhLech = tinhChenhLechDoiSanPham();
-                txtPhiPhat.setText(String.format("%.0f", chenhLech));
-                lblTongTienHoan.setText(formatKetQuaDoiSanPham(chenhLech));
+                if (chenhLech > 0) {
+                    lblTongTienHoan.setText("Khách cần bù: " + String.format("%,.0f VND", chenhLech));
+                    lblTongTienHoan.setStyle("-fx-text-fill:#e65100; -fx-font-size:18px; -fx-font-weight:bold;");
+                } else if (chenhLech < 0) {
+                    lblTongTienHoan.setText("Nhà thuốc hoàn: " + String.format("%,.0f VND", Math.abs(chenhLech)));
+                    lblTongTienHoan.setStyle("-fx-text-fill:#2e7d32; -fx-font-size:18px; -fx-font-weight:bold;");
+                } else {
+                    lblTongTienHoan.setText("Không chênh lệch(0 VND)");
+                    lblTongTienHoan.setStyle("-fx-text-fill:#16a34a; -fx-font-size:18px; -fx-font-weight:bold;");
+                }
             }
             return;
         }
 
-        txtPhiPhat.setText("0");
-        lblTongTienHoan.setText(String.format("%,.0f VND", tong));
+        // HOAN_TIEN
+        double tong = tinhTongGiaTriHienThi();
+        lblTongTienHoan.setText("Nhà thuốc hoàn: " + String.format("%,.0f VND", tong));
+        lblTongTienHoan.setStyle("-fx-text-fill:#16a34a; -fx-font-size:18px; -fx-font-weight:bold;");
     }
 
     private double tinhTongGiaTriThuocTra() {
@@ -581,138 +694,15 @@ public class GUI_ChiTietDoiTraController {
     }
 
     private double tinhGiaTriThuocDoi() {
-        if (DoiTraSession.getDonViDoiDaChon() != null) {
-            return DoiTraSession.getDonViDoiDaChon().getThanhTien();
-        }
-        if (DoiTraSession.getThuocDoiDaChon() == null) {
-            return 0;
-        }
-        return 0;
+        return dsThuocNhan.stream().mapToDouble(DoiTraSession.DonViDoiData::getThanhTien).sum();
     }
 
     private double tinhChenhLechDoiSanPham() {
         return tinhGiaTriThuocDoi() - tinhTongGiaTriThuocTra();
     }
 
-    private String formatKetQuaDoiSanPham(double chenhLech) {
-        if (chenhLech > 0) {
-            return "Bù: " + String.format("%,.0f VND", chenhLech);
-        }
-        if (chenhLech < 0) {
-            return "Hoàn: " + String.format("%,.0f VND", Math.abs(chenhLech));
-        }
-        return "Không";
-    }
-
     private String formatDate(Date date) {
         return date != null ? date.toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "--";
-    }
-
-    private String buildLyDoLuu(String lyDoGoc) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Ly do: ").append(lyDoGoc);
-
-        String thongTinThuocTra = buildThongTinThuocTra();
-        if (!thongTinThuocTra.isBlank()) {
-            builder.append(" | Thuoc tra: ").append(thongTinThuocTra);
-        }
-
-        if (cbHinhThucXuLy.getValue() != HinhThucDoiTra.DOI_SAN_PHAM || DoiTraSession.getThuocDoiDaChon() == null) {
-            return builder.toString();
-        }
-
-        builder.append(" | Thuoc doi: ")
-                .append(DoiTraSession.getThuocDoiDaChon().getTenThuoc())
-                .append(" (")
-                .append(DoiTraSession.getThuocDoiDaChon().getMaThuoc())
-                .append(")");
-
-        builder.append(" | Ket qua doi: ").append(xacDinhKetQuaDoiSanPham());
-        return builder.toString();
-    }
-
-    private String xacDinhKetQuaDoiSanPham() {
-        double chenhLech = tinhChenhLechDoiSanPham();
-        if (chenhLech > 0) {
-            return "BU_TIEN";
-        }
-        if (chenhLech < 0) {
-            return "HOAN_TIEN";
-        }
-        return "KHONG_CHENH_LECH";
-    }
-
-    private String buildThongTinThuocTra() {
-        if (dsTam.isEmpty()) {
-            return "";
-        }
-
-        List<String> thongTin = new ArrayList<>();
-        for (ChiTietDoiTraTam item : dsTam) {
-            thongTin.add(item.tenThuoc + " x" + item.soLuongTra + " " + item.tenDonVi);
-        }
-        return String.join(", ", thongTin);
-    }
-
-    private String buildThongTinThuocDoiHienThi(double giaTriThuocDoi) {
-        if (DoiTraSession.getThuocDoiDaChon() == null) {
-            return "Chua chon thuoc doi";
-        }
-
-        StringBuilder thongTin = new StringBuilder();
-        thongTin.append(DoiTraSession.getThuocDoiDaChon().getTenThuoc())
-                .append(" (")
-                .append(DoiTraSession.getThuocDoiDaChon().getMaThuoc())
-                .append(")");
-
-        if (DoiTraSession.getDonViDoiDaChon() != null) {
-            thongTin.append(" - ")
-                    .append(DoiTraSession.getDonViDoiDaChon().getSoLuong())
-                    .append(" ")
-                    .append(DoiTraSession.getDonViDoiDaChon().getTenDonVi());
-        }
-
-        thongTin.append(" - ").append(String.format("%,.0f VND", giaTriThuocDoi));
-        return thongTin.toString();
-    }
-
-    private String buildThongTinThuocDoiLuu() {
-        if (DoiTraSession.getThuocDoiDaChon() == null) {
-            return "";
-        }
-
-        StringBuilder thongTin = new StringBuilder();
-        thongTin.append(DoiTraSession.getThuocDoiDaChon().getTenThuoc())
-                .append(" (")
-                .append(DoiTraSession.getThuocDoiDaChon().getMaThuoc())
-                .append(")");
-
-        if (DoiTraSession.getDonViDoiDaChon() != null) {
-            thongTin.append(" x")
-                    .append(DoiTraSession.getDonViDoiDaChon().getSoLuong())
-                    .append(" ")
-                    .append(DoiTraSession.getDonViDoiDaChon().getTenDonVi())
-                    .append(" @ ")
-                    .append(String.format("%,.0f VND", DoiTraSession.getDonViDoiDaChon().getDonGia()))
-                    .append("/don vi");
-        }
-
-        return thongTin.toString();
-    }
-
-    private String boSungThongTinThuocDoi(String lyDoDaLuu) {
-        if (cbHinhThucXuLy.getValue() != HinhThucDoiTra.DOI_SAN_PHAM || DoiTraSession.getDonViDoiDaChon() == null) {
-            return lyDoDaLuu;
-        }
-
-        String thongTinDayDu = buildThongTinThuocDoiLuu();
-        if (thongTinDayDu.isEmpty() || lyDoDaLuu == null || lyDoDaLuu.contains(thongTinDayDu)) {
-            return lyDoDaLuu;
-        }
-
-        String tenThuocCu = DoiTraSession.getThuocDoiDaChon().getTenThuoc() +
-                " (" + DoiTraSession.getThuocDoiDaChon().getMaThuoc() + ")";
-        return lyDoDaLuu.replace(tenThuocCu, thongTinDayDu);
     }
 
     private void showAlert(Alert.AlertType type, String message) {
@@ -728,14 +718,16 @@ public class GUI_ChiTietDoiTraController {
         private final String tenDonVi;
         private int soLuongTra;
         private double thanhTienHoan;
+        private final String tinhTrang;
 
-        public ChiTietDoiTraTam(ChiTietDoiTraView source, int soLuongTra) {
+        public ChiTietDoiTraTam(ChiTietDoiTraView source, int soLuongTra, String tinhTrang) {
             this.maQuyDoi = source.getMaQuyDoi();
             this.maLoThuoc = source.getMaLoThuoc();
             this.tenThuoc = source.getTenThuoc();
             this.tenDonVi = source.getTenDonVi();
             this.soLuongTra = soLuongTra;
             this.thanhTienHoan = source.getDonGia() * soLuongTra;
+            this.tinhTrang = tinhTrang;
         }
 
         public ChiTietDoiTraTam(DoiTraSession.ChiTietDoiTraTamData data) {
@@ -745,11 +737,12 @@ public class GUI_ChiTietDoiTraController {
             this.tenDonVi = data.getTenDonVi();
             this.soLuongTra = data.getSoLuongTra();
             this.thanhTienHoan = data.getThanhTienHoan();
+            this.tinhTrang = data.getTinhTrang();
         }
 
         public DoiTraSession.ChiTietDoiTraTamData toSessionData() {
             return new DoiTraSession.ChiTietDoiTraTamData(
-                    maQuyDoi, maLoThuoc, tenThuoc, tenDonVi, soLuongTra, thanhTienHoan);
+                    maQuyDoi, maLoThuoc, tenThuoc, tenDonVi, soLuongTra, thanhTienHoan, tinhTrang);
         }
 
         public void addSoLuong(int soLuongThem, double donGia) {

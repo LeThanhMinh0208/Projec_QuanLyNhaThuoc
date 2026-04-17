@@ -142,7 +142,26 @@ public class GUI_XuLyDoiTraController {
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : actions);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    HoaDonView hd = getTableView().getItems().get(getIndex());
+                    long millisPerDay = 86_400_000L;
+                    long soNgay = -1;
+                    if (hd.getNgayLap() != null) {
+                        soNgay = java.time.temporal.ChronoUnit.DAYS.between(hd.getNgayLap().toLocalDateTime().toLocalDate(), java.time.LocalDate.now());
+                    }
+                    if (soNgay > 30) {
+                        btnXuLy.setDisable(true);
+                        btnXuLy.setStyle("-fx-background-color:#94a3b8;-fx-text-fill:white;-fx-font-size:12px;-fx-padding:4 10;");
+                        btnXuLy.setText("Quá 30 ngày");
+                    } else {
+                        btnXuLy.setDisable(false);
+                        btnXuLy.setStyle("-fx-background-color:#16a34a;-fx-text-fill:white;-fx-font-size:12px;-fx-padding:4 10;-fx-cursor:hand;");
+                        btnXuLy.setText("Xử lý đổi trả");
+                    }
+                    setGraphic(actions);
+                }
             }
         });
 

@@ -5,6 +5,7 @@ import entity.ChiTietDoiTra;
 import entity.ChiTietDoiTraView;
 import entity.PhieuDoiTra;
 import entity.PhieuDoiTraView;
+import utils.DoiTraSession;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -76,6 +77,7 @@ public class DAO_PhieuDoiTra {
         List<PhieuDoiTraView> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT pdt.maPhieuDoiTra, pdt.ngayDoiTra, pdt.maHoaDon, pdt.hinhThucXuLy, pdt.phiPhat, pdt.lyDo, " +
+                "       pdt.ketQuaDoiSanPham, pdt.danhSachThuocDoi, " +
                 "       kh.hoTen AS tenKhachHang, nv.hoTen AS tenNhanVien " +
                 "FROM PhieuDoiTra pdt " +
                 "JOIN HoaDon hd ON hd.maHoaDon = pdt.maHoaDon " +
@@ -110,6 +112,8 @@ public class DAO_PhieuDoiTra {
                 item.setHinhThucXuLy(rs.getString("hinhThucXuLy"));
                 item.setPhiPhat(rs.getDouble("phiPhat"));
                 item.setLyDo(rs.getString("lyDo"));
+                item.setKetQuaDoiSanPham(rs.getString("ketQuaDoiSanPham"));
+                item.setDanhSachThuocDoi(rs.getString("danhSachThuocDoi"));
                 list.add(item);
             }
         } catch (SQLException e) {
@@ -153,7 +157,7 @@ public class DAO_PhieuDoiTra {
         return list;
     }
 
-    public boolean lapPhieuDoiTra(PhieuDoiTra pdt, List<ChiTietDoiTra> dsChiTiet) {
+    public boolean lapPhieuDoiTra(PhieuDoiTra pdt, List<ChiTietDoiTra> dsChiTiet, List<DoiTraSession.DonViDoiData> dsThuocDoi) {
         if (pdt == null || pdt.getHoaDon() == null || pdt.getNhanVien() == null || dsChiTiet == null || dsChiTiet.isEmpty()) {
             return false;
         }
@@ -168,21 +172,54 @@ public class DAO_PhieuDoiTra {
             con = ConnectDB.getConnection();
             con.setAutoCommit(false);
 
+            // Serialize dsThuocDoi to JSON-like string
+            String danhSachThuocDoiJson = null;
+            if (dsThuocDoi != null && !dsThuocDoi.isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+                for (DoiTraSession.DonViDoiData td : dsThuocDoi) {
+                    if (sb.length() > 0) sb.append(";");
+                    sb.append(td.getMaQuyDoi()).append("|")
+                      .append(td.getTenThuoc()).append("|")
+                      .append(td.getTenDonVi()).append("|")
+                      .append(td.getSoLuong()).append("|")
+                      .append(td.getDonGia());
+                }
+                danhSachThuocDoiJson = sb.toString();
+            }
+            pdt.setDanhSachThuocDoi(danhSachThuocDoiJson);
+
+            // --- INSERT PhieuDoiTra (với retry cho race condition mã phiếu) ---
             String sqlPhieu =
-                    "INSERT INTO PhieuDoiTra(maPhieuDoiTra, maHoaDon, maNhanVien, ngayDoiTra, lyDo, hinhThucXuLy, phiPhat) VALUES(?,?,?,?,?,?,?)";
-            try (PreparedStatement pst = con.prepareStatement(sqlPhieu)) {
-                pst.setString(1, pdt.getMaPhieuDoiTra());
-                pst.setString(2, pdt.getHoaDon().getMaHoaDon());
-                pst.setString(3, pdt.getNhanVien().getMaNhanVien());
-                pst.setTimestamp(4, new java.sql.Timestamp(pdt.getNgayDoiTra().getTime()));
-                pst.setString(5, pdt.getLyDo());
-                pst.setString(6, pdt.getHinhThucXuLy().name());
-                pst.setDouble(7, pdt.getPhiPhat());
-                pst.executeUpdate();
+                    "INSERT INTO PhieuDoiTra(maPhieuDoiTra, maHoaDon, maNhanVien, ngayDoiTra, lyDo, hinhThucXuLy, phiPhat, ketQuaDoiSanPham, danhSachThuocDoi) VALUES(?,?,?,?,?,?,?,?,?)";
+            int retry = 0;
+            while (retry < 3) {
+                try (PreparedStatement pst = con.prepareStatement(sqlPhieu)) {
+                    pst.setString(1, pdt.getMaPhieuDoiTra());
+                    pst.setString(2, pdt.getHoaDon().getMaHoaDon());
+                    pst.setString(3, pdt.getNhanVien().getMaNhanVien());
+                    pst.setTimestamp(4, new java.sql.Timestamp(pdt.getNgayDoiTra().getTime()));
+                    pst.setString(5, pdt.getLyDo());
+                    pst.setString(6, pdt.getHinhThucXuLy().name());
+                    pst.setDouble(7, pdt.getPhiPhat());
+                    pst.setString(8, pdt.getKetQuaDoiSanPham());
+                    pst.setString(9, pdt.getDanhSachThuocDoi());
+                    pst.executeUpdate();
+                    break;
+                } catch (SQLException e) {
+                    if ((e.getErrorCode() == 2627 || e.getErrorCode() == 2601) && retry < 2) {
+                        pdt.setMaPhieuDoiTra(generateMaPhieuDoiTra());
+                        retry++;
+                    } else {
+                        con.rollback();
+                        con.setAutoCommit(true);
+                        return false;
+                    }
+                }
             }
 
+            // --- INSERT ChiTietDoiTra + cộng tồn thuốc trả ---
             String sqlChiTiet = "INSERT INTO ChiTietDoiTra(maPhieuDoiTra, maQuyDoi, maLoThuoc, soLuong, tinhTrang) VALUES(?,?,?,?,?)";
-            String sqlUpdateLo = "UPDATE LoThuoc SET soLuongTon = soLuongTon + ? WHERE maLoThuoc = ?";
+            String sqlCongTon = "UPDATE LoThuoc SET soLuongTon = soLuongTon + ? WHERE maLoThuoc = ?";
 
             for (ChiTietDoiTra ct : chiTietHopLe) {
                 int soLuongConLai = getSoLuongConLaiCoTheDoi(con, pdt.getHoaDon().getMaHoaDon(), ct.getMaQuyDoi(), ct.getMaLoThuoc());
@@ -202,10 +239,68 @@ public class DAO_PhieuDoiTra {
                 }
 
                 int tyLeQuyDoi = getTyLeQuyDoi(con, ct.getMaQuyDoi());
-                try (PreparedStatement pst = con.prepareStatement(sqlUpdateLo)) {
+                try (PreparedStatement pst = con.prepareStatement(sqlCongTon)) {
                     pst.setInt(1, ct.getSoLuong() * tyLeQuyDoi);
                     pst.setString(2, ct.getMaLoThuoc());
                     pst.executeUpdate();
+                }
+            }
+
+            // --- Trừ tồn kho thuốc đổi cho khách (DOI_SAN_PHAM - Hỗ trợ trừ nhiều lô FEFO) ---
+            if (dsThuocDoi != null && !dsThuocDoi.isEmpty()) {
+                for (DoiTraSession.DonViDoiData thuocDoi : dsThuocDoi) {
+                    int tyLe = getTyLeQuyDoi(con, thuocDoi.getMaQuyDoi());
+                    int soLuongPhaiTruCoBan = thuocDoi.getSoLuong() * tyLe;
+
+                    String maThuoc = getMaThuocByMaQuyDoi(con, thuocDoi.getMaQuyDoi());
+                    if (maThuoc == null) {
+                        con.rollback();
+                        con.setAutoCommit(true);
+                        return false;
+                    }
+
+                    // Lấy tất cả lô FEFO có thể bán lưu vào một list riêng biệt trước
+                    String sqlLayLo = "SELECT maLoThuoc, soLuongTon FROM LoThuoc " +
+                                     "WHERE maThuoc = ? AND viTriKho = 'KHO_BAN_HANG' " +
+                                     "AND soLuongTon > 0 AND trangThai = 1 " +
+                                     "AND hanSuDung >= CAST(GETDATE() AS DATE) " +
+                                     "ORDER BY hanSuDung ASC";
+                    
+                    List<String> listMaLo = new ArrayList<>();
+                    List<Integer> listTonLo = new ArrayList<>();
+                    
+                    try (PreparedStatement pstLo = con.prepareStatement(sqlLayLo)) {
+                        pstLo.setString(1, maThuoc);
+                        try (ResultSet rsLo = pstLo.executeQuery()) {
+                            while (rsLo.next()) {
+                                listMaLo.add(rsLo.getString("maLoThuoc"));
+                                listTonLo.add(rsLo.getInt("soLuongTon"));
+                            }
+                        }
+                    }
+
+                    int soLuongDaTru = 0;
+                    for (int i = 0; i < listMaLo.size() && soLuongDaTru < soLuongPhaiTruCoBan; i++) {
+                        String maLo = listMaLo.get(i);
+                        int tonLo = listTonLo.get(i);
+                        int canTru = Math.min(tonLo, soLuongPhaiTruCoBan - soLuongDaTru);
+                        
+                        // Trừ tồn kho tại lô này
+                        String sqlTruTon = "UPDATE LoThuoc SET soLuongTon = soLuongTon - ? WHERE maLoThuoc = ?";
+                        try (PreparedStatement pstTru = con.prepareStatement(sqlTruTon)) {
+                            pstTru.setInt(1, canTru);
+                            pstTru.setString(2, maLo);
+                            pstTru.executeUpdate();
+                        }
+                        soLuongDaTru += canTru;
+                    }
+
+                    // Nếu sau khi quét hết các lô mà vẫn chưa trừ đủ số lượng -> rollback
+                    if (soLuongDaTru < soLuongPhaiTruCoBan) {
+                        con.rollback();
+                        con.setAutoCommit(true);
+                        return false;
+                    }
                 }
             }
 
@@ -224,6 +319,51 @@ public class DAO_PhieuDoiTra {
             e.printStackTrace();
             return false;
         }
+    }
+
+    // Overload giữ tương thích cũ (Dialog chỉ dùng HOAN_TIEN, không truyền dsThuocDoi)
+    public boolean lapPhieuDoiTra(PhieuDoiTra pdt, List<ChiTietDoiTra> dsChiTiet) {
+        return lapPhieuDoiTra(pdt, dsChiTiet, null);
+    }
+
+    private String getMaThuocByMaQuyDoi(Connection con, String maQuyDoi) throws SQLException {
+        String sql = "SELECT maThuoc FROM DonViQuyDoi WHERE maQuyDoi = ?";
+        try (PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, maQuyDoi);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                return rs.getString("maThuoc");
+            }
+        }
+        return null;
+    }
+
+    private String getLoFEFO(Connection con, String maThuoc) throws SQLException {
+        String sql = "SELECT TOP 1 maLoThuoc FROM LoThuoc " +
+                     "WHERE maThuoc = ? AND viTriKho = 'KHO_BAN_HANG' " +
+                     "AND soLuongTon > 0 AND trangThai = 1 " +
+                     "AND hanSuDung >= CAST(GETDATE() AS DATE) " +
+                     "ORDER BY hanSuDung ASC";
+        try (PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, maThuoc);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                return rs.getString("maLoThuoc");
+            }
+        }
+        return null;
+    }
+
+    private int getSoLuongTon(Connection con, String maLoThuoc) throws SQLException {
+        String sql = "SELECT soLuongTon FROM LoThuoc WHERE maLoThuoc = ?";
+        try (PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, maLoThuoc);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("soLuongTon");
+            }
+        }
+        return 0;
     }
 
     private int getSoLuongConLaiCoTheDoi(Connection con, String maHoaDon, String maQuyDoi, String maLoThuoc) throws SQLException {

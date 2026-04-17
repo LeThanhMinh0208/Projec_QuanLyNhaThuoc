@@ -243,6 +243,8 @@ CREATE TABLE PhieuDoiTra (
     lyDo NVARCHAR(255),
     hinhThucXuLy VARCHAR(20) NOT NULL,
     phiPhat DECIMAL(18,2) DEFAULT 0,
+    ketQuaDoiSanPham NVARCHAR(50) NULL,
+    danhSachThuocDoi NVARCHAR(MAX) NULL,
 
     FOREIGN KEY (maHoaDon) REFERENCES HoaDon(maHoaDon),
     FOREIGN KEY (maNhanVien) REFERENCES NhanVien(maNhanVien),
@@ -669,9 +671,9 @@ SET loaiBan = 'BAN_THEO_DON'
 WHERE maHoaDon IN (SELECT maHoaDon FROM DonThuoc);
 GO
 
-INSERT INTO PhieuDoiTra (maPhieuDoiTra, maHoaDon, maNhanVien, ngayDoiTra, lyDo, hinhThucXuLy, phiPhat) VALUES
-('PDT0001', 'HD0001', 'NV001', '2026-03-09', N'Khách bị dị ứng', 'HOAN_TIEN', 0),
-('PDT0002', 'HD0006', 'NV001', '2026-03-09', N'Khách bị dị ứng', 'DOI_SAN_PHAM', 0);
+INSERT INTO PhieuDoiTra (maPhieuDoiTra, maHoaDon, maNhanVien, ngayDoiTra, lyDo, hinhThucXuLy, phiPhat, ketQuaDoiSanPham) VALUES
+('PDT0001', 'HD0001', 'NV001', '2026-03-09', N'Khách bị dị ứng', 'HOAN_TIEN', 0, NULL),
+('PDT0002', 'HD0006', 'NV001', '2026-03-09', N'Khách bị dị ứng', 'DOI_SAN_PHAM', 0, NULL);
 GO
 
 INSERT INTO ChiTietDoiTra (maPhieuDoiTra, maQuyDoi, maLoThuoc, soLuong, tinhTrang) VALUES
