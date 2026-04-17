@@ -291,4 +291,32 @@ public class DAO_HoaDon {
         }
         return list;
     }
+    /**
+     * Lấy dữ liệu chi tiết hóa đơn chuyên dụng cho tính năng Tái Lập Đơn Thuốc
+     */
+    public List<Object[]> getChiTietRebuildCart(String maHoaDon) {
+        List<Object[]> list = new java.util.ArrayList<>();
+        String sql = "SELECT dv.maThuoc, ct.maQuyDoi, ct.soLuong, ct.donGia, ct.maBangGia, dv.tenDonVi " +
+                     "FROM ChiTietHoaDon ct " +
+                     "JOIN DonViQuyDoi dv ON ct.maQuyDoi = dv.maQuyDoi " +
+                     "WHERE ct.maHoaDon = ?";
+        try (Connection con = ConnectDB.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, maHoaDon);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                list.add(new Object[]{
+                    rs.getString("maThuoc"),
+                    rs.getString("maQuyDoi"),
+                    rs.getInt("soLuong"),
+                    rs.getDouble("donGia"),
+                    rs.getString("maBangGia"),
+                    rs.getString("tenDonVi")
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
