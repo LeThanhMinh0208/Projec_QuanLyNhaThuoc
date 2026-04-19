@@ -936,13 +936,20 @@ public class GUI_QuanLyBanHangController {
     }
 
     @FXML void onDatLaiDonThuoc(ActionEvent event) {
-        Alert confirm = new Alert(AlertType.CONFIRMATION, "Xóa thông tin đơn thuốc? Giỏ hàng vẫn giữ.", ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Xác nhận");
-        confirm.showAndWait();
-        if (confirm.getResult() == ButtonType.YES) {
-            donThuocTemp = null;
-            resetCardDonThuoc();
+        if (cartDataDon != null && !cartDataDon.isEmpty()) {
+            Alert confirm = new Alert(AlertType.CONFIRMATION, 
+                "Đặt lại thông tin đơn thuốc sẽ xóa toàn bộ thuốc trong giỏ hàng. Bạn có đồng ý không?", 
+                ButtonType.YES, ButtonType.NO);
+            confirm.setTitle("Xác nhận");
+            if (confirm.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
+                return;
+            }
+            cartDataDon.clear();
+            tinhTongTienDon();
         }
+
+        donThuocTemp = null;
+        resetCardDonThuoc();
     }
 
     /** Cập nhật card đơn thuốc sau khi thêm/sửa */
@@ -1003,9 +1010,9 @@ public class GUI_QuanLyBanHangController {
         tblGioHangDon.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         
         colCartDonXoa.setCellFactory(param -> new TableCell<>() {
-            private final Button btnXoa = new Button("🗑");
+            private final Button btnXoa = new Button("✕");
             {
-                btnXoa.setStyle("-fx-text-fill: red; -fx-background-color: transparent; -fx-cursor: hand;");
+                btnXoa.getStyleClass().add("bh-btn-remove");
                 btnXoa.setOnAction(event -> {
                     CartItem item = getTableView().getItems().get(getIndex());
                     cartDataDon.remove(item);
@@ -1038,6 +1045,11 @@ public class GUI_QuanLyBanHangController {
 
     // Thanh toán theo đơn — INSERT DonThuoc nếu donThuocTemp != null
     @FXML void handleThanhToanDon(ActionEvent event) {
+        if (donThuocTemp == null) {
+            showAlert(AlertType.ERROR, "Lỗi", "Chưa có thông tin đơn thuốc. Vui lòng nhập thông tin đơn trước khi thanh toán.");
+            return;
+        }
+
         if (cartDataDon.isEmpty()) {
             showAlert(AlertType.WARNING, "Cảnh báo", "Giỏ hàng theo đơn hiện đang rỗng!");
             return;

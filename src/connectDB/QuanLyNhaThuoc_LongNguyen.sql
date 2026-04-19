@@ -835,9 +835,10 @@ SET loaiBan = 'BAN_THEO_DON'
 WHERE maHoaDon IN (SELECT maHoaDon FROM DonThuoc);
 GO
 
-INSERT INTO PhieuDoiTra (maPhieuDoiTra, maHoaDon, maNhanVien, ngayDoiTra, lyDo, hinhThucXuLy, phiPhat, ketQuaDoiSanPham) VALUES
-('PDT0001', 'HD0001', 'NV001', '2026-03-09 15:50:40.400', N'Khách bị dị ứng', 'HOAN_TIEN', 0, NULL),
-('PDT0002', 'HD0006', 'NV001', '2026-03-09 18:30:50.550', N'Khách bị dị ứng', 'DOI_SAN_PHAM', 0, NULL);
+-- Cập nhật phiếu đổi trả mẫu đầy đủ thông tin (9 cột) cho PDT0001 và PDT0002
+INSERT INTO PhieuDoiTra (maPhieuDoiTra, maHoaDon, maNhanVien, ngayDoiTra, lyDo, hinhThucXuLy, phiPhat, ketQuaDoiSanPham, danhSachThuocDoi) VALUES
+('PDT0001', 'HD0001', 'NV001', '2026-03-09 15:50:40.400', N'Khách bị dị ứng', 'HOAN_TIEN', 0, NULL, NULL),
+('PDT0002', 'HD0006', 'NV001', '2026-03-09 18:30:50.550', N'Khách bị dị ứng', 'DOI_SAN_PHAM', 0, N'KHONG_CHENH_LECH', N'QD01435|Rabidoc LS 75mg/20mg Capsule|Viên|1|8964.0');
 GO
 
 INSERT INTO ChiTietDoiTra (maPhieuDoiTra, maQuyDoi, maLoThuoc, soLuong, tinhTrang) VALUES
