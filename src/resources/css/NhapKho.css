@@ -157,12 +157,28 @@
     -fx-background-insets: 0;
 }
 
-.nk-table .table-row-cell:selected .table-cell,
-.nk-table .table-row-cell:selected .label,
-.nk-table .table-row-cell:selected .text {
+/* 1. Chỉ đổi màu chữ thuần trong bảng thành trắng */
+.nk-table .table-row-cell:selected .table-cell {
     -fx-text-fill: white !important;
-    -fx-fill: white !important;
     -fx-font-weight: bold !important;
+}
+
+/* 2. FIX: Giữ nguyên màu chữ đen cho các ô nhập liệu (TextField) để không bị tàng hình */
+.nk-table .table-row-cell:selected .text-input {
+    -fx-text-fill: #0f172a !important;
+    -fx-font-weight: bold !important;
+}
+
+/* 3. FIX: Bảo vệ cuốn lịch không bị ám màu trắng lây từ dòng selected */
+.date-picker-popup .label, 
+.date-picker-popup .text {
+    -fx-text-fill: #334155 !important;
+    -fx-fill: #334155 !important;
+}
+
+/* Trả lại màu trắng cho đúng cái ngày đang được tick chọn trong lịch */
+.date-picker-popup .day-cell:selected .text {
+    -fx-fill: white !important;
 }
 
 /* Thanh cuộn (Scrollbar) */

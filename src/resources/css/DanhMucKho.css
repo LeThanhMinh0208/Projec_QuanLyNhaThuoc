@@ -10,23 +10,45 @@
     -fx-text-fill: #1b84c4; /* Màu xanh đậm */
 }
 
-/* --- 3 NÚT CHỨC NĂNG TO BẢN --- */
-.btn-action {
-    -fx-text-fill: white;
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
-    -fx-padding: 15px 0;
-    -fx-background-radius: 12px;
+/* ========================================
+   CARDS 3 NÚT CHỨC NĂNG (STYLE TỪ TRANG CHỦ)
+   ======================================== */
+.top-card {
+    -fx-background-radius: 35px; /* 💡 Tăng từ 12px lên 35px để bo tròn sâu như viên thuốc */
     -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.15), 10, 0, 0, 4);
+    -fx-transition: all 0.3s ease;
+    -fx-alignment: center; /* Ép mọi thứ vào giữa thẻ */
 }
-.btn-nhap { -fx-background-color: #21c37d; } /* Màu xanh lá nhạt */
-.btn-nhap:hover { -fx-background-color: #1ba066; }
 
-.btn-xuat { -fx-background-color: #2fb9f6; } /* Màu xanh lơ */
-.btn-xuat:hover { -fx-background-color: #259ed4; }
+/* Hiệu ứng nảy lên khi lia chuột */
+.top-card:hover {
+    -fx-translate-y: -3px; 
+}
 
-.btn-kiemke { -fx-background-color: #fbb028; } /* Màu vàng cam */
-.btn-kiemke:hover { -fx-background-color: #df9b22; }
+/* NÚT NHẬP KHO - Xanh Lá */
+.card-green { 
+    -fx-background-color: linear-gradient(to bottom right, #10b981, #34d399); 
+}
+.card-green:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.6), 20, 0, 0, 8);
+}
+
+/* NÚT XUẤT KHO - Xanh Dương */
+.card-blue { 
+    -fx-background-color: linear-gradient(to bottom right, #0ea5e9, #38bdf8); 
+}
+.card-blue:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.6), 20, 0, 0, 8);
+}
+
+/* NÚT KIỂM KÊ - Cam Vàng */
+.card-orange { 
+    -fx-background-color: linear-gradient(to bottom right, #f59e0b, #fbbf24); 
+}
+.card-orange:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(245, 158, 11, 0.6), 20, 0, 0, 8);
+}
 
 /* --- BỘ LỌC VÀ TÌM KIẾM --- */
 .dmk-combo {

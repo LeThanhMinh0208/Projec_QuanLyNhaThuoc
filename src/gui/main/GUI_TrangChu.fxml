@@ -14,6 +14,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane fx:id="mainBorderPane" prefHeight="900.0" prefWidth="1500.0" stylesheets="@../../resources/css/TrangChu.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.GUI_TrangChuController">
@@ -63,7 +64,6 @@
                         <content>
                            <VBox styleClass="dropdown-content">
                               <Button onAction="#handleMoQuanLyDonThuoc" styleClass="sub-btn" text="Danh Mục Đơn Thuốc" />
-                              <Button styleClass="sub-btn" text="Tái Lập Đơn Thuốc" />
                            </VBox>
                         </content>
                      </TitledPane>
@@ -109,8 +109,6 @@
                            <VBox styleClass="dropdown-content">
                               <Button onAction="#handleMoQuanLyDanhMucNhaCungCap" styleClass="sub-btn" text="Danh Mục Nhà Cung Cấp" />
                               <Button onAction="#handleMoQuanLyCongNo" styleClass="sub-btn" text="Quản Lý Công Nợ" />
-                              <Button styleClass="sub-btn" text="Nhật Ký Nhập Hàng" />
-                              <Button styleClass="sub-btn" text="Quản Lý Đổi Trả Hàng" />
                            </VBox>
                         </content>
                      </TitledPane>
@@ -158,23 +156,28 @@
                <children>
                   <Label maxWidth="Infinity" alignment="CENTER" styleClass="main-title" text="HỆ THỐNG QUẢN LÝ NHÀ THUỐC LONG NGUYÊN" />
 
-                  <HBox spacing="25.0">
+<HBox spacing="30.0" alignment="CENTER">
                      <children>
-                        <AnchorPane prefHeight="80.0" prefWidth="380.0" styleClass="top-card, card-blue" HBox.hgrow="ALWAYS" onMouseClicked="#handleMoBanThuoc">
+                        <HBox alignment="CENTER" spacing="15.0" prefHeight="75.0" prefWidth="200.0" styleClass="top-card, card-blue" HBox.hgrow="ALWAYS" onMouseClicked="#handleMoBanThuoc">
                            <children>
-                              <Label layoutX="20.0" layoutY="25.0" styleClass="card-title" text="BÁN THUỐC" />
+                              <Label styleClass="card-icon" text="🛒" />
+                              <Label styleClass="card-title" text="BÁN THUỐC" />
                            </children>
-                        </AnchorPane>
-                        <AnchorPane onMouseClicked="#handleMoXuLyDoiTraCard" prefHeight="80.0" prefWidth="380.0" styleClass="top-card, card-orange" HBox.hgrow="ALWAYS">
+                        </HBox>
+                        
+                        <HBox alignment="CENTER" spacing="15.0" onMouseClicked="#handleMoXuLyDoiTraCard" prefHeight="75.0" prefWidth="200.0" styleClass="top-card, card-orange" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label layoutX="20.0" layoutY="25.0" styleClass="card-title" text="ĐỔI / TRẢ" />
+                              <Label styleClass="card-icon" text="🔄" />
+                              <Label styleClass="card-title" text="ĐỔI / TRẢ" />
                            </children>
-                        </AnchorPane>
-                        <AnchorPane prefHeight="80.0" prefWidth="380.0" styleClass="top-card, card-green" HBox.hgrow="ALWAYS">
+                        </HBox>
+                        
+                        <HBox alignment="CENTER" spacing="15.0" prefHeight="75.0" prefWidth="200.0" styleClass="top-card, card-green" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label layoutX="20.0" layoutY="25.0" styleClass="card-title" text="BÁO CÁO" />
+                              <Label styleClass="card-icon" text="📊" />
+                              <Label styleClass="card-title" text="BÁO CÁO" />
                            </children>
-                        </AnchorPane>
+                        </HBox>
                      </children>
                   </HBox>
                   
@@ -184,6 +187,7 @@
                      </children>
                      <padding><Insets left="20.0" right="20.0" /></padding>
                   </HBox>
+                  
                   <VBox styleClass="panel-white" VBox.vgrow="ALWAYS">
                      <children>
                         <Label styleClass="section-title" text="DANH MỤC THUỐC" />

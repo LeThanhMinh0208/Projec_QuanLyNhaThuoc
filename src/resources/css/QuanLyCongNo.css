@@ -74,20 +74,32 @@
 
 .cn-table .table-row-cell:odd { -fx-background-color: #f8fafc; }
 
-/* FIX CLICK: Đảm bảo chữ luôn hiện màu đen/xám đậm khi dòng được chọn */
+/* ========================================================
+   FIX CLICK: HIỆU ỨNG CHỌN DÒNG CHUẨN MÀU XANH DƯƠNG ĐẬM
+   ======================================================== */
 .cn-table .table-row-cell:selected, 
 .cn-table .table-row-cell:focused:selected {
-    -fx-background-color: #e0f2fe; /* Màu nền xanh nhạt khi chọn */
+    -fx-background-color: #0ea5e9 !important; 
+    -fx-background-insets: 0;
 }
 
 .cn-table .table-row-cell:selected .table-cell {
-    -fx-text-fill: #0f172a !important; /* Ép chữ phải hiện màu đen đậm */
-    -fx-font-weight: bold;
+    -fx-text-fill: white !important; 
+    -fx-font-weight: bold !important;
 }
 
-.cn-table .table-cell {
-    -fx-alignment: CENTER_LEFT;
-    -fx-padding: 0 15;
+/* --- STYLE NÚT MÀU XANH LÁ CHO CHỨC NĂNG "NCC THANH TOÁN" --- */
+.cn-btn-success {
+    -fx-background-color: linear-gradient(to right, #10b981, #059669);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 25px;
+    -fx-cursor: hand;
+    -fx-padding: 10 25;
+    -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.4), 10, 0, 0, 4);
+}
+.cn-btn-success:hover {
+    -fx-background-color: linear-gradient(to right, #34d399, #10b981);
 }
 
 /* --- 4. DIALOG (LẬP PHIẾU & CHI TIẾT) - ĐỒNG BỘ 100% --- */

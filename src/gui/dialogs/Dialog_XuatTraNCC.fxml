@@ -3,11 +3,11 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox prefWidth="950.0" prefHeight="850.0" spacing="15.0" styleClass="dialog-container" stylesheets="@../../resources/css/XuatKho.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.dialogs.Dialog_XuatTraNCCController">
+<VBox prefWidth="900.0" prefHeight="750.0" spacing="10.0" styleClass="dialog-container" stylesheets="@../../resources/css/XuatKho.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.dialogs.Dialog_XuatTraNCCController">
    <children>
       <Label styleClass="dialog-title" text="🔙 LẬP PHIẾU TRẢ HÀNG NHÀ CUNG CẤP" />
       
-      <GridPane hgap="20.0" vgap="15.0" style="-fx-background-color: #f8fafc; -fx-padding: 15; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+      <GridPane hgap="15.0" vgap="10.0" style="-fx-background-color: #f8fafc; -fx-padding: 10; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
          <columnConstraints>
             <ColumnConstraints percentWidth="40.0" />
             <ColumnConstraints percentWidth="60.0" />
@@ -15,68 +15,68 @@
          <children>
             <VBox spacing="5.0" GridPane.columnIndex="0">
                <Label styleClass="input-label-title" text="Người Lập Phiếu:" />
-               <TextField fx:id="txtNguoiLap" disable="true" editable="false" prefHeight="40.0" styleClass="input-field, input-field-readonly" />
+               <TextField fx:id="txtNguoiLap" disable="true" editable="false" prefHeight="35.0" styleClass="input-field, input-field-readonly" />
             </VBox>
             <VBox spacing="5.0" GridPane.columnIndex="1">
                <Label styleClass="input-label-title" style="-fx-text-fill: #0ea5e9;" text="Chọn Nhà Cung Cấp cần xuất trả (*):" />
-               <ComboBox fx:id="cbNhaCungCap" prefHeight="40.0" maxWidth="Infinity" promptText="-- Chọn nhà cung cấp --" styleClass="input-field" />
+               <ComboBox fx:id="cbNhaCungCap" prefHeight="35.0" maxWidth="Infinity" promptText="-- Chọn nhà cung cấp --" styleClass="input-field" />
             </VBox>
          </children>
       </GridPane>
 
-      <VBox spacing="10.0" styleClass="xk-card" style="-fx-padding: 15; -fx-border-color: #0ea5e9; -fx-border-width: 1; -fx-border-radius: 8;">
+      <VBox spacing="10.0" styleClass="xk-card" style="-fx-padding: 10; -fx-border-color: #0ea5e9; -fx-border-width: 1; -fx-border-radius: 8;">
          <children>
              <HBox spacing="15.0" alignment="BOTTOM_LEFT">
                 <VBox spacing="5.0" prefWidth="250.0">
                     <Label styleClass="input-label-title" text="🔍 Tìm thuốc nhanh:" />
-                    <TextField fx:id="txtTimNhanhThuoc" prefHeight="40.0" promptText="Nhập tên hoặc mã..." styleClass="input-field" />
+                    <TextField fx:id="txtTimNhanhThuoc" prefHeight="35.0" promptText="Nhập tên hoặc mã..." styleClass="input-field" />
                 </VBox>
                 <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                     <Label styleClass="input-label-title" text="💊 Danh sách Thuốc (Lọc theo NCC):" />
-                    <ComboBox fx:id="cbChonThuoc" prefHeight="40.0" maxWidth="Infinity" promptText="-- Vui lòng chọn NCC trước --" styleClass="input-field" />
+                    <ComboBox fx:id="cbChonThuoc" prefHeight="35.0" maxWidth="Infinity" promptText="-- Vui lòng chọn NCC trước --" styleClass="input-field" />
                 </VBox>
              </HBox>
 
              <HBox spacing="15.0" alignment="BOTTOM_LEFT">
                 <VBox spacing="5.0" prefWidth="450.0">
                     <Label styleClass="input-label-title" text="📦 Chọn Lô đang tồn trong hệ thống (*):" />
-                    <ComboBox fx:id="cbChonLo" prefHeight="40.0" maxWidth="Infinity" promptText="-- Chọn Lô --" styleClass="input-field" />
+                    <ComboBox fx:id="cbChonLo" prefHeight="35.0" maxWidth="Infinity" promptText="-- Chọn Lô --" styleClass="input-field" />
                 </VBox>
                 <VBox spacing="5.0" prefWidth="150.0">
                     <Label styleClass="input-label-title" text="SL Xuất Trả (*):" />
-                    <TextField fx:id="txtSoLuongTra" prefHeight="40.0" promptText="VD: 50" styleClass="input-field" alignment="CENTER" />
+                    <TextField fx:id="txtSoLuongTra" prefHeight="35.0" promptText="VD: 50" styleClass="input-field" alignment="CENTER" />
                 </VBox>
                 <Region HBox.hgrow="ALWAYS" />
-                <Button onAction="#handleThemThuoc" minWidth="180.0" prefHeight="45.0" styleClass="btn-success" text="+ THÊM VÀO BẢNG" />
+                <Button onAction="#handleThemThuoc" minWidth="180.0" prefHeight="35.0" styleClass="btn-success" text="+ THÊM VÀO BẢNG" />
              </HBox>
          </children>
       </VBox>
 
-      <TableView fx:id="tableThuocTra" styleClass="xk-table" VBox.vgrow="ALWAYS">
-         <columns>
-            <TableColumn fx:id="colSTT" prefWidth="60.0" text="STT" />
-            <TableColumn fx:id="colTenThuoc" prefWidth="300.0" text="TÊN THUỐC" />
-            <TableColumn fx:id="colSoLo" prefWidth="150.0" text="SỐ LÔ" />
-            <TableColumn fx:id="colSoLuong" prefWidth="100.0" text="SL TRẢ" />
-            <TableColumn fx:id="colThanhTien" prefWidth="150.0" text="THÀNH TIỀN" />
-            <TableColumn fx:id="colXoa" prefWidth="90.0" text="XÓA" />
-         </columns>
-         <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
-      </TableView>
+     <TableView fx:id="tableThuocTra" minHeight="200.0" prefHeight="300.0" styleClass="xk-table" VBox.vgrow="ALWAYS">
+   <columns>
+      <TableColumn fx:id="colSTT" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" text="STT" />
+      <TableColumn fx:id="colTenThuoc" minWidth="350.0" prefWidth="380.0" text="TÊN THUỐC" />
+      <TableColumn fx:id="colSoLo" minWidth="130.0" prefWidth="130.0" text="SỐ LÔ" />
+      <TableColumn fx:id="colSoLuong" maxWidth="100.0" minWidth="80.0" prefWidth="80.0" text="SL TRẢ" />
+      <TableColumn fx:id="colThanhTien" minWidth="150.0" prefWidth="160.0" text="THÀNH TIỀN" />
+      <TableColumn fx:id="colXoa" maxWidth="60.0" minWidth="60.0" prefWidth="60.0" text="XÓA" />
+   </columns>
+   <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+</TableView>
 
       <VBox spacing="5.0">
           <Label styleClass="input-label-title" text="Lý do xuất trả hàng:" />
-          <TextField fx:id="txtGhiChu" prefHeight="40.0" promptText="Nhập lý do trả (VD: Hàng cận date, lỗi bao bì...)" styleClass="input-field" />
+          <TextField fx:id="txtGhiChu" prefHeight="35.0" promptText="Nhập lý do trả (VD: Hàng cận date, lỗi bao bì...)" styleClass="input-field" />
       </VBox>
 
       <HBox alignment="CENTER_RIGHT" spacing="15.0">
          <Label text="Tổng tiền NCC hoàn lại:" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #64748b;" />
-         <Label fx:id="lblTongTien" text="0 VNĐ" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ef4444;" />
+         <Label fx:id="lblTongTien" text="0 VNĐ" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #ef4444;" />
          
          <Region HBox.hgrow="ALWAYS" />
          
-         <Button onAction="#handleHuyBo" prefHeight="45.0" prefWidth="120.0" styleClass="btn-cancel" text="Hủy Bỏ" />
-         <Button onAction="#handleXacNhanTra" prefHeight="45.0" prefWidth="250.0" styleClass="btn-success" text="✔ XÁC NHẬN TRẢ HÀNG" />
+         <Button onAction="#handleHuyBo" prefHeight="40.0" prefWidth="120.0" styleClass="btn-cancel" text="Hủy Bỏ" />
+         <Button onAction="#handleXacNhanTra" prefHeight="40.0" prefWidth="250.0" styleClass="btn-success" text="✔ XÁC NHẬN TRẢ HÀNG" />
       </HBox>
    </children>
 </VBox>

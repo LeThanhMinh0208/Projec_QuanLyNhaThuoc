@@ -123,6 +123,8 @@ public class GUI_QuanLyBanHangController {
  // 🚨 BIẾN STATIC ĐỂ NHẬN DỮ LIỆU TÁI LẬP TỪ MÀN HÌNH KHÁC
     private static GUI_QuanLyBanHangController instance;
     private static DonThuoc donThuocTaiLapPending = null;
+    private static Image hinhAnhTaiLapPending = null; 
+    public static void setHinhAnhTaiLap(Image img) { hinhAnhTaiLapPending = img; }
 
     public static GUI_QuanLyBanHangController getInstance() { return instance; }
     public static void setTaiLapData(DonThuoc dt) { donThuocTaiLapPending = dt; }
@@ -1213,6 +1215,15 @@ public class GUI_QuanLyBanHangController {
             this.donThuocTemp.setTenBacSi(dtCu.getTenBacSi());
             this.donThuocTemp.setThongTinBenhNhan(dtCu.getThongTinBenhNhan());
             this.donThuocTemp.setChanDoan(dtCu.getChanDoan());
+            this.donThuocTemp.setHinhAnhDon(dtCu.getHinhAnhDon());
+            
+     
+            if (hinhAnhTaiLapPending != null) {
+              
+                this.donThuocTemp.setHinhAnhDon(dtCu.getHinhAnhDon()); 
+               
+          
+            }
 
             try {
                 int maxMaDT = daoDonThuoc.getMaxMaDonThuoc();

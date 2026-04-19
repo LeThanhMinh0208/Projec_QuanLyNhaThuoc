@@ -32,35 +32,52 @@
             
             <HBox fx:id="viewTaoPhieu" spacing="25.0">
                <children>
-                  <VBox prefWidth="350.0" spacing="15.0" styleClass="box-nhap-lieu">
+                 <VBox prefWidth="350.0" spacing="15.0" styleClass="box-nhap-lieu">
                      <children>
                         <Label text="Thông Tin Phiếu Nhập" styleClass="label-header" />
                         <Region prefHeight="1.0" style="-fx-background-color: #bae6fd;" />
-                        <GridPane vgap="15.0" hgap="10.0">
-                      <columnConstraints>
-   <ColumnConstraints minWidth="-Infinity" />
-   <ColumnConstraints hgrow="ALWAYS" />
-</columnConstraints>
+                        
+                        <VBox spacing="15.0">
                            <children>
-                              <Label text="Mã Đơn Đặt (*):" styleClass="input-label-title" GridPane.rowIndex="0" />
-                              <ComboBox fx:id="cbMaDon" prefWidth="250.0" promptText="Chọn mã đơn..." styleClass="input-field" GridPane.rowIndex="0" GridPane.columnIndex="1" />
-                              
-                              <Label text="Nhà Cung Cấp:" styleClass="input-label-title" GridPane.rowIndex="1" />
-                              <TextField fx:id="txtNhaCungCap" editable="false" styleClass="input-field-readonly" GridPane.rowIndex="1" GridPane.columnIndex="1" />
-                              
-                              <Label text="Người Giao:" styleClass="input-label-title" GridPane.rowIndex="2" />
-                              <TextField fx:id="txtNguoiGiao" promptText="Nguyễn Văn A..." styleClass="input-field" GridPane.rowIndex="2" GridPane.columnIndex="1" />
-                              
-                              <Label text="Ngày Nhập:" styleClass="input-label-title" GridPane.rowIndex="3" />
-                              <DatePicker fx:id="dpNgayNhap" prefWidth="250.0" styleClass="input-field" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                              <VBox spacing="5.0">
+                                 <children>
+                                    <Label text="Mã Đơn Đặt (*):" styleClass="input-label-title" />
+                                    <ComboBox fx:id="cbMaDon" prefHeight="40.0" maxWidth="Infinity" promptText="-- Chọn mã đơn --" styleClass="input-field" />
+                                 </children>
+                              </VBox>
+
+                              <VBox spacing="5.0">
+                                 <children>
+                                    <Label text="Nhà Cung Cấp:" styleClass="input-label-title" />
+                                    <TextField fx:id="txtNhaCungCap" prefHeight="40.0" editable="false" styleClass="input-field, input-field-readonly" />
+                                 </children>
+                              </VBox>
+
+                              <VBox spacing="5.0">
+                                 <children>
+                                    <Label text="Người Giao:" styleClass="input-label-title" />
+                                    <TextField fx:id="txtNguoiGiao" prefHeight="40.0" promptText="VD: Nguyễn Văn A..." styleClass="input-field" />
+                                 </children>
+                              </VBox>
+
+                              <VBox spacing="5.0">
+                                 <children>
+                                    <Label text="Ngày Nhập:" styleClass="input-label-title" />
+                                    <DatePicker fx:id="dpNgayNhap" prefHeight="40.0" maxWidth="Infinity" styleClass="input-field" />
+                                 </children>
+                              </VBox>
                            </children>
-                        </GridPane>
+                        </VBox>
+                        
                         <VBox spacing="5.0" VBox.vgrow="ALWAYS">
-                           <Label text="Ghi Chú:" styleClass="input-label-title" />
-                           <TextArea fx:id="txtGhiChu" prefRowCount="4" promptText="Ghi chú thêm về lô hàng nhập..." wrapText="true" styleClass="input-field" VBox.vgrow="ALWAYS" />
+                           <children>
+                              <Label text="Ghi Chú:" styleClass="input-label-title" />
+                              <TextArea fx:id="txtGhiChu" prefRowCount="4" promptText="Ghi chú thêm về lô hàng nhập..." wrapText="true" styleClass="input-field" VBox.vgrow="ALWAYS" />
+                           </children>
                         </VBox>
                      </children>
                   </VBox>
+              
 
                   <VBox spacing="15.0" HBox.hgrow="ALWAYS">
                      <children>

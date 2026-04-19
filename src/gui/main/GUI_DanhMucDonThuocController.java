@@ -132,7 +132,35 @@ public class GUI_DanhMucDonThuocController implements Initializable {
                             // 1. Set data vào bộ nhớ đệm
                             gui.main.GUI_QuanLyBanHangController.setTaiLapData(dt);
                             
-                            // 2. Chuyển trang (Sử dụng SceneUtils của hệ thống sếp)
+                            // ========================================================
+                            // 💡 XỬ LÝ LẤY ẢNH VÀ TRUYỀN SANG TRANG BÁN HÀNG
+                            // ========================================================
+                            String tenFileAnh = dt.getHinhAnhDon();
+                            if (tenFileAnh != null && !tenFileAnh.trim().isEmpty() && !tenFileAnh.equals("url_hinh_anh")) {
+                                try {
+                                    Image img = null;
+                                    String projectPath = System.getProperty("user.dir");
+                                    File file = new File(projectPath + "/src/resources/images/images_donthuoc/" + tenFileAnh);
+
+                                    if (file.exists()) {
+                                        img = new Image(file.toURI().toString(), false);
+                                    } else {
+                                        var stream = getClass().getResourceAsStream("/resources/images/images_donthuoc/" + tenFileAnh);
+                                        if (stream != null) img = new Image(stream);
+                                    }
+                                    
+                                    // Truyền thẳng cục Image sang bên kia
+                                    gui.main.GUI_QuanLyBanHangController.setHinhAnhTaiLap(img);
+                                    
+                                } catch (Exception ex) {
+                                    System.err.println("Lỗi load ảnh tái lập: " + ex.getMessage());
+                                }
+                            } else {
+                                // Nếu không có ảnh thì clear ảnh cũ bên Bán Hàng đi
+                                gui.main.GUI_QuanLyBanHangController.setHinhAnhTaiLap(null); 
+                            }
+
+                            // 2. Chuyển trang 
                             utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyBanHang.fxml");
                         }
                     });
@@ -309,23 +337,28 @@ public class GUI_DanhMucDonThuocController implements Initializable {
             Stage stage = new Stage();
             stage.setTitle("Hình Ảnh Đơn Thuốc: " + tenFileAnh);
             
+            // 💡 GIẢI PHÁP FIX KÍCH THƯỚC CỐ ĐỊNH CHO MỌI MÀN HÌNH
+            // Cố định cửa sổ là 900x650 (Size vàng cho laptop 14 inch đổ lên)
+            double fixedWidth = 900;
+            double fixedHeight = 650;
+            
             ImageView imageView = new ImageView(img);
-            imageView.setPreserveRatio(true);
+            // Ép cái ảnh phải nằm gọn trong khung 900x650, không được lố
+            imageView.setFitWidth(fixedWidth - 20); // Trừ hao viền padding
+            imageView.setFitHeight(fixedHeight - 20);
+            imageView.setPreserveRatio(true); // Giữ đúng tỷ lệ ảnh gốc, không làm méo hình
             imageView.setSmooth(true);
 
             StackPane imageContainer = new StackPane(imageView);
             imageContainer.setAlignment(Pos.CENTER);
             imageContainer.setStyle("-fx-background-color: #f0f9ff; -fx-padding: 10;");
 
-            double windowWidth = Math.min(img.getWidth() + 40, 1200); 
-            double windowHeight = Math.min(img.getHeight() + 60, 800);
-
-            ScrollPane scrollPane = new ScrollPane(imageContainer);
-            scrollPane.setPannable(true);
-            scrollPane.setStyle("-fx-background-color: transparent;");
-
-            Scene scene = new Scene(scrollPane, windowWidth, windowHeight);
+            // Không cần ScrollPane nữa vì ảnh đã tự thu nhỏ lại vừa vặn cửa sổ
+            Scene scene = new Scene(imageContainer, fixedWidth, fixedHeight);
             stage.setScene(scene);
+            
+            // Khóa không cho user kéo giãn cửa sổ làm bể layout
+            stage.setResizable(false); 
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.show();
 
@@ -334,7 +367,6 @@ public class GUI_DanhMucDonThuocController implements Initializable {
             showWarn("Lỗi hệ thống khi mở trình xem ảnh: " + e.getMessage());
         }
     }
-
     private void showWarn(String msg) {
         new Alert(Alert.AlertType.WARNING, msg, ButtonType.OK).showAndWait();
     }

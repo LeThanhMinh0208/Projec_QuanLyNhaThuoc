@@ -186,10 +186,11 @@ public class Dialog_XuatTraNCCController {
             return new javafx.beans.property.SimpleStringProperty(ma);
         });
 
-        colSoLo.setCellValueFactory(new PropertyValueFactory<>("soLo"));
-        colSoLuong.setCellValueFactory(new PropertyValueFactory<>("soLuong"));
+        // 🚨 Đổi getSoLo() thành getMaLo() nếu IDE báo đỏ
+        colSoLo.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getSoLo()));
+        colSoLuong.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getSoLuong()));
         
-        colThanhTien.setCellValueFactory(new PropertyValueFactory<>("thanhTien"));
+        colThanhTien.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getThanhTien()));
         colThanhTien.setCellFactory(c -> new TableCell<>() {
             @Override protected void updateItem(Double item, boolean empty) {
                 super.updateItem(item, empty);
@@ -205,7 +206,6 @@ public class Dialog_XuatTraNCCController {
                     dsTraTam.remove(getTableView().getItems().get(getIndex())); 
                     tinhTongTien();
                     tableThuocTra.refresh(); 
-                    
                     if (dsTraTam.isEmpty()) {
                         cbNhaCungCap.setDisable(false);
                         cbNhaCungCap.setStyle("-fx-opacity: 1;");

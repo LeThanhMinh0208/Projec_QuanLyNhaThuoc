@@ -508,4 +508,32 @@ public class DAO_Thuoc {
             return false;
         }
     }
+    /**
+     * Lấy danh sách các loại thuốc CÓ SẴN LÔ TỒN KHO tại một vị trí kho cụ thể.
+     */
+    public ArrayList<Thuoc> getThuocCoLoTrongKho(String viTriKho) {
+        ArrayList<Thuoc> list = new ArrayList<>();
+        String sql = "SELECT DISTINCT t.*, d.tenDanhMuc AS tenDanhMucHienThi " +
+                     "FROM Thuoc t " +
+                     "LEFT JOIN DanhMucThuoc d ON t.maDanhMuc = d.maDanhMuc " +
+                     "INNER JOIN LoThuoc lo ON lo.maThuoc = t.maThuoc " +
+                     "WHERE lo.viTriKho = ? " +
+                     "  AND lo.soLuongTon > 0 " +
+                     "  AND lo.trangThai = 1 " +
+                     "  AND lo.hanSuDung >= CAST(GETDATE() AS DATE)";
+        java.sql.Connection con = connectDB.ConnectDB.getConnection();
+        try {
+            try (java.sql.PreparedStatement pst = con.prepareStatement(sql)) {
+                pst.setString(1, viTriKho);
+                try (java.sql.ResultSet rs = pst.executeQuery()) {
+                    while (rs.next()) {
+                        list.add(mapThuoc(rs));
+                    }
+                }
+            }
+        } catch (java.sql.SQLException e) {
+            System.err.println("Lỗi SQL khi lấy thuốc theo kho: " + e.getMessage());
+        }
+        return list;
+    }
 }

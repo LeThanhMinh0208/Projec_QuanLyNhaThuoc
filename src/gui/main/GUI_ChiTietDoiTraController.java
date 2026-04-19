@@ -412,7 +412,7 @@ public class GUI_ChiTietDoiTraController {
         }
 
         if (dsTam.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Chưa có phiếu đổi trả nào.");
+            showAlert(Alert.AlertType.WARNING, "Chưa có thuốc nào trong danh sách trả.");
             return;
         }
 
@@ -424,11 +424,9 @@ public class GUI_ChiTietDoiTraController {
             return;
         }
 
-        if (cbHinhThucXuLy.getValue() == HinhThucDoiTra.DOI_SAN_PHAM) {
-            if (dsThuocNhan.isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Chưa có thông tin thuốc đổi cho phiếu đổi sản phẩm.");
-                return;
-            }
+        if (isDoi && dsThuocNhan.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Chưa có thông tin thuốc đổi cho phiếu đổi sản phẩm.");
+            return;
         }
 
         NhanVien nhanVien = UserSession.getInstance().getUser();
@@ -452,21 +450,22 @@ public class GUI_ChiTietDoiTraController {
         pdt.setHinhThucXuLy(cbHinhThucXuLy.getValue());
 
         // [2] Tính phiPhat và ketQuaDoiSanPham
-        if (cbHinhThucXuLy.getValue() == HinhThucDoiTra.DOI_SAN_PHAM) {
+        if (isDoi) {
             double chenhLech = tinhChenhLechDoiSanPham();
             pdt.setPhiPhat(Math.abs(chenhLech));
             pdt.setKetQuaDoiSanPham(chenhLech > 0 ? "BU_TIEN" : chenhLech < 0 ? "HOAN_TIEN" : "KHONG_CHENH_LECH");
         } else {
             if ("Khách hàng muốn hoàn".equals(lyDo)) {
                  double tongTienHoan = 0;
-                 for (ChiTietDoiTraTam t : dsTam) tongTienHoan += t.thanhTienHoan; // Sử dụng thanhTienHoan
-                 pdt.setPhiPhat(tongTienHoan * 0.3);
+                 for (ChiTietDoiTraTam t : dsTam) tongTienHoan += t.thanhTienHoan;
+                 pdt.setPhiPhat(tongTienHoan * 0.3); // Phạt 30% nếu khách tự ý trả
             } else {
                  pdt.setPhiPhat(0);
             }
             pdt.setKetQuaDoiSanPham(null);
         }
 
+        // Tạo danh sách chi tiết thuốc trả
         List<ChiTietDoiTra> chiTiet = new ArrayList<>();
         for (ChiTietDoiTraTam item : dsTam) {
             ChiTietDoiTra ct = new ChiTietDoiTra();
@@ -474,7 +473,7 @@ public class GUI_ChiTietDoiTraController {
             ct.setMaQuyDoi(item.maQuyDoi);
             ct.setMaLoThuoc(item.maLoThuoc);
             ct.setSoLuong(item.soLuongTra);
-            ct.setTinhTrang(item.tinhTrang);
+            ct.setTinhTrang(item.tinhTrang); // Ở đây sếp đang truyền null vì bỏ ô nhập tình trạng
             chiTiet.add(ct);
         }
 
@@ -486,14 +485,60 @@ public class GUI_ChiTietDoiTraController {
             return;
         }
 
-        // Truyền dsThuocDoi vào DAO
-        List<DoiTraSession.DonViDoiData> dsThuocDoiParam =
-                cbHinhThucXuLy.getValue() == HinhThucDoiTra.DOI_SAN_PHAM
-                        ? new ArrayList<>(dsThuocNhan)
-                        : null;
+        // =====================================================================
+        // GIAO DỊCH 1: LƯU PHIẾU ĐỔI TRẢ (KHÁCH TRẢ VỀ)
+        // =====================================================================
+        List<DoiTraSession.DonViDoiData> dsThuocDoiParam = isDoi ? new ArrayList<>(dsThuocNhan) : null;
+        boolean okPhieuTra = daoPhieuDoiTra.lapPhieuDoiTra(pdt, chiTiet, dsThuocDoiParam);
 
-        boolean ok = daoPhieuDoiTra.lapPhieuDoiTra(pdt, chiTiet, dsThuocDoiParam);
-        if (ok) {
+        if (okPhieuTra) {
+            // =====================================================================
+            // GIAO DỊCH 2: TẠO HÓA ĐƠN CHO THUỐC ĐỔI (KHÁCH LẤY ĐI)
+            // Mục đích: Ép trừ kho FEFO và tăng Số Lượng Bán trong thống kê
+            // =====================================================================
+            if (isDoi && !dsThuocNhan.isEmpty()) {
+                try {
+                    dao.DAO_HoaDon daoHoaDon = new dao.DAO_HoaDon();
+                    String maHDMoi = daoHoaDon.generateMaHoaDon();
+                    
+                    HoaDon hdMoi = new HoaDon();
+                    hdMoi.setMaHoaDon(maHDMoi);
+                    hdMoi.setNgayLap(new java.sql.Timestamp(System.currentTimeMillis()));
+                    hdMoi.setThueVAT(8.0); // Mặc định VAT
+                    hdMoi.setHinhThucThanhToan("TIEN_MAT"); 
+                    hdMoi.setLoaiBan("BAN_LE"); // Từ khóa để sau này phân biệt
+                    hdMoi.setNhanVien(nhanVien);
+                    
+                    // Lấy Khách Hàng từ hóa đơn gốc (Cần tạo đối tượng hoặc truy vấn DAO)
+                    entity.KhachHang kh = new dao.DAO_KhachHang().getBySdt(hoaDon.getSdt());
+                    hdMoi.setKhachHang(kh);
+                    hdMoi.setGhiChu("HĐ xuất bù cho PDT: " + pdt.getMaPhieuDoiTra());
+
+                    // Chuyển dsThuocNhan thành ChiTietHoaDon
+                    List<entity.ChiTietHoaDon> dsCTHD = new ArrayList<>();
+                    for (DoiTraSession.DonViDoiData item : dsThuocNhan) {
+                        entity.ChiTietHoaDon ct = new entity.ChiTietHoaDon();
+                        ct.setHoaDon(hdMoi);
+                        ct.setMaQuyDoi(item.getMaQuyDoi());
+                        ct.setSoLuong(item.getSoLuong());
+                        ct.setDonGia(item.getDonGia());
+                        
+                        // Phải tìm một bảng giá mặc định để chèn vào (hoặc null nếu DB cho phép)
+                        ct.setMaBangGia("BG0001"); // Sếp tự điều chỉnh lại mã bảng giá cho đúng logic nhà thuốc nhé
+                        
+                        dsCTHD.add(ct);
+                    }
+
+                    // Gọi hàm thanh toán để chốt kho
+                    boolean okHoaDon = daoHoaDon.thanhToan(hdMoi, dsCTHD);
+                    if(!okHoaDon) {
+                        System.err.println("Cảnh báo: Tạo Phiếu Đổi Trả thành công nhưng lỗi khi tạo Hóa Đơn trừ kho bù!");
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
             showAlert(Alert.AlertType.INFORMATION, "Lập phiếu đổi trả thành công. Mã phiếu: " + pdt.getMaPhieuDoiTra());
             DoiTraSession.clear();
             SceneUtils.switchPage("/gui/main/GUI_XuLyDoiTra.fxml");

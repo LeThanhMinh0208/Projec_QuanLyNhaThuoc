@@ -284,4 +284,26 @@ public class DAO_NhaCungCap {
         }
         return -1;
     }
+    public boolean capNhatCongNo(String maNCC, double congNoMoi) {
+        Connection con = ConnectDB.getInstance().getConnection();
+        PreparedStatement stmt = null;
+        int n = 0;
+        try {
+            // Cập nhật lại cột CongNo dựa trên mã Nhà Cung Cấp
+            // Sếp nhớ kiểm tra đúng tên cột trong CSDL của sếp nhé (ví dụ: congNo hay CongNo)
+            stmt = con.prepareStatement("UPDATE NhaCungCap SET congNo = ? WHERE maNhaCungCap = ?");
+            stmt.setDouble(1, congNoMoi);
+            stmt.setString(2, maNCC);
+            n = stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+            } catch (SQLException e2) {
+                e2.printStackTrace();
+            }
+        }
+        return n > 0;
+    }
 }

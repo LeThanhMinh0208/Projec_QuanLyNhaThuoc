@@ -11,6 +11,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
+<?import javafx.scene.layout.GridPane?> 
+<?import javafx.scene.layout.ColumnConstraints?>
 
 <VBox prefHeight="800.0" prefWidth="1200.0" spacing="25.0" styleClass="dmk-main-bg" stylesheets="@../../resources/css/DanhMucKho.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.GUI_DanhMucKhoController">
    <padding>
@@ -19,37 +21,44 @@
 
    <Label styleClass="dmk-page-title" text="QUẢN LÝ DANH MỤC KHO" />
 
-   <HBox spacing="20.0">
-      <Button fx:id="btnNhapKho" maxWidth="Infinity" onAction="#moTrangNhapKho" styleClass="btn-action, btn-nhap" text="Nhập Kho" HBox.hgrow="ALWAYS">
-         <graphic>
-            <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../resources/icons/into_warehouse.png" />
-               </image>
-            </ImageView>
-         </graphic>
-      </Button>
+   <GridPane hgap="15" maxWidth="Infinity">
+      <columnConstraints>
+         <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS" />
+         <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS" />
+         <ColumnConstraints percentWidth="33.34" hgrow="ALWAYS" />
+      </columnConstraints>
+      <children>
+         <Button fx:id="btnNhapKho" maxWidth="Infinity" minHeight="50" prefHeight="50" style="-fx-font-size: 16px; -fx-font-weight: bold;" onAction="#moTrangNhapKho" styleClass="top-card, card-green, btn-action" text="Nhập Kho" textFill="WHITE" GridPane.columnIndex="0">
+            <graphic>
+               <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                  <image>
+                     <Image url="@../../resources/icons/into_warehouse.png" />
+                  </image>
+               </ImageView>
+            </graphic>
+         </Button>
 
-      <Button fx:id="btnXuatKho" maxWidth="Infinity" onAction="#handleChuyenTrangXuatKho" styleClass="btn-action, btn-xuat" text="Xuất Kho" HBox.hgrow="ALWAYS">
-         <graphic>
-            <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../resources/icons/export_icon.png" />
-               </image>
-            </ImageView>
-         </graphic>
-      </Button>
+         <Button fx:id="btnXuatKho" maxWidth="Infinity" minHeight="50" prefHeight="50" style="-fx-font-size: 16px; -fx-font-weight: bold;" onAction="#handleChuyenTrangXuatKho" styleClass="top-card, card-blue, btn-action" text="Xuất Kho" textFill="WHITE" GridPane.columnIndex="1">
+            <graphic>
+               <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                  <image>
+                     <Image url="@../../resources/icons/export_icon.png" />
+                  </image>
+               </ImageView>
+            </graphic>
+         </Button>
 
-      <Button fx:id="btnKiemKe" maxWidth="Infinity" onAction="#handleChuyenTrangKiemKe" styleClass="btn-action, btn-kiemke" text="Kiểm Kê Kho" HBox.hgrow="ALWAYS">
-         <graphic>
-            <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../resources/icons/inventory_icon.png" />
-               </image>
-            </ImageView>
-         </graphic>
-      </Button>
-   </HBox>
+         <Button fx:id="btnKiemKe" maxWidth="Infinity" minHeight="50" prefHeight="50" style="-fx-font-size: 16px; -fx-font-weight: bold;" onAction="#handleChuyenTrangKiemKe" styleClass="top-card, card-orange, btn-action" text="Kiểm Kê Kho" textFill="WHITE" GridPane.columnIndex="2">
+            <graphic>
+               <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                  <image>
+                     <Image url="@../../resources/icons/inventory_icon.png" />
+                  </image>
+               </ImageView>
+            </graphic>
+         </Button>
+      </children>
+   </GridPane>
 
    <HBox alignment="CENTER_LEFT" spacing="20.0">
       <ComboBox fx:id="cmbViTriKho" prefHeight="45.0" prefWidth="250.0" promptText="Tất cả vị trí kho" styleClass="dmk-combo" />

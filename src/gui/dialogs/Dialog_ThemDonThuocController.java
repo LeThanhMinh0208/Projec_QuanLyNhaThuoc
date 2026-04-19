@@ -45,26 +45,35 @@ public class Dialog_ThemDonThuocController {
     public void setDonThuoc(DonThuoc dt, String nextMa) {
         if (dt != null) {
             isEdit = true;
-            lblTitle.setText("SỬA THÔNG TIN ĐƠN THUỐC");
+            lblTitle.setText("SỬA / TÁI LẬP THÔNG TIN ĐƠN THUỐC");
+            
+            // 1. Đổ dữ liệu TEXT vào các ô nhập liệu (Sếp lỡ xóa mất đoạn này nè)
             txtMaDon.setText(dt.getMaDonThuoc());
             txtTenBacSi.setText(dt.getTenBacSi());
             txtBenhNhan.setText(dt.getThongTinBenhNhan());
             txtChanDoan.setText(dt.getChanDoan());
 
-            // Nếu đang sửa và đã có ảnh → hiển thị
-            if (dt.getHinhAnhDon() != null && !dt.getHinhAnhDon().isEmpty()) {
+            // 2. Đổ dữ liệu ẢNH vào form và đánh lừa hệ thống
+            if (dt.getHinhAnhDon() != null && !dt.getHinhAnhDon().trim().isEmpty() && !dt.getHinhAnhDon().equals("url_hinh_anh")) {
+                
+
+                selectedAnhDonFile = new File(DON_THUOC_IMAGE_DIR + dt.getHinhAnhDon());
+                
+                // Hiển thị text báo thành công
+                lblTenAnhDon.setText("✔ Đã tái lập ảnh: " + dt.getHinhAnhDon());
+                lblTenAnhDon.setStyle("-fx-text-fill: #388e3c; -fx-font-weight: bold;");
+
+                // Load ảnh lên khung Preview
                 try {
-                    Path imgPath = Paths.get(DON_THUOC_IMAGE_DIR, dt.getHinhAnhDon());
-                    if (imgPath.toFile().exists()) {
-                        imgPreviewDon.setImage(new Image(imgPath.toFile().toURI().toString()));
-                        lblTenAnhDon.setText("✔ " + dt.getHinhAnhDon());
-                        lblTenAnhDon.setStyle(
-                            "-fx-text-fill: #388e3c; -fx-font-size: 11px;");
-                        // Khi sửa, đã có ảnh cũ thì đánh dấu để ko bắt buộc chọn lại
-                        // Tạo 1 File giả trỏ đến ảnh cũ
-                        selectedAnhDonFile = imgPath.toFile();
+                    if (selectedAnhDonFile.exists()) {
+                        imgPreviewDon.setImage(new Image(selectedAnhDonFile.toURI().toString()));
+                    } else {
+                        var stream = getClass().getResourceAsStream("/resources/images/images_donthuoc/" + dt.getHinhAnhDon());
+                        if (stream != null) imgPreviewDon.setImage(new Image(stream));
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                    System.err.println("Không thể load preview ảnh.");
+                }
             }
         } else {
             isEdit = false;

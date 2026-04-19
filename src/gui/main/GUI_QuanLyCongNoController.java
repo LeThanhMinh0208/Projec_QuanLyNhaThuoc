@@ -146,8 +146,13 @@ public class GUI_QuanLyCongNoController {
             javafx.scene.Parent root = loader.load();
 
             Object ctrl = loader.getController();
+            
+            // 💡 ĐÃ FIX: Cho phép truyền dữ liệu NCC sang cả 2 Form (Phiếu Chi & Phiếu Thu)
             if (ctrl instanceof gui.dialogs.Dialog_LapPhieuChiController && data != null) {
                 ((gui.dialogs.Dialog_LapPhieuChiController) ctrl).setNhaCungCap(data);
+            } 
+            else if (ctrl instanceof gui.dialogs.Dialog_NCCThanhToanController && data != null) {
+                ((gui.dialogs.Dialog_NCCThanhToanController) ctrl).setNhaCungCap(data);
             }
 
             javafx.stage.Stage stage = new javafx.stage.Stage();
@@ -157,9 +162,8 @@ public class GUI_QuanLyCongNoController {
             stage.initModality(javafx.stage.Modality.APPLICATION_MODAL); 
             stage.showAndWait();
 
-        } catch (java.io.IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            // Đã sử dụng AlertUtils siêu gọn
             utils.AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không mở được giao diện: " + e.getMessage());
         }
     }
@@ -229,5 +233,23 @@ public class GUI_QuanLyCongNoController {
             // Đã sử dụng AlertUtils siêu gọn
             utils.AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không mở được giao diện: " + e.getMessage());
         }
+    }
+    @FXML
+    void handleMoFormNCCThanhToan(ActionEvent event) {
+        NhaCungCap selected = tableCongNoNCC.getSelectionModel().getSelectedItem();
+        
+        if (selected == null) {
+            utils.AlertUtils.showAlert(Alert.AlertType.WARNING, "Chưa chọn nhà cung cấp", "Vui lòng chọn một nhà cung cấp từ bảng để thu tiền!");
+            return;
+        }
+        
+        // KIỂM TRA QUAN TRỌNG: Chỉ cho phép thu tiền khi NCC đang nợ mình (Công nợ bị ÂM)
+        if (selected.getCongNo() >= 0) {
+            utils.AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Không thể thu tiền", "Nhà cung cấp này không nợ tiền cửa hàng.\nChức năng này chỉ dùng để thu hồi tiền khi NCC nợ lại do trả hàng (Công nợ hiện số Âm).");
+            return;
+        }
+
+        openDialog("/gui/dialogs/Dialog_NCCThanhToan.fxml", "Thu Tiền Nhà Cung Cấp", selected);
+        loadDuLieuTuDatabase(); 
     }
 }

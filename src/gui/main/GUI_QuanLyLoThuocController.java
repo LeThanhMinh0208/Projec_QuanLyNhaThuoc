@@ -65,7 +65,9 @@ public class GUI_QuanLyLoThuocController implements Initializable {
     @FXML private Label lblNhaCungCap;
     @FXML private Label lblSlNhapBanDau;
     @FXML private Label lblSlDaBan;
-    @FXML private Label lblSlXuatTra;
+    @FXML private Label lblSlTraNcc;
+    @FXML private Label lblSlXuatHuy;
+    @FXML private Label lblSlDoiTra;
 
     private DAO_LoThuoc daoLoThuoc;
     private ObservableList<LoThuoc> dsLoThuoc;
@@ -365,9 +367,11 @@ public class GUI_QuanLyLoThuocController implements Initializable {
             "l.ngayNhapKho, " +
             "ncc.tenNhaCungCap AS tenNCC, " +
             "l.soLuongTon, " +
-            "(SELECT ISNULL(SUM(ctpn.soLuong * dq.tyLeQuyDoi), 0) FROM ChiTietPhieuNhap ctpn JOIN DonViQuyDoi dq ON ctpn.maQuyDoi = dq.maQuyDoi WHERE ctpn.maLoThuoc = l.maLoThuoc) AS slNhap, " +
+            "(SELECT ISNULL(SUM(ctpn.soLuong * dq.tyLeQuyDoi), 0) FROM ChiTietPhieuNhap ctpn JOIN DonViQuyDoi dq ON ctpn.maQuyDoi = dq.maQuyDoi WHERE ctpn.maLoThuoc = l.maLoThuoc) AS slNhapThucTe, " +
             "(SELECT ISNULL(SUM(cthd.soLuong * dq.tyLeQuyDoi), 0) FROM ChiTietHoaDon cthd JOIN DonViQuyDoi dq ON cthd.maQuyDoi = dq.maQuyDoi WHERE cthd.maLoThuoc = l.maLoThuoc) AS slBan, " +
-            "(SELECT ISNULL(SUM(ctpx.soLuong), 0) FROM ChiTietPhieuXuat ctpx JOIN PhieuXuat px ON ctpx.maPhieuXuat = px.maPhieuXuat WHERE ctpx.maLoThuoc = l.maLoThuoc AND px.loaiPhieu IN (2, 3)) AS slXuat " +
+            "(SELECT ISNULL(SUM(ctpx.soLuong), 0) FROM ChiTietPhieuXuat ctpx JOIN PhieuXuat px ON ctpx.maPhieuXuat = px.maPhieuXuat WHERE ctpx.maLoThuoc = l.maLoThuoc AND px.loaiPhieu = 2) AS slTraNcc, " +
+            "(SELECT ISNULL(SUM(ctpx.soLuong), 0) FROM ChiTietPhieuXuat ctpx JOIN PhieuXuat px ON ctpx.maPhieuXuat = px.maPhieuXuat WHERE ctpx.maLoThuoc = l.maLoThuoc AND px.loaiPhieu = 3) AS slXuatHuy, " +
+            "(SELECT ISNULL(SUM(ctdt.soLuong), 0) FROM ChiTietDoiTra ctdt WHERE ctdt.maLoThuoc = l.maLoThuoc) AS slDoiTra " +
             "FROM LoThuoc l " +
             "LEFT JOIN NhaCungCap ncc ON l.maNhaCungCap = ncc.maNhaCungCap " +
             "WHERE l.maLoThuoc = ?";
@@ -378,30 +382,37 @@ public class GUI_QuanLyLoThuocController implements Initializable {
             
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                Date dNgayNhap = rs.getDate("ngayNhapKho");
+                java.sql.Date dNgayNhap = rs.getDate("ngayNhapKho");
                 lblNgayNhap.setText(dNgayNhap != null ? dNgayNhap.toLocalDate().format(formatter) : "Không xác định");
 
                 String tenNCC = rs.getString("tenNCC");
                 lblNhaCungCap.setText(tenNCC != null ? tenNCC : "Không xác định");
 
-                int slNhap = rs.getInt("slNhap");
-                int slBan = rs.getInt("slBan");
-                int slXuat = rs.getInt("slXuat");
+                // Lấy các biến số lượng từ CSDL
+                int slNhap = rs.getInt("slNhapThucTe"); 
+                int slBan = rs.getInt("slBan");         
+                int slTraNcc = rs.getInt("slTraNcc");
+                int slXuatHuy = rs.getInt("slXuatHuy");
+                int slDoiTra = rs.getInt("slDoiTra");   
                 int tonKho = rs.getInt("soLuongTon");
 
-                if (slNhap == 0 && (tonKho > 0 || slBan > 0 || slXuat > 0)) {
-                    slNhap = tonKho + slBan + slXuat;
+    
+                if (slNhap == 0 && (tonKho > 0 || slBan > 0 || slTraNcc > 0 || slXuatHuy > 0)) {
+                    slNhap = tonKho + slBan + slTraNcc + slXuatHuy - slDoiTra;
+                    if (slNhap < 0) slNhap = 0; 
                 }
 
+                // Đổ dữ liệu lên màn hình
                 lblSlNhapBanDau.setText(slNhap + " " + donVi);
                 lblSlDaBan.setText(slBan + " " + donVi);
-                lblSlXuatTra.setText(slXuat + " " + donVi);
+                lblSlTraNcc.setText(slTraNcc + " " + donVi);
+                lblSlXuatHuy.setText(slXuatHuy + " " + donVi);
+                lblSlDoiTra.setText(slDoiTra + " " + donVi);
             }
         } catch (Exception e) { 
             e.printStackTrace(); 
         }
     }
-
     private void kiemTraVaKhoaLoTuDong(List<LoThuoc> list) {
         boolean coLoBiKhoaThuDong = false;
         

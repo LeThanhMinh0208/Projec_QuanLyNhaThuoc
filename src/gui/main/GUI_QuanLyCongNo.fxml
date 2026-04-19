@@ -36,6 +36,7 @@
                   <HBox alignment="CENTER_LEFT" spacing="20.0">
                      <children>
                         <Button onAction="#handleMoFormLapPhieu" prefHeight="45.0" styleClass="cn-btn-action" text="➕ Lập Phiếu Chi Mới" />
+                        <Button onAction="#handleMoFormNCCThanhToan" prefHeight="45.0" styleClass="cn-btn-success" text="💵 NCC Thanh Toán" />
                         <Region HBox.hgrow="ALWAYS" />
                         <HBox alignment="CENTER_LEFT" styleClass="cn-search-box">
                            <children>

@@ -48,11 +48,12 @@ public class GUI_XuatKhoController implements Initializable {
         colSTT.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(tableDanhMucPhieuXuat.getItems().indexOf(p.getValue()) + 1));
         colMaPhieu.setCellValueFactory(new PropertyValueFactory<>("maPhieuXuat"));
         colNguoiLap.setCellValueFactory(new PropertyValueFactory<>("maNhanVien"));
-        colKhoNhan.setCellValueFactory(new PropertyValueFactory<>("khoNhan"));
         
-        // Fix hiển thị cột Kho Nhận mượt mà
+     // =======================================================
+        // 1. CỘT NƠI NHẬN (Đồng bộ màu theo Nút chức năng)
+        // =======================================================
+        colKhoNhan.setCellValueFactory(new PropertyValueFactory<>("khoNhan"));
         colKhoNhan.setCellFactory(c -> new TableCell<>() {
-            // Khởi tạo DAO để lấy tên NCC
             private dao.DAO_NhaCungCap daoNCC = new dao.DAO_NhaCungCap(); 
 
             @Override protected void updateItem(String item, boolean empty) {
@@ -62,8 +63,14 @@ public class GUI_XuatKhoController implements Initializable {
                 } else {
                     PhieuXuat px = getTableRow().getItem();
                     
-                    if (px.getLoaiPhieu() == 2) {
-                        // NẾU LÀ TRẢ NCC -> TÌM TÊN NHÀ CUNG CẤP VÀ HIỂN THỊ
+                    if (px.getLoaiPhieu() == 1) {
+                        // 🟢 CHUYỂN KHO -> MÀU XANH LÁ TỪ CSS
+                        String tenKho = "KHO_BAN_HANG".equals(item) ? "Kho Bán Hàng" : ("KHO_DU_TRU".equals(item) ? "Kho Dự Trữ" : item);
+                        setText(tenKho);
+                        setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;"); 
+                        
+                    } else if (px.getLoaiPhieu() == 2) {
+                        // 🔵 TRẢ NHÀ CUNG CẤP -> MÀU XANH DƯƠNG TỪ CSS
                         String tenNCC = "Không rõ NCC";
                         if (px.getMaNhaCungCap() != null) {
                             entity.NhaCungCap ncc = daoNCC.getNhaCungCapByMa(px.getMaNhaCungCap());
@@ -72,17 +79,13 @@ public class GUI_XuatKhoController implements Initializable {
                             }
                         }
                         setText(tenNCC); 
-                        setStyle("-fx-text-fill: #f59e0b; -fx-font-weight: bold;"); // Màu cam in đậm cho nổi bật
+                        setStyle("-fx-text-fill: #0ea5e9; -fx-font-weight: bold;"); 
                         
                     } else if (px.getLoaiPhieu() == 3) {
+                        // 🟠 XUẤT HỦY -> MÀU VÀNG CAM TỪ CSS
                         setText("Hủy rác y tế"); 
-                        setStyle("-fx-text-fill: #ef4444; -fx-font-style: italic;");
-                    } else if ("KHO_BAN_HANG".equals(item)) {
-                        setText("Kho Bán Hàng"); 
-                        setStyle("-fx-text-fill: #15803d; -fx-font-weight: bold;");
-                    } else if ("KHO_DU_TRU".equals(item)) {
-                        setText("Kho Dự Trữ"); 
-                        setStyle("-fx-text-fill: #b91c1c; -fx-font-weight: bold;");
+                        setStyle("-fx-text-fill: #fb8500; -fx-font-weight: bold;");
+                        
                     } else {
                         setText(item == null ? "---" : item); 
                         setStyle("");
@@ -91,25 +94,40 @@ public class GUI_XuatKhoController implements Initializable {
             }
         });
 
+        // =======================================================
+        // 2. CỘT LOẠI PHIẾU (Đồng bộ màu với cột Nơi Nhận)
+        // =======================================================
+        colLoaiPhieu.setCellValueFactory(new PropertyValueFactory<>("loaiPhieu"));
+        colLoaiPhieu.setCellFactory(c -> new TableCell<>() {
+            @Override protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) { 
+                    setText(null); setStyle(""); 
+                } else {
+                    if (item == 1) { 
+                        setText("🚚 Chuyển Kho"); 
+                        setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+                    } else if (item == 2) { 
+                        setText("🔙 Trả NCC"); 
+                        setStyle("-fx-text-fill: #0ea5e9; -fx-font-weight: bold;");
+                    } else if (item == 3) { 
+                        setText("🗑 Xuất Hủy"); 
+                        setStyle("-fx-text-fill: #fb8500; -fx-font-weight: bold;");
+                    } else {
+                        setText("---"); setStyle("");
+                    }
+                }
+            }
+        });
+        // =======================================================
+        // 3. CỘT THỜI GIAN VÀ NÚT THAO TÁC (Giữ nguyên)
+        // =======================================================
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         colThoiGian.setCellValueFactory(new PropertyValueFactory<>("ngayXuat"));
         colThoiGian.setCellFactory(c -> new TableCell<>() {
             @Override protected void updateItem(LocalDateTime item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? null : dtf.format(item));
-            }
-        });
-
-        colLoaiPhieu.setCellValueFactory(new PropertyValueFactory<>("loaiPhieu"));
-        colLoaiPhieu.setCellFactory(c -> new TableCell<>() {
-            @Override protected void updateItem(Integer item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) { setText(null); setStyle(""); }
-                else {
-                    if (item == 1) { setText("🚚 Chuyển Kho"); setStyle("-fx-text-fill: #0ea5e9; -fx-font-weight: bold;"); }
-                    else if (item == 2) { setText("🔙 Trả NCC"); setStyle("-fx-text-fill: #f59e0b; -fx-font-weight: bold;"); }
-                    else { setText("🗑 Xuất Hủy"); setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold;"); }
-                }
             }
         });
 

@@ -43,17 +43,13 @@ public class Dialog_XuatHuyController implements Initializable {
             txtNguoiLap.setText(UserSession.getInstance().getUser().getHoTen());
         }
 
-        // Setup Kho Xuất
-        cbKhoXuat.getItems().addAll("Kho dự trữ", "Kho bán hàng");
-        cbKhoXuat.getSelectionModel().selectFirst();
-        cbKhoXuat.valueProperty().addListener((o, oldV, newV) -> cbChonLo.getItems().clear());
-
-        // Setup Chọn Thuốc (Có tìm kiếm + Hình ảnh)
-        ObservableList<Thuoc> allThuoc = FXCollections.observableArrayList(new DAO_Thuoc().getAllThuoc());
-        FilteredList<Thuoc> filter = new FilteredList<>(allThuoc, p -> true);
+        // Khai báo danh sách thuốc động (sẽ thay đổi khi đổi kho)
+        ObservableList<Thuoc> danhSachThuocKho = FXCollections.observableArrayList();
+        FilteredList<Thuoc> filter = new FilteredList<>(danhSachThuocKho, p -> true);
         cbChonThuoc.setItems(filter);
         setupComboThuoc();
 
+        // Xử lý tìm kiếm nhanh
         txtTimNhanhThuoc.textProperty().addListener((o, oldV, newV) -> {
             filter.setPredicate(t -> {
                 if (newV == null || newV.isEmpty()) return true;
@@ -63,17 +59,41 @@ public class Dialog_XuatHuyController implements Initializable {
             if (!newV.isEmpty()) cbChonThuoc.show();
         });
 
+        // ========================================================
+        // LOGIC CHỌN KHO -> CẬP NHẬT DANH SÁCH THUỐC (ĐỒNG BỘ)
+        // ========================================================
+        cbKhoXuat.getItems().addAll("Kho dự trữ", "Kho bán hàng");
+        cbKhoXuat.valueProperty().addListener((o, oldV, newV) -> {
+            if (newV != null) {
+                // 1. Reset các ô chọn thuốc, chọn lô & số lượng cũ cho sạch
+                cbChonThuoc.getSelectionModel().clearSelection();
+                cbChonLo.getItems().clear();
+                txtSoLuongHuy.setText("");
+                
+                // 2. Tải danh sách thuốc CHỈ CÓ TRONG KHO VỪA CHỌN
+                String maKho = newV.equals("Kho dự trữ") ? "KHO_DU_TRU" : "KHO_BAN_HANG";
+                danhSachThuocKho.setAll(new DAO_Thuoc().getThuocCoLoTrongKho(maKho));
+            }
+        });
+
+        // Chọn Thuốc -> Load Lô FEFO
         cbChonThuoc.valueProperty().addListener((o, oldV, s) -> {
             if (s != null && cbKhoXuat.getValue() != null) {
                 String k = cbKhoXuat.getValue().equals("Kho dự trữ") ? "KHO_DU_TRU" : "KHO_BAN_HANG";
                 cbChonLo.setItems(FXCollections.observableArrayList(daoLo.getLoThuocTheoFEFO(s.getMaThuoc(), k)));
+            } else {
+                cbChonLo.getItems().clear();
             }
         });
 
+        // Format hiển thị cho ComboBox Lô Thuốc
         cbChonLo.setConverter(new StringConverter<LoThuoc>() {
             @Override public String toString(LoThuoc l) { return l==null ? "" : "Lô: " + l.getMaLoThuoc() + " (Tồn: " + l.getSoLuongTon() + ")"; }
             @Override public LoThuoc fromString(String s) { return null; }
         });
+
+        // Mặc định chọn "Kho dự trữ" khi vừa mở form lên (để kích hoạt trigger load thuốc lần đầu)
+        cbKhoXuat.getSelectionModel().selectFirst();
     }
 
     private void setupComboThuoc() {
@@ -97,6 +117,7 @@ public class Dialog_XuatHuyController implements Initializable {
 
     private void setupTable() {
         colSTT.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(dsHuyTam.indexOf(c.getValue()) + 1));
+        
         colTenThuoc.setCellValueFactory(c -> {
             String ma = c.getValue().getMaThuoc();
             for(Thuoc t : cbChonThuoc.getItems()) {
@@ -104,13 +125,15 @@ public class Dialog_XuatHuyController implements Initializable {
             }
             return new javafx.beans.property.SimpleStringProperty(ma);
         });
-        colSoLo.setCellValueFactory(new PropertyValueFactory<>("soLo"));
-        colSoLuong.setCellValueFactory(new PropertyValueFactory<>("soLuong"));
+
+        // 🚨 Đổi getSoLo() thành getMaLo() nếu IDE báo đỏ
+        colSoLo.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getSoLo()));
+        colSoLuong.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getSoLuong()));
         
         colXoa.setCellFactory(c -> new TableCell<>() {
-            private final Button b = new Button("🗑");
+            private final Button b = new Button("✕");
             { 
-                b.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-cursor: hand;"); 
+                b.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold;"); 
                 b.setOnAction(e -> { 
                     dsHuyTam.remove(getTableView().getItems().get(getIndex())); 
                     tableThuocHuy.refresh(); 

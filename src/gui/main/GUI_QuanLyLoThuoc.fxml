@@ -98,7 +98,7 @@
                      <font><Font name="System Bold" size="16.0" /></font>
                      <VBox.margin><Insets bottom="10.0" /></VBox.margin>
                   </Label>
-                  <GridPane hgap="40.0" vgap="15.0">
+                 <GridPane hgap="25.0" vgap="15.0">
                      <children>
                         <Label text="Ngày nhập kho:" textFill="#7f8c8d" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                         <Label fx:id="lblNgayNhap" styleClass="text-bold" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0" />
@@ -114,9 +114,15 @@
 
                         <Label text="Số lượng đã bán:" textFill="#7f8c8d" GridPane.columnIndex="4" GridPane.rowIndex="0" />
                         <Label fx:id="lblSlDaBan" styleClass="text-bold" text="-" textFill="#27ae60" GridPane.columnIndex="5" GridPane.rowIndex="0" />
+
+                        <Label text="Khách Đổi/Trả:" textFill="#7f8c8d" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                        <Label fx:id="lblSlDoiTra" styleClass="text-bold" text="-" textFill="#8e44ad" GridPane.columnIndex="5" GridPane.rowIndex="1" />
                         
-                        <Label text="SL xuất trả/hủy:" textFill="#7f8c8d" GridPane.columnIndex="4" GridPane.rowIndex="1" />
-                        <Label fx:id="lblSlXuatTra" styleClass="text-bold" text="-" textFill="#d35400" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+                        <Label text="SL Trả NCC:" textFill="#7f8c8d" GridPane.columnIndex="6" GridPane.rowIndex="0" />
+                        <Label fx:id="lblSlTraNcc" styleClass="text-bold" text="-" textFill="#d35400" GridPane.columnIndex="7" GridPane.rowIndex="0" />
+
+                        <Label text="SL Xuất hủy:" textFill="#7f8c8d" GridPane.columnIndex="6" GridPane.rowIndex="1" />
+                        <Label fx:id="lblSlXuatHuy" styleClass="text-bold" text="-" textFill="#c0392b" GridPane.columnIndex="7" GridPane.rowIndex="1" />
                      </children>
                   </GridPane>
                </children>

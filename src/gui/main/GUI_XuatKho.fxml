@@ -2,6 +2,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
 
 <VBox prefHeight="850.0" prefWidth="1200.0" spacing="25.0" styleClass="xk-main-bg" stylesheets="@../../resources/css/XuatKho.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.GUI_XuatKhoController">
    <padding><Insets bottom="30.0" left="30.0" right="30.0" top="30.0" /></padding>
@@ -12,15 +14,20 @@
          <Region maxWidth="400.0" styleClass="xk-title-line" />
       </VBox>
 
-      <HBox alignment="CENTER_LEFT" spacing="20.0">
+    <GridPane hgap="20" maxWidth="Infinity">
+         <columnConstraints>
+            <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS" />
+            <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS" />
+            <ColumnConstraints percentWidth="33.34" hgrow="ALWAYS" />
+         </columnConstraints>
          <children>
-            <Button maxWidth="Infinity" minWidth="0.0" onAction="#handleMoDialogChuyenKho" prefHeight="70.0" styleClass="btn-color-1" text="🚚 Lệnh Chuyển Kho" HBox.hgrow="ALWAYS" />
+            <Button maxWidth="Infinity" minHeight="50" prefHeight="50" style="-fx-font-size: 16px; -fx-font-weight: bold;" onAction="#handleMoDialogChuyenKho" styleClass="top-card, card-green, btn-action" text="🚚 Lệnh Chuyển Kho" textFill="WHITE" GridPane.columnIndex="0" />
             
-            <Button maxWidth="Infinity" minWidth="0.0" onAction="#handleMoDialogTraNCC" prefHeight="70.0" styleClass="btn-color-2" text="🔙 Trả Nhà Cung Cấp" HBox.hgrow="ALWAYS" />
+            <Button maxWidth="Infinity" minHeight="50" prefHeight="50" style="-fx-font-size: 16px; -fx-font-weight: bold;" onAction="#handleMoDialogTraNCC" styleClass="top-card, card-blue, btn-action" text="🔙 Trả Nhà Cung Cấp" textFill="WHITE" GridPane.columnIndex="1" />
             
-            <Button maxWidth="Infinity" minWidth="0.0" onAction="#handleMoDialogXuatHuy" prefHeight="70.0" styleClass="btn-color-3" text="🗑 Lệnh Xuất Hủy" HBox.hgrow="ALWAYS" />
+            <Button maxWidth="Infinity" minHeight="50" prefHeight="50" style="-fx-font-size: 16px; -fx-font-weight: bold;" onAction="#handleMoDialogXuatHuy" styleClass="top-card, card-orange, btn-action" text="🗑 Lệnh Xuất Hủy" textFill="WHITE" GridPane.columnIndex="2" />
          </children>
-      </HBox>
+      </GridPane>
 
       <VBox spacing="20.0" styleClass="xk-card" VBox.vgrow="ALWAYS">
          <padding><Insets bottom="20.0" left="25.0" right="25.0" top="25.0" /></padding>
