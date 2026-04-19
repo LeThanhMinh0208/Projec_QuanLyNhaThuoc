@@ -271,16 +271,20 @@ public class GUI_DangNhapController {
         String matKhau  = txtMatKhau.getText();
 
         if (taiKhoan.isEmpty() || matKhau.isEmpty()) {
-            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Nhập tài khoản và mật khẩu sếp ơi!");
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng nhập đầy đủ tài khoản và mật khẩu!");
             return;
         }
 
         NhanVien nv = nhanVienDao.dangNhap(taiKhoan, matKhau);
         if (nv != null) {
-            if (nv.getTrangThai() == 2) {
-                AlertUtils.showAlert(Alert.AlertType.ERROR, "Khóa rồi", "Tài khoản bị khóa, liên hệ sếp tổng nha!");
-                return;
-            }
+        	if (nv.getTrangThai() == 2) {
+        	    AlertUtils.showAlert(
+        	        Alert.AlertType.ERROR,
+        	        "Thất bại",
+        	        "Tài khoản của bạn đã bị khóa!\nVui lòng liên hệ Quản lý để được hỗ trợ."
+        	    );
+        	    return;
+        	}
             UserSession.getInstance().setUser(nv);
             WindowUtils.closeWindow(event);
 
@@ -297,7 +301,7 @@ public class GUI_DangNhapController {
                 mainStage.show();
             } catch (Exception e) { e.printStackTrace(); }
         } else {
-            AlertUtils.showAlert(Alert.AlertType.ERROR, "Thất bại", "Sai tài khoản hoặc mật khẩu rồi sếp!");
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Thất bại", "Tài khoản hoặc mật khẩu không đúng!");
         }
     }
 }
