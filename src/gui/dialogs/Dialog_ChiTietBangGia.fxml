@@ -95,6 +95,13 @@
                     styleClass="bh-btn-primary" prefHeight="34"/>
         </HBox>
 
+        <!-- Search block -->
+        <HBox spacing="8" alignment="CENTER_LEFT" style="-fx-padding: 0 0 8 0;">
+            <Label text="Tìm thuốc:" style="-fx-text-fill:#64748b;" />
+            <TextField fx:id="txtTimKiem" promptText="Nhập tên thuốc..."
+                       HBox.hgrow="ALWAYS" prefHeight="36" />
+        </HBox>
+
         <!-- Chi tiết bảng giá table -->
         <TableView fx:id="tableChiTiet" prefHeight="250.0" styleClass="bg-detail-table">
             <columnResizePolicy>

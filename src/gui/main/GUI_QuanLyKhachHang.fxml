@@ -7,6 +7,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.Region?>
 
 <VBox prefHeight="800.0" prefWidth="1200.0" spacing="25.0" styleClass="main-bg" 
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
@@ -21,7 +22,12 @@
 
     <!-- Header -->
     <HBox alignment="CENTER_LEFT" spacing="20">
-        <Label styleClass="main-title" text="QUẢN LÝ KHÁCH HÀNG" />
+        <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity">
+            <children>
+                <Label styleClass="main-title" text="QUẢN LÝ KHÁCH HÀNG" />
+                <Region prefHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+            </children>
+        </VBox>
     </HBox>
 
     <!-- Action Buttons -->

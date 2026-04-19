@@ -3,17 +3,18 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.Region?>
 
 <VBox prefHeight="850.0" prefWidth="1200.0" spacing="25.0" styleClass="dmk-main-bg" stylesheets="@../../resources/css/QuanLyDonDatHang.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.GUI_QuanLyDonDatHangController">
    <padding>
       <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
    </padding>
    <children>
-      <VBox spacing="5.0">
-         <children>
-            <Label styleClass="dmk-page-title" text="Quản Lý Đơn Đặt Hàng" />
-            <Region maxWidth="150.0" prefHeight="4.0" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
-         </children>
+      <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity">
+          <children>
+              <Label styleClass="main-title" text="QUẢN LÝ ĐƠN ĐẶT HÀNG" />
+              <Region prefHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+          </children>
       </VBox>
       
       <HBox alignment="CENTER_LEFT" spacing="20.0">

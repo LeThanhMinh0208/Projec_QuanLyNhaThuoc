@@ -3,6 +3,7 @@
 <?import java.net.URL?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.geometry.Insets?>
 
 <VBox prefHeight="850.0" prefWidth="1200.0" spacing="20.0" styleClass="main-bg"
@@ -16,8 +17,13 @@
 
     <padding><Insets bottom="30.0" left="40.0" right="40.0" top="30.0" /></padding>
 
-    <HBox alignment="CENTER_LEFT" spacing="16" VBox.vgrow="NEVER" style="-fx-padding:0 0 16 0;">
-        <Label styleClass="main-title" text="LỊCH SỬ GIAO DỊCH KHÁCH HÀNG" />
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity">
+            <children>
+                <Label styleClass="main-title" text="LỊCH SỬ GIAO DỊCH KHÁCH HÀNG" />
+                <Region prefHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+            </children>
+        </VBox>
     </HBox>
 
     <VBox styleClass="bh-panel" spacing="10" VBox.vgrow="NEVER">

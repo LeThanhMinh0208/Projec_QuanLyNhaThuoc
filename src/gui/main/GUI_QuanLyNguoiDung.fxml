@@ -2,6 +2,7 @@
 <?import java.net.URL?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.geometry.Insets?>
 
 <VBox prefHeight="800.0" prefWidth="1200.0" spacing="25.0" styleClass="main-bg" 
@@ -15,7 +16,12 @@
     <padding><Insets bottom="30.0" left="40.0" right="40.0" top="30.0" /></padding>
 
     <HBox alignment="CENTER_LEFT" spacing="20">
-        <Label styleClass="main-title" text="DANH MỤC NGƯỜI DÙNG" />
+        <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity">
+            <children>
+                <Label styleClass="main-title" text="DANH MỤC NGƯỜI DÙNG" />
+                <Region prefHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+            </children>
+        </VBox>
     </HBox>
 
     <GridPane hgap="8" maxWidth="Infinity">

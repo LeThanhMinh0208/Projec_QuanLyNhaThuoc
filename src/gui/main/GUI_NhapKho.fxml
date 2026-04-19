@@ -2,6 +2,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.Region?>
 
 
 <VBox prefHeight="850.0" spacing="20.0" styleClass="nk-main-bg" stylesheets="@../../resources/css/NhapKho.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.GUI_NhapKhoController">
@@ -9,10 +10,10 @@
    <children>
       <HBox alignment="CENTER_LEFT" spacing="30.0">
          <children>
-            <VBox spacing="5.0">
+            <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity">
                <children>
-                  <Label styleClass="nk-page-title" text="LẬP PHIẾU NHẬP KHO" />
-                  <Region prefHeight="4.0" prefWidth="150.0" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+                  <Label styleClass="main-title" text="LẬP PHIẾU NHẬP KHO" />
+                  <Region prefHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
                </children>
             </VBox>
             

@@ -11,6 +11,15 @@
     -fx-effect: dropshadow(gaussian, rgba(26,154,218,0.25), 5, 0.5, 0, 2);
 }
 
+.main-title {
+    -fx-font-size: 32px;
+    -fx-font-weight: 900;
+    -fx-text-fill: linear-gradient(to bottom, #0ea5e9, #0369a1);
+    -fx-padding: 10 0 20 0;
+    -fx-text-alignment: center;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.4), 5, 0, 0, 2);
+}
+
 /* KHUNG TÌM KIẾM */
 .big-search-box {
     -fx-background-color: white;

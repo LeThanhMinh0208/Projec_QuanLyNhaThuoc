@@ -5,7 +5,6 @@ import java.io.File;
 import java.sql.Date;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import dao.DAO_HoaDon;
 import entity.HoaDonView;
@@ -46,8 +45,13 @@ public class Dialog_ChiTietHoaDonController {
     }
 
     private void setupTable() {
-        AtomicInteger stt = new AtomicInteger(0);
-        colSTT      .setCellValueFactory(d -> new SimpleStringProperty(String.valueOf(stt.incrementAndGet())));
+        colSTT.setCellFactory(col -> new javafx.scene.control.TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : String.valueOf(getIndex() + 1));
+            }
+        });
         colTenThuoc .setCellValueFactory(d -> new SimpleStringProperty((String)  d.getValue()[0]));
         colDonVi    .setCellValueFactory(d -> new SimpleStringProperty((String)  d.getValue()[1]));
         colLoThuoc  .setCellValueFactory(d -> new SimpleStringProperty((String)  d.getValue()[2]));

@@ -3,7 +3,6 @@ package gui.dialogs;
 import java.sql.Date;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import dao.DAO_PhieuDoiTra;
 import entity.PhieuDoiTraView;
@@ -20,6 +19,7 @@ import utils.SceneUtils;
 
 public class Dialog_ChiTietPhieuDoiTraController {
 
+    @FXML private javafx.scene.control.ScrollPane scrollPane;
     @FXML private Label lblMaPhieu;
     @FXML private Label lblNgayDoiTra;
     @FXML private Label lblMaHoaDon;
@@ -74,8 +74,13 @@ public class Dialog_ChiTietPhieuDoiTraController {
     }
 
     private void setupTable() {
-        AtomicInteger stt = new AtomicInteger(0);
-        colSTT.setCellValueFactory(d -> new SimpleStringProperty(String.valueOf(stt.incrementAndGet())));
+        colSTT.setCellFactory(col -> new javafx.scene.control.TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : String.valueOf(getIndex() + 1));
+            }
+        });
         colTenThuoc.setCellValueFactory(d -> new SimpleStringProperty((String) d.getValue()[0]));
         colDonVi.setCellValueFactory(d -> new SimpleStringProperty((String) d.getValue()[1]));
         colLoThuoc.setCellValueFactory(d -> new SimpleStringProperty((String) d.getValue()[2]));
@@ -87,8 +92,13 @@ public class Dialog_ChiTietPhieuDoiTraController {
         colDonGia.setCellValueFactory(d -> new SimpleStringProperty(String.format("%,.0f VND", (double) d.getValue()[5])));
         colThanhTien.setCellValueFactory(d -> new SimpleStringProperty(String.format("%,.0f VND", (double) d.getValue()[6])));
         
-        AtomicInteger sttDoi = new AtomicInteger(0);
-        colDoiSTT.setCellValueFactory(d -> new SimpleStringProperty(String.valueOf(sttDoi.incrementAndGet())));
+        colDoiSTT.setCellFactory(col -> new javafx.scene.control.TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : String.valueOf(getIndex() + 1));
+            }
+        });
         colDoiTen.setCellValueFactory(d -> new SimpleStringProperty((String) d.getValue()[1]));
         colDoiDonVi.setCellValueFactory(d -> new SimpleStringProperty((String) d.getValue()[2]));
         colDoiSoLuong.setCellValueFactory(d -> new SimpleStringProperty(String.valueOf(d.getValue()[3])));
@@ -126,11 +136,17 @@ public class Dialog_ChiTietPhieuDoiTraController {
 
         if (pdt.isDoiSanPham()) {
             lblTongTienHoan.setText(pdt.getMoTaChenhLechDoiSanPham());
-            return;
+        } else {
+            double tongTienHoan = Math.max(0, tongTien - pdt.getPhiPhat());
+            lblTongTienHoan.setText(String.format("%,.0f VND", tongTienHoan));
         }
 
-        double tongTienHoan = Math.max(0, tongTien - pdt.getPhiPhat());
-        lblTongTienHoan.setText(String.format("%,.0f VND", tongTienHoan));
+        javafx.application.Platform.runLater(() -> {
+            if (scrollPane != null) {
+                scrollPane.setVvalue(0.0);
+                scrollPane.setHvalue(0.0);
+            }
+        });
     }
 
     @FXML

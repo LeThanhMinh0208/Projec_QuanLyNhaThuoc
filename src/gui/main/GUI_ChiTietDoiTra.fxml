@@ -28,7 +28,12 @@
 
     <HBox alignment="CENTER_LEFT" spacing="16" VBox.vgrow="NEVER" style="-fx-padding:0 0 10 0;">
         <Button text="Quay lại" onAction="#handleQuayLai" styleClass="bh-btn-secondary" prefHeight="38" prefWidth="110" />
-        <Label styleClass="main-title" text="CHI TIẾT ĐỔI TRẢ" />
+        <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity">
+            <children>
+                <Label styleClass="main-title" text="CHI TIẾT ĐỔI TRẢ" />
+                <Region prefHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+            </children>
+        </VBox>
     </HBox>
 
     <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color:transparent; -fx-background:transparent;">
@@ -106,7 +111,7 @@
 
                         <Label text="Thuốc đổi:" style="-fx-text-fill:#64748b;" GridPane.rowIndex="2" GridPane.columnIndex="0" />
                         <HBox alignment="CENTER_LEFT" spacing="10" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="2">
-                            <Button text="Chọn thuốc đổi" onAction="#handleChonThuocDoi" styleClass="bh-btn-secondary" prefHeight="32" />
+                            <Button text="Chọn thuốc đổi" onAction="#handleChonThuocDoi" styleClass="bh-btn-secondary" prefHeight="32" minWidth="-Infinity" wrapText="false" />
                             <Button text="Bỏ chọn" onAction="#handleBoThuocDoi" styleClass="bh-btn-secondary" prefHeight="32" />
                         </HBox>
                         <HBox alignment="CENTER_RIGHT" spacing="10" GridPane.rowIndex="2" GridPane.columnIndex="3">
@@ -157,6 +162,7 @@
                         <Label text="Tổng số mặt hàng:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" />
                         <Label fx:id="lblTongDong" style="-fx-text-fill:#0f172a;" />
                         <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="lblPhiPhat" style="-fx-text-fill:#dc2626; -fx-font-size:14px;" visible="false" managed="false" />
                         <Label text="Thanh toán:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" />
                         <Label fx:id="lblTongTienHoan" style="-fx-text-fill:#16a34a; -fx-font-size:18px; -fx-font-weight:bold;" />
                     </HBox>

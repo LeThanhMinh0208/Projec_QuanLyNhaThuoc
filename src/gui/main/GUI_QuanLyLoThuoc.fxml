@@ -19,7 +19,12 @@
    <top>
       <VBox spacing="15.0" BorderPane.alignment="CENTER">
          <children>
-            <Label styleClass="title-label" text="QUẢN LÝ LÔ THUỐC" />
+            <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity">
+                <children>
+                    <Label styleClass="main-title" text="QUẢN LÝ LÔ THUỐC" />
+                    <Region prefHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+                </children>
+            </VBox>
             
             <HBox spacing="20.0" alignment="CENTER_LEFT">
                <children>
@@ -68,7 +73,7 @@
             </HBox>
          </children>
          <padding>
-            <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
+            <Insets bottom="10.0" left="40.0" right="40.0" top="30.0" />
          </padding>
       </VBox>
    </top>
@@ -132,7 +137,7 @@
             </VBox>
          </children>
          <BorderPane.margin>
-            <Insets bottom="20.0" left="20.0" right="20.0" />
+            <Insets bottom="30.0" left="40.0" right="40.0" />
          </BorderPane.margin>
       </VBox>
    </center>
