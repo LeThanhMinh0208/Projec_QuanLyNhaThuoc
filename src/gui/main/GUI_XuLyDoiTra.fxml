@@ -22,10 +22,10 @@
 
     <HBox alignment="CENTER_LEFT" spacing="16" VBox.vgrow="NEVER" style="-fx-padding: 0 0 10 0;">
         <children>
-            <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity">
+            <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity" minHeight="-Infinity">
                 <children>
                     <Label styleClass="main-title" text="ĐỔI TRẢ THUỐC" />
-                    <Region prefHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+                    <Region prefHeight="4.0" minHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
                 </children>
             </VBox>
             <HBox alignment="CENTER_LEFT" styleClass="tab-container">
@@ -54,7 +54,7 @@
             <Label prefWidth="80" style="-fx-text-fill:#64748b; -fx-font-size:13px;" text="Đến ngày:" />
             <DatePicker fx:id="dpDenNgay" prefWidth="150" />
             <Label style="-fx-text-fill:#64748b; -fx-font-size:13px;" text="Hình thức TT:" />
-            <ComboBox fx:id="cbHinhThuc" prefWidth="160" promptText="Tất cả" />
+            <ComboBox fx:id="cbHinhThuc" prefWidth="160" promptText="Tất cả" onAction="#handleTimKiem" />
         </HBox>
         <HBox alignment="CENTER_LEFT" spacing="12">
             <Label prefWidth="70" style="-fx-text-fill:#64748b; -fx-font-size:13px;" text="Tìm kiếm:" />
@@ -62,8 +62,10 @@
                 <Label styleClass="search-icon" text="🔍" />
                 <TextField fx:id="txtTimKiem" promptText="Mã HĐ, tên/SĐT khách hàng..." styleClass="search-input" HBox.hgrow="ALWAYS" />
             </HBox>
-            <Button onAction="#handleTimKiem" prefHeight="38" prefWidth="120" styleClass="bh-btn-primary" text="🔍 Tìm kiếm" />
-            <Button onAction="#handleXoaBoLoc" prefHeight="38" prefWidth="120" styleClass="bh-btn-secondary" text="✕ Xóa bộ lọc" />
+            <Button onAction="#handleTimKiem" prefHeight="38" text="🔍 Tìm kiếm"
+                    style="-fx-background-color: linear-gradient(to bottom, #38bdf8, #0ea5e9); -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 8 16; -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.35), 8, 0, 0, 3);" />
+            <Button onAction="#handleXoaBoLoc" prefHeight="38" text="✕ Xóa bộ lọc"
+                    style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-font-size: 13px; -fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 8 16; -fx-border-color: #e2e8f0; -fx-border-radius: 10; -fx-border-width: 1.5;" />
         </HBox>
     </VBox>
                         </children>

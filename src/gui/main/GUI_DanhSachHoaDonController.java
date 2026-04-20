@@ -203,6 +203,12 @@ public class GUI_DanhSachHoaDonController {
     }
 
     @FXML
+    void onFilterHinhThuc(ActionEvent event) {
+        // Khi thay đổi ComboBox hình thức TT → reload data từ DB
+        loadData();
+    }
+
+    @FXML
     void handleXoaBoLoc(ActionEvent event) {
         dpTuNgay.setValue(LocalDate.now().withDayOfMonth(1));
         dpDenNgay.setValue(LocalDate.now());
