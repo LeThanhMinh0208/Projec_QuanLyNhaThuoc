@@ -217,35 +217,43 @@ public class DAO_PhieuDoiTra {
                 }
             }
 
-            // --- INSERT ChiTietDoiTra + cộng tồn thuốc trả ---
+         // --- INSERT ChiTietDoiTra + cộng tồn thuốc trả ---
             String sqlChiTiet = "INSERT INTO ChiTietDoiTra(maPhieuDoiTra, maQuyDoi, maLoThuoc, soLuong, tinhTrang) VALUES(?,?,?,?,?)";
+            // 🚨 CHỈ CỘNG VÀO TỒN KHO. (VÌ DB SẾP KHÔNG CÓ CỘT soLuongKhachTra NÊN KHÔNG ĐƯỢC THÊM VÀO)
             String sqlCongTon = "UPDATE LoThuoc SET soLuongTon = soLuongTon + ? WHERE maLoThuoc = ?";
 
             for (ChiTietDoiTra ct : chiTietHopLe) {
                 int soLuongConLai = getSoLuongConLaiCoTheDoi(con, pdt.getHoaDon().getMaHoaDon(), ct.getMaQuyDoi(), ct.getMaLoThuoc());
+                
                 if (ct.getSoLuong() <= 0 || ct.getSoLuong() > soLuongConLai) {
                     con.rollback();
                     con.setAutoCommit(true);
                     return false;
                 }
 
+                // 💡 BƯỚC QUAN TRỌNG NHẤT: Lấy tỷ lệ quy đổi và nhân lên để ra SỐ VIÊN (VD: 1 Hộp * 100 = 100 Viên)
+                int tyLeQuyDoi = getTyLeQuyDoi(con, ct.getMaQuyDoi());
+                int soLuongCoBan = ct.getSoLuong() * tyLeQuyDoi;
+
                 try (PreparedStatement pst = con.prepareStatement(sqlChiTiet)) {
                     pst.setString(1, ct.getMaPhieuDoiTra());
                     pst.setString(2, ct.getMaQuyDoi());
                     pst.setString(3, ct.getMaLoThuoc());
-                    pst.setInt(4, ct.getSoLuong());
+                    
+                    // 💡 LƯU SỐ LƯỢNG CƠ BẢN (100 Viên) VÀO BẢNG CHI TIẾT
+                    pst.setInt(4, soLuongCoBan); 
+                    
                     pst.setString(5, ct.getTinhTrang());
                     pst.executeUpdate();
                 }
 
-                int tyLeQuyDoi = getTyLeQuyDoi(con, ct.getMaQuyDoi());
                 try (PreparedStatement pst = con.prepareStatement(sqlCongTon)) {
-                    pst.setInt(1, ct.getSoLuong() * tyLeQuyDoi);
+                    // 💡 CỘNG SỐ LƯỢNG CƠ BẢN (100 Viên) VÀO TỒN KHO
+                    pst.setInt(1, soLuongCoBan); 
                     pst.setString(2, ct.getMaLoThuoc());
                     pst.executeUpdate();
                 }
             }
-
             // --- Trừ tồn kho thuốc đổi cho khách (DOI_SAN_PHAM - Hỗ trợ trừ nhiều lô FEFO) ---
             if (dsThuocDoi != null && !dsThuocDoi.isEmpty()) {
                 for (DoiTraSession.DonViDoiData thuocDoi : dsThuocDoi) {

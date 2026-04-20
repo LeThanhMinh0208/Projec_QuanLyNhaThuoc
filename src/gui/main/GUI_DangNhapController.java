@@ -93,7 +93,7 @@ public class GUI_DangNhapController {
     }
 
     // =================================================================
-    // 🎇 ENGINE PHÁO HOA XUNG QUANH KHUNG ĐĂNG NHẬP (KHUNG 950x600)
+    // 🎇 ENGINE PHÁO HOA XUNG QUANH KHUNG ĐĂNG NHẬP (BẢN SLOW MOTION)
     // =================================================================
     private void startAnimeEngine() {
         new AnimationTimer() {
@@ -104,7 +104,6 @@ public class GUI_DangNhapController {
                 
                 backgroundDust.forEach(e -> e.update(t));
 
-                // 🌟 TĂNG TẦN SUẤT BẮN PHÁO LÊN X3 (0.04 so với 0.015 cũ)
                 if (random.nextDouble() < 0.04) {
                     int burstCount = random.nextDouble() < 0.2 ? random.nextInt(2) + 1 : 1;
                     for(int i = 0; i < burstCount; i++) {
@@ -119,19 +118,20 @@ public class GUI_DangNhapController {
                 while (fwIt.hasNext()) {
                     Firework fw = fwIt.next();
                     if (fw.update()) {
-                        // 🌟 PHÁO NỔ KHỔNG LỒ (120 - 200 tia lửa)
-                        int particleCount = random.nextInt(80) + 120;
+                        // 🌟 PHÁO NỔ TỪ TỪ (100 - 150 tia lửa)
+                        int particleCount = random.nextInt(50) + 100;
                         for (int i = 0; i < particleCount; i++) {
                             FireworkParticle fp = new FireworkParticle(fw.x, fw.y, fw.color);
                             fwParticles.add(fp);
                             animeBackgroundPane.getChildren().add(fp.node);
                         }
                         
-                        // HIỆU ỨNG FLASH KHI NỔ
-                        Circle flash = new Circle(fw.x, fw.y, 180, Color.WHITE);
+                        // 💡 ĐÃ SỬA: HIỆU ỨNG FLASH SÁNG LÊN VÀ TẮT ĐI TỪ TỪ (500ms thay vì 200ms)
+                        Circle flash = new Circle(fw.x, fw.y, 200, Color.WHITE);
                         flash.setEffect(new Glow(1.0));
                         animeBackgroundPane.getChildren().add(flash);
-                        FadeTransition ft = new FadeTransition(Duration.millis(200), flash);
+                        FadeTransition ft = new FadeTransition(Duration.millis(500), flash);
+                        ft.setFromValue(0.8);
                         ft.setToValue(0);
                         ft.setOnFinished(e -> animeBackgroundPane.getChildren().remove(flash));
                         ft.play();
@@ -154,7 +154,7 @@ public class GUI_DangNhapController {
         }.start();
     }
 
-    // --- QUẢN LÝ BỤI NỀN (Khung 950x600) ---
+    // --- QUẢN LÝ BỤI NỀN ---
     private class AnimeEntity {
         javafx.scene.Node node;
         double dx, dy;
@@ -171,7 +171,6 @@ public class GUI_DangNhapController {
         public void update(double t) {
             node.setLayoutX(node.getLayoutX() + dx);
             node.setLayoutY(node.getLayoutY() + dy);
-            // Vòng lặp ranh giới 950x600
             if (node.getLayoutX() < -10) node.setLayoutX(960);
             if (node.getLayoutX() > 960) node.setLayoutX(-10);
             if (node.getLayoutY() < -10) node.setLayoutY(610);
@@ -179,24 +178,23 @@ public class GUI_DangNhapController {
         }
     }
 
-    // --- QUẢN LÝ PHÁO BÔNG BẮN LÊN (Bắn quanh khung) ---
+    // --- QUẢN LÝ PHÁO BÔNG BẮN LÊN ---
     private class Firework {
         Circle node;
         double x, y, dy;
         Color color;
 
         public Firework() {
-            // 🌟 LOGIC BẮN HAI BÊN HÔNG: Tránh bị khung đăng nhập ở giữa che mất
             if (random.nextBoolean()) {
-                x = random.nextDouble() * 250; // Bắn từ bên Trái (0 -> 250)
+                x = random.nextDouble() * 250; 
             } else {
-                x = 700 + random.nextDouble() * 250; // Bắn từ bên Phải (700 -> 950)
+                x = 700 + random.nextDouble() * 250; 
             }
             
-            y = 650; // Xuất phát từ dưới mép màn hình
-            dy = -(random.nextDouble() * 7 + 10); // Lực bắn vừa phải để nổ ngang form đăng nhập
+            y = 650; 
+            // 💡 ĐÃ SỬA: Lực bắn lên mượt hơn một chút
+            dy = -(random.nextDouble() * 5 + 9); 
             
-            // Random màu rực rỡ
             color = Color.hsb(random.nextDouble() * 360, 1.0, 1.0);
             
             node = new Circle(3.5, color); 
@@ -207,13 +205,14 @@ public class GUI_DangNhapController {
 
         public boolean update() {
             y += dy;
-            dy += 0.25; // Trọng lực
+            // 💡 ĐÃ SỬA: Lực kéo trái đất nhẹ hơn lúc bay lên -> Bay lả lướt hơn
+            dy += 0.15; 
             node.setLayoutY(y);
-            return dy >= -1.0; // Đạt đỉnh thì nổ
+            return dy >= -0.5; // Nổ khi gần chạm đỉnh
         }
     }
 
-    // --- QUẢN LÝ TIA LỬA NỔ TUNG TÓE ---
+    // --- QUẢN LÝ TIA LỬA NỔ TUNG TÓE (VẬT LÝ LƠ LỬNG) ---
     private class FireworkParticle {
         Circle node;
         double x, y, dx, dy, life, maxLife;
@@ -222,16 +221,17 @@ public class GUI_DangNhapController {
             x = startX; y = startY;
             double angle = random.nextDouble() * Math.PI * 2;
             
-            // TỐC ĐỘ VĂNG LỚN ĐỂ LAN RỘNG
-            double speed = random.nextDouble() * 20 + 3; 
+            // 💡 ĐÃ SỬA 1: TỐC ĐỘ BUNG RA TỪ TỪ (Giảm từ 20 xuống 12)
+            double speed = random.nextDouble() * 12 + 2; 
             dx = Math.cos(angle) * speed;
             dy = Math.sin(angle) * speed;
             
-            maxLife = random.nextInt(70) + 50; 
+            // 💡 ĐÃ SỬA 2: TĂNG THỜI GIAN SỐNG LÊN ĐỂ TIA LỬA LƠ LỬNG LÂU HƠN
+            maxLife = random.nextInt(100) + 80; 
             life = maxLife;
             
             Color particleColor = random.nextDouble() > 0.8 ? Color.WHITE : baseColor;
-            double size = random.nextDouble() * 3.0 + 1.0;
+            double size = random.nextDouble() * 3.5 + 1.0;
             node = new Circle(size, particleColor);
             
             node.setEffect(new Glow(1.0));
@@ -243,14 +243,17 @@ public class GUI_DangNhapController {
             x += dx;
             y += dy;
             
-            // VẬT LÝ NÂNG CAO
-            dx *= 0.90; // Lực cản không khí phanh nhanh
-            dy *= 0.90; 
-            dy += 0.35; // Rơi rũ xuống theo trọng lực
+            // 💡 ĐÃ SỬA 3: VẬT LÝ SIÊU MƯỢT
+            dx *= 0.96; // Giảm lực ma sát -> Trôi ra xa mượt mà hơn (Không phanh gấp)
+            dy *= 0.96; 
+            dy += 0.06; // Trọng lực siêu nhẹ -> Rơi lơ lửng như bụi tiên thay vì rớt vèo xuống
             
             life--;
-            node.setOpacity((life / maxLife) * 1.5); 
             
+            // Mờ đi từ từ một cách uyển chuyển
+            node.setOpacity((life / maxLife) * 1.2); 
+            
+            // Kích thước thu nhỏ dần mượt mà
             double scale = (life / maxLife);
             node.setScaleX(scale);
             node.setScaleY(scale);
@@ -263,7 +266,7 @@ public class GUI_DangNhapController {
     }
 
     // =================================================================
-    // LOGIC ĐĂNG NHẬP (Chỉ Fullsize khi mở Trang Chủ)
+    // LOGIC ĐĂNG NHẬP 
     // =================================================================
     @FXML
     void handleDangNhap(ActionEvent event) {
@@ -291,8 +294,6 @@ public class GUI_DangNhapController {
                 mainStage.setTitle("Long Nguyên Pharma - " + nv.getHoTen());
                 
                 mainStage.setScene(new javafx.scene.Scene(root));
-                
-                // 🚨 BẬT FULL MÀN HÌNH HỆ THỐNG
                 mainStage.setMaximized(true); 
                 mainStage.show();
             } catch (Exception e) { e.printStackTrace(); }
