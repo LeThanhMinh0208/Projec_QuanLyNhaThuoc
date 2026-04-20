@@ -43,13 +43,14 @@ public class DAO_PhieuDoiTra {
                 "               WHERE pdt.maHoaDon = ct.maHoaDon " +
                 "                 AND dt.maQuyDoi = ct.maQuyDoi " +
                 "                 AND dt.maLoThuoc = ct.maLoThuoc), 0) AS soLuongDaTra, " +
-                "       MAX(ct.donGia) AS donGia " +
+                "       MAX(ct.donGia) * (1 + hd.thueVAT / 100.0) AS donGia " +
                 "FROM ChiTietHoaDon ct " +
+                "JOIN HoaDon hd ON hd.maHoaDon = ct.maHoaDon " +
                 "JOIN DonViQuyDoi dv ON dv.maQuyDoi = ct.maQuyDoi " +
                 "JOIN Thuoc t ON t.maThuoc = dv.maThuoc " +
                 "JOIN LoThuoc lo ON lo.maLoThuoc = ct.maLoThuoc " +
                 "WHERE ct.maHoaDon = ? " +
-                "GROUP BY ct.maHoaDon, ct.maQuyDoi, ct.maLoThuoc, t.tenThuoc, dv.tenDonVi, lo.hanSuDung " +
+                "GROUP BY ct.maHoaDon, hd.thueVAT, ct.maQuyDoi, ct.maLoThuoc, t.tenThuoc, dv.tenDonVi, lo.hanSuDung " +
                 "ORDER BY t.tenThuoc, lo.hanSuDung";
         try (Connection con = ConnectDB.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {

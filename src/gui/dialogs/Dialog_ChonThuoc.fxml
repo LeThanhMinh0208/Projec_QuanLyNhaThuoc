@@ -68,7 +68,7 @@
         <children>
             <Button text="Hủy" onAction="#handleHuy" styleClass="dialog-btn-cancel"
                     prefWidth="100" prefHeight="42"/>
-            <Button fx:id="btnThemVaoGio" text="✔️ Chọn thuốc" onAction="#handleChon"
+            <Button fx:id="btnThemVaoGio" text="Chọn thuốc" onAction="#handleChon"
                     styleClass="dialog-btn-ok" prefWidth="160" prefHeight="42"
                     style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 6px;"/>
         </children>

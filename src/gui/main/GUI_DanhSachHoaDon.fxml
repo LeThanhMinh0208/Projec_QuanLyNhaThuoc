@@ -3,6 +3,7 @@
 <?import java.net.URL?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.geometry.Insets?>
 
 <VBox styleClass="main-bg" VBox.vgrow="ALWAYS"
@@ -17,8 +18,13 @@
     <padding><Insets bottom="30.0" left="40.0" right="40.0" top="30.0" /></padding>
 
     <!-- Header -->
-    <HBox alignment="CENTER_LEFT" spacing="16" VBox.vgrow="NEVER" style="-fx-padding:0 0 16 0;">
-        <Label styleClass="main-title" text="DANH SÁCH HÓA ĐƠN" />
+    <HBox alignment="CENTER_LEFT" spacing="20" minHeight="-Infinity" style="-fx-padding: 0 0 10 0;">
+        <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity" minHeight="-Infinity">
+            <children>
+                <Label styleClass="main-title" text="DANH SÁCH HÓA ĐƠN" />
+                <Region prefHeight="4.0" minHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+            </children>
+        </VBox>
     </HBox>
 
     <!-- ===== THANH FILTER ===== -->
@@ -29,7 +35,7 @@
             <Label text="Đến ngày:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" prefWidth="80" />
             <DatePicker fx:id="dpDenNgay" prefWidth="150" />
             <Label text="Hình thức TT:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" />
-            <ComboBox fx:id="cbHinhThuc" prefWidth="160" promptText="Tất cả" />
+            <ComboBox fx:id="cbHinhThuc" prefWidth="160" promptText="Tất cả" onAction="#onFilterHinhThuc" />
             <Label text="Loại hóa đơn:" style="-fx-text-fill:#64748b; -fx-font-size:13px;" />
             <ComboBox fx:id="cbLoaiBan" prefWidth="160" onAction="#onFilterLoaiBan" />
         </HBox>

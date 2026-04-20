@@ -77,10 +77,10 @@ public class GUI_DanhMucThuocController {
 
                 switch (item) {
                     case "DANG_BAN":
-                        setText("Dang kinh doanh");
+                        setText("Đang kinh doanh");
                         break;
                     case "HET_HANG":
-                        setText("Het hang");
+                        setText("Hết hàng");
                         break;
                     default:
                         setText(item);
@@ -95,7 +95,7 @@ public class GUI_DanhMucThuocController {
             @Override
             protected void updateItem(Boolean item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty || item == null ? null : (item ? "Co" : "Khong"));
+                setText(empty || item == null ? null : (item ? "Có" : "Không"));
             }
         });
 
@@ -272,7 +272,7 @@ public class GUI_DanhMucThuocController {
         boolean isExchangeMode = DoiTraSession.isDangChonThuocDoi();
 
         if (lblTitle != null) {
-            lblTitle.setText(isExchangeMode ? "CHON THUOC DOI" : "QUAN LY DANH MUC THUOC");
+            lblTitle.setText(isExchangeMode ? "CHỌN THUỐC ĐỔI" : "QUẢN LÝ DANH MỤC THUỐC");
         }
 
         setNodeVisible(btnThem, !isExchangeMode);

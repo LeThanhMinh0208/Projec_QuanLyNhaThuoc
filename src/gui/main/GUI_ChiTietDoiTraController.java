@@ -88,6 +88,7 @@ public class GUI_ChiTietDoiTraController {
     @FXML private ComboBox<String> cbLyDo;
     @FXML private TextField txtLyDo;
     @FXML private ComboBox<HinhThucDoiTra> cbHinhThucXuLy;
+    @FXML private javafx.scene.control.Label lblPhiPhat;
 
     private final DAO_PhieuDoiTra daoPhieuDoiTra = new DAO_PhieuDoiTra();
     private final ObservableList<ChiTietDoiTraView> dsChiTietHoaDon = FXCollections.observableArrayList();
@@ -105,6 +106,7 @@ public class GUI_ChiTietDoiTraController {
         cbLyDo.setItems(FXCollections.observableArrayList(
                 "Khách hàng muốn hoàn", "Lỗi từ nhà sản xuất"));
         cbLyDo.setValue("Khách hàng muốn hoàn");
+        cbLyDo.valueProperty().addListener((obs, oldVal, newVal) -> capNhatTong());
 
         setupSoLuongSpinner();
         setupAvailableTable();
@@ -521,7 +523,7 @@ public class GUI_ChiTietDoiTraController {
                         ct.setHoaDon(hdMoi);
                         ct.setMaQuyDoi(item.getMaQuyDoi());
                         ct.setSoLuong(item.getSoLuong());
-                        ct.setDonGia(item.getDonGia());
+                        ct.setDonGia(item.getDonGia() / (1 + hdMoi.getThueVAT() / 100.0));
                         
                         // Phải tìm một bảng giá mặc định để chèn vào (hoặc null nếu DB cho phép)
                         ct.setMaBangGia("BG0001"); // Sếp tự điều chỉnh lại mã bảng giá cho đúng logic nhà thuốc nhé
@@ -581,6 +583,9 @@ public class GUI_ChiTietDoiTraController {
             Parent root = loader.load();
             Dialog_ChonThuocController controller = loader.getController();
 
+            String loaiBan = hoaDon != null ? hoaDon.getLoaiBan() : "BAN_LE";
+            controller.setLoaiBan(loaiBan);
+
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("Chọn thuốc đổi");
@@ -613,11 +618,12 @@ public class GUI_ChiTietDoiTraController {
                 return null;
             }
 
+            double donGiaVAT = controller.getDonGiaChon() * (1 + hoaDon.getThueVAT() / 100.0);
             return new DoiTraSession.DonViDoiData(
                     donVi.getMaQuyDoi(),
                     donVi.getTenDonVi(),
                     controller.getSoLuongChon(),
-                    controller.getDonGiaChon(),
+                    donGiaVAT,
                     thuoc.getTenThuoc());
         } catch (Exception e) {
             e.printStackTrace();
@@ -701,13 +707,34 @@ public class GUI_ChiTietDoiTraController {
                     lblTongTienHoan.setStyle("-fx-text-fill:#16a34a; -fx-font-size:18px; -fx-font-weight:bold;");
                 }
             }
+            if (lblPhiPhat != null) {
+                lblPhiPhat.setVisible(false);
+                lblPhiPhat.setManaged(false);
+            }
             return;
         }
 
         // HOAN_TIEN
         double tong = tinhTongGiaTriHienThi();
-        lblTongTienHoan.setText("Nhà thuốc hoàn: " + String.format("%,.0f VND", tong));
+        double phiPhat = 0;
+        
+        if ("Khách hàng muốn hoàn".equals(cbLyDo.getValue())) {
+            phiPhat = tong * 0.3;
+        }
+        
+        double tongTienHoan = tong - phiPhat;
+        
+        lblTongTienHoan.setText("Nhà thuốc hoàn: " + String.format("%,.0f VND", tongTienHoan));
         lblTongTienHoan.setStyle("-fx-text-fill:#16a34a; -fx-font-size:18px; -fx-font-weight:bold;");
+        
+        if (phiPhat > 0 && lblPhiPhat != null) {
+            lblPhiPhat.setText("Phí phạt (30%): " + String.format("-%,.0f VND", phiPhat));
+            lblPhiPhat.setVisible(true);
+            lblPhiPhat.setManaged(true);
+        } else if (lblPhiPhat != null) {
+            lblPhiPhat.setVisible(false);
+            lblPhiPhat.setManaged(false);
+        }
     }
 
     private double tinhTongGiaTriThuocTra() {

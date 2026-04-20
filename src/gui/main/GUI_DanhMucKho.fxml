@@ -8,6 +8,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
@@ -19,7 +20,14 @@
       <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
    </padding>
 
-   <Label styleClass="dmk-page-title" text="QUẢN LÝ DANH MỤC KHO" />
+   <HBox alignment="CENTER_LEFT" spacing="20">
+      <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity">
+         <children>
+            <Label styleClass="main-title" text="QUẢN LÝ DANH MỤC KHO" />
+            <Region prefHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+         </children>
+      </VBox>
+   </HBox>
 
    <GridPane hgap="15" maxWidth="Infinity">
       <columnConstraints>

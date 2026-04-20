@@ -81,7 +81,7 @@ public class GUI_TrangChuController {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    setText(item ? "Co" : "Khong");
+                    setText(item ? "Có" : "Không");
                     getStyleClass().add(item ? "text-do" : "text-xanh-la");
                 }
             }
@@ -97,13 +97,13 @@ public class GUI_TrangChuController {
                     setText(null);
                 } else {
                     if ("DANG_BAN".equals(item)) {
-                        setText("Dang Ban");
+                        setText("Đang Bán");
                         getStyleClass().add("text-xanh-bien");
                     } else if ("HET_HANG".equals(item)) {
-                        setText("Het Hang");
+                        setText("Hết Hàng");
                         getStyleClass().add("text-vang-cam");
                     } else if ("NGUNG_BAN".equals(item)) {
-                        setText("Ngung Ban");
+                        setText("Ngừng Bán");
                         getStyleClass().add("text-do");
                     } else {
                         setText(item);

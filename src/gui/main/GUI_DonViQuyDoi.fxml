@@ -22,10 +22,10 @@
     </padding>
 
     <children>
-        <VBox spacing="4.0">
+        <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity" minHeight="-Infinity">
             <children>
                 <Label styleClass="main-title" text="DANH SÁCH QUY ĐỔI ĐƠN VỊ THUỐC" />
-                <Region prefHeight="4.0" prefWidth="260.0" style="-fx-background-color: #0ea5e9; -fx-background-radius: 8;" />
+                <Region prefHeight="4.0" minHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
             </children>
         </VBox>
 

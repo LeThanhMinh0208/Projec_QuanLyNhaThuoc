@@ -39,6 +39,17 @@ public class Dialog_ChonThuocController {
     private final ObservableList<Thuoc> dsThuoc = FXCollections.observableArrayList();
     private Thuoc thuocChon;
 
+    private String loaiBan = "BAN_LE";
+
+    public void setLoaiBan(String loaiBan) {
+        this.loaiBan = loaiBan;
+        if ("BAN_THEO_DON".equals(loaiBan)) {
+            dsThuoc.setAll(daoThuoc.getAllThuocCoLoKhoBanHang());
+        } else {
+            dsThuoc.setAll(daoThuoc.getAllThuocKhongKeDonKhoBanHang());
+        }
+    }
+
     // Thông tin đơn vị mặc định và giá
     private DonViQuyDoi donViMacDinh;
     private double donGiaMacDinh;
@@ -47,9 +58,8 @@ public class Dialog_ChonThuocController {
 
     @FXML
     public void initialize() {
-        // VĐ2: Load thuốc theo điều kiện — KHO_BAN_HANG, tồn > 0, DANG_BAN
-        // Không lọc canKeDon — bán theo đơn được phép bán cả thuốc kê đơn
-        dsThuoc.setAll(daoThuoc.getAllThuocCoLoKhoBanHang());
+        // Mặc định load bán lẻ, dùng khi dialog hiện lên chưa setLoaiBan
+        dsThuoc.setAll(daoThuoc.getAllThuocKhongKeDonKhoBanHang());
 
         // Custom cell factory cho ListView
         listThuoc.setCellFactory(lv -> new ThuocListCell());

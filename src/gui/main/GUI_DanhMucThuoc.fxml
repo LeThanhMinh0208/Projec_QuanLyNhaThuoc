@@ -4,7 +4,9 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 
@@ -20,8 +22,13 @@
    <children>
       <!-- Header -->
       <HBox alignment="CENTER_LEFT" spacing="20">
-          <Label fx:id="lblTitle" styleClass="main-title" text="QUẢN LÝ DANH MỤC THUỐC" />
-      </HBox>
+          <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity">
+              <children>
+                  <Label fx:id="lblTitle" styleClass="main-title" text="QUẢN LÝ DANH MỤC THUỐC" />
+                  <Region prefHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+              </children>
+          </VBox>
+       </HBox>
       
       <GridPane hgap="8" maxWidth="Infinity">
          <columnConstraints>

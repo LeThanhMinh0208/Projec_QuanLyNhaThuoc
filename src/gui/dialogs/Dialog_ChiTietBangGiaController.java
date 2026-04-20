@@ -6,6 +6,7 @@ import entity.ChiTietBangGia;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -26,7 +27,7 @@ public class Dialog_ChiTietBangGiaController {
     @FXML private Label     lblHeaderTitle, lblMa, lblLoai, lblNgayBatDau, lblTrangThai, lblNgayKTHint;
     @FXML private Label     lblCanhBaoActive, lblCanhBaoDefault, lblCanhBaoKetThuc;
     @FXML private Button    btnThemThuoc, btnXoaBangGia;
-    @FXML private TextField txtTen;
+    @FXML private TextField txtTen, txtTimKiem;
     @FXML private DatePicker dpNgayKetThuc;
     @FXML private TextArea  txtMoTa;
 
@@ -88,7 +89,17 @@ public class Dialog_ChiTietBangGiaController {
             }
         });
 
-        tableChiTiet.setItems(listCT);
+
+        // Setup Search
+        FilteredList<ChiTietBangGia> filteredList = new FilteredList<>(listCT, p -> true);
+        txtTimKiem.textProperty().addListener((obs, oldVal, newVal) -> {
+            filteredList.setPredicate(item -> {
+                if (newVal == null || newVal.isEmpty()) return true;
+                String lower = newVal.toLowerCase().trim();
+                return item.getTenThuoc().toLowerCase().contains(lower);
+            });
+        });
+        tableChiTiet.setItems(filteredList);
     }
 
     /** Gọi từ bên ngoài để nạp dữ liệu vào dialog */

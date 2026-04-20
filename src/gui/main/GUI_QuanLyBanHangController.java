@@ -316,7 +316,6 @@ public class GUI_QuanLyBanHangController {
         };
         task.setOnSucceeded(e -> {
             masterDataLe.setAll(task.getValue());
-            tblThuocLe.setItems(masterDataLe);
         });
         new Thread(task).start();
     }
@@ -342,7 +341,6 @@ public class GUI_QuanLyBanHangController {
     @FXML void handleLamMoiLe(ActionEvent event) {
         txtTimKiemThuocLe.clear();
         loadDataLeAsync();
-        setupSearchLogic();
     }
 
     @FXML void handleThemVaoGioLe(ActionEvent event) {
@@ -592,9 +590,9 @@ public class GUI_QuanLyBanHangController {
             }
 
             handleHuyGioLe(null);
+            onXoaKhachHang(null);
             // Reload lại danh sách thuốc (tồn kho đã thay đổi)
             loadDataLeAsync();
-            setupSearchLogic();
         } else {
             showAlert(AlertType.ERROR, "Lỗi", "Thanh toán thất bại. Vui lòng thử lại!");
         }
@@ -652,7 +650,6 @@ public class GUI_QuanLyBanHangController {
 
     private ObservableList<Thuoc> masterDataDon = FXCollections.observableArrayList();
     private ObservableList<CartItem> cartDataDon = FXCollections.observableArrayList();
-    private KhachHang currentKhachHangDon = null;
     private double tongTienDon = 0;
     private double thueVatDon = 0;
     private final DAO_DonThuoc daoDonThuoc = new DAO_DonThuoc();
@@ -791,7 +788,6 @@ public class GUI_QuanLyBanHangController {
         };
         task.setOnSucceeded(e -> {
             masterDataDon.setAll(task.getValue());
-            tblThuocDon.setItems(masterDataDon);
         });
         new Thread(task).start();
     }
@@ -818,7 +814,6 @@ public class GUI_QuanLyBanHangController {
     @FXML void handleLamMoiDon(ActionEvent event) {
         txtTimKiemThuocDon.clear();
         loadDataDonAsync();
-        setupSearchLogicDon();
     }
 
     // Thêm thuốc từ bảng vào giỏ hàng đơn (giống tab lẻ, nhưng KHÔNG chặn kê đơn)
@@ -941,13 +936,20 @@ public class GUI_QuanLyBanHangController {
     }
 
     @FXML void onDatLaiDonThuoc(ActionEvent event) {
-        Alert confirm = new Alert(AlertType.CONFIRMATION, "Xóa thông tin đơn thuốc? Giỏ hàng vẫn giữ.", ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Xác nhận");
-        confirm.showAndWait();
-        if (confirm.getResult() == ButtonType.YES) {
-            donThuocTemp = null;
-            resetCardDonThuoc();
+        if (cartDataDon != null && !cartDataDon.isEmpty()) {
+            Alert confirm = new Alert(AlertType.CONFIRMATION, 
+                "Đặt lại thông tin đơn thuốc sẽ xóa toàn bộ thuốc trong giỏ hàng. Bạn có đồng ý không?", 
+                ButtonType.YES, ButtonType.NO);
+            confirm.setTitle("Xác nhận");
+            if (confirm.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
+                return;
+            }
+            cartDataDon.clear();
+            tinhTongTienDon();
         }
+
+        donThuocTemp = null;
+        resetCardDonThuoc();
     }
 
     /** Cập nhật card đơn thuốc sau khi thêm/sửa */
@@ -961,15 +963,12 @@ public class GUI_QuanLyBanHangController {
         String benhNhan = donThuocTemp.getThongTinBenhNhan();
         String chanDoan = donThuocTemp.getChanDoan();
 
-        StringBuilder tomTat = new StringBuilder();
-        if (bacSi != null && !bacSi.isBlank())
-            tomTat.append("BS: ").append(bacSi).append("\n");
-        if (benhNhan != null && !benhNhan.isBlank())
-            tomTat.append("BN: ").append(benhNhan).append("\n");
-        if (chanDoan != null && !chanDoan.isBlank())
-            tomTat.append("Chẩn đoán: ").append(chanDoan);
+        List<String> list = new ArrayList<>();
+        if (bacSi != null && !bacSi.isBlank()) list.add("BS: " + bacSi);
+        if (benhNhan != null && !benhNhan.isBlank()) list.add("BN: " + benhNhan);
+        if (chanDoan != null && !chanDoan.isBlank()) list.add("Chẩn đoán: " + chanDoan);
 
-        lblTrangThaiDon.setText(tomTat.toString().trim());
+        lblTrangThaiDon.setText(String.join(" | ", list));
         // Hiện paneThongTinDon và cho nó chiếm không gian
         if (paneThongTinDon != null) {
             paneThongTinDon.setVisible(true);
@@ -1011,9 +1010,9 @@ public class GUI_QuanLyBanHangController {
         tblGioHangDon.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         
         colCartDonXoa.setCellFactory(param -> new TableCell<>() {
-            private final Button btnXoa = new Button("🗑");
+            private final Button btnXoa = new Button("✕");
             {
-                btnXoa.setStyle("-fx-text-fill: red; -fx-background-color: transparent; -fx-cursor: hand;");
+                btnXoa.getStyleClass().add("bh-btn-remove");
                 btnXoa.setOnAction(event -> {
                     CartItem item = getTableView().getItems().get(getIndex());
                     cartDataDon.remove(item);
@@ -1046,6 +1045,11 @@ public class GUI_QuanLyBanHangController {
 
     // Thanh toán theo đơn — INSERT DonThuoc nếu donThuocTemp != null
     @FXML void handleThanhToanDon(ActionEvent event) {
+        if (donThuocTemp == null) {
+            showAlert(AlertType.ERROR, "Lỗi", "Chưa có thông tin đơn thuốc. Vui lòng nhập thông tin đơn trước khi thanh toán.");
+            return;
+        }
+
         if (cartDataDon.isEmpty()) {
             showAlert(AlertType.WARNING, "Cảnh báo", "Giỏ hàng theo đơn hiện đang rỗng!");
             return;
@@ -1066,7 +1070,7 @@ public class GUI_QuanLyBanHangController {
                             pMethod.equals("Thẻ tín dụng") ? "THE" : "TIEN_MAT";
 
         // --- FIX thueVAT: DB lưu 8.0 = 8%, KHÔNG phải 0.08 ---
-        HoaDon hd = new HoaDon(maHD, Timestamp.valueOf(LocalDateTime.now()), 8.0, dbHinhThuc, "Bán hóa đơn theo đơn thuốc", user, currentKhachHangDon);
+        HoaDon hd = new HoaDon(maHD, Timestamp.valueOf(LocalDateTime.now()), 8.0, dbHinhThuc, "Bán hóa đơn theo đơn thuốc", user, currentKhachHang);
         hd.setLoaiBan("BAN_THEO_DON"); // Tường minh set BAN_THEO_DON
         
         List<ChiTietHoaDon> dsCT = new ArrayList<>();
@@ -1097,9 +1101,9 @@ public class GUI_QuanLyBanHangController {
                 daoDonThuoc.themDonThuoc(donThuocTemp);
             }
             
-            if (currentKhachHangDon != null) {
+            if (currentKhachHang != null) {
                 int diemCong = (int) ((tongTienDon + thueVatDon) / 1000);
-                daoKhachHang.capNhatDiemTichLuy(currentKhachHangDon.getMaKhachHang(), currentKhachHangDon.getDiemTichLuy() + diemCong);
+                daoKhachHang.capNhatDiemTichLuy(currentKhachHang.getMaKhachHang(), currentKhachHang.getDiemTichLuy() + diemCong);
             }
             // ── Hỏi in hóa đơn sau thanh toán đơn thuốc ──
             Alert confirmPrint = new Alert(AlertType.CONFIRMATION);
@@ -1136,12 +1140,11 @@ public class GUI_QuanLyBanHangController {
             // Reset toàn bộ giỏ hàng + card đơn thuốc
             cartDataDon.clear();
             tinhTongTienDon();
-            currentKhachHangDon = null;
+            onXoaKhachHang(null);
             resetCardDonThuoc();
 
             // Reload lại danh sách thuốc (tồn kho đã thay đổi)
             loadDataDonAsync();
-            setupSearchLogicDon();
         } else {
             showAlert(AlertType.ERROR, "Lỗi CSDL", "Thanh toán theo đơn thất bại!");
         }

@@ -279,6 +279,7 @@ public class GUI_XuLyDoiTraController {
     }
 
     private void xuLyDoiTra(HoaDonView hd) {
+        // Trigger recompile for Eclipse
         DoiTraSession.clear();
         DoiTraSession.setHoaDonDangXuLy(hd);
         SceneUtils.switchPage("/gui/main/GUI_ChiTietDoiTra.fxml");
