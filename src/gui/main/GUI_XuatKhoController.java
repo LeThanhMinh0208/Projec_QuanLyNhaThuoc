@@ -49,7 +49,7 @@ public class GUI_XuatKhoController implements Initializable {
         colMaPhieu.setCellValueFactory(new PropertyValueFactory<>("maPhieuXuat"));
         colNguoiLap.setCellValueFactory(new PropertyValueFactory<>("maNhanVien"));
         
-     // =======================================================
+        // =======================================================
         // 1. CỘT NƠI NHẬN (Đồng bộ màu theo Nút chức năng)
         // =======================================================
         colKhoNhan.setCellValueFactory(new PropertyValueFactory<>("khoNhan"));
@@ -119,8 +119,9 @@ public class GUI_XuatKhoController implements Initializable {
                 }
             }
         });
+
         // =======================================================
-        // 3. CỘT THỜI GIAN VÀ NÚT THAO TÁC (Giữ nguyên)
+        // 3. CỘT THỜI GIAN VÀ NÚT THAO TÁC
         // =======================================================
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         colThoiGian.setCellValueFactory(new PropertyValueFactory<>("ngayXuat"));
@@ -132,9 +133,10 @@ public class GUI_XuatKhoController implements Initializable {
         });
 
         colThaoTac.setCellFactory(c -> new TableCell<>() {
-            private final Button btn = new Button("👁 Xem");
+            // Đã sửa: Xóa Icon mắt, set class css btn-view-detail
+            private final Button btn = new Button("Xem");
             { 
-                btn.setStyle("-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-cursor: hand;");
+                btn.getStyleClass().add("btn-view-detail");
                 btn.setOnAction(e -> handleXemChiTiet(getTableView().getItems().get(getIndex())));
             }
             @Override protected void updateItem(Void i, boolean e) {

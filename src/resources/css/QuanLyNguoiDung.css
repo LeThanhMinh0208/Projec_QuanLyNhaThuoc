@@ -16,19 +16,51 @@
     -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.4), 5, 0, 0, 2);
 }
 
+/* ========================================
+   CARDS 3 NÚT CHỨC NĂNG (STYLE ĐỒNG BỘ DANH MỤC KHO)
+   ======================================== */
 .top-card {
-    -fx-background-radius: 12px;
+    -fx-background-radius: 35px; /* 💡 Bo tròn sâu thành hình viên thuốc */
     -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 8, 0, 0, 3);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.15), 10, 0, 0, 4);
+    -fx-transition: all 0.3s ease;
+    -fx-alignment: center; /* Ép nội dung vào giữa */
 }
+
+/* Hiệu ứng nảy lên và phát sáng khi lia chuột */
 .top-card:hover {
-    -fx-translate-y: -2px;
-    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.4), 15, 0, 0, 5);
+    -fx-translate-y: -3px; 
 }
-.card-blue   { -fx-background-color: linear-gradient(to bottom right, #0ea5e9, #38bdf8); }
-.card-orange { -fx-background-color: linear-gradient(to bottom right, #f59e0b, #fbbf24); }
-.card-green  { -fx-background-color: linear-gradient(to bottom right, #10b981, #34d399); }
-.btn-action { -fx-font-weight: bold; -fx-font-size: 16px; -fx-cursor: hand; }
+
+/* NÚT THÊM MỚI - Xanh Lá */
+.card-green { 
+    -fx-background-color: linear-gradient(to bottom right, #10b981, #34d399); 
+}
+.card-green:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.6), 20, 0, 0, 8);
+}
+
+/* NÚT CẬP NHẬT - Xanh Dương */
+.card-blue { 
+    -fx-background-color: linear-gradient(to bottom right, #0ea5e9, #38bdf8); 
+}
+.card-blue:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.6), 20, 0, 0, 8);
+}
+
+/* NÚT XÓA - Cam Vàng (Vì nút Danger đã dùng cho khóa TK) */
+.card-orange { 
+    -fx-background-color: linear-gradient(to bottom right, #f59e0b, #fbbf24); 
+}
+.card-orange:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(245, 158, 11, 0.6), 20, 0, 0, 8);
+}
+
+.btn-action { 
+    -fx-font-weight: 900; /* In đậm chữ lên cho mạnh mẽ */
+    -fx-font-size: 16px; 
+    -fx-cursor: hand; 
+}
 
 .search-box {
     -fx-background-color: white;

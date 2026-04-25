@@ -16,6 +16,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import utils.AlertUtils;
+import javafx.stage.FileChooser;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -24,6 +31,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 
 public class GUI_NhapKhoController {
 
@@ -571,6 +579,90 @@ public class GUI_NhapKhoController {
         } catch (Exception e) {
             e.printStackTrace();
             AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể mở giao diện chi tiết phiếu nhập.");
+        }
+    }
+    @FXML
+    void handleImportCSV(ActionEvent event) {
+        // 1. CHẶN LỖI: Phải có đơn hàng đang hiển thị trên bảng thì mới cho nạp file
+        if (donHienTai == null || listChiTietHienTai == null || listChiTietHienTai.isEmpty()) {
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Chưa chọn đơn hàng", 
+                "Sếp vui lòng chọn Đơn đặt hàng trên phần mềm trước, sau đó mới nạp file CSV của NCC đưa!");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Chọn file CSV từ Nhà cung cấp");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        File file = fileChooser.showOpenDialog(txtNhaCungCap.getScene().getWindow());
+
+        if (file != null) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"))) {
+                String line;
+                int lineNumber = 0;
+                int countSuccess = 0;
+                List<String[]> dataRows = new ArrayList<>();
+
+                while ((line = br.readLine()) != null) {
+                    lineNumber++;
+                    if (lineNumber == 1 && line.startsWith("\uFEFF")) line = line.substring(1); // Gỡ BOM
+
+                    // Tách cột (hỗ trợ cả dấu phẩy và chấm phẩy)
+                    String separator = line.contains(";") ? ";" : ",";
+                    String[] cols = line.split(separator);
+                    
+                    // NCC thường đưa file có dòng tiêu đề ở dòng 1
+                    // Nên mình bắt đầu lấy dữ liệu từ dòng 2 trở đi
+                    if (lineNumber < 2 || cols.length == 0) continue;
+                    dataRows.add(cols);
+                }
+
+                // 2. LOGIC CHÍNH: Khớp dữ liệu từ file vào danh sách thuốc đang "áp cứng" trên bảng
+                for (String[] row : dataRows) {
+                    if (row[0] == null || row[0].trim().isEmpty()) continue;
+                    
+                    String tenThuocNCC = row[0].trim().replaceAll("^\"|\"$", "");
+
+                    // Tìm thuốc này trong danh sách "áp cứng" của đơn hàng hiện tại
+                    for (ChiTietDonDatHang ct : listChiTietHienTai) {
+                        if (ct.getThuoc().getTenThuoc().equalsIgnoreCase(tenThuocNCC)) {
+                            
+                            // Điền các thông tin thiếu từ file NCC vào
+                            try {
+                                // Cột 1: SL thực giao
+                                if (row.length > 1) ct.setSoLuongDaNhan(Integer.parseInt(row[1].replaceAll("[^\\d]", "")));
+                                
+                                // Cột 2: Số lô
+                                if (row.length > 2) ct.setMaLo(row[2].trim().replaceAll("^\"|\"$", ""));
+                                
+                                // Cột 3: Ngày sản xuất (yyyy-MM-dd)
+                                if (row.length > 3) ct.setNgaySanXuatTemp(row[3].trim());
+                                
+                                // Cột 4: Hạn sử dụng (yyyy-MM-dd)
+                                if (row.length > 4) ct.setHanSuDung(row[4].trim());
+                                
+                                // Cột 5: Giá nhập thực tế (nếu NCC có thay đổi giá)
+                                if (row.length > 5) ct.setDonGiaDuKien(Double.parseDouble(row[5].replaceAll("[^\\d.]", "")));
+                                
+                                countSuccess++;
+                            } catch (Exception e) {
+                                System.err.println("Lỗi dòng " + tenThuocNCC + ": " + e.getMessage());
+                            }
+                            break; 
+                        }
+                    }
+                }
+
+                // 3. Cập nhật UI
+                tableNhapKho.refresh();
+                tinhToanTongTienHienThi();
+                
+                AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", 
+                    "Hệ thống đã tự động điền thông tin cho " + countSuccess + "/" + listChiTietHienTai.size() + " thuốc trong đơn hàng " + donHienTai.getMaDonDatHang());
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi nạp file", "File không đúng định dạng!");
+            }
         }
     }
 }

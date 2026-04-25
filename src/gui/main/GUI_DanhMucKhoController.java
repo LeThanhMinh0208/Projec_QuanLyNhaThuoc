@@ -89,16 +89,34 @@ public class GUI_DanhMucKhoController implements Initializable {
             }
         });
 
+        // 🚨 FIX LỖI MÀU TRẠNG THÁI Ở ĐÂY
         colTrangThaiTon.setCellValueFactory(new PropertyValueFactory<>("soLuongTon"));
         colTrangThaiTon.setCellFactory(column -> new TableCell<>() {
             @Override protected void updateItem(Integer soLuong, boolean empty) {
                 super.updateItem(soLuong, empty);
                 setAlignment(Pos.CENTER);
+                
+                // Xóa sạch các class màu cũ để tránh xung đột
+                getStyleClass().removeAll("status-con-hang", "status-sap-het", "status-het-hang");
+                setStyle(""); // Reset luôn style cứng cho chắc ăn
+                
                 if (empty || soLuong == null) {
-                    setText(null); setStyle("");
+                    setText(null); 
                 } else {
-                    setText(soLuong < 100 ? "Tồn Thấp" : "Tồn Cao");
-                    setStyle(soLuong < 100 ? "-fx-text-fill: #dc2626; -fx-font-weight: bold;" : "-fx-text-fill: #16a34a; -fx-font-weight: bold;");
+                    if (soLuong == 0) {
+                        setText("Cạn Kho");
+                        // Ép trực tiếp màu bằng setStyle nếu CSS không ăn
+                        setStyle("-fx-text-fill: #dc2626; -fx-font-weight: bold;"); 
+                        getStyleClass().add("status-het-hang"); 
+                    } else if (soLuong <= 100) {
+                        setText("Sắp Hết Hàng");
+                        setStyle("-fx-text-fill: #ea580c; -fx-font-weight: bold;");
+                        getStyleClass().add("status-sap-het");  
+                    } else {
+                        setText("Còn Hàng");
+                        setStyle("-fx-text-fill: #16a34a; -fx-font-weight: bold;");
+                        getStyleClass().add("status-con-hang"); 
+                    }
                 }
             }
         });
@@ -128,7 +146,16 @@ public class GUI_DanhMucKhoController implements Initializable {
                               (viTriSelection.equals("Kho Bán Hàng") && "KHO_BAN_HANG".equals(lo.getViTriKho())) ||
                               (viTriSelection.equals("Kho Dự Trữ") && "KHO_DU_TRU".equals(lo.getViTriKho()));
 
-            String trangThai = lo.getSoLuongTon() < 100 ? "tồn thấp" : "tồn cao";
+            // 💡 Cập nhật lại chuỗi trạng thái để tìm kiếm cho chuẩn
+            String trangThai;
+            if (lo.getSoLuongTon() == 0) {
+                trangThai = "cạn kho";
+            } else if (lo.getSoLuongTon() <= 100) {
+                trangThai = "sắp hết hàng";
+            } else {
+                trangThai = "còn hàng";
+            }
+
             boolean matchSearch = tuKhoa.isEmpty() || 
                                  lo.getMaLoThuoc().toLowerCase().contains(tuKhoa) ||
                                  lo.getThuoc().getMaThuoc().toLowerCase().contains(tuKhoa) ||
@@ -139,8 +166,23 @@ public class GUI_DanhMucKhoController implements Initializable {
         });
     }
 
-    @FXML void moTrangNhapKho(ActionEvent event) { SceneUtils.switchPage("/gui/main/GUI_NhapKho.fxml"); }
-    @FXML void handleChuyenTrangXuatKho(ActionEvent event) { SceneUtils.switchPage("/gui/main/GUI_XuatKho.fxml"); }
+    // =========================================================================
+    // HÀM CHUYỂN TRANG: Gọi đại ca Trang Chủ và truyền chữ "Nhập Kho" / "Xuất Kho"
+    // =========================================================================
+    @FXML 
+    void moTrangNhapKho(ActionEvent event) { 
+        if (GUI_TrangChuController.getInstance() != null) {
+            GUI_TrangChuController.getInstance().chuyenTrangVaHighlight("/gui/main/GUI_NhapKho.fxml", "Nhập Kho");
+        }
+    }
+
+    @FXML 
+    void handleChuyenTrangXuatKho(ActionEvent event) { 
+        if (GUI_TrangChuController.getInstance() != null) {
+            GUI_TrangChuController.getInstance().chuyenTrangVaHighlight("/gui/main/GUI_XuatKho.fxml", "Xuất Kho");
+        }
+    }
+
     @FXML void handleChuyenTrangKiemKe(ActionEvent event) { 
         AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Tính năng đang phát triển", "Tính năng kiểm kê kho sẽ được cập nhật trong phiên bản tiếp theo.");
     }

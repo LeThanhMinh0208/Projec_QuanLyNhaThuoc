@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
+import javafx.geometry.Pos;
 
 public class GUI_LichSuGiaoDichController {
 
@@ -30,7 +32,6 @@ public class GUI_LichSuGiaoDichController {
     @FXML private DatePicker dpTuNgay, dpDenNgay;
     
     @FXML private TableView<GiaoDichKhachHang> tableGiaoDich;
-    // Khai báo cột mới
     @FXML private TableColumn<GiaoDichKhachHang, String> colMaHD, colNgayLap, colKhachHang, colSdt;
     @FXML private TableColumn<GiaoDichKhachHang, String> colTamTinh, colVAT, colTongTT, colHinhThuc;
     @FXML private TableColumn<GiaoDichKhachHang, Void> colHanhDong;
@@ -61,8 +62,8 @@ public class GUI_LichSuGiaoDichController {
 
     private void setupTable() {
         colMaHD.setCellValueFactory(new PropertyValueFactory<>("maHoaDon"));
-        colKhachHang.setCellValueFactory(new PropertyValueFactory<>("tenKhachHang")); // Cột Khách hàng
-        colSdt.setCellValueFactory(new PropertyValueFactory<>("sdtKhachHang"));       // Cột SĐT
+        colKhachHang.setCellValueFactory(new PropertyValueFactory<>("tenKhachHang")); 
+        colSdt.setCellValueFactory(new PropertyValueFactory<>("sdtKhachHang"));       
         
         colNgayLap.setCellValueFactory(c -> new SimpleStringProperty(
             c.getValue().getNgayLap() != null ? dateFormat.format(c.getValue().getNgayLap()) : ""));
@@ -73,14 +74,20 @@ public class GUI_LichSuGiaoDichController {
         colHinhThuc.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getHinhThucLabel()));
 
         colHanhDong.setCellFactory(param -> new TableCell<>() {
-            private final Button btn = new Button("👁 Chi tiết");
+            // 💡 Đổi thành nút "Xem" và gán Class xanh dương nhạt
+            private final Button btn = new Button("Xem");
             {
-                btn.setStyle("-fx-background-color:#2563eb;-fx-text-fill:white;-fx-font-size:12px;-fx-padding:4 10;-fx-cursor:hand;");
+                btn.getStyleClass().add("btn-view-pill");
                 btn.setOnAction(e -> moDialogChiTiet(getTableView().getItems().get(getIndex())));
             }
             @Override protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : btn);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(btn);
+                    setAlignment(Pos.CENTER);
+                }
             }
         });
     }
@@ -92,7 +99,12 @@ public class GUI_LichSuGiaoDichController {
 
     private void setupFilter() {
         filteredData = new FilteredList<>(masterData, p -> true);
-        tableGiaoDich.setItems(filteredData);
+        
+        // 💡 Bọc SortedList để sắp xếp bảng mượt mà
+        SortedList<GiaoDichKhachHang> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(tableGiaoDich.comparatorProperty());
+        
+        tableGiaoDich.setItems(sortedData);
         applyFilter(); 
         
         txtTimKiem.textProperty().addListener((obs, oldVal, newVal) -> applyFilter());
@@ -112,7 +124,6 @@ public class GUI_LichSuGiaoDichController {
         filteredData.setPredicate(gd -> {
             String keyword = txtTimKiem.getText().toLowerCase().trim();
             
-            // Tìm theo Mã HĐ, Tên KH, hoặc SĐT KH
             boolean matchText = keyword.isEmpty() || 
                                 (gd.getMaHoaDon() != null && gd.getMaHoaDon().toLowerCase().contains(keyword)) ||
                                 (gd.getTenKhachHang() != null && gd.getTenKhachHang().toLowerCase().contains(keyword)) ||

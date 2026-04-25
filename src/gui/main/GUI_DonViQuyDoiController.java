@@ -10,6 +10,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -67,11 +68,13 @@ public class GUI_DonViQuyDoiController {
         colThaoTac.setCellFactory(column -> new TableCell<>() {
             private final Button btnSua = new Button("Sửa");
             private final Button btnXoa = new Button("Xóa");
-            private final HBox actions = new HBox(8, btnSua, btnXoa);
+            private final HBox actions = new HBox(10, btnSua, btnXoa); // Tăng khoảng cách lên 10
 
             {
-                btnSua.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6;");
-                btnXoa.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6;");
+                // Gán class CSS thay vì setStyle cứng
+                btnSua.getStyleClass().add("btn-edit-pill");
+                btnXoa.getStyleClass().add("btn-delete-pill");
+                actions.setAlignment(Pos.CENTER);
 
                 btnSua.setOnAction(e -> {
                     DonViQuyDoiRow row = getTableView().getItems().get(getIndex());
@@ -87,7 +90,11 @@ public class GUI_DonViQuyDoiController {
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : actions);
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(actions);
+                }
             }
         });
     }

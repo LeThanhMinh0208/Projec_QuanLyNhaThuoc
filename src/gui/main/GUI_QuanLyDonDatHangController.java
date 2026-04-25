@@ -29,7 +29,6 @@ public class GUI_QuanLyDonDatHangController {
     @FXML private TableView<DonDatHang> tableDonDat;
     @FXML private TableColumn<DonDatHang, Void> colChiTiet, colThaoTac;
     
-    // Đã FIX: Xóa dấu phẩy thừa ở cuối
     @FXML private TableColumn<DonDatHang, String> colMaDon, colNhaCungCap, colTrangThaiHang;
     @FXML private TableColumn<DonDatHang, java.sql.Date> colNgayLap;
     @FXML private TextField txtTimKiem;
@@ -83,9 +82,9 @@ public class GUI_QuanLyDonDatHangController {
 
         // CỘT TRẠNG THÁI NHẬP
         colTrangThaiHang.setCellValueFactory(new PropertyValueFactory<>("trangThaiHang"));
-        colTrangThaiHang.setCellFactory(col -> createBadgeCell());;
+        colTrangThaiHang.setCellFactory(col -> createBadgeCell());
 
-     // NÚT NHẬP KHO
+        // NÚT NHẬP KHO
         colThaoTac.setCellFactory(param -> new TableCell<DonDatHang, Void>() {
             private final Button btnNhap = new Button("📦 Nhập kho");
             {
@@ -101,7 +100,7 @@ public class GUI_QuanLyDonDatHangController {
                     // Logic kiểm tra mặc định
                     boolean choPhep = don.isChoPhepNhapKho();
                     
-                    // ĐOẠN FIX CỦA SẾP: Ép tắt nút nếu đơn đã "Giao Một Phần" (vì phần thiếu đã tách đơn rồi)
+                    // ĐOẠN FIX: Ép tắt nút nếu đơn đã "Giao Một Phần"
                     String trangThai = don.getTrangThaiHang(); 
                     if (trangThai != null && trangThai.toLowerCase().contains("một phần")) {
                         choPhep = false; // Thu hồi quyền nhập kho
@@ -155,8 +154,7 @@ public class GUI_QuanLyDonDatHangController {
     }
 
     public void loadData() {
-List<DonDatHang> list = dao.getAllDonDatHang();
-  
+        List<DonDatHang> list = dao.getAllDonDatHang();
         list.sort((d1, d2) -> d2.getMaDonDatHang().compareTo(d1.getMaDonDatHang()));
         
         masterData.setAll(list);
@@ -242,6 +240,7 @@ List<DonDatHang> list = dao.getAllDonDatHang();
             AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể tải trang Nhập Kho!");
         }
     }
+    
     @FXML void handleLamMoi(ActionEvent event) { 
         loadData(); 
         txtTimKiem.clear(); 

@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="800.0" prefWidth="1200.0" spacing="22.0" styleClass="main-bg dvqd-page" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.GUI_DonViQuyDoiController">
+<VBox prefHeight="800.0" prefWidth="1200.0" spacing="22.0" styleClass="main-bg" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.GUI_DonViQuyDoiController">
     <stylesheets>
         <URL value="@../../resources/css/TrangChu.css" />
         <URL value="@../../resources/css/BanHang.css" />
@@ -25,7 +25,7 @@
         <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity" minHeight="-Infinity">
             <children>
                 <Label styleClass="main-title" text="DANH SÁCH QUY ĐỔI ĐƠN VỊ THUỐC" />
-                <Region prefHeight="4.0" minHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+              <Region maxWidth="Infinity" styleClass="xk-title-line" />
             </children>
         </VBox>
 

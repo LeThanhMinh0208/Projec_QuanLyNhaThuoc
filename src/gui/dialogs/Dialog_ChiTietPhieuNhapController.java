@@ -9,13 +9,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.scene.control.Alert;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -35,7 +38,6 @@ public class Dialog_ChiTietPhieuNhapController {
     private DecimalFormat df = new DecimalFormat("#,### VNĐ");
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     
-    // Biến lưu Phiếu Nhập hiện tại để In
     private PhieuNhap phieuHienTai;
 
     @FXML public void initialize() {
@@ -57,9 +59,8 @@ public class Dialog_ChiTietPhieuNhapController {
         colThanhTien.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: #e11d48;");
     }
 
-    // Hàm nhận dữ liệu từ trang Nhập Kho truyền sang
     public void setPhieuNhap(PhieuNhap pn) {
-        this.phieuHienTai = pn; // Gán vào biến toàn cục để dành cho việc IN PDF
+        this.phieuHienTai = pn; 
         
         lblMaPhieu.setText("Mã phiếu: " + pn.getMaPhieuNhap());
         lblNhaCungCap.setText(pn.getNhaCungCap().getTenNhaCungCap());
@@ -73,13 +74,12 @@ public class Dialog_ChiTietPhieuNhapController {
     private void loadChiTietTuDatabase(String maPhieu) {
         ObservableList<ChiTietUI> list = FXCollections.observableArrayList();
         
-        // ĐÃ SỬA CÂU LỆNH SQL: Join thêm bảng DonViQuyDoi để lấy đúng tenDonVi thay vì maQuyDoi
         String sql = "SELECT t.tenThuoc, dv.tenDonVi, ctpn.soLuong, ctpn.donGiaNhap, " +
                      "lt.maLoThuoc, lt.ngaySanXuat, lt.hanSuDung " +
                      "FROM ChiTietPhieuNhap ctpn " +
                      "JOIN LoThuoc lt ON ctpn.maLoThuoc = lt.maLoThuoc " +
                      "JOIN Thuoc t ON lt.maThuoc = t.maThuoc " +
-                     "JOIN DonViQuyDoi dv ON ctpn.maQuyDoi = dv.maQuyDoi " + // Thêm dòng này
+                     "JOIN DonViQuyDoi dv ON ctpn.maQuyDoi = dv.maQuyDoi " +
                      "WHERE ctpn.maPhieuNhap = ?";
 
         try (Connection con = ConnectDB.getInstance().getConnection();
@@ -89,10 +89,7 @@ public class Dialog_ChiTietPhieuNhapController {
             while (rs.next()) {
                 ChiTietUI ct = new ChiTietUI();
                 ct.setTenThuoc(rs.getString("tenThuoc"));
-                
-                // ĐÃ SỬA: Lấy từ cột tenDonVi vừa Join
                 ct.setDonVi(rs.getString("tenDonVi")); 
-                
                 ct.setSoLuong(rs.getInt("soLuong"));
                 ct.setGiaNhap(rs.getDouble("donGiaNhap"));
                 ct.setMaLo(rs.getString("maLoThuoc"));
@@ -106,26 +103,121 @@ public class Dialog_ChiTietPhieuNhapController {
         }
     }
 
-    // ===============================================
-    // XỬ LÝ NÚT IN PHIẾU NHẬP (TÍNH NĂNG MỚI BỔ SUNG)
-    // ===============================================
     @FXML 
     void handleInPhieu(ActionEvent event) {
-
-        if (phieuHienTai != null && tableChiTiet.getItems() != null && !tableChiTiet.getItems().isEmpty()) {
-            
-            try {
-             
-                Print_PhieuNhap.inPhieu(phieuHienTai, tableChiTiet.getItems());
-                
-            } catch (Exception e) {
-                e.printStackTrace();
-                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi Hệ Thống", "Không thể khởi tạo tiến trình in: " + e.getMessage());
-            }
-            
-        } else {
-            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thông báo", "Phiếu này chưa có chi tiết hàng hóa hoặc dữ liệu trống, không thể in PDF!");
+        if (phieuHienTai == null || tableChiTiet.getItems() == null || tableChiTiet.getItems().isEmpty()) {
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thông báo", "Phiếu này chưa có chi tiết hàng hóa, không thể in!");
+            return;
         }
+        
+        Stage previewStage = new Stage();
+        previewStage.setTitle("Xem trước Phiếu Nhập Kho - " + phieuHienTai.getMaPhieuNhap());
+        previewStage.initModality(Modality.APPLICATION_MODAL);
+
+        VBox paper = new VBox(10);
+        paper.setStyle("-fx-background-color: white; -fx-padding: 40; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 0);");
+        paper.setMaxWidth(750);
+
+        Label lblHeader = new Label("NHÀ THUỐC LONG NGUYÊN");
+        lblHeader.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e293b;");
+        Label lblAddress = new Label("Đ/c: 12 Nguyễn Văn Bảo, P.4, Gò Vấp, TP.HCM");
+        lblAddress.setStyle("-fx-font-size: 14px; -fx-font-style: italic; -fx-text-fill: #64748b;");
+        
+        Label lblTitle = new Label("PHIẾU NHẬP KHO");
+        lblTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 15 0 10 0;");
+
+        GridPane infoGrid = new GridPane();
+        infoGrid.setVgap(8); infoGrid.setHgap(30);
+        infoGrid.add(new Label("Mã phiếu: " + phieuHienTai.getMaPhieuNhap()), 0, 0);
+        infoGrid.add(new Label("Ngày nhập: " + sdf.format(phieuHienTai.getNgayNhap())), 0, 1);
+        infoGrid.add(new Label("Nhà cung cấp: " + phieuHienTai.getNhaCungCap().getTenNhaCungCap()), 1, 0);
+        infoGrid.add(new Label("Người lập: " + phieuHienTai.getNhanVien().getHoTen()), 1, 1);
+
+        TableView<ChiTietUI> tablePreview = new TableView<>();
+        tablePreview.setSelectionModel(null);
+        tablePreview.setFocusTraversable(false);
+        tablePreview.setStyle("-fx-background-color: white; -fx-border-color: #e2e8f0;");
+        tablePreview.setPrefHeight(300);
+
+        TableColumn<ChiTietUI, String> cTen = new TableColumn<>("Tên thuốc");
+        cTen.setCellValueFactory(new PropertyValueFactory<>("tenThuoc"));
+        cTen.setPrefWidth(200);
+
+        TableColumn<ChiTietUI, String> cDVT = new TableColumn<>("ĐVT");
+        cDVT.setCellValueFactory(new PropertyValueFactory<>("donVi"));
+        cDVT.setPrefWidth(50);
+        
+        TableColumn<ChiTietUI, String> cLo = new TableColumn<>("Số lô");
+        cLo.setCellValueFactory(new PropertyValueFactory<>("maLo"));
+        cLo.setPrefWidth(80);
+
+        TableColumn<ChiTietUI, String> cGia = new TableColumn<>("Giá nhập");
+        cGia.setCellValueFactory(new PropertyValueFactory<>("giaNhapStr"));
+        cGia.setPrefWidth(90);
+
+        TableColumn<ChiTietUI, Integer> cSL = new TableColumn<>("SL");
+        cSL.setCellValueFactory(new PropertyValueFactory<>("soLuong"));
+        cSL.setPrefWidth(50);
+
+        TableColumn<ChiTietUI, String> cTT = new TableColumn<>("Thành tiền");
+        cTT.setCellValueFactory(new PropertyValueFactory<>("thanhTienStr"));
+        cTT.setPrefWidth(120);
+
+        tablePreview.getColumns().addAll(cTen, cDVT, cLo, cGia, cSL, cTT);
+        tablePreview.setItems(tableChiTiet.getItems());
+
+        Label lblTotal = new Label("TỔNG TIỀN NHẬP: " + df.format(phieuHienTai.getTongTien()));
+        lblTotal.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #dc2626; -fx-padding: 10 0 0 0;");
+
+        paper.getChildren().addAll(lblHeader, lblAddress, new Separator(), lblTitle, infoGrid, tablePreview, lblTotal);
+        paper.setAlignment(Pos.TOP_CENTER);
+
+        Button btnCancel = new Button("Đóng");
+        btnCancel.setStyle("-fx-background-color: #e2e8f0; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 20;");
+        btnCancel.setOnAction(e -> previewStage.close());
+
+        Button btnConfirm = new Button("✔ Xác nhận In");
+        btnConfirm.setStyle("-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 20;");
+        
+        // ===============================================
+        // ĐÃ SỬA: SỬ DỤNG ĐƯỜNG DẪN TƯƠNG ĐỐI (RELATIVE PATH)
+        // ===============================================
+        btnConfirm.setOnAction(e -> {
+            try {
+                // Định nghĩa đường dẫn tương đối (tự động lấy gốc là thư mục project của máy người chạy)
+                File exportDir = new File("exports" + File.separator + "phieunhap");
+                
+                // Nếu máy thành viên khác chưa có thư mục này -> Tự động tạo
+                if (!exportDir.exists()) {
+                    exportDir.mkdirs();
+                }
+
+                // Khai báo file đích
+                File finalFile = new File(exportDir, "PhieuNhapKho_" + phieuHienTai.getMaPhieuNhap() + ".pdf");
+                String finalPath = finalFile.getAbsolutePath();
+
+                // Gọi service In
+                Print_PhieuNhap.inPhieu(phieuHienTai, tableChiTiet.getItems(), finalPath);
+                
+                AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã lưu phiếu thành công tại:\n" + finalPath);
+                previewStage.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi Hệ Thống", "Không thể in phiếu. Chi tiết: " + ex.getMessage());
+            }
+        });
+
+        HBox actionBox = new HBox(15, btnCancel, btnConfirm);
+        actionBox.setAlignment(Pos.CENTER_RIGHT);
+        actionBox.setPadding(new Insets(15, 0, 0, 0));
+
+        VBox root = new VBox(15, new ScrollPane(paper), actionBox);
+        root.setStyle("-fx-background-color: #f8fafc; -fx-padding: 20;");
+        root.setAlignment(Pos.CENTER);
+
+        Scene scene = new Scene(root, 800, 700);
+        previewStage.setScene(scene);
+        previewStage.show();
     }
 
     @FXML void handleDong(ActionEvent event) {
@@ -133,9 +225,6 @@ public class Dialog_ChiTietPhieuNhapController {
         stage.close();
     }
 
-    // =========================================================
-    // INNER CLASS DÙNG ĐỂ HIỂN THỊ LÊN BẢNG (MÌ ĂN LIỀN)
-    // =========================================================
     public class ChiTietUI {
         private String tenThuoc, donVi, maLo;
         private int soLuong;

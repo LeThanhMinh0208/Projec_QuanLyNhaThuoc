@@ -3,6 +3,7 @@ package gui.dialogs;
 import dao.*;
 import entity.*;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.*;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.*;
@@ -91,7 +92,7 @@ public class Dialog_XuatTraNCCController {
 
         cbChonThuoc.valueProperty().addListener((o, oldV, t) -> loadDanhSachLoTheoThuocVaNCC(t));
 
-        // 3. SETUP COMBOBOX LÔ THUỐC (Hiển thị thêm Tên Kho để nhân viên biết đi tìm)
+        // 3. SETUP COMBOBOX LÔ THUỐC
         cbChonLo.setConverter(new StringConverter<LoThuoc>() {
             @Override public String toString(LoThuoc l) { 
                 if (l == null) return "";
@@ -102,7 +103,6 @@ public class Dialog_XuatTraNCCController {
         });
     }
 
- // Lọc Thuốc không cần phân biệt Kho
     private void loadDanhSachThuocTheoNCC() {
         NhaCungCap ncc = cbNhaCungCap.getValue();
         masterListThuoc.clear();
@@ -110,7 +110,6 @@ public class Dialog_XuatTraNCCController {
         cbChonLo.getItems().clear();
 
         if (ncc != null) {
-            // 🚨 THÊM t.donViCoBan VÀO CÂU SELECT
             String sql = "SELECT DISTINCT t.maThuoc, t.tenThuoc, t.hinhAnh, t.donViCoBan " +
                          "FROM Thuoc t JOIN LoThuoc l ON t.maThuoc = l.maThuoc " +
                          "WHERE l.maNhaCungCap = ? AND l.soLuongTon > 0 AND l.trangThai = 1";
@@ -123,7 +122,7 @@ public class Dialog_XuatTraNCCController {
                     t.setMaThuoc(rs.getString("maThuoc"));
                     t.setTenThuoc(rs.getString("tenThuoc"));
                     t.setHinhAnh(rs.getString("hinhAnh"));
-                    t.setDonViCoBan(rs.getString("donViCoBan")); // 🚨 GÁN ĐƠN VỊ VÀO ĐÂY
+                    t.setDonViCoBan(rs.getString("donViCoBan")); 
                     masterListThuoc.add(t);
                 }
             } catch (Exception e) { 
@@ -138,18 +137,13 @@ public class Dialog_XuatTraNCCController {
         }
     }
 
-    // Lọc Lô không cần phân biệt Kho
     private void loadDanhSachLoTheoThuocVaNCC(Thuoc t) {
         NhaCungCap ncc = cbNhaCungCap.getValue();
-        
         if (t != null && ncc != null) {
-            // Gọi hàm DAO mới tạo ở trên
             List<LoThuoc> tatCaCacLo = daoLo.getTatCaLoThuocTraNCC(t.getMaThuoc());
-            
             List<LoThuoc> loCuaNCC = tatCaCacLo.stream()
                     .filter(l -> l.getNhaCungCap() != null && l.getNhaCungCap().getMaNhaCungCap().equals(ncc.getMaNhaCungCap()))
                     .collect(Collectors.toList());
-                    
             cbChonLo.setItems(FXCollections.observableArrayList(loCuaNCC));
         } else {
             cbChonLo.getItems().clear();
@@ -186,7 +180,6 @@ public class Dialog_XuatTraNCCController {
             return new javafx.beans.property.SimpleStringProperty(ma);
         });
 
-        // 🚨 Đổi getSoLo() thành getMaLo() nếu IDE báo đỏ
         colSoLo.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getSoLo()));
         colSoLuong.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getSoLuong()));
         
@@ -245,11 +238,8 @@ public class Dialog_XuatTraNCCController {
             int sl = Integer.parseInt(txtSoLuongTra.getText().replaceAll("[^\\d]", ""));
             if (sl <= 0) return;
             
-            // 🚨 SỬA CÂU THÔNG BÁO VƯỢT TỒN KHO TẠI ĐÂY 🚨
             if (sl > l.getSoLuongTon()) { 
-                // Lấy đơn vị của thuốc (nếu có), không có thì hiện chữ "sản phẩm"
                 String donVi = (t.getDonViCoBan() != null && !t.getDonViCoBan().trim().isEmpty()) ? t.getDonViCoBan() : "sản phẩm";
-                
                 AlertUtils.showAlert(Alert.AlertType.ERROR, "Vượt quá số lượng", 
                     "Số lượng xuất trả không được vượt quá số lượng đang tồn!\n" +
                     "Lô này trong kho chỉ còn: " + l.getSoLuongTon() + " " + donVi + "."); 
@@ -261,7 +251,6 @@ public class Dialog_XuatTraNCCController {
             dsTraTam.add(new ChiTietPhieuXuat(null, t.getMaThuoc(), l.getMaLoThuoc(), sl, gia, sl * gia));
             tinhTongTien();
             
-            // ĐÃ CÓ HÀNG TRONG BẢNG -> KHÓA CỨNG COMBOBOX NHÀ CUNG CẤP LẠI
             cbNhaCungCap.setDisable(true);
             cbNhaCungCap.setStyle("-fx-opacity: 1; -fx-background-color: #f1f5f9; -fx-font-weight: bold;");
             
@@ -311,6 +300,93 @@ public class Dialog_XuatTraNCCController {
             ((Stage) txtGhiChu.getScene().getWindow()).close();
         } else {
             AlertUtils.showAlert(Alert.AlertType.ERROR, "Thất bại", "Lỗi khi lưu phiếu trả hàng!");
+        }
+    }
+
+    @FXML
+    private void handleImportCSV(javafx.event.ActionEvent event) {
+        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+        fileChooser.setTitle("Chọn file CSV Trả hàng NCC");
+        fileChooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        java.io.File file = fileChooser.showOpenDialog(lblTongTien.getScene().getWindow());
+
+        if (file != null) {
+            try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(file), "UTF-8"))) {
+                String line;
+                int lineNumber = 0;
+                String tenNCCFile = "";
+                int count = 0;
+                
+                dsTraTam.clear();
+                cbNhaCungCap.setDisable(false);
+
+                while ((line = br.readLine()) != null) {
+                    lineNumber++;
+                    if (lineNumber == 1 && line.startsWith("\uFEFF")) line = line.substring(1);
+                    if (line.trim().isEmpty()) continue;
+
+                    String[] cols = line.split(line.contains(";") ? ";" : ",");
+
+                    if (lineNumber == 1) {
+                        if (cols.length >= 2) {
+                            tenNCCFile = cols[1].trim().replaceAll("^\"|\"$", "");
+                            for (NhaCungCap ncc : cbNhaCungCap.getItems()) {
+                                if (ncc.getTenNhaCungCap().equalsIgnoreCase(tenNCCFile)) {
+                                    cbNhaCungCap.getSelectionModel().select(ncc);
+                                    break;
+                                }
+                            }
+                        }
+                        continue;
+                    }
+
+                    if (lineNumber == 2) continue;
+
+                    if (cols.length < 3) continue;
+                    String tenThuocFile = cols[0].trim().replaceAll("^\"|\"$", "");
+                    String soLoFile = cols[1].trim().replaceAll("^\"|\"$", "");
+                    int slTra = Integer.parseInt(cols[2].replaceAll("[^\\d]", ""));
+
+                    NhaCungCap selectedNCC = cbNhaCungCap.getValue();
+                    if (selectedNCC == null) break;
+
+                    String sqlFindLo = "SELECT l.*, t.tenThuoc FROM LoThuoc l " +
+                                       "JOIN Thuoc t ON l.maThuoc = t.maThuoc " +
+                                       "WHERE t.tenThuoc = ? AND l.maLoThuoc = ? AND l.maNhaCungCap = ?";
+                    
+                    try (Connection con = connectDB.ConnectDB.getInstance().getConnection();
+                         PreparedStatement pst = con.prepareStatement(sqlFindLo)) {
+                        pst.setString(1, tenThuocFile);
+                        pst.setString(2, soLoFile);
+                        pst.setString(3, selectedNCC.getMaNhaCungCap());
+                        ResultSet rs = pst.executeQuery();
+                        
+                        if (rs.next()) {
+                            double giaNhap = rs.getDouble("giaNhap");
+                            int tonHT = rs.getInt("soLuongTon");
+                            String maThuoc = rs.getString("maThuoc");
+                            
+                            if (slTra <= tonHT) {
+                                dsTraTam.add(new ChiTietPhieuXuat(null, maThuoc, soLoFile, slTra, giaNhap, slTra * giaNhap));
+                                count++;
+                            }
+                        }
+                    }
+                }
+
+                if (count > 0) {
+                    cbNhaCungCap.setDisable(true);
+                    tableThuocTra.refresh();
+                    tinhTongTien();
+                    AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã nạp xong " + count + " mặt hàng trả cho " + tenNCCFile);
+                } else {
+                    AlertUtils.showAlert(Alert.AlertType.WARNING, "Thông báo", "Không tìm thấy dữ liệu khớp hoặc NCC không chính xác!");
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Lỗi đọc file: " + e.getMessage());
+            }
         }
     }
     

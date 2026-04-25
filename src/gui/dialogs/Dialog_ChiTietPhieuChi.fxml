@@ -60,7 +60,7 @@
             <HBox alignment="CENTER_RIGHT" spacing="15.0">
                <children>
                   <Button fx:id="btnDong" onAction="#handleDong" prefHeight="45.0" prefWidth="120.0" styleClass="btn-dialog-cancel" text="Đóng" />
-                  <Button onAction="#handleInPhieu" prefHeight="45.0" prefWidth="160.0" styleClass="btn-dialog-print" text="🖨 IN PHIẾU PDF" />
+                  <Button onAction="#handleInPhieu" prefHeight="45.0" prefWidth="160.0" styleClass="btn-dialog-print" text="🖨 IN PHIẾU" />
                </children>
             </HBox>
          </children>

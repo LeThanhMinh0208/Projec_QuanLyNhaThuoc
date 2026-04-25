@@ -17,6 +17,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import javafx.event.ActionEvent; 
+import javafx.scene.control.Alert;
 
 public class Dialog_XuatChuyenKhoController implements Initializable {
     @FXML private ComboBox<String> cbKhoXuat;
@@ -180,6 +182,101 @@ public class Dialog_XuatChuyenKhoController implements Initializable {
         if (daoPX.chuyenKhoNoiBo(px, new ArrayList<>(dsXuatTam), maKhoNhan)) {
             AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chuyển kho hoàn tất! Mã phiếu: " + maPhieuMoi); 
             ((Stage) txtKhoNhan.getScene().getWindow()).close();
+        }
+    }
+    @FXML
+    private void handleImportCSV(ActionEvent event) {
+        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+        fileChooser.setTitle("Chọn file CSV Lệnh Chuyển Kho");
+        fileChooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        java.io.File file = fileChooser.showOpenDialog(txtKhoNhan.getScene().getWindow());
+
+        if (file != null) {
+            try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(file), "UTF-8"))) {
+                String line;
+                int lineNumber = 0;
+                int successCount = 0;
+                
+                // Xóa danh sách cũ trước khi nạp lệnh mới
+                dsXuatTam.clear();
+
+                while ((line = br.readLine()) != null) {
+                    lineNumber++;
+                    if (lineNumber == 1 && line.startsWith("\uFEFF")) line = line.substring(1); // Gỡ BOM
+                    if (line.trim().isEmpty()) continue;
+
+                    String separator = line.contains(";") ? ";" : ",";
+                    String[] cols = line.split(separator);
+
+                    // --- BƯỚC 1: ĐỌC DÒNG 1 ĐỂ GÁN KHO LÊN GIAO DIỆN ---
+                    if (lineNumber == 1) {
+                        if (cols.length >= 2) {
+                            String tenKhoXuatFile = cols[1].trim().replaceAll("^\"|\"$", "");
+                            
+                            // Tự động chọn Kho Xuất trên UI (Lệnh này sẽ kích hoạt listener tự đổi Kho Nhận luôn)
+                            boolean foundWarehouse = false;
+                            for (String item : cbKhoXuat.getItems()) {
+                                if (item.equalsIgnoreCase(tenKhoXuatFile)) {
+                                    cbKhoXuat.getSelectionModel().select(item);
+                                    foundWarehouse = true;
+                                    break;
+                                }
+                            }
+                            
+                            if (!foundWarehouse) {
+                                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi file", "Tên kho xuất '" + tenKhoXuatFile + "' không hợp lệ!");
+                                return;
+                            }
+                        }
+                        continue;
+                    }
+
+                    // Bỏ qua dòng tiêu đề cột (Dòng 2)
+                    if (lineNumber == 2) continue;
+
+                    // --- BƯỚC 2: NẠP DANH SÁCH THUỐC ---
+                    if (cols.length < 2) continue;
+
+                    String tenThuocFile = cols[0].trim().replaceAll("^\"|\"$", "");
+                    String soLoFile = cols[1].trim().replaceAll("^\"|\"$", "");
+                    String maKhoXuatDB = cbKhoXuat.getValue().equals("Kho dự trữ") ? "KHO_DU_TRU" : "KHO_BAN_HANG";
+
+                    // Tìm thuốc trong hệ thống
+                    Thuoc thuocFound = null;
+                    for (Thuoc t : new DAO_Thuoc().getThuocCoLoTrongKho(maKhoXuatDB)) {
+                        if (t.getTenThuoc().equalsIgnoreCase(tenThuocFile)) {
+                            thuocFound = t;
+                            break;
+                        }
+                    }
+
+                    if (thuocFound != null) {
+                        java.util.List<LoThuoc> dsLo = daoLo.getLoThuocTheoFEFO(thuocFound.getMaThuoc(), maKhoXuatDB);
+                        LoThuoc loFound = null;
+                        for (LoThuoc l : dsLo) {
+                            if (l.getMaLoThuoc().equalsIgnoreCase(soLoFile)) {
+                                loFound = l;
+                                break;
+                            }
+                        }
+
+                        if (loFound != null && loFound.getSoLuongTon() > 0) {
+                            int slFull = loFound.getSoLuongTon();
+                            dsXuatTam.add(new ChiTietPhieuXuat(null, thuocFound.getMaThuoc(), loFound.getMaLoThuoc(), slFull, loFound.getGiaNhap(), slFull * loFound.getGiaNhap()));
+                            successCount++;
+                        }
+                    }
+                }
+
+                tableThuocChuyen.refresh();
+                AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", 
+                    "Đã thiết lập lộ trình từ [" + cbKhoXuat.getValue() + "] sang [" + txtKhoNhan.getText() + "]\n" +
+                    "Nạp thành công " + successCount + " lô thuốc.");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể đọc file: " + e.getMessage());
+            }
         }
     }
     

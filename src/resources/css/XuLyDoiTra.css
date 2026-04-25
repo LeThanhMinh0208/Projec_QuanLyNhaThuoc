@@ -1,0 +1,144 @@
+/* ========================================================
+   1. GLOBAL & BACKGROUND (XANH LƠ NHẠT)
+   ======================================================== */
+.main-bg { 
+    -fx-background-color: #f0f9ff; 
+}
+
+/* TIÊU ĐỀ & GẠCH CHÂN CHUẨN ẢNH */
+.main-title {
+    -fx-font-size: 32px;
+    -fx-font-weight: 900;
+    -fx-text-fill: linear-gradient(to bottom, #0ea5e9, #0369a1);
+    -fx-padding: 10 0 5 0;
+}
+
+.xk-title-line {
+    -fx-background-color: #0ea5e9;
+    -fx-min-height: 4px;
+    -fx-max-height: 4px;
+    -fx-background-radius: 5px;
+    -fx-pref-width: 250px;
+}
+/* ========================================================
+   2. TABS "VIÊN THUỐC" (NỀN XÁM - NÚT XANH DƯƠNG CHUẨN ẢNH)
+   ======================================================== */
+.tab-container {
+    -fx-background-color: #e2e8f0; /* Nền xám nhạt bao ngoài */
+    -fx-background-radius: 30px;
+    -fx-padding: 4px;
+    -fx-max-height: 45px;
+}
+
+.tab-toggle-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #64748b; /* Chữ xám khi chưa chọn */
+    -fx-font-weight: 900;
+    -fx-font-size: 14px;
+    -fx-background-radius: 25px;
+    -fx-padding: 8 25;
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s ease;
+}
+
+/* 🚨 ĐÂY LÀ CHỖ TẠO SỰ KHÁC BIỆT: Nút xanh dương, chữ trắng */
+.tab-toggle-button:selected {
+    -fx-background-color: #0ea5e9; /* Xanh dương rực rỡ */
+    -fx-text-fill: white;          /* Chữ trắng nổi bật */
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.4), 8, 0, 0, 2); /* Bóng tỏa màu xanh */
+}
+
+/* ========================================================
+   3. BỘ LỌC VIÊN THUỐC (FIX TRIỆT ĐỂ Ô CHỌN NGÀY)
+   ======================================================== */
+.dt-input {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-border-width: 1.5px;
+    -fx-background-radius: 25px;
+    -fx-border-radius: 25px;
+    -fx-padding: 0; 
+    -fx-cursor: hand;
+}
+
+/* 🚨 FIX: Ép cái ruột của DatePicker phải tròn và trong suốt */
+.dt-input > .text-field {
+    -fx-background-color: transparent !important;
+    -fx-background-radius: 25px 0 0 25px;
+    -fx-padding: 8 15;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #334155;
+}
+
+/* Ép nút lịch/mũi tên ComboBox bo theo vỏ */
+.dt-input > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0 25px 25px 0;
+    -fx-padding: 0 12 0 5;
+}
+
+.dt-input:focused, .dt-input:showing {
+    -fx-border-color: #0ea5e9;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.3), 10, 0, 0, 0);
+}
+
+/* --- THANH TÌM KIẾM --- */
+.dt-search-wrapper {
+    -fx-background-color: white;
+    -fx-background-radius: 25px; 
+    -fx-border-color: #7dd3fc; 
+    -fx-border-radius: 25px; 
+    -fx-padding: 0 15 0 15;
+    -fx-border-width: 1.5px;
+}
+.search-input { -fx-background-color: transparent; -fx-font-weight: bold; }
+
+/* ========================================================
+   4. NÚT BẤM CHỨC NĂNG (PILL SHAPE)
+   ======================================================== */
+.btn-pill-action {
+    -fx-background-radius: 30px;
+    -fx-border-radius: 30px;
+    -fx-cursor: hand;
+    -fx-font-weight: 900;
+    -fx-transition: all 0.3s ease;
+}
+.btn-pill-action:hover { -fx-translate-y: -2px; }
+
+/* NÚT XANH LÁ (DÙNG CHO XỬ LÝ/CHI TIẾT) */
+.btn-detail-pill-green {
+    -fx-background-color: #dcfce7; /* Xanh lá nhạt */
+    -fx-text-fill: #15803d;        /* Chữ xanh lá đậm */
+    -fx-font-weight: 900;
+    -fx-font-size: 12px;
+    -fx-background-radius: 20px;
+    -fx-cursor: hand;
+    -fx-padding: 5px 18px;
+    -fx-border-width: 0;
+}
+.btn-detail-pill-green:hover { -fx-background-color: #bbf7d0; }
+
+.btn-detail-disabled {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #94a3b8;
+    -fx-background-radius: 20px;
+}
+
+/* ========================================================
+   5. BẢNG DỮ LIỆU & CARD
+   ======================================================== */
+.panel-white {
+    -fx-background-color: white;
+    -fx-background-radius: 15px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);
+    -fx-padding: 10;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #0ea5e9;
+    -fx-background-radius: 12px 12px 0 0;
+}
+
+.table-row-cell:selected { -fx-background-color: #0ea5e9 !important; }
+.table-row-cell:selected .table-cell { -fx-text-fill: white !important; -fx-font-weight: bold; }

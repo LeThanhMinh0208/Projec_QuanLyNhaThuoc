@@ -65,8 +65,8 @@
                <children>
                    <HBox alignment="CENTER_LEFT" spacing="15.0">
                      <children>
-                        <DatePicker fx:id="dpTuNgay" prefHeight="40.0" promptText="Từ ngày..." />
-                        <DatePicker fx:id="dpDenNgay" prefHeight="40.0" promptText="Đến ngày..." />
+                        <DatePicker fx:id="dpTuNgay" prefHeight="40.0" promptText="Từ ngày..." styleClass="cn-input" />
+                        <DatePicker fx:id="dpDenNgay" prefHeight="40.0" promptText="Đến ngày..." styleClass="cn-input" />
                         <Button styleClass="cn-btn-secondary" text="Lọc" prefHeight="40.0" />
                         <Region HBox.hgrow="ALWAYS" />
                         <HBox spacing="10.0" styleClass="cn-search-container" prefHeight="45.0" prefWidth="400.0">

@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -101,30 +102,36 @@ public class GUI_DanhSachHoaDonController {
                 super.updateItem(val, empty);
                 if (empty || val == null) {
                     setText(null);
-                    setStyle("");
-                } else if ("BAN_THEO_DON".equals(val)) {
-                    setText("Theo đơn");
-                    setStyle("-fx-text-fill: #1565C0; -fx-font-weight: bold;");
+                    getStyleClass().removeAll("text-theo-don", "text-ban-le");
                 } else {
-                    setText("Bán lẻ");
-                    setStyle("-fx-text-fill: #2E7D32;");
+                    getStyleClass().removeAll("text-theo-don", "text-ban-le");
+                    if ("BAN_THEO_DON".equals(val)) {
+                        setText("Theo đơn");
+                        getStyleClass().add("text-theo-don"); // Class trong Danhsachhoadon.css
+                    } else {
+                        setText("Bán lẻ");
+                        getStyleClass().add("text-ban-le"); // Class trong Danhsachhoadon.css
+                    }
                 }
             }
         });
 
+        // Nút HÀNH ĐỘNG (XEM) - Dáng viên thuốc chuẩn Pill-shape
         colHanhDong.setCellFactory(col -> new TableCell<>() {
-            private final Button btn = new Button("👁 Chi tiết");
+            private final Button btn = new Button("Xem");
             {
-                btn.setStyle("-fx-background-color:#2563eb;-fx-text-fill:white;-fx-font-size:12px;-fx-padding:4 10;-fx-cursor:hand;");
+                btn.getStyleClass().add("btn-view-pill"); // Ăn class từ Danhsachhoadon.css
                 btn.setOnAction(e -> moDialogChiTiet(getTableView().getItems().get(getIndex())));
             }
             @Override protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : btn);
+                if (empty) setGraphic(null); 
+                else {
+                    setGraphic(btn);
+                    setAlignment(Pos.CENTER);
+                }
             }
         });
-
-        tableHoaDon.setItems(filteredData != null ? filteredData : data);
     }
 
     private void loadData() {

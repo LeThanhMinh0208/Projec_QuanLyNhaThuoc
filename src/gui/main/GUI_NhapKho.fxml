@@ -82,9 +82,20 @@
 
                   <VBox spacing="15.0" HBox.hgrow="ALWAYS">
                      <children>
-                        <VBox styleClass="nk-card" VBox.vgrow="ALWAYS">
+                <VBox styleClass="nk-card" VBox.vgrow="ALWAYS">
                            <children>
-                              <Label text="Chi Tiết Hàng Thực Nhận" styleClass="label-header" style="-fx-padding: 15 15 5 15;" />
+                              
+                              <HBox alignment="CENTER_LEFT">
+                                 <children>
+                                    <Label style="-fx-padding: 15 15 5 15;" styleClass="label-header" text="Chi Tiết Hàng Thực Nhận" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Button onAction="#handleImportCSV" prefHeight="35.0" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 8;" text="📥 Nhập từ file CSV" />
+                                 </children>
+                                 <padding>
+                                    <Insets right="15.0" top="10.0" />
+                                 </padding>
+                              </HBox>
+
                               <TableView fx:id="tableNhapKho" editable="true" styleClass="nk-table" VBox.vgrow="ALWAYS">
                                  <columns>
                                     <TableColumn fx:id="colTenThuoc" prefWidth="200.0" text="TÊN THUỐC" />
@@ -96,8 +107,11 @@
                                     <TableColumn fx:id="colHanDung" prefWidth="120.0" text="HẠN DÙNG" />
                                     <TableColumn fx:id="colGiaNhap" prefWidth="120.0" text="GIÁ/ĐV" />
                                  </columns>
-                                 <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+                                 <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
                               </TableView>
+
                            </children>
                            <padding>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

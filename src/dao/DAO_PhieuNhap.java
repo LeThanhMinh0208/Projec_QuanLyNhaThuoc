@@ -50,7 +50,7 @@ public class DAO_PhieuNhap {
             }
 
             // =========================================================================
-            // 2. LƯU VÀO BẢNG LÔ THUỐC (ĐÃ SỬA: THÊM NGÀY NHẬP KHO VÀ NHÀ CUNG CẤP)
+            // 2. LƯU VÀO BẢNG LÔ THUỐC 
             // =========================================================================
             String sqlInsertLoThuoc = "IF NOT EXISTS (SELECT 1 FROM LoThuoc WHERE maLoThuoc=?) " + 
                                       "INSERT INTO LoThuoc (maLoThuoc, maThuoc, ngaySanXuat, hanSuDung, soLuongTon, giaNhap, viTriKho, trangThai, ngayNhapKho, maNhaCungCap) " +
@@ -93,7 +93,6 @@ public class DAO_PhieuNhap {
                         pstLoThuoc.setInt(6, soLuongThucTeVaoKho);    
                         pstLoThuoc.setDouble(7, giaNhapThucTeVaoKho); 
                         
-                        // 🚨🚨 ĐÂY LÀ 2 DÒNG QUAN TRỌNG NHẤT VỪA THÊM VÀO 🚨🚨
                         pstLoThuoc.setDate(8, new java.sql.Date(System.currentTimeMillis())); // Lấy ngày máy tính làm ngày nhập
                         pstLoThuoc.setString(9, phieuNhap.getNhaCungCap().getMaNhaCungCap()); // Lấy mã NCC từ đối tượng PhieuNhap
                         
@@ -131,8 +130,11 @@ public class DAO_PhieuNhap {
                 }
             }
 
-            // Tách đơn nếu giao thiếu (Giữ nguyên)
+            // ==================================================================
+            // 🚨 ĐÃ FIX: XỬ LÝ CHUẨN TÁCH ĐƠN & HỦY PHẦN THIẾU
+            // ==================================================================
             if (isGiaoThieu && soNgayHen > 0) {
+                // TH1: Giao thiếu nhưng HẸN NGÀY GIAO BÙ -> Cập nhật GIAO_MOT_PHAN và TÁCH ĐƠN
                 try (PreparedStatement pstUpdateOld = con.prepareStatement("UPDATE DonDatHang SET trangThai = 'GIAO_MOT_PHAN' WHERE maDonDatHang = ?")) {
                     pstUpdateOld.setString(1, donGoc.getMaDonDatHang());
                     pstUpdateOld.executeUpdate();
@@ -166,13 +168,22 @@ public class DAO_PhieuNhap {
                     }
                     pstInsertCT.executeBatch();
                 }
-            } else if (!isGiaoThieu) {
+            } 
+            else if (isGiaoThieu && soNgayHen <= 0) {
+                // 🚨🚨🚨 TH2: Giao thiếu nhưng NHẬP 0 NGÀY (Hủy phần thiếu) -> Cập nhật GIAO_MOT_PHAN
+                try (PreparedStatement pstTrangThai = con.prepareStatement("UPDATE DonDatHang SET trangThai = 'GIAO_MOT_PHAN' WHERE maDonDatHang = ?")) {
+                    pstTrangThai.setString(1, donGoc.getMaDonDatHang());
+                    pstTrangThai.executeUpdate();
+                }
+            } 
+            else if (!isGiaoThieu) {
+                // TH3: Giao đủ 100% -> Cập nhật GIAO_DU
                 try (PreparedStatement pstTrangThai = con.prepareStatement("UPDATE DonDatHang SET trangThai = 'GIAO_DU' WHERE maDonDatHang = ?")) {
                     pstTrangThai.setString(1, donGoc.getMaDonDatHang());
                     pstTrangThai.executeUpdate();
                 }
             }
- 
+
             con.commit(); 
             return true;
 

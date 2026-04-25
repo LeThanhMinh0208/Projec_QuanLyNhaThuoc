@@ -7,7 +7,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-// 🚨 NHỚ PHẢI IMPORT USERSESSION NÀY VÀO 🚨
 import utils.UserSession; 
 
 public class GUI_DoiMatKhauController {
@@ -20,10 +19,27 @@ public class GUI_DoiMatKhauController {
 
     @FXML
     public void initialize() {
-        // 🚨 LẤY TRỰC TIẾP TỪ USERSESSION, KHÔNG ĐỤNG TỚI TRANG CHỦ 🚨
-        currentUser = UserSession.getInstance().getUser(); 
+        // 1. Lấy thông tin user cũ từ Session
+        NhanVien sessionUser = UserSession.getInstance().getUser(); 
         
-        if (currentUser != null) {
+        if (sessionUser != null) {
+            // 🚨 BẮT ĐẦU FIX LỖI: Lôi dữ liệu MỚI NHẤT từ Database lên 🚨
+            // Quét danh sách nhân viên để lấy đúng nhân viên hiện tại với SĐT/Tên mới nhất
+            for (NhanVien nv : dao.getChiNhanVien()) {
+                if (nv.getMaNhanVien().equals(sessionUser.getMaNhanVien())) {
+                    currentUser = nv; // Cập nhật biến tạm
+                    // 💡 Ép Session ôm dữ liệu mới luôn để đi các trang khác không bị lỗi
+                    UserSession.getInstance().setUser(nv); 
+                    break;
+                }
+            }
+            
+            // Backup an toàn (phòng trường hợp lỗi kết nối DB)
+            if (currentUser == null) {
+                currentUser = sessionUser;
+            }
+
+            // Gán dữ liệu lên giao diện
             txtHoTen.setText(currentUser.getHoTen());
             txtTaiKhoan.setText(currentUser.getTenDangNhap());
         } else {
@@ -46,7 +62,7 @@ public class GUI_DoiMatKhauController {
             return;
         }
 
-        // 2. XÁC THỰC SỐ ĐIỆN THOẠI
+        // 2. XÁC THỰC SỐ ĐIỆN THOẠI (Lúc này đã là SĐT mới nhất từ DB)
         if (!sdtXacThuc.equals(currentUser.getSdt())) {
             new Alert(Alert.AlertType.ERROR, "Số điện thoại xác thực không khớp với hồ sơ của bạn!").show();
             return;
@@ -78,6 +94,7 @@ public class GUI_DoiMatKhauController {
         if (dao.doiMatKhau(currentUser.getMaNhanVien(), mkMoi)) {
             // Cập nhật luôn pass trong cái Session hiện tại để đồng bộ
             currentUser.setMatKhau(mkMoi); 
+            UserSession.getInstance().setUser(currentUser); // Chốt hạ lại lần nữa cho chắc
             
             Alert success = new Alert(Alert.AlertType.INFORMATION);
             success.setTitle("Thành Công");

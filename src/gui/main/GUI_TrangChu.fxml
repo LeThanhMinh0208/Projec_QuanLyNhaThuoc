@@ -21,20 +21,20 @@
    <left>
       <VBox prefWidth="250.0" styleClass="sidebar" BorderPane.alignment="CENTER">
          <children>
-            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="250.0" spacing="12.0">
+            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="250.0" spacing="10.0">
                <padding><Insets left="15.0" /></padding>
                <children>
-                  <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
                      <image><Image url="@../../resources/icons/icon_thuoc.png" /></image>
                   </ImageView>
-                  <Label styleClass="sidebar-logo" text="LONG NGUYÊN" />
+                  <Label prefWidth="180.0" styleClass="sidebar-logo" text="LONG NGUYÊN" />
                </children>
             </HBox>
 
             <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent; -fx-padding: 0;" VBox.vgrow="ALWAYS">
                <content>
                   <VBox>
-                     <Button onAction="#handleVeTrangChu" alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="50.0" prefWidth="250.0" styleClass="sidebar-btn-active" text="Trang Chủ">
+                     <Button onAction="#handleVeTrangChu" alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="55.0" prefWidth="250.0" styleClass="btn-home-special" text="Trang Chủ">
                         <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/ic_home.png" /></ImageView></graphic>
                      </Button>
 
@@ -156,7 +156,7 @@
                <children>
                   <Label maxWidth="Infinity" alignment="CENTER" styleClass="main-title" text="HỆ THỐNG QUẢN LÝ NHÀ THUỐC LONG NGUYÊN" />
 
-<HBox spacing="30.0" alignment="CENTER">
+                  <HBox spacing="30.0" alignment="CENTER">
                      <children>
                         <HBox alignment="CENTER" spacing="15.0" prefHeight="75.0" prefWidth="200.0" styleClass="top-card, card-blue" HBox.hgrow="ALWAYS" onMouseClicked="#handleMoBanThuoc">
                            <children>

@@ -312,30 +312,42 @@ public class GUI_QuanLyLoThuocController implements Initializable {
 
         colThaoTac.setCellFactory(param -> new TableCell<LoThuoc, LoThuoc>() {
             private final Button btnAction = new Button();
+
             @Override
             protected void updateItem(LoThuoc lo, boolean empty) {
                 super.updateItem(lo, empty);
                 if (empty || lo == null) {
                     setGraphic(null);
                 } else {
-                    if (lo.getTrangThai() == 1) { 
+                    // Bước 1: Xóa sạch các class cũ để tránh xung đột
+                    btnAction.getStyleClass().clear();
+                    
+                    // Bước 2: Kiểm tra trạng thái để gán Class viên thuốc và Text tương ứng
+                    if (lo.getTrangThai() == 1) { // Lô đang hoạt động
                         btnAction.setText("Khóa Lô");
-                        btnAction.getStyleClass().setAll("button", "btn-lock"); 
+                        btnAction.getStyleClass().add("btn-lock-pill"); // Class đỏ nhạt viên thuốc
                         btnAction.setOnAction(e -> xuLyKhoaLo(lo.getMaLoThuoc(), 0));
                         
-                        long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), lo.getHanSuDung().toLocalDate());
+                        // Logic kiểm tra Hết hàng hoặc Hết đát
+                        long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(
+                            java.time.LocalDate.now(), 
+                            lo.getHanSuDung().toLocalDate()
+                        );
+                        
                         if(lo.getSoLuongTon() == 0 || daysBetween < 0) {
                             btnAction.setDisable(true); 
                             btnAction.setText("Hết Hàng/Date");
+                            // Khi disable, JavaFX tự mờ đi nên vẫn giữ được dáng viên thuốc
                         } else {
                             btnAction.setDisable(false);
                         }
-                    } else { 
+                    } else { // Lô đang bị khóa
                         btnAction.setText("Mở Khóa");
-                        btnAction.getStyleClass().setAll("button", "btn-unlock"); 
+                        btnAction.getStyleClass().add("btn-unlock-pill"); // Class xanh lá viên thuốc
                         btnAction.setOnAction(e -> xuLyKhoaLo(lo.getMaLoThuoc(), 1));
                         btnAction.setDisable(false);
                     }
+                    
                     setGraphic(btnAction);
                     setAlignment(Pos.CENTER);
                 }

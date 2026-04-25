@@ -8,209 +8,161 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.*;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.control.cell.PropertyValueFactory; // Dòng này cực kỳ quan trọng!
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import utils.*;
-
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
 
 public class Dialog_XuatHuyController implements Initializable {
-    @FXML private ComboBox<String> cbKhoXuat;
     @FXML private TextField txtNguoiLap, txtGhiChu, txtSoLuongHuy, txtTimNhanhThuoc;
     @FXML private ComboBox<Thuoc> cbChonThuoc;
     @FXML private ComboBox<LoThuoc> cbChonLo;
-    
     @FXML private TableView<ChiTietPhieuXuat> tableThuocHuy;
     @FXML private TableColumn<ChiTietPhieuXuat, Integer> colSTT, colSoLuong;
     @FXML private TableColumn<ChiTietPhieuXuat, String> colTenThuoc, colSoLo;
     @FXML private TableColumn<ChiTietPhieuXuat, Void> colXoa;
+    @FXML private TextField txtNoiHuy;
 
     private ObservableList<ChiTietPhieuXuat> dsHuyTam = FXCollections.observableArrayList();
+    private ObservableList<Thuoc> masterListThuoc = FXCollections.observableArrayList();
     private DAO_LoThuoc daoLo = new DAO_LoThuoc();
     private DAO_PhieuXuat daoPX = new DAO_PhieuXuat();
-    private double tongGiaTriThietHai = 0; // Để log lại thiệt hại nếu cần
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupTable();
+        txtNoiHuy.setText("Hủy Rác Y Tế");
         if (UserSession.getInstance().getUser() != null) {
             txtNguoiLap.setText(UserSession.getInstance().getUser().getHoTen());
         }
 
-        // Khai báo danh sách thuốc động (sẽ thay đổi khi đổi kho)
-        ObservableList<Thuoc> danhSachThuocKho = FXCollections.observableArrayList();
-        FilteredList<Thuoc> filter = new FilteredList<>(danhSachThuocKho, p -> true);
+        // 1. TẢI TẤT CẢ THUỐC CÓ HÀNG TRONG HỆ THỐNG (KHÔNG PHÂN BIỆT KHO)
+        loadTatCaThuocCoHang();
+        FilteredList<Thuoc> filter = new FilteredList<>(masterListThuoc, p -> true);
         cbChonThuoc.setItems(filter);
-        setupComboThuoc();
 
-        // Xử lý tìm kiếm nhanh
-        txtTimNhanhThuoc.textProperty().addListener((o, oldV, newV) -> {
-            filter.setPredicate(t -> {
-                if (newV == null || newV.isEmpty()) return true;
-                String lower = newV.toLowerCase();
-                return t.getTenThuoc().toLowerCase().contains(lower) || t.getMaThuoc().toLowerCase().contains(lower);
-            });
+        txtTimNhanhThuoc.textProperty().addListener((o, old, newV) -> {
+            filter.setPredicate(t -> newV == null || newV.isEmpty() || t.getTenThuoc().toLowerCase().contains(newV.toLowerCase()));
             if (!newV.isEmpty()) cbChonThuoc.show();
         });
 
-        // ========================================================
-        // LOGIC CHỌN KHO -> CẬP NHẬT DANH SÁCH THUỐC (ĐỒNG BỘ)
-        // ========================================================
-        cbKhoXuat.getItems().addAll("Kho dự trữ", "Kho bán hàng");
-        cbKhoXuat.valueProperty().addListener((o, oldV, newV) -> {
-            if (newV != null) {
-                // 1. Reset các ô chọn thuốc, chọn lô & số lượng cũ cho sạch
-                cbChonThuoc.getSelectionModel().clearSelection();
-                cbChonLo.getItems().clear();
-                txtSoLuongHuy.setText("");
-                
-                // 2. Tải danh sách thuốc CHỈ CÓ TRONG KHO VỪA CHỌN
-                String maKho = newV.equals("Kho dự trữ") ? "KHO_DU_TRU" : "KHO_BAN_HANG";
-                danhSachThuocKho.setAll(new DAO_Thuoc().getThuocCoLoTrongKho(maKho));
+        cbChonThuoc.valueProperty().addListener((o, old, t) -> {
+            if (t != null) {
+                // Tải tất cả các lô của thuốc này ở mọi kho
+                cbChonLo.setItems(FXCollections.observableArrayList(daoLo.getTatCaLoThuocTraNCC(t.getMaThuoc())));
             }
         });
 
-        // Chọn Thuốc -> Load Lô FEFO
-        cbChonThuoc.valueProperty().addListener((o, oldV, s) -> {
-            if (s != null && cbKhoXuat.getValue() != null) {
-                String k = cbKhoXuat.getValue().equals("Kho dự trữ") ? "KHO_DU_TRU" : "KHO_BAN_HANG";
-                cbChonLo.setItems(FXCollections.observableArrayList(daoLo.getLoThuocTheoFEFO(s.getMaThuoc(), k)));
-            } else {
-                cbChonLo.getItems().clear();
-            }
-        });
-
-        // Format hiển thị cho ComboBox Lô Thuốc
         cbChonLo.setConverter(new StringConverter<LoThuoc>() {
-            @Override public String toString(LoThuoc l) { return l==null ? "" : "Lô: " + l.getMaLoThuoc() + " (Tồn: " + l.getSoLuongTon() + ")"; }
+            @Override public String toString(LoThuoc l) { 
+                if (l == null) return "";
+                String k = "KHO_BAN_HANG".equals(l.getViTriKho()) ? "Bán hàng" : "Dự trữ";
+                return "Lô: " + l.getMaLoThuoc() + " (Tồn: " + l.getSoLuongTon() + " | Kho: " + k + ")";
+            }
             @Override public LoThuoc fromString(String s) { return null; }
         });
-
-        // Mặc định chọn "Kho dự trữ" khi vừa mở form lên (để kích hoạt trigger load thuốc lần đầu)
-        cbKhoXuat.getSelectionModel().selectFirst();
     }
 
-    private void setupComboThuoc() {
-        cbChonThuoc.setCellFactory(lv -> new ListCell<Thuoc>() {
-            private final ImageView iv = new ImageView();
-            @Override protected void updateItem(Thuoc t, boolean empty) {
-                super.updateItem(t, empty);
-                if (empty || t == null) { setGraphic(null); setText(null); }
-                else {
-                    setText(t.getTenThuoc());
-                    try {
-                        InputStream is = getClass().getResourceAsStream("/resources/images/images_thuoc/" + t.getHinhAnh().trim());
-                        if (is != null) { iv.setImage(new Image(is)); iv.setFitWidth(40); iv.setFitHeight(30); setGraphic(iv); }
-                        else setGraphic(null);
-                    } catch (Exception ex) { setGraphic(null); }
-                }
+    private void loadTatCaThuocCoHang() {
+        String sql = "SELECT DISTINCT t.* FROM Thuoc t JOIN LoThuoc l ON t.maThuoc = l.maThuoc WHERE l.soLuongTon > 0 AND l.trangThai = 1";
+        try (Connection con = connectDB.ConnectDB.getInstance().getConnection();
+             Statement st = con.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                Thuoc t = new Thuoc();
+                t.setMaThuoc(rs.getString("maThuoc"));
+                t.setTenThuoc(rs.getString("tenThuoc"));
+                masterListThuoc.add(t);
             }
-        });
-        cbChonThuoc.setButtonCell(cbChonThuoc.getCellFactory().call(null));
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    @FXML
+    private void handleImportCSV(javafx.event.ActionEvent event) {
+        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+        fileChooser.setTitle("Chọn file CSV Xuất Hủy");
+        fileChooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        File file = fileChooser.showOpenDialog(txtNguoiLap.getScene().getWindow());
+
+        if (file != null) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"))) {
+                String line; int lineNumber = 0; int count = 0;
+                dsHuyTam.clear();
+                while ((line = br.readLine()) != null) {
+                    lineNumber++;
+                    if (lineNumber == 1 && line.startsWith("\uFEFF")) line = line.substring(1);
+                    if (lineNumber == 1 || line.trim().isEmpty()) continue; // Bỏ qua tiêu đề
+
+                    String[] cols = line.split(line.contains(";") ? ";" : ",");
+                    if (cols.length < 3) continue;
+
+                    String tenThuoc = cols[0].trim().replaceAll("^\"|\"$", "");
+                    String soLo = cols[1].trim().replaceAll("^\"|\"$", "");
+                    int slHuy = Integer.parseInt(cols[2].replaceAll("[^\\d]", ""));
+
+                    // Tìm lô thuốc bất kể kho
+                    String sql = "SELECT l.* FROM LoThuoc l JOIN Thuoc t ON l.maThuoc = t.maThuoc " +
+                                 "WHERE t.tenThuoc = ? AND l.maLoThuoc = ?";
+                    try (Connection con = connectDB.ConnectDB.getInstance().getConnection();
+                         PreparedStatement pst = con.prepareStatement(sql)) {
+                        pst.setString(1, tenThuoc); pst.setString(2, soLo);
+                        ResultSet rs = pst.executeQuery();
+                        if (rs.next()) {
+                            if (slHuy <= rs.getInt("soLuongTon")) {
+                                dsHuyTam.add(new ChiTietPhieuXuat(null, rs.getString("maThuoc"), soLo, slHuy, rs.getDouble("giaNhap"), slHuy * rs.getDouble("giaNhap")));
+                                count++;
+                            }
+                        }
+                    }
+                }
+                tableThuocHuy.refresh();
+                AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã nạp xong " + count + " lô thuốc cần hủy.");
+            } catch (Exception e) { AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Lỗi đọc file: " + e.getMessage()); }
+        }
     }
 
     private void setupTable() {
         colSTT.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(dsHuyTam.indexOf(c.getValue()) + 1));
-        
         colTenThuoc.setCellValueFactory(c -> {
             String ma = c.getValue().getMaThuoc();
-            for(Thuoc t : cbChonThuoc.getItems()) {
-                if(t.getMaThuoc().equals(ma)) return new javafx.beans.property.SimpleStringProperty(t.getTenThuoc());
-            }
+            for(Thuoc t : masterListThuoc) if(t.getMaThuoc().equals(ma)) return new javafx.beans.property.SimpleStringProperty(t.getTenThuoc());
             return new javafx.beans.property.SimpleStringProperty(ma);
         });
-
-        // 🚨 Đổi getSoLo() thành getMaLo() nếu IDE báo đỏ
-        colSoLo.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getSoLo()));
-        colSoLuong.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getSoLuong()));
-        
+        colSoLo.setCellValueFactory(new PropertyValueFactory<>("soLo"));
+        colSoLuong.setCellValueFactory(new PropertyValueFactory<>("soLuong"));
         colXoa.setCellFactory(c -> new TableCell<>() {
             private final Button b = new Button("✕");
-            { 
-                b.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold;"); 
-                b.setOnAction(e -> { 
-                    dsHuyTam.remove(getTableView().getItems().get(getIndex())); 
-                    tableThuocHuy.refresh(); 
-                }); 
-            }
-            @Override protected void updateItem(Void i, boolean e) {
-                super.updateItem(i, e); setGraphic(e ? null : b); setAlignment(Pos.CENTER);
-            }
+            { b.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: bold;");
+              b.setOnAction(e -> { dsHuyTam.remove(getTableView().getItems().get(getIndex())); tableThuocHuy.refresh(); }); }
+            @Override protected void updateItem(Void i, boolean e) { super.updateItem(i, e); setGraphic(e ? null : b); setAlignment(Pos.CENTER); }
         });
         tableThuocHuy.setItems(dsHuyTam);
     }
 
     @FXML private void handleThemThuoc() {
         Thuoc t = cbChonThuoc.getValue(); LoThuoc l = cbChonLo.getValue();
-        if (t == null || l == null || txtSoLuongHuy.getText().isEmpty()) {
-            AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Vui lòng chọn thuốc, lô và nhập số lượng!");
-            return;
-        }
-        
-        for(ChiTietPhieuXuat ct : dsHuyTam) {
-            if(ct.getSoLo().equals(l.getMaLoThuoc())) {
-                AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Lô này đã có trong danh sách hủy!");
-                return;
-            }
-        }
-        
-        try {
-            int sl = Integer.parseInt(txtSoLuongHuy.getText());
-            if (sl <= 0) return;
-            if (sl > l.getSoLuongTon()) { 
-                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Vượt tồn! Kho chỉ còn: " + l.getSoLuongTon()); 
-                return; 
-            }
-            
-            double gia = l.getGiaNhap();
-            dsHuyTam.add(new ChiTietPhieuXuat(null, t.getMaThuoc(), l.getMaLoThuoc(), sl, gia, sl * gia));
-            
-            txtSoLuongHuy.clear();
-            cbChonLo.getSelectionModel().clearSelection();
-            
-        } catch (NumberFormatException e) {
-            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Vui lòng nhập số lượng hợp lệ!");
-        }
+        if (t == null || l == null || txtSoLuongHuy.getText().isEmpty()) return;
+        int sl = Integer.parseInt(txtSoLuongHuy.getText().replaceAll("[^\\d]", ""));
+        if (sl > l.getSoLuongTon()) { AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Vượt tồn kho!"); return; }
+        dsHuyTam.add(new ChiTietPhieuXuat(null, t.getMaThuoc(), l.getMaLoThuoc(), sl, l.getGiaNhap(), sl * l.getGiaNhap()));
+        txtSoLuongHuy.clear();
     }
 
     @FXML private void handleXacNhanHuy() {
-        if (dsHuyTam.isEmpty()) {
-            AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Chưa có thuốc nào trong danh sách!");
-            return;
-        }
-        if (txtGhiChu.getText().isEmpty()) {
-            AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Bắt buộc phải nhập Lý do xuất hủy!");
-            return;
-        }
-
-        tongGiaTriThietHai = 0;
-        for (ChiTietPhieuXuat ct : dsHuyTam) {
-            tongGiaTriThietHai += ct.getThanhTien();
-        }
-
-        String maPhieuMoi = daoPX.getMaPhieuXuatMoi("XH"); // XH = Xuất Hủy
-        
-        PhieuXuat px = new PhieuXuat(
-            maPhieuMoi, null, 
-            UserSession.getInstance().getUser().getMaNhanVien(), 
-            3, null, null, 
-            tongGiaTriThietHai, 
-            txtGhiChu.getText()
-        );
-        
+        if (dsHuyTam.isEmpty() || txtGhiChu.getText().isEmpty()) { AlertUtils.showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng nhập đầy đủ thuốc và lý do!"); return; }
+        double tongTien = 0; for (ChiTietPhieuXuat ct : dsHuyTam) tongTien += ct.getThanhTien();
+        String ma = daoPX.getMaPhieuXuatMoi("XH");
+        PhieuXuat px = new PhieuXuat(ma, null, UserSession.getInstance().getUser().getMaNhanVien(), 3, null, null, tongTien, txtGhiChu.getText());
         if (daoPX.xuatHuyThuoc(px, new ArrayList<>(dsHuyTam))) {
-            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã hủy thuốc thành công!\nMã phiếu: " + maPhieuMoi); 
-            ((Stage) txtGhiChu.getScene().getWindow()).close();
-        } else {
-            AlertUtils.showAlert(Alert.AlertType.ERROR, "Thất bại", "Lỗi khi lưu phiếu xuất hủy!");
+            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã lưu phiếu xuất hủy: " + ma);
+            handleHuyBo();
         }
     }
-    
-    @FXML private void handleHuyBo() { ((Stage) txtGhiChu.getScene().getWindow()).close(); }
+
+    @FXML private void handleHuyBo() { ((Stage) txtNguoiLap.getScene().getWindow()).close(); }
 }

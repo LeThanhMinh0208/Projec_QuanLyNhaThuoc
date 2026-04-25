@@ -2,7 +2,7 @@
    GLOBAL & BACKGROUND (Nền xanh xám cực dịu mát)
    ======================================================== */
 .dmk-main-bg {
-    -fx-background-color: #f0f4f8; /* Xám pha chút xanh lơ nhạt, không làm mỏi mắt */
+    -fx-background-color: #f0f9ff; /* Xám pha chút xanh lơ nhạt, không làm mỏi mắt */
 }
 
 /* TIÊU ĐỀ NỔI BẬT 3D */
@@ -310,4 +310,67 @@
     -fx-text-fill: #ef4444;
     -fx-font-weight: 900;
     -fx-font-size: 26px;
+}
+/* =========================================================
+   FIX LỖI GÓC TRẮNG TRÊN THANH CUỘN (FILLER)
+   ========================================================= */
+.table-view .filler,
+.table-view .column-header-background .show-hide-columns-button {
+    /* Đổi mã màu này cho khớp đúng với màu xanh Header của sếp nhé */
+    -fx-background-color: #0ea5e9; 
+}
+
+/* =========================================================
+   TÂN TRANG LẠI THANH CUỘN (SCROLLBAR) CHO MƯỢT MẮT
+   ========================================================= */
+/* Làm trong nền của thanh cuộn */
+.table-view .scroll-bar:vertical,
+.table-view .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+/* Bo góc và đổi màu cái cục lăn (thumb) */
+.table-view .scroll-bar:vertical .thumb,
+.table-view .scroll-bar:horizontal .thumb {
+    -fx-background-color: #cbd5e1;
+    -fx-background-radius: 8px;
+}
+
+/* Hiệu ứng khi di chuột vào cục lăn */
+.table-view .scroll-bar:vertical .thumb:hover,
+.table-view .scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #94a3b8;
+}
+
+/* Ẩn bớt 2 cái nút mũi tên lên/xuống ở 2 đầu cho thiết kế nó hiện đại */
+.table-view .scroll-bar:vertical .increment-button,
+.table-view .scroll-bar:vertical .decrement-button,
+.table-view .scroll-bar:horizontal .increment-button,
+.table-view .scroll-bar:horizontal .decrement-button {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+}
+
+.table-view .scroll-bar:vertical .increment-arrow,
+.table-view .scroll-bar:vertical .decrement-arrow,
+.table-view .scroll-bar:horizontal .increment-arrow,
+.table-view .scroll-bar:horizontal .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding: 0;
+}
+
+/* ========================================================
+   STYLES CHO DÒNG ĐƯỢC CHỌN (SELECTED ROW) - MỚI CẬP NHẬT
+   (Nền xanh đậm, chữ trắng - giống header y chang ảnh sếp)
+   ======================================================== */
+
+/* Màu nền xanh đậm khi dòng được click chọn */
+.dmk-table .table-row-cell:selected {
+    -fx-background-color: #38bdf8 !important; /* Lấy đúng màu xanh từ header trong ảnh sếp đưa */
+}
+
+/* Ép màu chữ của dòng đang chọn thành màu trắng để nổi bật */
+.dmk-table .table-row-cell:selected .table-cell {
+    -fx-text-fill: #ffffff !important; 
+    -fx-font-weight: bold; /* Thêm bold cho chữ nó nét và dễ đọc hơn */
 }

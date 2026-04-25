@@ -6,10 +6,11 @@
 
 <VBox prefHeight="650.0" prefWidth="900.0" styleClass="dialog-root" stylesheets="@../../resources/css/QuanLyDonDatHang.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.dialogs.Dialog_TaoDonDatHangController">
    <children>
-      <HBox alignment="CENTER_LEFT" styleClass="dialog-header-area">
+     <HBox alignment="CENTER_LEFT" styleClass="dialog-header-area">
          <children>
             <Label text="✨ TẠO ĐƠN ĐẶT HÀNG MỚI" styleClass="dialog-title-text" />
             <Region HBox.hgrow="ALWAYS" />
+            <Button onAction="#handleImportCSV" prefHeight="35.0" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 8;" text="📥 Nhập từ file CSV" />
          </children>
       </HBox>
 
