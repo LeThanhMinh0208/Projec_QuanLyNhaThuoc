@@ -1,5 +1,13 @@
 package gui.main;
 
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import dao.DAO_DonDatHang;
 import dao.DAO_PhieuNhap;
 import entity.ChiTietDonDatHang;
@@ -10,28 +18,33 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DateCell;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import utils.AlertUtils;
 
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 public class GUI_NhapKhoController {
 
     @FXML private ToggleGroup tabGroup;
     @FXML private ToggleButton tabTaoPhieu, tabDanhSach;
-    @FXML private HBox viewTaoPhieu; 
+    @FXML private HBox viewTaoPhieu;
     @FXML private VBox viewDanhSach;
-    
+
     // ==========================================
     // UI TAB 1: TẠO PHIẾU NHẬP
     // ==========================================
@@ -40,11 +53,11 @@ public class GUI_NhapKhoController {
     @FXML private DatePicker dpNgayNhap;
     @FXML private TextArea txtGhiChu;
     @FXML private Label lblTongTien;
-    
+
     @FXML private TableView<ChiTietDonDatHang> tableNhapKho;
     @FXML private TableColumn<ChiTietDonDatHang, String> colTenThuoc, colDonVi, colMaLo, colNgaySX, colHanDung;
     @FXML private TableColumn<ChiTietDonDatHang, Integer> colSLDat, colSLNhan;
-    @FXML private TableColumn<ChiTietDonDatHang, String> colGiaNhap; 
+    @FXML private TableColumn<ChiTietDonDatHang, String> colGiaNhap;
 
     // ==========================================
     // UI TAB 2: DANH MỤC PHIẾU NHẬP
@@ -53,31 +66,31 @@ public class GUI_NhapKhoController {
     @FXML private TableView<PhieuNhap> tablePhieuNhap;
     @FXML private TableColumn<PhieuNhap, Void> colXemChiTietPN;
     @FXML private TableColumn<PhieuNhap, String> colMaPhieuNhap, colNhaCungCapPN, colNhanVienPN;
-    @FXML private TableColumn<PhieuNhap, java.sql.Timestamp> colNgayNhapPN; 
+    @FXML private TableColumn<PhieuNhap, java.sql.Timestamp> colNgayNhapPN;
     @FXML private TableColumn<PhieuNhap, Double> colTongTienPN;
 
     private DAO_DonDatHang daoDon = new DAO_DonDatHang();
     private DAO_PhieuNhap daoPhieuNhap = new DAO_PhieuNhap();
     private DonDatHang donHienTai;
     private List<ChiTietDonDatHang> listChiTietHienTai;
-    
+
     private DecimalFormat df = new DecimalFormat("#,### VNĐ");
-    private DecimalFormat dfInput = new DecimalFormat("#,###"); 
-    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm"); 
+    private DecimalFormat dfInput = new DecimalFormat("#,###");
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @FXML public void initialize() {
         setupTabs();
         setupTableTaoPhieu();
-        setupTableDanhSachPhieuNhap(); 
-        
-        loadDonChoNhap(); 
-        
+        setupTableDanhSachPhieuNhap();
+
+        loadDonChoNhap();
+
         // Khóa ngày nhập kho (mặc định hôm nay)
         if(dpNgayNhap != null) {
             dpNgayNhap.setValue(LocalDate.now());
             dpNgayNhap.setDisable(true);
-            dpNgayNhap.setStyle("-fx-opacity: 1; -fx-background-color: #f1f5f9;"); 
+            dpNgayNhap.setStyle("-fx-opacity: 1; -fx-background-color: #f1f5f9;");
             dpNgayNhap.setConverter(new StringConverter<LocalDate>() {
                 @Override public String toString(LocalDate date) { return (date != null) ? dateFormatter.format(date) : ""; }
                 @Override public LocalDate fromString(String string) { return (string != null && !string.isEmpty()) ? LocalDate.parse(string, dateFormatter) : null; }
@@ -85,7 +98,9 @@ public class GUI_NhapKhoController {
         }
 
         cbMaDon.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
-            if (newV != null) hienThiChiTietDon(newV);
+            if (newV != null) {
+				hienThiChiTietDon(newV);
+			}
         });
     }
 
@@ -94,14 +109,16 @@ public class GUI_NhapKhoController {
                 .filter(DonDatHang::isChoPhepNhapKho)
                 .filter(don -> {
                     String ttDB = don.getTrangThai();
-                    if (ttDB == null) return true;
+                    if (ttDB == null) {
+						return true;
+					}
                     if (ttDB.equals("GIAO_DU") || ttDB.equals("DONG_DON_THIEU") || ttDB.equals("DA_HUY") || ttDB.equals("GIAO_MOT_PHAN")) {
                         return false;
                     }
                     return true;
                 })
                 .collect(Collectors.toList());
-                
+
         cbMaDon.setItems(FXCollections.observableArrayList(dsDon));
     }
 
@@ -112,14 +129,14 @@ public class GUI_NhapKhoController {
         txtGhiChu.clear();
 
         listChiTietHienTai = daoDon.getChiTietByMaDon(don.getMaDonDatHang());
-        
+
         tableNhapKho.setItems(FXCollections.observableArrayList(listChiTietHienTai));
         tinhToanTongTienHienThi();
     }
 
     public void chuyenTuDonDatHang(DonDatHang don) {
         tabTaoPhieu.setSelected(true);
-        loadDonChoNhap(); 
+        loadDonChoNhap();
         for (DonDatHang d : cbMaDon.getItems()) {
             if (d.getMaDonDatHang().equals(don.getMaDonDatHang())) {
                 cbMaDon.getSelectionModel().select(d);
@@ -155,7 +172,7 @@ public class GUI_NhapKhoController {
                         try {
                             int val = newV.isEmpty() ? 0 : Integer.parseInt(newV);
                             getTableRow().getItem().setSoLuongDaNhan(val);
-                            tinhToanTongTienHienThi(); 
+                            tinhToanTongTienHienThi();
                         } catch (NumberFormatException e) { textField.setText(oldV); }
                     }
                 });
@@ -204,25 +221,26 @@ public class GUI_NhapKhoController {
             {
                 datePicker.getStyleClass().add("table-date-active");
                 datePicker.setPrefWidth(130);
-                
+
                 // Format dd/MM/yyyy
                 datePicker.setConverter(new StringConverter<LocalDate>() {
                     @Override public String toString(LocalDate date) { return (date != null) ? dateFormatter.format(date) : ""; }
                     @Override public LocalDate fromString(String string) { return (string != null && !string.isEmpty()) ? LocalDate.parse(string, dateFormatter) : null; }
                 });
-                
+
                 datePicker.valueProperty().addListener((obs, oldDate, newDate) -> {
                     if (getTableRow() != null && getTableRow().getItem() != null && newDate != null) {
                         getTableRow().getItem().setNgaySanXuatTemp(newDate.toString()); // Lưu DB dạng yyyy-MM-dd
                     }
                 });
-                
+
                 // CHẶN NGÀY: Chỉ cho chọn ngày trước hôm nay
                 datePicker.setDayCellFactory(picker -> new DateCell() {
-                    public void updateItem(LocalDate date, boolean empty) {
+                    @Override
+					public void updateItem(LocalDate date, boolean empty) {
                         super.updateItem(date, empty);
                         // Disable nếu ngày đó lớn hơn hoặc bằng hôm nay (nghĩa là chỉ nhận quá khứ)
-                        setDisable(empty || date.compareTo(LocalDate.now()) >= 0); 
+                        setDisable(empty || date.compareTo(LocalDate.now()) >= 0);
                     }
                 });
             }
@@ -250,18 +268,18 @@ public class GUI_NhapKhoController {
             {
                 datePicker.getStyleClass().add("table-date-active");
                 datePicker.setPrefWidth(130);
-                
+
                 datePicker.setConverter(new StringConverter<LocalDate>() {
                     @Override public String toString(LocalDate date) { return (date != null) ? dateFormatter.format(date) : ""; }
                     @Override public LocalDate fromString(String string) { return (string != null && !string.isEmpty()) ? LocalDate.parse(string, dateFormatter) : null; }
                 });
-                
+
                 datePicker.valueProperty().addListener((obs, oldDate, newDate) -> {
                     if (getTableRow() != null && getTableRow().getItem() != null && newDate != null) {
                         getTableRow().getItem().setHanSuDung(newDate.toString());
                     }
                 });
-                
+
                 // MẸO UX: Khi vừa click mở lịch HSD, kiểm tra xem NSX là ngày nào để khóa những ngày trước đó
                 datePicker.setOnShowing(event -> {
                     if (getTableRow() != null && getTableRow().getItem() != null) {
@@ -269,10 +287,11 @@ public class GUI_NhapKhoController {
                         if (nsxStr != null && !nsxStr.isEmpty()) {
                             LocalDate nsx = LocalDate.parse(nsxStr);
                             datePicker.setDayCellFactory(picker -> new DateCell() {
-                                public void updateItem(LocalDate date, boolean empty) {
+                                @Override
+								public void updateItem(LocalDate date, boolean empty) {
                                     super.updateItem(date, empty);
                                     // Disable nếu ngày HSD nhỏ hơn hoặc bằng NSX
-                                    setDisable(empty || date.compareTo(nsx) <= 0); 
+                                    setDisable(empty || date.compareTo(nsx) <= 0);
                                 }
                             });
                         }
@@ -305,11 +324,11 @@ public class GUI_NhapKhoController {
                 textField.setAlignment(Pos.CENTER_RIGHT);
                 textField.textProperty().addListener((obs, oldV, newV) -> {
                     if (getTableRow() != null && getTableRow().getItem() != null && newV != null && !newV.isEmpty()) {
-                        String cleanStr = newV.replaceAll("[^\\d]", ""); 
+                        String cleanStr = newV.replaceAll("[^\\d]", "");
                         try {
                             if (!cleanStr.isEmpty()) {
                                 long val = Long.parseLong(cleanStr);
-                                String formatted = dfInput.format(val).replace(',', '.'); 
+                                String formatted = dfInput.format(val).replace(',', '.');
                                 if (!newV.equals(formatted)) {
                                     textField.setText(formatted);
                                 }
@@ -343,11 +362,13 @@ public class GUI_NhapKhoController {
                 tong += ct.getSoLuongDaNhan() * ct.getDonGiaDuKien();
             }
         }
-        if(lblTongTien != null) lblTongTien.setText(df.format(tong));
+        if(lblTongTien != null) {
+			lblTongTien.setText(df.format(tong));
+		}
     }
 
     @FXML void handleLuuPhieuNhap(ActionEvent event) {
-        tableNhapKho.requestFocus(); 
+        tableNhapKho.requestFocus();
 
         if (donHienTai == null || listChiTietHienTai == null || listChiTietHienTai.isEmpty()) {
             AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Vui lòng chọn đơn hàng để nhập kho!");
@@ -365,13 +386,15 @@ public class GUI_NhapKhoController {
             if (ct.getSoLuongDaNhan() > 0) {
                 if (ct.getMaLo() == null || ct.getMaLo().trim().isEmpty()) {
                     AlertUtils.showAlert(Alert.AlertType.WARNING, "Thiếu dữ liệu", "Vui lòng nhập Mã Lô cho thuốc: " + ct.getThuoc().getTenThuoc());
-                    return; 
+                    return;
                 }
-                
+
                 // 🚨 KIỂM TRA ĐIỀU KIỆN NGÀY THÁNG LÚC LƯU 🚨
                 try {
-                    if (ct.getNgaySanXuatTemp() == null || ct.getHanSuDung() == null) throw new Exception();
-                    
+                    if (ct.getNgaySanXuatTemp() == null || ct.getHanSuDung() == null) {
+						throw new Exception();
+					}
+
                     LocalDate nsx = LocalDate.parse(ct.getNgaySanXuatTemp());
                     LocalDate hsd = LocalDate.parse(ct.getHanSuDung());
                     LocalDate today = LocalDate.now();
@@ -390,10 +413,10 @@ public class GUI_NhapKhoController {
                 }
 
                 if (daoPhieuNhap.kiemTraMaLoTonTai(ct.getMaLo().trim())) {
-                    AlertUtils.showAlert(Alert.AlertType.ERROR, "Trùng Mã Lô", 
-                        "Mã lô [" + ct.getMaLo().trim() + "] của thuốc " + ct.getThuoc().getTenThuoc() + 
+                    AlertUtils.showAlert(Alert.AlertType.ERROR, "Trùng Mã Lô",
+                        "Mã lô [" + ct.getMaLo().trim() + "] của thuốc " + ct.getThuoc().getTenThuoc() +
                         " ĐÃ TỒN TẠI!\n\nVui lòng nhập mã lô khác để quản lý đợt nhập này.");
-                    return; 
+                    return;
                 }
             }
             if (ct.getSoLuongDaNhan() < ct.getSoLuongDat()) {
@@ -415,36 +438,40 @@ public class GUI_NhapKhoController {
                     AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Vui lòng nhập số ngày hợp lệ!");
                     return;
                 }
-            } else return;
+            } else {
+				return;
+			}
         }
 
         PhieuNhap pn = new PhieuNhap();
         pn.setDonDatHang(donHienTai);
         pn.setNhaCungCap(donHienTai.getNhaCungCap());
-        
+
         entity.NhanVien nv = new entity.NhanVien();
-        nv.setMaNhanVien("NV001"); 
+        nv.setMaNhanVien("NV001");
         pn.setNhanVien(nv);
 
         boolean tc = daoPhieuNhap.luuPhieuNhapVaCapNhatDon(pn, listChiTietHienTai, donHienTai, soNgayHen);
-        
+
         if (tc) {
             double tongTienNhap = 0;
             for (ChiTietDonDatHang ct : listChiTietHienTai) {
                 tongTienNhap += ct.getSoLuongDaNhan() * ct.getDonGiaDuKien();
             }
-            
+
             dao.DAO_NhaCungCap daoNCC = new dao.DAO_NhaCungCap();
             daoNCC.congCongNoNhaCungCap(donHienTai.getNhaCungCap().getMaNhaCungCap(), tongTienNhap);
-            
-            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", 
+
+            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công",
                 "Đã lưu phiếu nhập kho!\nĐã cộng dồn " + df.format(tongTienNhap) + " vào công nợ của NCC.");
 
-            loadDonChoNhap(); 
+            loadDonChoNhap();
             handleHuyNhapKho(null);
-            
-            if(txtTimKiemPhieuNhap != null) txtTimKiemPhieuNhap.clear();
-            loadDanhSachPhieuNhap(); 
+
+            if(txtTimKiemPhieuNhap != null) {
+				txtTimKiemPhieuNhap.clear();
+			}
+            loadDanhSachPhieuNhap();
         } else {
             AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi Server", "Không thể lưu dữ liệu phiếu nhập, vui lòng thử lại!");
         }
@@ -456,7 +483,9 @@ public class GUI_NhapKhoController {
         txtNguoiGiao.clear();
         txtGhiChu.clear();
         tableNhapKho.getItems().clear();
-        if(lblTongTien != null) lblTongTien.setText("0 VNĐ");
+        if(lblTongTien != null) {
+			lblTongTien.setText("0 VNĐ");
+		}
         donHienTai = null;
     }
 
@@ -469,7 +498,7 @@ public class GUI_NhapKhoController {
                 viewTaoPhieu.setManaged(isTao);
                 viewDanhSach.setVisible(!isTao);
                 viewDanhSach.setManaged(!isTao);
-                
+
                 if (!isTao) {
                     loadDanhSachPhieuNhap();
                 }
@@ -478,36 +507,42 @@ public class GUI_NhapKhoController {
     }
 
     private void setupTableDanhSachPhieuNhap() {
-        if (tablePhieuNhap == null) return;
+        if (tablePhieuNhap == null) {
+			return;
+		}
 
         colMaPhieuNhap.setCellValueFactory(new PropertyValueFactory<>("maPhieuNhap"));
         colMaPhieuNhap.setStyle("-fx-alignment: CENTER; -fx-font-weight: bold;");
 
         colNhaCungCapPN.setCellValueFactory(c -> {
-            if(c.getValue().getNhaCungCap() != null) 
-                return new SimpleStringProperty(c.getValue().getNhaCungCap().getTenNhaCungCap());
+            if(c.getValue().getNhaCungCap() != null) {
+				return new SimpleStringProperty(c.getValue().getNhaCungCap().getTenNhaCungCap());
+			}
             return new SimpleStringProperty("N/A");
         });
-        
+
         colNhanVienPN.setCellValueFactory(c -> {
-            if(c.getValue().getNhanVien() != null) 
-                return new SimpleStringProperty(c.getValue().getNhanVien().getHoTen());
+            if(c.getValue().getNhanVien() != null) {
+				return new SimpleStringProperty(c.getValue().getNhanVien().getHoTen());
+			}
             return new SimpleStringProperty("N/A");
         });
 
         colNgayNhapPN.setCellValueFactory(new PropertyValueFactory<>("ngayNhap"));
         colNgayNhapPN.setStyle("-fx-alignment: CENTER;");
         colNgayNhapPN.setCellFactory(column -> new TableCell<PhieuNhap, java.sql.Timestamp>() {
-            protected void updateItem(java.sql.Timestamp item, boolean empty) {
+            @Override
+			protected void updateItem(java.sql.Timestamp item, boolean empty) {
                 super.updateItem(item, empty);
                 setText((empty || item == null) ? null : sdf.format(item));
             }
         });
 
-        colTongTienPN.setCellValueFactory(new PropertyValueFactory<>("tongTien")); 
+        colTongTienPN.setCellValueFactory(new PropertyValueFactory<>("tongTien"));
         colTongTienPN.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: #be123c;");
         colTongTienPN.setCellFactory(column -> new TableCell<PhieuNhap, Double>() {
-            protected void updateItem(Double item, boolean empty) {
+            @Override
+			protected void updateItem(Double item, boolean empty) {
                 super.updateItem(item, empty);
                 setText((empty || item == null) ? null : df.format(item));
             }
@@ -525,7 +560,8 @@ public class GUI_NhapKhoController {
                     }
                 });
             }
-            protected void updateItem(Void item, boolean empty) {
+            @Override
+			protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || getTableRow() == null || getTableRow().getItem() == null) {
                     setGraphic(null);
@@ -535,7 +571,7 @@ public class GUI_NhapKhoController {
                 }
             }
         });
-        
+
         if(txtTimKiemPhieuNhap != null) {
             txtTimKiemPhieuNhap.textProperty().addListener((obs, oldText, newText) -> {
                 loadDanhSachPhieuNhap(newText);
@@ -544,12 +580,14 @@ public class GUI_NhapKhoController {
     }
 
     private void loadDanhSachPhieuNhap() {
-        loadDanhSachPhieuNhap(""); 
+        loadDanhSachPhieuNhap("");
     }
-    
+
     private void loadDanhSachPhieuNhap(String tuKhoa) {
-        if (daoPhieuNhap == null || tablePhieuNhap == null) return;
-        List<PhieuNhap> ds = daoPhieuNhap.getAllPhieuNhap(tuKhoa); 
+        if (daoPhieuNhap == null || tablePhieuNhap == null) {
+			return;
+		}
+        List<PhieuNhap> ds = daoPhieuNhap.getAllPhieuNhap(tuKhoa);
         tablePhieuNhap.setItems(FXCollections.observableArrayList(ds));
     }
 
@@ -559,15 +597,15 @@ public class GUI_NhapKhoController {
             javafx.scene.Parent root = loader.load();
 
             gui.dialogs.Dialog_ChiTietPhieuNhapController controller = loader.getController();
-            controller.setPhieuNhap(phieuNhap); 
+            controller.setPhieuNhap(phieuNhap);
 
             javafx.stage.Stage stage = new javafx.stage.Stage();
             stage.setScene(new javafx.scene.Scene(root));
             stage.setTitle("Chi tiết Phiếu Nhập - " + phieuNhap.getMaPhieuNhap());
-            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL); 
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
             stage.setResizable(false);
             stage.showAndWait();
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể mở giao diện chi tiết phiếu nhập.");

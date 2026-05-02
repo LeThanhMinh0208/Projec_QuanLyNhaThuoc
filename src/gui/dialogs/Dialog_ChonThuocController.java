@@ -1,5 +1,8 @@
 package gui.dialogs;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import dao.DAO_BangGia;
 import dao.DAO_DonViQuyDoi;
 import dao.DAO_LoThuoc;
@@ -13,15 +16,17 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 public class Dialog_ChonThuocController {
 
@@ -69,13 +74,22 @@ public class Dialog_ChonThuocController {
         FilteredList<Thuoc> filtered = new FilteredList<>(dsThuoc, p -> true);
         txtTim.textProperty().addListener((obs, ov, nv) -> {
             filtered.setPredicate(t -> {
-                if (nv == null || nv.trim().isEmpty()) return true;
+                if (nv == null || nv.trim().isEmpty()) {
+					return true;
+				}
                 String f = nv.toLowerCase();
-                if (t.getMaThuoc() != null && t.getMaThuoc().toLowerCase().contains(f)) return true;
-                if (t.getTenThuoc() != null && t.getTenThuoc().toLowerCase().contains(f)) return true;
-                if (t.getHoatChat() != null && t.getHoatChat().toLowerCase().contains(f)) return true;
-                if (t.getTrieuChung() != null && t.getTrieuChung().toLowerCase().contains(f)) return true;
-                if (t.getCongDung() != null && t.getCongDung().toLowerCase().contains(f)) return true;
+                if ((t.getMaThuoc() != null && t.getMaThuoc().toLowerCase().contains(f)) || (t.getTenThuoc() != null && t.getTenThuoc().toLowerCase().contains(f))) {
+					return true;
+				}
+                if (t.getHoatChat() != null && t.getHoatChat().toLowerCase().contains(f)) {
+					return true;
+				}
+                if (t.getTrieuChung() != null && t.getTrieuChung().toLowerCase().contains(f)) {
+					return true;
+				}
+                if (t.getCongDung() != null && t.getCongDung().toLowerCase().contains(f)) {
+					return true;
+				}
                 return false;
             });
         });
@@ -185,7 +199,7 @@ public class Dialog_ChonThuocController {
             lblTen.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1e293b;");
             lblHoatChat.setStyle("-fx-font-size: 11px; -fx-text-fill: #64748b;");
             lblDonVi.setStyle("-fx-font-size: 11px; -fx-text-fill: #94a3b8;");
-            
+
             lblBadge.setStyle("-fx-background-color: #1565C0; -fx-text-fill: white; " +
                              "-fx-background-radius: 4; -fx-padding: 2 8; -fx-font-size: 10px; -fx-font-weight: bold;");
             lblBadge.setVisible(false);

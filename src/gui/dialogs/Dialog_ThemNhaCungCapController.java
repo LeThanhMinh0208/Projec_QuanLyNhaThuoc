@@ -4,7 +4,6 @@ import dao.DAO_NhaCungCap;
 import entity.NhaCungCap;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
@@ -37,17 +36,23 @@ public class Dialog_ThemNhaCungCapController {
         sdt = utils.ValidationUtils.normalizeString(sdt);
         diaChi = utils.ValidationUtils.normalizeString(diaChi);
         congNoStr = utils.ValidationUtils.normalizeString(congNoStr);
-        
+
         txtTen.setText(ten);
         txtSdt.setText(sdt);
         txtDiaChi.setText(diaChi);
         txtCongNo.setText(congNoStr);
 
         StringBuilder err = new StringBuilder();
-        if (!utils.ValidationUtils.isValidTenNhaCungCap(ten)) err.append("- Tên nhà cung cấp phải từ 2-150 ký tự và chứa ít nhất 1 chữ cái.\n");
-        if (!utils.ValidationUtils.isValidSdt(sdt)) err.append("- Số điện thoại phải gồm 10 số và bắt đầu bằng số 0.\n");
-        if (!utils.ValidationUtils.isValidDiaChi(diaChi)) err.append("- Địa chỉ phải từ 2-255 ký tự và chứa ít nhất 1 chữ cái hoặc số.\n");
-        
+        if (!utils.ValidationUtils.isValidTenNhaCungCap(ten)) {
+			err.append("- Tên nhà cung cấp phải từ 2-150 ký tự và chứa ít nhất 1 chữ cái.\n");
+		}
+        if (!utils.ValidationUtils.isValidSdt(sdt)) {
+			err.append("- Số điện thoại phải gồm 10 số và bắt đầu bằng số 0.\n");
+		}
+        if (!utils.ValidationUtils.isValidDiaChi(diaChi)) {
+			err.append("- Địa chỉ phải từ 2-255 ký tự và chứa ít nhất 1 chữ cái hoặc số.\n");
+		}
+
         if (err.length() > 0) {
             new Alert(Alert.AlertType.ERROR, "Dữ liệu nhập không hợp lệ:\n" + err.toString()).show();
             return;

@@ -1,5 +1,11 @@
 package gui.dialogs;
 
+import java.net.URL;
+import java.text.DecimalFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.ResourceBundle;
+
 import dao.DAO_NhaCungCap;
 import dao.DAO_PhieuXuat;
 import entity.ChiTietPhieuXuat;
@@ -16,18 +22,12 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
-import java.net.URL;
-import java.text.DecimalFormat;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.ResourceBundle;
-
 public class Dialog_ChiTietPhieuXuatController implements Initializable {
 
     @FXML private Label lblMaPhieu, lblNgayLap, lblNguoiLap, lblLoaiPhieu;
     @FXML private Label lblNoiXuat, lblNoiNhan, lblGhiChu, lblNguoiVanChuyen; // Thêm lblNguoiVanChuyen
-    
-    @FXML private Label lblTextTongTien, lblTongTien; 
+
+    @FXML private Label lblTextTongTien, lblTongTien;
 
     @FXML private TableView<ChiTietPhieuXuat> tableChiTiet;
     @FXML private TableColumn<ChiTietPhieuXuat, Integer> colSTT, colSoLuong;
@@ -45,7 +45,7 @@ public class Dialog_ChiTietPhieuXuatController implements Initializable {
 
     private void setupTable() {
         colSTT.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(tableChiTiet.getItems().indexOf(c.getValue()) + 1));
-        colTenThuoc.setCellValueFactory(new PropertyValueFactory<>("maThuoc")); 
+        colTenThuoc.setCellValueFactory(new PropertyValueFactory<>("maThuoc"));
         colSoLo.setCellValueFactory(new PropertyValueFactory<>("soLo"));
         colSoLuong.setCellValueFactory(new PropertyValueFactory<>("soLuong"));
 
@@ -70,14 +70,14 @@ public class Dialog_ChiTietPhieuXuatController implements Initializable {
         lblMaPhieu.setText(px.getMaPhieuXuat());
         lblNguoiLap.setText(px.getMaNhanVien());
         lblNgayLap.setText(px.getNgayXuat() != null ? dtf.format(px.getNgayXuat()) : "");
-        
+
         // =======================================================
         // TÁCH CHUỖI ĐỂ TÌM NGƯỜI VẬN CHUYỂN TRONG CỘT GHI CHÚ
         // =======================================================
         String ghiChuGoc = px.getGhiChu();
         if (ghiChuGoc != null && ghiChuGoc.contains("| VC:")) {
             // FIX: Dùng Regex cắt chuẩn dù có khoảng trắng hay không
-            String[] parts = ghiChuGoc.split("\\s*\\| VC:\\s*"); 
+            String[] parts = ghiChuGoc.split("\\s*\\| VC:\\s*");
             lblGhiChu.setText(parts.length > 0 && !parts[0].isEmpty() ? parts[0] : "Không có");
             lblNguoiVanChuyen.setText(parts.length > 1 && !parts[1].isEmpty() ? parts[1] : "Không có");
         } else {
@@ -88,7 +88,7 @@ public class Dialog_ChiTietPhieuXuatController implements Initializable {
         // =======================================================
         // HIỂN THỊ NƠI XUẤT, NƠI NHẬN & ẨN HIỆN CỘT
         // =======================================================
-        if (px.getLoaiPhieu() == 1) { 
+        if (px.getLoaiPhieu() == 1) {
             lblLoaiPhieu.setText("LỆNH CHUYỂN KHO NỘI BỘ");
             String kn = px.getKhoNhan();
             if ("KHO_BAN_HANG".equals(kn)) {
@@ -98,29 +98,29 @@ public class Dialog_ChiTietPhieuXuatController implements Initializable {
             } else {
                 lblNoiXuat.setText("Kho Nội Bộ"); lblNoiNhan.setText(kn);
             }
-            
+
             colDonGia.setVisible(false);
             colThanhTien.setVisible(false);
             lblTextTongTien.setVisible(false);
             lblTongTien.setVisible(false);
 
-        } else if (px.getLoaiPhieu() == 2) { 
+        } else if (px.getLoaiPhieu() == 2) {
             lblLoaiPhieu.setText("PHIẾU TRẢ NHÀ CUNG CẤP");
             lblNoiXuat.setText("Kho Nội Bộ");
             NhaCungCap ncc = new DAO_NhaCungCap().getNhaCungCapByMa(px.getMaNhaCungCap());
             lblNoiNhan.setText(ncc != null ? ncc.getTenNhaCungCap() : px.getMaNhaCungCap());
             lblTextTongTien.setText("Tổng tiền NCC hoàn lại:");
-            
+
             colDonGia.setVisible(true);
             colThanhTien.setVisible(true);
             lblTextTongTien.setVisible(true);
             lblTongTien.setVisible(true);
 
-        } else if (px.getLoaiPhieu() == 3) { 
+        } else if (px.getLoaiPhieu() == 3) {
             lblLoaiPhieu.setText("LỆNH XUẤT HỦY THUỐC");
             lblNoiXuat.setText("Kho Nội Bộ");
             lblNoiNhan.setText("Khu vực Hủy rác y tế");
-            
+
             colDonGia.setVisible(false);
             colThanhTien.setVisible(false);
             lblTextTongTien.setVisible(false);

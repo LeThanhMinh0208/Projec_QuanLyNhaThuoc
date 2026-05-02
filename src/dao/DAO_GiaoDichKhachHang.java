@@ -1,12 +1,16 @@
 package dao;
 
-import connectDB.ConnectDB;
-import entity.GiaoDichKhachHang;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import connectDB.ConnectDB;
+import entity.GiaoDichKhachHang;
 
 public class DAO_GiaoDichKhachHang {
 
@@ -110,7 +114,7 @@ public class DAO_GiaoDichKhachHang {
                      "LEFT JOIN KhachHang kh ON hd.maKhachHang = kh.maKhachHang " + // Join bảng KH
                      "LEFT JOIN NhanVien nv ON hd.maNhanVien = nv.maNhanVien " + // Thêm Join Nhân Viên
                      "JOIN ChiTietHoaDon ct ON hd.maHoaDon = ct.maHoaDon " +
-                     "WHERE hd.maKhachHang IS NOT NULL " + 
+                     "WHERE hd.maKhachHang IS NOT NULL " +
                      "GROUP BY hd.maHoaDon, hd.ngayLap, kh.hoTen, kh.sdt, nv.hoTen, hd.thueVAT, hd.hinhThucThanhToan, hd.ghiChu " +
                      "ORDER BY hd.ngayLap DESC";
 
@@ -122,10 +126,10 @@ public class DAO_GiaoDichKhachHang {
                 gd.setMaHoaDon(rs.getString("maHoaDon"));
                 gd.setNgayLap(rs.getTimestamp("ngayLap"));
                 // Lưu thông tin khách hàng vào Entity (Đảm bảo class GiaoDichKhachHang có các field này)
-                gd.setTenKhachHang(rs.getString("tenKhachHang")); 
+                gd.setTenKhachHang(rs.getString("tenKhachHang"));
                 gd.setSdtKhachHang(rs.getString("sdt"));
                 gd.setTenNhanVien(rs.getString("tenNhanVien") != null ? rs.getString("tenNhanVien") : "—");
-                
+
                 gd.setThueVAT(rs.getDouble("thueVAT"));
                 gd.setHinhThucThanhToan(rs.getString("hinhThucThanhToan"));
                 gd.setTamTinh(rs.getDouble("tamTinh"));

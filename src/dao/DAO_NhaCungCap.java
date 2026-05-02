@@ -1,10 +1,15 @@
 package dao;
 
-import connectDB.ConnectDB;
-import entity.NhaCungCap;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import connectDB.ConnectDB;
+import entity.NhaCungCap;
 
 public class DAO_NhaCungCap {
 
@@ -19,7 +24,8 @@ public class DAO_NhaCungCap {
 	public List<NhaCungCap> getAllNhaCungCap() {
         List<NhaCungCap> list = new ArrayList<>();
         String sql = "SELECT maNhaCungCap, tenNhaCungCap FROM NhaCungCap WHERE trangThai = 1";
-        try (Connection con = ConnectDB.getInstance().getConnection();
+        ConnectDB.getInstance();
+		try (Connection con = ConnectDB.getConnection();
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -40,7 +46,7 @@ public class DAO_NhaCungCap {
     public List<NhaCungCap> getAllNhaCungCapFull() {
         List<NhaCungCap> list = new ArrayList<>();
         String sql = "SELECT maNhaCungCap, tenNhaCungCap, sdt, diaChi, congNo, trangThai FROM NhaCungCap WHERE trangThai = 1";
-        try (Connection con = ConnectDB.getConnection(); 
+        try (Connection con = ConnectDB.getConnection();
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -53,8 +59,8 @@ public class DAO_NhaCungCap {
                 ncc.setTrangThai(rs.getBoolean("trangThai"));
                 list.add(ncc);
             }
-        } catch (Exception e) { 
-            e.printStackTrace(); 
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return list;
     }
@@ -102,8 +108,12 @@ public class DAO_NhaCungCap {
             return false;
         } finally {
             try {
-                if (rs != null) rs.close();
-                if (pstmt != null) pstmt.close();
+                if (rs != null) {
+					rs.close();
+				}
+                if (pstmt != null) {
+					pstmt.close();
+				}
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -134,8 +144,12 @@ public class DAO_NhaCungCap {
             e.printStackTrace();
         } finally {
             try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
+                if (rs != null) {
+					rs.close();
+				}
+                if (stmt != null) {
+					stmt.close();
+				}
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -186,7 +200,9 @@ public class DAO_NhaCungCap {
             e.printStackTrace();
             return false;
         } finally {
-            try { if (pstmt != null) pstmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { if (pstmt != null) {
+				pstmt.close();
+			} } catch (SQLException e) { e.printStackTrace(); }
         }
     }
 
@@ -206,7 +222,9 @@ public class DAO_NhaCungCap {
             e.printStackTrace();
             return false;
         } finally {
-            try { if (pstmt != null) pstmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { if (pstmt != null) {
+				pstmt.close();
+			} } catch (SQLException e) { e.printStackTrace(); }
         }
     }
 
@@ -224,7 +242,9 @@ public class DAO_NhaCungCap {
             e.printStackTrace();
             return false;
         } finally {
-            try { if (pstmt != null) pstmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { if (pstmt != null) {
+				pstmt.close();
+			} } catch (SQLException e) { e.printStackTrace(); }
         }
     }
 
@@ -250,7 +270,9 @@ public class DAO_NhaCungCap {
                 e.printStackTrace();
                 return false;
             } finally {
-                try { if (pstmt != null) pstmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+                try { if (pstmt != null) {
+					pstmt.close();
+				} } catch (SQLException e) { e.printStackTrace(); }
             }
         } else {
             // Soft delete
@@ -278,14 +300,17 @@ public class DAO_NhaCungCap {
             pst.setString(2, maNCC);
             pst.setString(3, maNCC);
             ResultSet rs = pst.executeQuery();
-            if (rs.next()) return rs.getInt("tongLienQuan");
+            if (rs.next()) {
+				return rs.getInt("tongLienQuan");
+			}
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return -1;
     }
     public boolean capNhatCongNo(String maNCC, double congNoMoi) {
-        Connection con = ConnectDB.getInstance().getConnection();
+        ConnectDB.getInstance();
+		Connection con = ConnectDB.getConnection();
         PreparedStatement stmt = null;
         int n = 0;
         try {
@@ -299,7 +324,9 @@ public class DAO_NhaCungCap {
             e.printStackTrace();
         } finally {
             try {
-                if (stmt != null) stmt.close();
+                if (stmt != null) {
+					stmt.close();
+				}
             } catch (SQLException e2) {
                 e2.printStackTrace();
             }

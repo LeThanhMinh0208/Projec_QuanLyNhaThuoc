@@ -1,12 +1,5 @@
 package dao;
 
-import connectDB.ConnectDB;
-import entity.ChiTietDoiTra;
-import entity.ChiTietDoiTraView;
-import entity.PhieuDoiTra;
-import entity.PhieuDoiTraView;
-import utils.DoiTraSession;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,6 +9,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import connectDB.ConnectDB;
+import entity.ChiTietDoiTra;
+import entity.ChiTietDoiTraView;
+import entity.PhieuDoiTra;
+import entity.PhieuDoiTraView;
+import utils.DoiTraSession;
 
 public class DAO_PhieuDoiTra {
     public String generateMaPhieuDoiTra() {
@@ -178,7 +178,9 @@ public class DAO_PhieuDoiTra {
             if (dsThuocDoi != null && !dsThuocDoi.isEmpty()) {
                 StringBuilder sb = new StringBuilder();
                 for (DoiTraSession.DonViDoiData td : dsThuocDoi) {
-                    if (sb.length() > 0) sb.append(";");
+                    if (sb.length() > 0) {
+						sb.append(";");
+					}
                     sb.append(td.getMaQuyDoi()).append("|")
                       .append(td.getTenThuoc()).append("|")
                       .append(td.getTenDonVi()).append("|")
@@ -266,10 +268,10 @@ public class DAO_PhieuDoiTra {
                                      "AND soLuongTon > 0 AND trangThai = 1 " +
                                      "AND hanSuDung >= CAST(GETDATE() AS DATE) " +
                                      "ORDER BY hanSuDung ASC";
-                    
+
                     List<String> listMaLo = new ArrayList<>();
                     List<Integer> listTonLo = new ArrayList<>();
-                    
+
                     try (PreparedStatement pstLo = con.prepareStatement(sqlLayLo)) {
                         pstLo.setString(1, maThuoc);
                         try (ResultSet rsLo = pstLo.executeQuery()) {
@@ -285,7 +287,7 @@ public class DAO_PhieuDoiTra {
                         String maLo = listMaLo.get(i);
                         int tonLo = listTonLo.get(i);
                         int canTru = Math.min(tonLo, soLuongPhaiTruCoBan - soLuongDaTru);
-                        
+
                         // Trừ tồn kho tại lô này
                         String sqlTruTon = "UPDATE LoThuoc SET soLuongTon = soLuongTon - ? WHERE maLoThuoc = ?";
                         try (PreparedStatement pstTru = con.prepareStatement(sqlTruTon)) {

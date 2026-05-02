@@ -1,8 +1,12 @@
 package gui.main;
 
+import java.io.IOException;
+import java.text.DecimalFormat;
+
 import dao.DAO_NhaCungCap;
 import entity.NhaCungCap;
-import gui.dialogs.*;
+import gui.dialogs.Dialog_SuaNhaCungCapController;
+import gui.dialogs.Dialog_XoaNhaCungCapController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -11,13 +15,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import utils.AlertUtils;
-
-import java.io.IOException;
-import java.text.DecimalFormat;
 
 public class GUI_DanhMucNhaCungCapController {
 
@@ -92,12 +97,18 @@ public class GUI_DanhMucNhaCungCapController {
         String keyword = txtTimKiem.getText() == null ? "" : txtTimKiem.getText().toLowerCase().trim();
 
         filteredData.setPredicate(ncc -> {
-            if (keyword.isEmpty()) return true;
-
-            if (ncc.getMaNhaCungCap() != null && ncc.getMaNhaCungCap().toLowerCase().contains(keyword)) return true;
-            if (ncc.getTenNhaCungCap() != null && ncc.getTenNhaCungCap().toLowerCase().contains(keyword)) return true;
-            if (ncc.getSdt() != null && ncc.getSdt().toLowerCase().contains(keyword)) return true;
-            if (ncc.getDiaChi() != null && ncc.getDiaChi().toLowerCase().contains(keyword)) return true;
+            if (keyword.isEmpty() || (ncc.getMaNhaCungCap() != null && ncc.getMaNhaCungCap().toLowerCase().contains(keyword))) {
+				return true;
+			}
+            if (ncc.getTenNhaCungCap() != null && ncc.getTenNhaCungCap().toLowerCase().contains(keyword)) {
+				return true;
+			}
+            if (ncc.getSdt() != null && ncc.getSdt().toLowerCase().contains(keyword)) {
+				return true;
+			}
+            if (ncc.getDiaChi() != null && ncc.getDiaChi().toLowerCase().contains(keyword)) {
+				return true;
+			}
 
             String congNoStr = df.format(ncc.getCongNo()).toLowerCase();
             return congNoStr.contains(keyword);

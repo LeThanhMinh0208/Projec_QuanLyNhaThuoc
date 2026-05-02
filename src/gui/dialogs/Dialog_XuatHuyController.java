@@ -1,31 +1,45 @@
 package gui.dialogs;
 
-import dao.*;
-import entity.*;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.collections.*;
-import javafx.collections.transformation.FilteredList;
-import javafx.fxml.*;
-import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
-import javafx.util.StringConverter;
-import utils.*;
-
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+
+import dao.DAO_LoThuoc;
+import dao.DAO_PhieuXuat;
+import dao.DAO_Thuoc;
+import entity.ChiTietPhieuXuat;
+import entity.LoThuoc;
+import entity.PhieuXuat;
+import entity.Thuoc;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.Stage;
+import javafx.util.StringConverter;
+import utils.AlertUtils;
+import utils.UserSession;
 
 public class Dialog_XuatHuyController implements Initializable {
     @FXML private ComboBox<String> cbKhoXuat;
     @FXML private TextField txtNguoiLap, txtGhiChu, txtSoLuongHuy, txtTimNhanhThuoc;
     @FXML private ComboBox<Thuoc> cbChonThuoc;
     @FXML private ComboBox<LoThuoc> cbChonLo;
-    
+
     @FXML private TableView<ChiTietPhieuXuat> tableThuocHuy;
     @FXML private TableColumn<ChiTietPhieuXuat, Integer> colSTT, colSoLuong;
     @FXML private TableColumn<ChiTietPhieuXuat, String> colTenThuoc, colSoLo;
@@ -52,11 +66,15 @@ public class Dialog_XuatHuyController implements Initializable {
         // Xử lý tìm kiếm nhanh
         txtTimNhanhThuoc.textProperty().addListener((o, oldV, newV) -> {
             filter.setPredicate(t -> {
-                if (newV == null || newV.isEmpty()) return true;
+                if (newV == null || newV.isEmpty()) {
+					return true;
+				}
                 String lower = newV.toLowerCase();
                 return t.getTenThuoc().toLowerCase().contains(lower) || t.getMaThuoc().toLowerCase().contains(lower);
             });
-            if (!newV.isEmpty()) cbChonThuoc.show();
+            if (!newV.isEmpty()) {
+				cbChonThuoc.show();
+			}
         });
 
         // ========================================================
@@ -69,7 +87,7 @@ public class Dialog_XuatHuyController implements Initializable {
                 cbChonThuoc.getSelectionModel().clearSelection();
                 cbChonLo.getItems().clear();
                 txtSoLuongHuy.setText("");
-                
+
                 // 2. Tải danh sách thuốc CHỈ CÓ TRONG KHO VỪA CHỌN
                 String maKho = newV.equals("Kho dự trữ") ? "KHO_DU_TRU" : "KHO_BAN_HANG";
                 danhSachThuocKho.setAll(new DAO_Thuoc().getThuocCoLoTrongKho(maKho));
@@ -106,8 +124,9 @@ public class Dialog_XuatHuyController implements Initializable {
                     setText(t.getTenThuoc());
                     try {
                         InputStream is = getClass().getResourceAsStream("/resources/images/images_thuoc/" + t.getHinhAnh().trim());
-                        if (is != null) { iv.setImage(new Image(is)); iv.setFitWidth(40); iv.setFitHeight(30); setGraphic(iv); }
-                        else setGraphic(null);
+                        if (is != null) { iv.setImage(new Image(is)); iv.setFitWidth(40); iv.setFitHeight(30); setGraphic(iv); } else {
+							setGraphic(null);
+						}
                     } catch (Exception ex) { setGraphic(null); }
                 }
             }
@@ -117,11 +136,13 @@ public class Dialog_XuatHuyController implements Initializable {
 
     private void setupTable() {
         colSTT.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(dsHuyTam.indexOf(c.getValue()) + 1));
-        
+
         colTenThuoc.setCellValueFactory(c -> {
             String ma = c.getValue().getMaThuoc();
             for(Thuoc t : cbChonThuoc.getItems()) {
-                if(t.getMaThuoc().equals(ma)) return new javafx.beans.property.SimpleStringProperty(t.getTenThuoc());
+                if(t.getMaThuoc().equals(ma)) {
+					return new javafx.beans.property.SimpleStringProperty(t.getTenThuoc());
+				}
             }
             return new javafx.beans.property.SimpleStringProperty(ma);
         });
@@ -129,15 +150,15 @@ public class Dialog_XuatHuyController implements Initializable {
         // 🚨 Đổi getSoLo() thành getMaLo() nếu IDE báo đỏ
         colSoLo.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getSoLo()));
         colSoLuong.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getSoLuong()));
-        
+
         colXoa.setCellFactory(c -> new TableCell<>() {
             private final Button b = new Button("✕");
-            { 
-                b.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold;"); 
-                b.setOnAction(e -> { 
-                    dsHuyTam.remove(getTableView().getItems().get(getIndex())); 
-                    tableThuocHuy.refresh(); 
-                }); 
+            {
+                b.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold;");
+                b.setOnAction(e -> {
+                    dsHuyTam.remove(getTableView().getItems().get(getIndex()));
+                    tableThuocHuy.refresh();
+                });
             }
             @Override protected void updateItem(Void i, boolean e) {
                 super.updateItem(i, e); setGraphic(e ? null : b); setAlignment(Pos.CENTER);
@@ -152,28 +173,30 @@ public class Dialog_XuatHuyController implements Initializable {
             AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Vui lòng chọn thuốc, lô và nhập số lượng!");
             return;
         }
-        
+
         for(ChiTietPhieuXuat ct : dsHuyTam) {
             if(ct.getSoLo().equals(l.getMaLoThuoc())) {
                 AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Lô này đã có trong danh sách hủy!");
                 return;
             }
         }
-        
+
         try {
             int sl = Integer.parseInt(txtSoLuongHuy.getText());
-            if (sl <= 0) return;
-            if (sl > l.getSoLuongTon()) { 
-                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Vượt tồn! Kho chỉ còn: " + l.getSoLuongTon()); 
-                return; 
+            if (sl <= 0) {
+				return;
+			}
+            if (sl > l.getSoLuongTon()) {
+                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Vượt tồn! Kho chỉ còn: " + l.getSoLuongTon());
+                return;
             }
-            
+
             double gia = l.getGiaNhap();
             dsHuyTam.add(new ChiTietPhieuXuat(null, t.getMaThuoc(), l.getMaLoThuoc(), sl, gia, sl * gia));
-            
+
             txtSoLuongHuy.clear();
             cbChonLo.getSelectionModel().clearSelection();
-            
+
         } catch (NumberFormatException e) {
             AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Vui lòng nhập số lượng hợp lệ!");
         }
@@ -195,22 +218,22 @@ public class Dialog_XuatHuyController implements Initializable {
         }
 
         String maPhieuMoi = daoPX.getMaPhieuXuatMoi("XH"); // XH = Xuất Hủy
-        
+
         PhieuXuat px = new PhieuXuat(
-            maPhieuMoi, null, 
-            UserSession.getInstance().getUser().getMaNhanVien(), 
-            3, null, null, 
-            tongGiaTriThietHai, 
+            maPhieuMoi, null,
+            UserSession.getInstance().getUser().getMaNhanVien(),
+            3, null, null,
+            tongGiaTriThietHai,
             txtGhiChu.getText()
         );
-        
+
         if (daoPX.xuatHuyThuoc(px, new ArrayList<>(dsHuyTam))) {
-            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã hủy thuốc thành công!\nMã phiếu: " + maPhieuMoi); 
+            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã hủy thuốc thành công!\nMã phiếu: " + maPhieuMoi);
             ((Stage) txtGhiChu.getScene().getWindow()).close();
         } else {
             AlertUtils.showAlert(Alert.AlertType.ERROR, "Thất bại", "Lỗi khi lưu phiếu xuất hủy!");
         }
     }
-    
+
     @FXML private void handleHuyBo() { ((Stage) txtGhiChu.getScene().getWindow()).close(); }
 }

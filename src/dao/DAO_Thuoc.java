@@ -212,7 +212,7 @@ public class DAO_Thuoc {
                      "canKeDon=?, trangThai=?, trieuChung=? WHERE maThuoc=?";
         try (Connection con = ConnectDB.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
-            
+
             pst.setString(1, t.getMaDanhMuc());
             pst.setString(2, t.getTenThuoc());
             pst.setString(3, t.getHoatChat());
@@ -233,26 +233,26 @@ public class DAO_Thuoc {
             return false;
         }
     }
-    
+
     public String getMaThuocMoi() {
         String maMoi = "T00001"; // 1. Đổi giá trị khởi tạo thành T + 5 số 0
         String sql = "SELECT MAX(maThuoc) FROM Thuoc WHERE maThuoc LIKE 'T%'"; // Thêm điều kiện LIKE 'T%' cho chắc cú
         Connection con = ConnectDB.getConnection();
-        
+
         try (PreparedStatement pst = con.prepareStatement(sql);
              ResultSet rs = pst.executeQuery()) {
-             
+
             if (rs.next() && rs.getString(1) != null) {
                 String maHienTai = rs.getString(1);
-                
+
                 // 2. Cắt đúng 1 ký tự "T" ở đầu (index 1)
-                int soHienTai = Integer.parseInt(maHienTai.substring(1)); 
-                
+                int soHienTai = Integer.parseInt(maHienTai.substring(1));
+
                 // 3. Tăng lên 1 đơn vị và ép format về dạng T + 5 chữ số
-                maMoi = String.format("T%05d", soHienTai + 1); 
+                maMoi = String.format("T%05d", soHienTai + 1);
             }
-        } catch (SQLException e) { 
-            e.printStackTrace(); 
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return maMoi;
     }
@@ -262,7 +262,7 @@ public class DAO_Thuoc {
         Connection con = null;
         try {
             con = ConnectDB.getConnection();
-            
+
             // ========================================================
             // BƯỚC 1: KIỂM TRA TRÙNG LẮP (AUTO-RESTORE)
             // ========================================================
@@ -314,7 +314,7 @@ public class DAO_Thuoc {
                 pstThuoc.setString(6, t.getHangSanXuat());
                 pstThuoc.setString(7, t.getNuocSanXuat());
                 pstThuoc.setString(8, t.getCongDung());
-                pstThuoc.setString(9, t.getDonViCoBan()); 
+                pstThuoc.setString(9, t.getDonViCoBan());
                 pstThuoc.setString(10, t.getHinhAnh());
                 pstThuoc.setBoolean(11, t.isCanKeDon());
                 pstThuoc.setString(12, t.getTrangThai());
@@ -328,26 +328,31 @@ public class DAO_Thuoc {
             try (PreparedStatement pstDonVi = con.prepareStatement(sqlDonVi)) {
                 pstDonVi.setString(1, maQuyDoiMoi);
                 pstDonVi.setString(2, t.getMaThuoc());
-                pstDonVi.setString(3, t.getDonViCoBan()); 
+                pstDonVi.setString(3, t.getDonViCoBan());
                 pstDonVi.executeUpdate();
             }
 
-            con.commit(); 
+            con.commit();
             return true;
-            
-        } catch (SQLException e) { 
-            try { if (con != null) con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-            e.printStackTrace(); 
-            return false; 
+
+        } catch (SQLException e) {
+            try { if (con != null) {
+				con.rollback();
+			} } catch (SQLException ex) { ex.printStackTrace(); }
+            e.printStackTrace();
+            return false;
         } finally {
-            try { if (con != null) con.setAutoCommit(true); } catch (SQLException ex) { ex.printStackTrace(); }
+            try { if (con != null) {
+				con.setAutoCommit(true);
+			} } catch (SQLException ex) { ex.printStackTrace(); }
         }
     }
 
     public Thuoc getThuocTheoMaHoacTen(String query) {
         Thuoc thuoc = null;
         try {
-            Connection con = ConnectDB.getInstance().getConnection();
+            ConnectDB.getInstance();
+			Connection con = ConnectDB.getConnection();
             String sql = "SELECT TOP 1 * FROM Thuoc WHERE maThuoc = ? OR tenThuoc LIKE ?";
             PreparedStatement stmt = con.prepareStatement(sql);
             stmt.setString(1, query);
@@ -369,7 +374,8 @@ public class DAO_Thuoc {
         ArrayList<Thuoc> list = new ArrayList<>();
         String sql = "SELECT TOP 10 maThuoc, tenThuoc FROM Thuoc WHERE maThuoc LIKE ? OR tenThuoc LIKE ?";
         try {
-            Connection con = ConnectDB.getInstance().getConnection();
+            ConnectDB.getInstance();
+			Connection con = ConnectDB.getConnection();
             PreparedStatement stmt = con.prepareStatement(sql);
             stmt.setString(1, "%" + query + "%");
             stmt.setString(2, "%" + query + "%");
@@ -403,7 +409,8 @@ public class DAO_Thuoc {
     public boolean capNhatGiaNhapMoi(String maThuoc, double giaMoi) {
         int n = 0;
         String sql = "UPDATE Thuoc SET GiaNhap = ? WHERE MaThuoc = ?";
-        try (java.sql.Connection con = connectDB.ConnectDB.getInstance().getConnection();
+        connectDB.ConnectDB.getInstance();
+		try (java.sql.Connection con = ConnectDB.getConnection();
              java.sql.PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setDouble(1, giaMoi);
             stmt.setString(2, maThuoc);
@@ -417,7 +424,8 @@ public class DAO_Thuoc {
     public double getGiaNhapGanNhat(String maThuoc) {
         double giaNhap = 0.0;
         String sql = "SELECT TOP 1 giaNhap FROM LoThuoc WHERE maThuoc = ? ORDER BY maLoThuoc DESC";
-        try (java.sql.Connection con = connectDB.ConnectDB.getInstance().getConnection();
+        connectDB.ConnectDB.getInstance();
+		try (java.sql.Connection con = ConnectDB.getConnection();
              java.sql.PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setString(1, maThuoc);
             java.sql.ResultSet rs = pst.executeQuery();

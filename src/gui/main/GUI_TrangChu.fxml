@@ -129,7 +129,7 @@
                         <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/baocao.png" /></ImageView></graphic>
                         <content>
                            <VBox styleClass="dropdown-content">
-                              <Button styleClass="sub-btn" text="Thống Kê Doanh Thu" />
+                              <Button onAction="#handleMoThongKeDoanhThu" styleClass="sub-btn" text="Thống Kê Doanh Thu" />
                               <Button styleClass="sub-btn" text="Thống Kê Hàng Hóa" />
                               <Button styleClass="sub-btn" text="Thống Kê Tồn Kho" />
                            </VBox>

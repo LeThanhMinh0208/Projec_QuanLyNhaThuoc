@@ -32,12 +32,12 @@ public class Dialog_SuaNhaCungCapController {
             txtSdt.setText(ncc.getSdt());
             txtDiaChi.setText(ncc.getDiaChi());
             txtCongNo.setText(String.valueOf(ncc.getCongNo()));
-            
+
             // Khóa mã không cho sửa
             txtMa.setEditable(false);
             txtMa.setDisable(true);
             txtCongNo.setTooltip(new javafx.scene.control.Tooltip("Công nợ được cập nhật tự động từ phiếu nhập hàng"));
-            
+
             setupChangeDetection();
         }
     }
@@ -71,16 +71,22 @@ public class Dialog_SuaNhaCungCapController {
         ten = utils.ValidationUtils.normalizeString(ten);
         sdt = utils.ValidationUtils.normalizeString(sdt);
         diaChi = utils.ValidationUtils.normalizeString(diaChi);
-        
+
         txtTen.setText(ten);
         txtSdt.setText(sdt);
         txtDiaChi.setText(diaChi);
 
         StringBuilder err = new StringBuilder();
-        if (!utils.ValidationUtils.isValidTenNhaCungCap(ten)) err.append("- Tên nhà cung cấp phải từ 2-150 ký tự và chứa ít nhất 1 chữ cái.\n");
-        if (!utils.ValidationUtils.isValidSdt(sdt)) err.append("- Số điện thoại phải gồm 10 số và bắt đầu bằng số 0.\n");
-        if (!utils.ValidationUtils.isValidDiaChi(diaChi)) err.append("- Địa chỉ phải từ 2-255 ký tự và chứa ít nhất 1 chữ cái hoặc số.\n");
-        
+        if (!utils.ValidationUtils.isValidTenNhaCungCap(ten)) {
+			err.append("- Tên nhà cung cấp phải từ 2-150 ký tự và chứa ít nhất 1 chữ cái.\n");
+		}
+        if (!utils.ValidationUtils.isValidSdt(sdt)) {
+			err.append("- Số điện thoại phải gồm 10 số và bắt đầu bằng số 0.\n");
+		}
+        if (!utils.ValidationUtils.isValidDiaChi(diaChi)) {
+			err.append("- Địa chỉ phải từ 2-255 ký tự và chứa ít nhất 1 chữ cái hoặc số.\n");
+		}
+
         if (err.length() > 0) {
             new Alert(Alert.AlertType.ERROR, "Dữ liệu nhập không hợp lệ:\n" + err.toString()).show();
             return;

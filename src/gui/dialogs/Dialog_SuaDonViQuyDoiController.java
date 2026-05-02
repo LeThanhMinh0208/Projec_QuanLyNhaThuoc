@@ -1,28 +1,28 @@
 package gui.dialogs;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+
 import dao.DAO_DonViQuyDoi;
 import dao.DAO_Thuoc;
 import entity.DonViQuyDoi;
 import entity.Thuoc;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ListCell;
-import javafx.beans.value.ChangeListener;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import utils.AlertUtils;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
 
 public class Dialog_SuaDonViQuyDoiController {
 

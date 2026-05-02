@@ -56,7 +56,7 @@ public class Dialog_SuaKhachHangController {
         String ten = txtHoTen.getText();
         String sdt = txtSdt.getText();
         String diaChi = txtDiaChi.getText();
-        
+
         ten = utils.ValidationUtils.capitalizeName(ten);
         sdt = utils.ValidationUtils.normalizeString(sdt);
         diaChi = utils.ValidationUtils.normalizeString(diaChi);
@@ -66,15 +66,21 @@ public class Dialog_SuaKhachHangController {
         txtDiaChi.setText(diaChi);
 
         StringBuilder err = new StringBuilder();
-        if (!utils.ValidationUtils.isValidTenKhachHang(ten)) err.append("- Họ tên phải từ 2-100 ký tự và chứa ít nhất 1 chữ cái.\n");
-        if (!utils.ValidationUtils.isValidSdt(sdt)) err.append("- Số điện thoại phải gồm 10 số và bắt đầu bằng số 0.\n");
-        if (!utils.ValidationUtils.isValidDiaChi(diaChi)) err.append("- Địa chỉ phải từ 2-255 ký tự và chứa ít nhất 1 chữ cái hoặc số.\n");
-        
+        if (!utils.ValidationUtils.isValidTenKhachHang(ten)) {
+			err.append("- Họ tên phải từ 2-100 ký tự và chứa ít nhất 1 chữ cái.\n");
+		}
+        if (!utils.ValidationUtils.isValidSdt(sdt)) {
+			err.append("- Số điện thoại phải gồm 10 số và bắt đầu bằng số 0.\n");
+		}
+        if (!utils.ValidationUtils.isValidDiaChi(diaChi)) {
+			err.append("- Địa chỉ phải từ 2-255 ký tự và chứa ít nhất 1 chữ cái hoặc số.\n");
+		}
+
         if (err.length() > 0) {
             new Alert(Alert.AlertType.ERROR, "Dữ liệu nhập không hợp lệ:\n" + err.toString()).show();
             return;
         }
-        
+
         KhachHang existingKh = daoKhachHang.getBySdt(sdt);
         if (existingKh != null && !existingKh.getMaKhachHang().equals(khachHang.getMaKhachHang())) {
             new Alert(Alert.AlertType.ERROR, "Số điện thoại này đã tồn tại trong hệ thống!").show();

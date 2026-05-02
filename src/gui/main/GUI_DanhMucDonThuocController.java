@@ -1,5 +1,10 @@
 package gui.main;
 
+import java.io.File;
+import java.net.URL;
+import java.util.List;
+import java.util.ResourceBundle;
+
 import dao.DAO_DanhMucDonThuoc;
 import dao.DAO_HoaDon;
 import entity.DonThuoc;
@@ -16,19 +21,21 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
-import java.io.File;
-import java.net.URL;
-import java.util.List;
-import java.util.ResourceBundle;
 
 public class GUI_DanhMucDonThuocController implements Initializable {
 
@@ -38,18 +45,18 @@ public class GUI_DanhMucDonThuocController implements Initializable {
     @FXML private TableColumn<DonThuoc, String> colBacSi;
     @FXML private TableColumn<DonThuoc, String> colChanDoan;
     @FXML private TableColumn<DonThuoc, String> colBenhNhan;
-    
-    @FXML private TableColumn<DonThuoc, DonThuoc> colChiTietHoaDon; 
+
+    @FXML private TableColumn<DonThuoc, DonThuoc> colChiTietHoaDon;
     @FXML private TableColumn<DonThuoc, DonThuoc> colHinhAnh;
     @FXML private TableColumn<DonThuoc, DonThuoc> colTaiLap; // 🚨 CỘT TÁI LẬP 🚨
     @FXML private TableColumn<DonThuoc, DonThuoc> colXoa;
-    
+
     @FXML private TextField                     txtTimKiem;
     @FXML private ComboBox<String>              cbLocDanhMuc;
 
     private final DAO_DanhMucDonThuoc dao = new DAO_DanhMucDonThuoc();
-    private final DAO_HoaDon daoHoaDon = new DAO_HoaDon(); 
-    
+    private final DAO_HoaDon daoHoaDon = new DAO_HoaDon();
+
     private final ObservableList<DonThuoc> masterData = FXCollections.observableArrayList();
     private FilteredList<DonThuoc> filteredData;
 
@@ -77,8 +84,11 @@ public class GUI_DanhMucDonThuocController implements Initializable {
                     if (dt.getMaHoaDon() != null && !dt.getMaHoaDon().trim().isEmpty()) {
                         try {
                             HoaDonView hdView = daoHoaDon.getHoaDonViewByMa(dt.getMaHoaDon());
-                            if (hdView != null) moDialogChiTiet(hdView);
-                            else showWarn("Lỗi: Không tìm thấy chi tiết hóa đơn!");
+                            if (hdView != null) {
+								moDialogChiTiet(hdView);
+							} else {
+								showWarn("Lỗi: Không tìm thấy chi tiết hóa đơn!");
+							}
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
@@ -99,7 +109,7 @@ public class GUI_DanhMucDonThuocController implements Initializable {
         colHinhAnh.setCellFactory(param -> new TableCell<>() {
             private final Button btnXem = new Button("👁 Xem");
             {
-                btnXem.getStyleClass().addAll("btn-action-table", "btn-soft-teal"); 
+                btnXem.getStyleClass().addAll("btn-action-table", "btn-soft-teal");
                 btnXem.setOnAction(e -> hienThiHinhAnh(getTableView().getItems().get(getIndex()).getHinhAnhDon()));
             }
             @Override
@@ -131,7 +141,7 @@ public class GUI_DanhMucDonThuocController implements Initializable {
                         if (btn == ButtonType.YES) {
                             // 1. Set data vào bộ nhớ đệm
                             gui.main.GUI_QuanLyBanHangController.setTaiLapData(dt);
-                            
+
                             // ========================================================
                             // 💡 XỬ LÝ LẤY ẢNH VÀ TRUYỀN SANG TRANG BÁN HÀNG
                             // ========================================================
@@ -146,21 +156,23 @@ public class GUI_DanhMucDonThuocController implements Initializable {
                                         img = new Image(file.toURI().toString(), false);
                                     } else {
                                         var stream = getClass().getResourceAsStream("/resources/images/images_donthuoc/" + tenFileAnh);
-                                        if (stream != null) img = new Image(stream);
+                                        if (stream != null) {
+											img = new Image(stream);
+										}
                                     }
-                                    
+
                                     // Truyền thẳng cục Image sang bên kia
                                     gui.main.GUI_QuanLyBanHangController.setHinhAnhTaiLap(img);
-                                    
+
                                 } catch (Exception ex) {
                                     System.err.println("Lỗi load ảnh tái lập: " + ex.getMessage());
                                 }
                             } else {
                                 // Nếu không có ảnh thì clear ảnh cũ bên Bán Hàng đi
-                                gui.main.GUI_QuanLyBanHangController.setHinhAnhTaiLap(null); 
+                                gui.main.GUI_QuanLyBanHangController.setHinhAnhTaiLap(null);
                             }
 
-                            // 2. Chuyển trang 
+                            // 2. Chuyển trang
                             utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyBanHang.fxml");
                         }
                     });
@@ -187,9 +199,11 @@ public class GUI_DanhMucDonThuocController implements Initializable {
                     confirm.showAndWait().ifPresent(btn -> {
                         if (btn == ButtonType.YES) {
                             if (dao.xoa(dt.getMaDonThuoc())) {
-                                taiDuLieu(); 
+                                taiDuLieu();
                                 new Alert(Alert.AlertType.INFORMATION, "Đã xóa đơn thuốc!", ButtonType.OK).showAndWait();
-                            } else showWarn("Xóa thất bại!");
+                            } else {
+								showWarn("Xóa thất bại!");
+							}
                         }
                     });
                 });
@@ -226,7 +240,9 @@ public class GUI_DanhMucDonThuocController implements Initializable {
     }
 
     private void locDuLieu() {
-        if (filteredData == null) return;
+        if (filteredData == null) {
+			return;
+		}
         String selectedBacSi = cbLocDanhMuc.getValue();
         String keyword = txtTimKiem.getText() == null ? "" : txtTimKiem.getText().trim().toLowerCase();
 
@@ -243,7 +259,7 @@ public class GUI_DanhMucDonThuocController implements Initializable {
                 String benhNhan = dt.getThongTinBenhNhan() == null ? "" : dt.getThongTinBenhNhan().toLowerCase();
                 String chanDoan = dt.getChanDoan() == null ? "" : dt.getChanDoan().toLowerCase();
 
-                matchKeyword = maDon.contains(keyword) 
+                matchKeyword = maDon.contains(keyword)
                             || maHD.contains(keyword)
                             || benhNhan.contains(keyword)
                             || chanDoan.contains(keyword);
@@ -255,7 +271,7 @@ public class GUI_DanhMucDonThuocController implements Initializable {
 
     private void taiDuLieu() {
         String bacSiDangChon = cbLocDanhMuc.getValue();
-        cbLocDanhMuc.setOnAction(null); 
+        cbLocDanhMuc.setOnAction(null);
 
         List<String> listBacSi = dao.getDanhSachBacSi();
         if (!listBacSi.contains("Tất cả bác sĩ")) {
@@ -268,8 +284,8 @@ public class GUI_DanhMucDonThuocController implements Initializable {
         } else {
             cbLocDanhMuc.getSelectionModel().selectFirst();
         }
-        
-        cbLocDanhMuc.setOnAction(e -> locDuLieu()); 
+
+        cbLocDanhMuc.setOnAction(e -> locDuLieu());
         masterData.setAll(dao.getAll());
         locDuLieu();
     }
@@ -279,9 +295,11 @@ public class GUI_DanhMucDonThuocController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_DonThuoc.fxml"));
             Parent root = loader.load();
             Dialog_DonThuocController ctrl = loader.getController();
-            ctrl.setOnSuccess(this::taiDuLieu); 
-            
-            if (donThuocSua != null) ctrl.setDonThuocSua(donThuocSua);
+            ctrl.setOnSuccess(this::taiDuLieu);
+
+            if (donThuocSua != null) {
+				ctrl.setDonThuocSua(donThuocSua);
+			}
 
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -326,22 +344,24 @@ public class GUI_DanhMucDonThuocController implements Initializable {
                 img = new Image(file.toURI().toString(), false);
             } else {
                 var stream = getClass().getResourceAsStream("/resources/images/images_donthuoc/" + tenFileAnh);
-                if (stream != null) img = new Image(stream);
+                if (stream != null) {
+					img = new Image(stream);
+				}
             }
 
             if (img == null || img.isError()) {
                 showWarn("Không tìm thấy file ảnh: " + tenFileAnh + "\nĐã thử tìm tại: " + file.getAbsolutePath());
-                return; 
+                return;
             }
 
             Stage stage = new Stage();
             stage.setTitle("Hình Ảnh Đơn Thuốc: " + tenFileAnh);
-            
+
             // 💡 GIẢI PHÁP FIX KÍCH THƯỚC CỐ ĐỊNH CHO MỌI MÀN HÌNH
             // Cố định cửa sổ là 900x650 (Size vàng cho laptop 14 inch đổ lên)
             double fixedWidth = 900;
             double fixedHeight = 650;
-            
+
             ImageView imageView = new ImageView(img);
             // Ép cái ảnh phải nằm gọn trong khung 900x650, không được lố
             imageView.setFitWidth(fixedWidth - 20); // Trừ hao viền padding
@@ -356,9 +376,9 @@ public class GUI_DanhMucDonThuocController implements Initializable {
             // Không cần ScrollPane nữa vì ảnh đã tự thu nhỏ lại vừa vặn cửa sổ
             Scene scene = new Scene(imageContainer, fixedWidth, fixedHeight);
             stage.setScene(scene);
-            
+
             // Khóa không cho user kéo giãn cửa sổ làm bể layout
-            stage.setResizable(false); 
+            stage.setResizable(false);
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.show();
 

@@ -1,5 +1,8 @@
 package gui.main;
 
+import java.net.URL;
+import java.util.ResourceBundle;
+
 import dao.DAO_LoThuoc;
 import entity.LoThuoc;
 import javafx.beans.property.SimpleStringProperty;
@@ -11,14 +14,16 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import utils.AlertUtils;
 import utils.SceneUtils;
 
@@ -27,7 +32,7 @@ public class GUI_DanhMucKhoController implements Initializable {
     @FXML private ComboBox<String> cmbViTriKho;
     @FXML private TextField txtTimKiem;
     @FXML private TableView<LoThuoc> tableKho;
-    
+
     @FXML private TableColumn<LoThuoc, String> colMaThuoc, colHinhAnh, colTenThuoc, colViTriKho, colMaLo;
     @FXML private TableColumn<LoThuoc, Integer> colSoLuong, colTrangThaiTon;
 
@@ -48,10 +53,14 @@ public class GUI_DanhMucKhoController implements Initializable {
     }
 
     private Image loadImage(String tenFile) {
-        if (tenFile == null || tenFile.trim().isEmpty()) return null;
+        if (tenFile == null || tenFile.trim().isEmpty()) {
+			return null;
+		}
         try {
             URL url = getClass().getResource("/resources/images/images_thuoc/" + tenFile.trim());
-            if (url != null) return new Image(url.toExternalForm(), 45, 45, true, true);
+            if (url != null) {
+				return new Image(url.toExternalForm(), 45, 45, true, true);
+			}
         } catch (Exception e) {}
         return null;
     }
@@ -71,8 +80,8 @@ public class GUI_DanhMucKhoController implements Initializable {
             private final ImageView imageView = new ImageView();
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || getTableRow() == null || getTableRow().getItem() == null) { 
-                    setGraphic(null); 
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setGraphic(null);
                 } else {
                     LoThuoc lo = getTableRow().getItem();
                     Image img = loadImage(lo.getThuoc().getHinhAnh());
@@ -124,12 +133,12 @@ public class GUI_DanhMucKhoController implements Initializable {
         String tuKhoa = txtTimKiem.getText().toLowerCase().trim();
 
         filteredData.setPredicate(lo -> {
-            boolean matchKho = viTriSelection.equals("Tất cả vị trí kho") || 
+            boolean matchKho = viTriSelection.equals("Tất cả vị trí kho") ||
                               (viTriSelection.equals("Kho Bán Hàng") && "KHO_BAN_HANG".equals(lo.getViTriKho())) ||
                               (viTriSelection.equals("Kho Dự Trữ") && "KHO_DU_TRU".equals(lo.getViTriKho()));
 
             String trangThai = lo.getSoLuongTon() < 100 ? "tồn thấp" : "tồn cao";
-            boolean matchSearch = tuKhoa.isEmpty() || 
+            boolean matchSearch = tuKhoa.isEmpty() ||
                                  lo.getMaLoThuoc().toLowerCase().contains(tuKhoa) ||
                                  lo.getThuoc().getMaThuoc().toLowerCase().contains(tuKhoa) ||
                                  lo.getThuoc().getTenThuoc().toLowerCase().contains(tuKhoa) ||
@@ -141,7 +150,7 @@ public class GUI_DanhMucKhoController implements Initializable {
 
     @FXML void moTrangNhapKho(ActionEvent event) { SceneUtils.switchPage("/gui/main/GUI_NhapKho.fxml"); }
     @FXML void handleChuyenTrangXuatKho(ActionEvent event) { SceneUtils.switchPage("/gui/main/GUI_XuatKho.fxml"); }
-    @FXML void handleChuyenTrangKiemKe(ActionEvent event) { 
+    @FXML void handleChuyenTrangKiemKe(ActionEvent event) {
         AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Tính năng đang phát triển", "Tính năng kiểm kê kho sẽ được cập nhật trong phiên bản tiếp theo.");
     }
 }

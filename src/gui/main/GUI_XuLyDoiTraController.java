@@ -239,10 +239,7 @@ public class GUI_XuLyDoiTraController {
         } else {
             String lower = keyword.toLowerCase();
             filteredData.setPredicate(hd -> {
-                if (hd.getMaHoaDon() != null && hd.getMaHoaDon().toLowerCase().contains(lower)) {
-                    return true;
-                }
-                if (hd.getTenKhachHang() != null && hd.getTenKhachHang().toLowerCase().contains(lower)) {
+                if ((hd.getMaHoaDon() != null && hd.getMaHoaDon().toLowerCase().contains(lower)) || (hd.getTenKhachHang() != null && hd.getTenKhachHang().toLowerCase().contains(lower))) {
                     return true;
                 }
                 return hd.getSdt() != null && hd.getSdt().toLowerCase().contains(lower);

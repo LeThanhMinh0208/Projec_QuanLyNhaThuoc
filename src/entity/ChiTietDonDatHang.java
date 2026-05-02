@@ -4,11 +4,11 @@ public class ChiTietDonDatHang {
     private DonDatHang donDatHang;
     private Thuoc thuoc;
     private DonViQuyDoi donViQuyDoi;
-    
+
     private int soLuongDat;
     private int soLuongDaNhan;
     private double donGiaDuKien;
-    
+
     // Các biến tạm để form Nhập Kho lưu thông tin Lô/Date
     private String maLo;
     private String ngaySanXuatTemp;

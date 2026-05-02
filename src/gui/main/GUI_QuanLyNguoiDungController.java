@@ -1,10 +1,11 @@
 package gui.main;
 
+import java.util.Optional;
+
 import dao.DAO_NhanVien;
 import entity.NhanVien;
 import gui.dialogs.Dialog_SuaNhanVienController;
 import gui.dialogs.Dialog_ThemNhanVienController;
-
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,13 +16,18 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
-import java.util.Optional;
 
 public class GUI_QuanLyNguoiDungController {
 
@@ -100,11 +106,13 @@ public class GUI_QuanLyNguoiDungController {
         FilteredList<NhanVien> filteredData = new FilteredList<>(dsNhanVien, p -> true);
         txtTimKiem.textProperty().addListener((obs, oldV, newV) -> {
             filteredData.setPredicate(nv -> {
-                if (newV == null || newV.isEmpty()) return true;
+                if (newV == null || newV.isEmpty()) {
+					return true;
+				}
                 String key = newV.toLowerCase();
-                return nv.getHoTen().toLowerCase().contains(key) || 
+                return nv.getHoTen().toLowerCase().contains(key) ||
                        nv.getMaNhanVien().toLowerCase().contains(key) ||
-                       nv.getSdt().contains(key) || 
+                       nv.getSdt().contains(key) ||
                        nv.getTenDangNhap().toLowerCase().contains(key);
             });
         });
@@ -120,7 +128,7 @@ public class GUI_QuanLyNguoiDungController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ThemNhanVien.fxml"));
             Parent root = loader.load();
             Dialog_ThemNhanVienController controller = loader.getController();
-            controller.setParentController(this); 
+            controller.setParentController(this);
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setTitle("Thêm Người Dùng Mới");
@@ -144,7 +152,7 @@ public class GUI_QuanLyNguoiDungController {
             Parent root = loader.load();
             Dialog_SuaNhanVienController controller = loader.getController();
             controller.setParentController(this);
-            controller.setNhanVien(nvCanSua); 
+            controller.setNhanVien(nvCanSua);
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
@@ -160,7 +168,7 @@ public class GUI_QuanLyNguoiDungController {
             new Alert(Alert.AlertType.WARNING, "Vui lòng chọn nhân viên cần xóa!").show();
             return;
         }
-        
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Xác nhận xóa mềm");
         alert.setHeaderText("Bạn có chắc chắn muốn xóa nhân viên: " + selected.getHoTen() + " ?");

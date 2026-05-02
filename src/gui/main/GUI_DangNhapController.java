@@ -1,7 +1,13 @@
 package gui.main;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
 import dao.DAO_NhanVien;
 import entity.NhanVien;
+import javafx.animation.Animation;
 import javafx.animation.AnimationTimer;
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
@@ -24,23 +30,18 @@ import utils.AlertUtils;
 import utils.UserSession;
 import utils.WindowUtils;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
 public class GUI_DangNhapController {
 
     @FXML private StackPane rootPane;
     @FXML private AnchorPane animeBackgroundPane;
-    @FXML private VBox mainCard; 
-    @FXML private ImageView imgLogo; 
+    @FXML private VBox mainCard;
+    @FXML private ImageView imgLogo;
     @FXML private Button btnDangNhap;
     @FXML private TextField txtTenDangNhap;
     @FXML private PasswordField txtMatKhau;
 
     private DAO_NhanVien nhanVienDao = new DAO_NhanVien();
-    
+
     // Quản lý Animation (Bụi lấp lánh & Pháo bông)
     private List<AnimeEntity> backgroundDust = new ArrayList<>();
     private List<Firework> fireworks = new ArrayList<>();
@@ -68,7 +69,7 @@ public class GUI_DangNhapController {
         TranslateTransition floatLogo = new TranslateTransition(Duration.seconds(2), imgLogo);
         floatLogo.setByY(-10);
         floatLogo.setAutoReverse(true);
-        floatLogo.setCycleCount(TranslateTransition.INDEFINITE);
+        floatLogo.setCycleCount(Animation.INDEFINITE);
         floatLogo.play();
 
         // Hiệu ứng nảy nút Đăng nhập
@@ -88,7 +89,7 @@ public class GUI_DangNhapController {
         for (int i = 0; i < 200; i++) {
             backgroundDust.add(new AnimeEntity(pColors[random.nextInt(pColors.length)]));
         }
-        
+
         backgroundDust.forEach(e -> animeBackgroundPane.getChildren().add(e.node));
     }
 
@@ -101,7 +102,7 @@ public class GUI_DangNhapController {
             @Override
             public void handle(long now) {
                 double t = (now - start) / 1_000_000_000.0;
-                
+
                 backgroundDust.forEach(e -> e.update(t));
 
                 // 🌟 TĂNG TẦN SUẤT BẮN PHÁO LÊN X3 (0.04 so với 0.015 cũ)
@@ -126,7 +127,7 @@ public class GUI_DangNhapController {
                             fwParticles.add(fp);
                             animeBackgroundPane.getChildren().add(fp.node);
                         }
-                        
+
                         // HIỆU ỨNG FLASH KHI NỔ
                         Circle flash = new Circle(fw.x, fw.y, 180, Color.WHITE);
                         flash.setEffect(new Glow(1.0));
@@ -159,7 +160,7 @@ public class GUI_DangNhapController {
         javafx.scene.Node node;
         double dx, dy;
 
-        public AnimeEntity(Color c) { 
+        public AnimeEntity(Color c) {
             node = new Circle(random.nextDouble() * 2 + 1, c);
             node.setOpacity(random.nextDouble() * 0.6 + 0.1);
             node.setLayoutX(random.nextDouble() * 950);
@@ -172,10 +173,18 @@ public class GUI_DangNhapController {
             node.setLayoutX(node.getLayoutX() + dx);
             node.setLayoutY(node.getLayoutY() + dy);
             // Vòng lặp ranh giới 950x600
-            if (node.getLayoutX() < -10) node.setLayoutX(960);
-            if (node.getLayoutX() > 960) node.setLayoutX(-10);
-            if (node.getLayoutY() < -10) node.setLayoutY(610);
-            if (node.getLayoutY() > 610) node.setLayoutY(-10);
+            if (node.getLayoutX() < -10) {
+				node.setLayoutX(960);
+			}
+            if (node.getLayoutX() > 960) {
+				node.setLayoutX(-10);
+			}
+            if (node.getLayoutY() < -10) {
+				node.setLayoutY(610);
+			}
+            if (node.getLayoutY() > 610) {
+				node.setLayoutY(-10);
+			}
         }
     }
 
@@ -192,15 +201,15 @@ public class GUI_DangNhapController {
             } else {
                 x = 700 + random.nextDouble() * 250; // Bắn từ bên Phải (700 -> 950)
             }
-            
+
             y = 650; // Xuất phát từ dưới mép màn hình
             dy = -(random.nextDouble() * 7 + 10); // Lực bắn vừa phải để nổ ngang form đăng nhập
-            
+
             // Random màu rực rỡ
             color = Color.hsb(random.nextDouble() * 360, 1.0, 1.0);
-            
-            node = new Circle(3.5, color); 
-            node.setEffect(new Glow(1.0)); 
+
+            node = new Circle(3.5, color);
+            node.setEffect(new Glow(1.0));
             node.setLayoutX(x);
             node.setLayoutY(y);
         }
@@ -221,19 +230,19 @@ public class GUI_DangNhapController {
         public FireworkParticle(double startX, double startY, Color baseColor) {
             x = startX; y = startY;
             double angle = random.nextDouble() * Math.PI * 2;
-            
+
             // TỐC ĐỘ VĂNG LỚN ĐỂ LAN RỘNG
-            double speed = random.nextDouble() * 20 + 3; 
+            double speed = random.nextDouble() * 20 + 3;
             dx = Math.cos(angle) * speed;
             dy = Math.sin(angle) * speed;
-            
-            maxLife = random.nextInt(70) + 50; 
+
+            maxLife = random.nextInt(70) + 50;
             life = maxLife;
-            
+
             Color particleColor = random.nextDouble() > 0.8 ? Color.WHITE : baseColor;
             double size = random.nextDouble() * 3.0 + 1.0;
             node = new Circle(size, particleColor);
-            
+
             node.setEffect(new Glow(1.0));
             node.setLayoutX(x);
             node.setLayoutY(y);
@@ -242,23 +251,23 @@ public class GUI_DangNhapController {
         public boolean update() {
             x += dx;
             y += dy;
-            
+
             // VẬT LÝ NÂNG CAO
             dx *= 0.90; // Lực cản không khí phanh nhanh
-            dy *= 0.90; 
+            dy *= 0.90;
             dy += 0.35; // Rơi rũ xuống theo trọng lực
-            
+
             life--;
-            node.setOpacity((life / maxLife) * 1.5); 
-            
+            node.setOpacity((life / maxLife) * 1.5);
+
             double scale = (life / maxLife);
             node.setScaleX(scale);
             node.setScaleY(scale);
-            
+
             node.setLayoutX(x);
             node.setLayoutY(y);
-            
-            return life <= 0; 
+
+            return life <= 0;
         }
     }
 
@@ -293,11 +302,11 @@ public class GUI_DangNhapController {
                 javafx.scene.Parent root = loader.load();
                 javafx.stage.Stage mainStage = new javafx.stage.Stage();
                 mainStage.setTitle("Long Nguyên Pharma - " + nv.getHoTen());
-                
+
                 mainStage.setScene(new javafx.scene.Scene(root));
-                
+
                 // 🚨 BẬT FULL MÀN HÌNH HỆ THỐNG
-                mainStage.setMaximized(true); 
+                mainStage.setMaximized(true);
                 mainStage.show();
             } catch (Exception e) { e.printStackTrace(); }
         } else {

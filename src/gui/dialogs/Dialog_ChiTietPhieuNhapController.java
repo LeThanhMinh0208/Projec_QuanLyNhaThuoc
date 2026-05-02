@@ -1,27 +1,26 @@
 package gui.dialogs;
 
-import connectDB.ConnectDB;
-import entity.PhieuNhap;
-import service.Print_PhieuNhap; 
-import utils.AlertUtils; 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Stage;
-import javafx.scene.control.Alert;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import connectDB.ConnectDB;
+import entity.PhieuNhap;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
+import service.Print_PhieuNhap;
+import utils.AlertUtils;
 
 public class Dialog_ChiTietPhieuNhapController {
 
@@ -34,7 +33,7 @@ public class Dialog_ChiTietPhieuNhapController {
 
     private DecimalFormat df = new DecimalFormat("#,### VNĐ");
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-    
+
     // Biến lưu Phiếu Nhập hiện tại để In
     private PhieuNhap phieuHienTai;
 
@@ -43,16 +42,16 @@ public class Dialog_ChiTietPhieuNhapController {
         colDonVi.setCellValueFactory(new PropertyValueFactory<>("donVi"));
         colSoLuong.setCellValueFactory(new PropertyValueFactory<>("soLuong"));
         colSoLuong.setStyle("-fx-alignment: CENTER; -fx-font-weight: bold; -fx-text-fill: #059669;");
-        
+
         colMaLo.setCellValueFactory(new PropertyValueFactory<>("maLo"));
         colMaLo.setStyle("-fx-alignment: CENTER;");
-        
+
         colNgaySX.setCellValueFactory(new PropertyValueFactory<>("ngaySXStr"));
         colHanDung.setCellValueFactory(new PropertyValueFactory<>("hanDungStr"));
-        
+
         colGiaNhap.setCellValueFactory(new PropertyValueFactory<>("giaNhapStr"));
         colGiaNhap.setStyle("-fx-alignment: CENTER-RIGHT;");
-        
+
         colThanhTien.setCellValueFactory(new PropertyValueFactory<>("thanhTienStr"));
         colThanhTien.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: #e11d48;");
     }
@@ -60,7 +59,7 @@ public class Dialog_ChiTietPhieuNhapController {
     // Hàm nhận dữ liệu từ trang Nhập Kho truyền sang
     public void setPhieuNhap(PhieuNhap pn) {
         this.phieuHienTai = pn; // Gán vào biến toàn cục để dành cho việc IN PDF
-        
+
         lblMaPhieu.setText("Mã phiếu: " + pn.getMaPhieuNhap());
         lblNhaCungCap.setText(pn.getNhaCungCap().getTenNhaCungCap());
         lblNguoiLap.setText(pn.getNhanVien().getHoTen());
@@ -72,7 +71,7 @@ public class Dialog_ChiTietPhieuNhapController {
 
     private void loadChiTietTuDatabase(String maPhieu) {
         ObservableList<ChiTietUI> list = FXCollections.observableArrayList();
-        
+
         // ĐÃ SỬA CÂU LỆNH SQL: Join thêm bảng DonViQuyDoi để lấy đúng tenDonVi thay vì maQuyDoi
         String sql = "SELECT t.tenThuoc, dv.tenDonVi, ctpn.soLuong, ctpn.donGiaNhap, " +
                      "lt.maLoThuoc, lt.ngaySanXuat, lt.hanSuDung " +
@@ -82,17 +81,18 @@ public class Dialog_ChiTietPhieuNhapController {
                      "JOIN DonViQuyDoi dv ON ctpn.maQuyDoi = dv.maQuyDoi " + // Thêm dòng này
                      "WHERE ctpn.maPhieuNhap = ?";
 
-        try (Connection con = ConnectDB.getInstance().getConnection();
+        ConnectDB.getInstance();
+		try (Connection con = ConnectDB.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setString(1, maPhieu);
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 ChiTietUI ct = new ChiTietUI();
                 ct.setTenThuoc(rs.getString("tenThuoc"));
-                
+
                 // ĐÃ SỬA: Lấy từ cột tenDonVi vừa Join
-                ct.setDonVi(rs.getString("tenDonVi")); 
-                
+                ct.setDonVi(rs.getString("tenDonVi"));
+
                 ct.setSoLuong(rs.getInt("soLuong"));
                 ct.setGiaNhap(rs.getDouble("donGiaNhap"));
                 ct.setMaLo(rs.getString("maLoThuoc"));
@@ -109,20 +109,20 @@ public class Dialog_ChiTietPhieuNhapController {
     // ===============================================
     // XỬ LÝ NÚT IN PHIẾU NHẬP (TÍNH NĂNG MỚI BỔ SUNG)
     // ===============================================
-    @FXML 
+    @FXML
     void handleInPhieu(ActionEvent event) {
 
         if (phieuHienTai != null && tableChiTiet.getItems() != null && !tableChiTiet.getItems().isEmpty()) {
-            
+
             try {
-             
+
                 Print_PhieuNhap.inPhieu(phieuHienTai, tableChiTiet.getItems());
-                
+
             } catch (Exception e) {
                 e.printStackTrace();
                 AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi Hệ Thống", "Không thể khởi tạo tiến trình in: " + e.getMessage());
             }
-            
+
         } else {
             AlertUtils.showAlert(Alert.AlertType.WARNING, "Thông báo", "Phiếu này chưa có chi tiết hàng hóa hoặc dữ liệu trống, không thể in PDF!");
         }

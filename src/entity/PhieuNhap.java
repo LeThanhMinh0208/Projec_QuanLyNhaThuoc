@@ -4,11 +4,11 @@ import java.sql.Timestamp;
 
 public class PhieuNhap {
     private String maPhieuNhap;
-    private DonDatHang donDatHang; 
+    private DonDatHang donDatHang;
     private NhaCungCap nhaCungCap;
     private NhanVien nhanVien;
     private Timestamp ngayNhap;
-    
+
     // Thêm trường phụ để tính tổng tiền trên UI
     private double tongTien;
 

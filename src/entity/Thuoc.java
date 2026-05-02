@@ -35,7 +35,7 @@ public class Thuoc {
         this.hinhAnh = hinhAnh;
         this.canKeDon = canKeDon;
         this.trangThai = trangThai;
-        
+
     }
 
     // --- GETTERS & SETTERS ---
@@ -74,10 +74,10 @@ public class Thuoc {
 
     public String getTrangThai() { return trangThai; }
     public void setTrangThai(String trangThai) { this.trangThai = trangThai; }
-    
+
     public String getTrieuChung() { return trieuChung; }
     public void setTrieuChung(String trieuChung) { this.trieuChung = trieuChung; }
-    
+
     public String getTenDanhMuc() { return tenDanhMuc; }
     public void setTenDanhMuc(String tenDanhMuc) { this.tenDanhMuc = tenDanhMuc; }
     @Override

@@ -1,17 +1,5 @@
 package gui.dialogs;
 
-import dao.DAO_DanhMucThuoc;
-import dao.DAO_Thuoc;
-import entity.DanhMucThuoc;
-import entity.Thuoc;
-import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,6 +7,25 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+
+import dao.DAO_DanhMucThuoc;
+import dao.DAO_Thuoc;
+import entity.DanhMucThuoc;
+import entity.Thuoc;
+import javafx.collections.FXCollections;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Control;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 public class Dialog_SuaThuocController {
 
@@ -52,11 +59,13 @@ public class Dialog_SuaThuocController {
     private static final String THUOC_IMAGE_DIR =
         "src/resources/images/images_thuoc/";
 
-    @FXML 
+    @FXML
     public void initialize() {
         // Nạp danh mục
         dsDM = daoDM.getAllDanhMuc();
-        for (DanhMucThuoc dm : dsDM) cbDanhMuc.getItems().add(dm.getTenDanhMuc());
+        for (DanhMucThuoc dm : dsDM) {
+			cbDanhMuc.getItems().add(dm.getTenDanhMuc());
+		}
 
         // Nạp trạng thái và đơn vị tính
         cbTrangThai.getItems().setAll("Đang bán", "Ngưng bán", "Hết hàng");
@@ -77,7 +86,9 @@ public class Dialog_SuaThuocController {
     private void setupChangeDetection() {
         Runnable checkChanged = () -> {
             boolean changed = true; // Sẽ check khi form load xong
-            if (txtTen.getText() != null) btnLuu.setDisable(false);
+            if (txtTen.getText() != null) {
+				btnLuu.setDisable(false);
+			}
         };
         txtTen.textProperty().addListener((o, ov, nv) -> btnLuu.setDisable(false));
         txtHoatChat.textProperty().addListener((o, ov, nv) -> btnLuu.setDisable(false));
@@ -90,7 +101,7 @@ public class Dialog_SuaThuocController {
         chkKeDon.selectedProperty().addListener((o, ov, nv) -> btnLuu.setDisable(false));
         txtCongDung.textProperty().addListener((o, ov, nv) -> btnLuu.setDisable(false));
         txtTrieuChung.textProperty().addListener((o, ov, nv) -> btnLuu.setDisable(false));
-        
+
         // Sẽ gọi init sau khi setThuocData.
     }
 
@@ -103,7 +114,7 @@ public class Dialog_SuaThuocController {
     }
 
     private void xoaLoi(Control control) {
-        control.setStyle(""); 
+        control.setStyle("");
         control.setTooltip(null);
     }
 
@@ -111,14 +122,16 @@ public class Dialog_SuaThuocController {
         Control[] danhSachO = {txtTen, txtHoatChat, txtHangSX, cbNuocSX, txtHamLuong, cbDonVi, cbDanhMuc, txtCongDung, txtTrieuChung, cbTrangThai};
         for (Control c : danhSachO) {
             c.focusedProperty().addListener((obs, oldVal, newVal) -> {
-                if (newVal) xoaLoi(c);
+                if (newVal) {
+					xoaLoi(c);
+				}
             });
         }
     }
 
     // --- ĐỔ DỮ LIỆU TỪ BẢNG VÀO FORM SỬA ---
     public void setThuocData(Thuoc t) {
-        this.tenFileAnh = t.getHinhAnh(); 
+        this.tenFileAnh = t.getHinhAnh();
 
         txtMa.setText(t.getMaThuoc());
         txtTen.setText(t.getTenThuoc());
@@ -138,7 +151,7 @@ public class Dialog_SuaThuocController {
             Image img = new Image(getClass().getResourceAsStream(path));
             imgPreview.setImage(img);
         } catch (Exception e) {}
-        
+
         btnLuu.setDisable(true); // Vừa mới mở lên chưa có gì thay đổi
     }
 
@@ -179,7 +192,9 @@ public class Dialog_SuaThuocController {
         boolean hopLe = true;
 
         Control[] danhSachO = {txtTen, txtHoatChat, txtHangSX, cbNuocSX, txtHamLuong, cbDonVi, cbDanhMuc, cbTrangThai, txtCongDung, txtTrieuChung};
-        for (Control c : danhSachO) xoaLoi(c);
+        for (Control c : danhSachO) {
+			xoaLoi(c);
+		}
 
         // --- QUÉT RÀNG BUỘC RỖNG & ĐỘ DÀI ---
         String tenDMSelected = cbDanhMuc.getValue();
@@ -240,17 +255,22 @@ public class Dialog_SuaThuocController {
         // Nếu có bất kỳ ô nào vi phạm -> Dừng lại và hiện Alert cảnh báo
         if (!hopLe) {
             StringBuilder errorMsg = new StringBuilder("Số liệu chỉnh sửa không hợp lệ:\n");
-            
-            if (!utils.ValidationUtils.isValidTenThuoc(tenThuoc)) errorMsg.append("- Tên thuốc không hợp lệ.\n");
-            else if (!txtMa.getText().isEmpty()) {
+
+            if (!utils.ValidationUtils.isValidTenThuoc(tenThuoc)) {
+				errorMsg.append("- Tên thuốc không hợp lệ.\n");
+			} else if (!txtMa.getText().isEmpty()) {
                 Thuoc currThuoc = daoThuoc.getThuocByMa(txtMa.getText());
                 if (currThuoc != null && !currThuoc.getTenThuoc().equalsIgnoreCase(tenThuoc) && daoThuoc.existsByTenThuoc(tenThuoc)) {
                     errorMsg.append("- Tên thuốc mới đã bị trùng với tên thuốc khác trong hệ thống.\n");
                 }
             }
-            
-            if (tenDMSelected == null || tenDMSelected.trim().isEmpty()) errorMsg.append("- Chưa chọn danh mục.\n");
-            if (donViSelected == null || donViSelected.trim().isEmpty()) errorMsg.append("- Chưa chọn đơn vị tính.\n");
+
+            if (tenDMSelected == null || tenDMSelected.trim().isEmpty()) {
+				errorMsg.append("- Chưa chọn danh mục.\n");
+			}
+            if (donViSelected == null || donViSelected.trim().isEmpty()) {
+				errorMsg.append("- Chưa chọn đơn vị tính.\n");
+			}
 
             errorMsg.append("\nVui lòng kiểm tra lại các ô bị bôi đỏ!");
             new Alert(Alert.AlertType.ERROR, errorMsg.toString()).show();

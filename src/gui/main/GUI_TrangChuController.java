@@ -1,5 +1,5 @@
 package gui.main;
-import gui.main.GUI_QuanLyBangGiaController;
+import java.io.InputStream;
 
 import dao.DAO_Thuoc;
 import entity.NhanVien;
@@ -26,8 +26,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-
-import java.io.InputStream;
 
 public class GUI_TrangChuController {
 
@@ -168,13 +166,21 @@ public class GUI_TrangChuController {
                 }
                 String filter = newValue.toLowerCase();
 
-                if (thuoc.getTrieuChung() != null && thuoc.getTrieuChung().toLowerCase().contains(filter)) return true;
-                if (thuoc.getMaThuoc().toLowerCase().contains(filter)) return true;
-                if (thuoc.getTenThuoc().toLowerCase().contains(filter)) return true;
-                if (thuoc.getCongDung() != null && thuoc.getCongDung().toLowerCase().contains(filter)) return true;
-                if (thuoc.getHoatChat() != null && thuoc.getHoatChat().toLowerCase().contains(filter)) return true;
-                if (thuoc.getHangSanXuat() != null && thuoc.getHangSanXuat().toLowerCase().contains(filter)) return true;
-                if (thuoc.getNuocSanXuat() != null && thuoc.getNuocSanXuat().toLowerCase().contains(filter)) return true;
+                if ((thuoc.getTrieuChung() != null && thuoc.getTrieuChung().toLowerCase().contains(filter)) || thuoc.getMaThuoc().toLowerCase().contains(filter) || thuoc.getTenThuoc().toLowerCase().contains(filter)) {
+					return true;
+				}
+                if (thuoc.getCongDung() != null && thuoc.getCongDung().toLowerCase().contains(filter)) {
+					return true;
+				}
+                if (thuoc.getHoatChat() != null && thuoc.getHoatChat().toLowerCase().contains(filter)) {
+					return true;
+				}
+                if (thuoc.getHangSanXuat() != null && thuoc.getHangSanXuat().toLowerCase().contains(filter)) {
+					return true;
+				}
+                if (thuoc.getNuocSanXuat() != null && thuoc.getNuocSanXuat().toLowerCase().contains(filter)) {
+					return true;
+				}
 
                 String keDonString = thuoc.isCanKeDon() ? "co ke don" : "khong ke don";
                 return keDonString.contains(filter);
@@ -311,6 +317,11 @@ public class GUI_TrangChuController {
     @FXML
     void handleMoDoiMatKhau(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_DoiMatKhau.fxml");
+    }
+
+    @FXML
+    void handleMoThongKeDoanhThu(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_ThongKeDoanhThu.fxml");
     }
 
     @FXML
