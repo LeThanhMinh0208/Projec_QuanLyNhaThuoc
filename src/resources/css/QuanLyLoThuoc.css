@@ -1,5 +1,5 @@
 /* ========================================================
-   1. GLOBAL & BACKGROUND (ĐỒNG BỘ MÀU XANH LƠ TRANG CHỦ)
+   1. GLOBAL & BACKGROUND 
    ======================================================== */
 .main-bg {
     -fx-background-color: #f0f9ff; 
@@ -14,18 +14,18 @@
 .xk-title-line {
     -fx-background-color: #0ea5e9;
     -fx-min-height: 4px;
-    -fx-background-radius: 2px;
+    -fx-background-radius: 2;
 }
 
 /* ========================================================
-   2. SEARCH & FILTER (DÁNG VIÊN THUỐC)
+   2. SEARCH & FILTER 
    ======================================================== */
 .big-search-box {
     -fx-background-color: white;
     -fx-border-color: #7dd3fc;
     -fx-border-width: 1.5px;
-    -fx-background-radius: 30px;
-    -fx-border-radius: 30px;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 10, 0, 0, 4);
 }
 
@@ -38,8 +38,8 @@
 .xk-input, .xk-input-small {
     -fx-background-color: white;
     -fx-border-color: #cbd5e1;
-    -fx-border-radius: 20px;
-    -fx-background-radius: 20px;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
     -fx-font-weight: bold;
 }
 .xk-input:focused, .xk-input-small:focused {
@@ -47,39 +47,56 @@
     -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.2), 8, 0, 0, 0);
 }
 
-/* --- NÚT BẤM DÁNG VIÊN THUỐC --- */
-.btn-pill {
-    -fx-background-radius: 30px;
+/* --- NÚT BẤM DÁNG VIÊN THUỐC (ĐÃ GỘP CLASS) --- */
+.btn-green-pill { 
+    -fx-background-color: linear-gradient(to bottom, #10b981, #059669); 
+    -fx-background-radius: 30;
     -fx-cursor: hand;
     -fx-font-weight: 900;
     -fx-text-fill: white;
-    -fx-transition: all 0.3s ease;
 }
-.btn-pill:hover { -fx-translate-y: -2px; }
+.btn-green-pill:hover { -fx-translate-y: -2px; }
 
-.btn-green-pill { -fx-background-color: linear-gradient(to bottom, #10b981, #059669); }
-.btn-refresh-pill { -fx-background-color: linear-gradient(to bottom, #3b82f6, #1d4ed8); }
+.btn-refresh-pill { 
+    -fx-background-color: linear-gradient(to bottom, #3b82f6, #1d4ed8); 
+    -fx-background-radius: 30;
+    -fx-cursor: hand;
+    -fx-font-weight: 900;
+    -fx-text-fill: white;
+}
+.btn-refresh-pill:hover { -fx-translate-y: -2px; }
+
+.btn-clear-red {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #dc2626;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20;
+    -fx-cursor: hand;
+    -fx-padding: 5 15;
+}
+.btn-clear-red:hover { -fx-background-color: #fca5a5; }
 
 .filter-pane-card {
     -fx-background-color: white;
-    -fx-background-radius: 15px;
+    -fx-background-radius: 15;
     -fx-border-color: #e2e8f0;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 2);
 }
+.label-filter { -fx-font-weight: bold; -fx-text-fill: #475569; }
 
 /* ========================================================
    3. TABLE VIEW & DETAIL
    ======================================================== */
 .table-view {
     -fx-background-color: white;
-    -fx-background-radius: 12px;
+    -fx-background-radius: 12;
     -fx-border-color: #e2e8f0;
     -fx-padding: 5;
 }
 
 .table-view .column-header-background {
     -fx-background-color: #0ea5e9;
-    -fx-background-radius: 10px 10px 0 0;
+    -fx-background-radius: 10 10 0 0;
 }
 
 .table-view .column-header .label {
@@ -87,6 +104,9 @@
     -fx-font-weight: 900;
     -fx-text-transform: uppercase;
 }
+
+.table-row-cell:odd { -fx-background-color: #f8fafc; }
+.table-row-cell:even { -fx-background-color: white; }
 
 .table-row-cell:selected {
     -fx-background-color: #38bdf8 !important;
@@ -96,13 +116,13 @@
     -fx-font-weight: bold;
 }
 
-/* KHUNG CHI TIẾT DẬP CHÌM (GIỐNG CÁC TRANG TRƯỚC) */
+/* KHUNG CHI TIẾT DẬP CHÌM */
 .detail-info-card {
     -fx-background-color: linear-gradient(to bottom right, #ffffff, #f0f9ff);
     -fx-border-color: #7dd3fc;
     -fx-border-width: 2px;
-    -fx-border-radius: 12px;
-    -fx-background-radius: 12px;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
     -fx-effect: innershadow(three-pass-box, rgba(2, 132, 199, 0.1), 10, 0, 0, 2);
 }
 
@@ -113,38 +133,44 @@
     -fx-padding: 0 0 10 0;
 }
 
-.value-text { -fx-font-weight: 900; -fx-font-size: 14px; }
-.text-price { -fx-text-fill: #e11d48; }
-.text-green { -fx-text-fill: #10b981; }
-.text-red { -fx-text-fill: #ef4444; }
-.text-blue { -fx-text-fill: #2563eb; }
+/* --- MÀU SẮC DỮ LIỆU (ĐÃ GỘP FONT & SIZE VÀO TỪNG CLASS) --- */
+.value-text { -fx-font-weight: 900; -fx-font-size: 14px; -fx-text-fill: #1e293b; }
+.text-price { -fx-font-weight: 900; -fx-font-size: 14px; -fx-text-fill: #e11d48 !important; }
+.text-green { -fx-font-weight: 900; -fx-font-size: 14px; -fx-text-fill: #10b981 !important; }
+.text-red   { -fx-font-weight: 900; -fx-font-size: 14px; -fx-text-fill: #ef4444 !important; }
+.text-blue  { -fx-font-weight: 900; -fx-font-size: 14px; -fx-text-fill: #2563eb !important; }
+.text-purple{ -fx-font-weight: 900; -fx-font-size: 14px; -fx-text-fill: #8b5cf6 !important; }
+.text-orange{ -fx-font-weight: 900; -fx-font-size: 14px; -fx-text-fill: #f97316 !important; }
+
 /* ========================================================
    NÚT THAO TÁC TRONG BẢNG (DÁNG VIÊN THUỐC)
    ======================================================== */
 .btn-unlock-pill {
-    -fx-background-color: #dcfce7; /* Xanh lá cực nhạt */
-    -fx-text-fill: #16a34a;        /* Chữ xanh lá đậm */
+    -fx-background-color: #dcfce7; 
+    -fx-text-fill: #16a34a;        
     -fx-font-weight: 900;
     -fx-font-size: 12px;
-    -fx-background-radius: 20px;   /* Bo tròn viên thuốc */
+    -fx-background-radius: 20;   
     -fx-cursor: hand;
-    -fx-padding: 5px 15px;
-    -fx-border-width: 0;
+    -fx-padding: 5 15;
 }
-.btn-unlock-pill:hover { 
-    -fx-background-color: #bbf7d0; 
-}
+.btn-unlock-pill:hover { -fx-background-color: #bbf7d0; }
 
 .btn-lock-pill {
-    -fx-background-color: #fee2e2; /* Đỏ cực nhạt */
-    -fx-text-fill: #dc2626;        /* Chữ đỏ đậm */
+    -fx-background-color: #fee2e2; 
+    -fx-text-fill: #dc2626;        
     -fx-font-weight: 900;
     -fx-font-size: 12px;
-    -fx-background-radius: 20px;   /* Bo tròn viên thuốc */
+    -fx-background-radius: 20;   
     -fx-cursor: hand;
-    -fx-padding: 5px 15px;
-    -fx-border-width: 0;
+    -fx-padding: 5 15;
 }
-.btn-lock-pill:hover { 
-    -fx-background-color: #fecaca; 
-}
+.btn-lock-pill:hover { -fx-background-color: #fecaca; }
+
+/* =========================================================
+   SCROLLBAR MƯỢT MÀ TÀNG HÌNH
+   ========================================================= */
+.table-view .scroll-bar:vertical, .table-view .scroll-bar:horizontal { -fx-background-color: transparent; }
+.table-view .scroll-bar:vertical .thumb, .table-view .scroll-bar:horizontal .thumb { -fx-background-color: #cbd5e1; -fx-background-radius: 8; }
+.table-view .scroll-bar:vertical .thumb:hover, .table-view .scroll-bar:horizontal .thumb:hover { -fx-background-color: #94a3b8; }
+.table-view .filler, .table-view .column-header-background .show-hide-columns-button { -fx-background-color: #0ea5e9; }

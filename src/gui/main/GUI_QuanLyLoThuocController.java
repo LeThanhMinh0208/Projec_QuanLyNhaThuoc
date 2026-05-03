@@ -2,7 +2,7 @@ package gui.main;
 
 import connectDB.ConnectDB;
 import dao.DAO_LoThuoc;
-import dao.DAO_NhaCungCap; // Thêm DAO để lấy NCC
+import dao.DAO_NhaCungCap; 
 import entity.LoThuoc;
 import entity.NhaCungCap;
 import javafx.beans.property.SimpleObjectProperty;
@@ -46,7 +46,6 @@ public class GUI_QuanLyLoThuocController implements Initializable {
     @FXML private TextField txtTonDen;
     @FXML private ComboBox<String> cbKho;
     
-    // 🚨 KHAI BÁO COMBOBOX LỌC NHÀ CUNG CẤP TỪ FXML 🚨
     @FXML private ComboBox<String> cbLocNhaCungCap;
 
     @FXML private TableView<LoThuoc> tableLoThuoc;
@@ -69,6 +68,10 @@ public class GUI_QuanLyLoThuocController implements Initializable {
     @FXML private Label lblSlXuatHuy;
     @FXML private Label lblSlDoiTra;
 
+    // 🚨 2 BIẾN MỚI CHO KIỂM KÊ 🚨
+    @FXML private Label lblKkDu;
+    @FXML private Label lblKkThieu;
+
     private DAO_LoThuoc daoLoThuoc;
     private ObservableList<LoThuoc> dsLoThuoc;
     private FilteredList<LoThuoc> filteredData;
@@ -81,14 +84,12 @@ public class GUI_QuanLyLoThuocController implements Initializable {
         daoLoThuoc = new DAO_LoThuoc();
         dsLoThuoc = FXCollections.observableArrayList();
 
-        // 1. Bơm data cho ComboBox
         cbTrangThai.setItems(FXCollections.observableArrayList("Tất cả", "Đang hoạt động", "Đã khóa"));
         cbTrangThai.getSelectionModel().selectFirst();
 
         cbKho.setItems(FXCollections.observableArrayList("Tất cả", "Kho Bán Hàng", "Kho Dự Trữ"));
         cbKho.getSelectionModel().selectFirst();
 
-        // 🚨 2. BƠM DATA CHO COMBOBOX NHÀ CUNG CẤP 🚨
         try {
             ObservableList<String> tenNccList = FXCollections.observableArrayList("Tất cả");
             List<NhaCungCap> dsNcc = new DAO_NhaCungCap().getAllNhaCungCap();
@@ -110,7 +111,7 @@ public class GUI_QuanLyLoThuocController implements Initializable {
 
         setupTable();
         setupColorsAndImages();
-        loadData(); // Tự động khóa lô rác ngay lần load đầu tiên
+        loadData(); 
         setupRowSelection();
         setupSmartFilter();
     }
@@ -127,7 +128,6 @@ public class GUI_QuanLyLoThuocController implements Initializable {
         dpHsdDen.valueProperty().addListener((obs, oldV, newV) -> updateFilter());
         cbKho.valueProperty().addListener((obs, oldV, newV) -> updateFilter());
         
-        // 🚨 Bắt sự kiện lọc của NCC 🚨
         if(cbLocNhaCungCap != null) {
             cbLocNhaCungCap.valueProperty().addListener((obs, oldV, newV) -> updateFilter());
         }
@@ -167,7 +167,6 @@ public class GUI_QuanLyLoThuocController implements Initializable {
                 if (dpHsdDen.getValue() != null) matchHsd = matchHsd && !hsd.isAfter(dpHsdDen.getValue());
             }
             
-            // 🚨 KIỂM TRA ĐIỀU KIỆN NHÀ CUNG CẤP 🚨
             boolean matchNCC = true;
             if (cbLocNhaCungCap != null && cbLocNhaCungCap.getValue() != null) {
                 String nccFilter = cbLocNhaCungCap.getValue();
@@ -236,7 +235,6 @@ public class GUI_QuanLyLoThuocController implements Initializable {
             }
         });
 
-        // HSD format dd-MM-yyyy
         colHanSuDung.setCellFactory(column -> new TableCell<LoThuoc, Date>() {
             @Override
             protected void updateItem(Date item, boolean empty) {
@@ -246,11 +244,9 @@ public class GUI_QuanLyLoThuocController implements Initializable {
                     setText(item.toLocalDate().format(formatter)); 
                     long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), item.toLocalDate());
                     
-                    // NẾU ĐÃ HẾT HẠN (daysBetween < 0) -> Đen xì, gạch ngang
                     if (daysBetween < 0) {
                         setStyle("-fx-text-fill: #7f8c8d; -fx-font-weight: bold; -fx-alignment: CENTER; -fx-strikethrough: true;"); 
                     } 
-                    // CẬN DATE (<= 90 ngày) -> Màu Đỏ chót
                     else if (daysBetween <= 90) {
                         setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold; -fx-alignment: CENTER;"); 
                     } 
@@ -261,7 +257,6 @@ public class GUI_QuanLyLoThuocController implements Initializable {
             }
         });
 
-        // SL < 100 TÔ ĐỎ, SL = 0 Gạch ngang
         colSoLuong.setCellFactory(column -> new TableCell<LoThuoc, Integer>() {
             @Override
             protected void updateItem(Integer item, boolean empty) {
@@ -319,16 +314,13 @@ public class GUI_QuanLyLoThuocController implements Initializable {
                 if (empty || lo == null) {
                     setGraphic(null);
                 } else {
-                    // Bước 1: Xóa sạch các class cũ để tránh xung đột
                     btnAction.getStyleClass().clear();
                     
-                    // Bước 2: Kiểm tra trạng thái để gán Class viên thuốc và Text tương ứng
-                    if (lo.getTrangThai() == 1) { // Lô đang hoạt động
+                    if (lo.getTrangThai() == 1) { 
                         btnAction.setText("Khóa Lô");
-                        btnAction.getStyleClass().add("btn-lock-pill"); // Class đỏ nhạt viên thuốc
+                        btnAction.getStyleClass().add("btn-lock-pill"); 
                         btnAction.setOnAction(e -> xuLyKhoaLo(lo.getMaLoThuoc(), 0));
                         
-                        // Logic kiểm tra Hết hàng hoặc Hết đát
                         long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(
                             java.time.LocalDate.now(), 
                             lo.getHanSuDung().toLocalDate()
@@ -337,13 +329,12 @@ public class GUI_QuanLyLoThuocController implements Initializable {
                         if(lo.getSoLuongTon() == 0 || daysBetween < 0) {
                             btnAction.setDisable(true); 
                             btnAction.setText("Hết Hàng/Date");
-                            // Khi disable, JavaFX tự mờ đi nên vẫn giữ được dáng viên thuốc
                         } else {
                             btnAction.setDisable(false);
                         }
-                    } else { // Lô đang bị khóa
+                    } else { 
                         btnAction.setText("Mở Khóa");
-                        btnAction.getStyleClass().add("btn-unlock-pill"); // Class xanh lá viên thuốc
+                        btnAction.getStyleClass().add("btn-unlock-pill"); 
                         btnAction.setOnAction(e -> xuLyKhoaLo(lo.getMaLoThuoc(), 1));
                         btnAction.setDisable(false);
                     }
@@ -374,6 +365,7 @@ public class GUI_QuanLyLoThuocController implements Initializable {
         });
     }
 
+ // 🚨 ĐÃ FIX: TÁCH RIÊNG TỔNG DƯ VÀ TỔNG THIẾU ĐỂ KHÔNG BỊ TRIỆT TIÊU LẪN NHAU 🚨
     private void loadThongKeTheLo(String maLoThuoc, String donVi) {
         String sql = "SELECT " +
             "l.ngayNhapKho, " +
@@ -383,7 +375,12 @@ public class GUI_QuanLyLoThuocController implements Initializable {
             "(SELECT ISNULL(SUM(cthd.soLuong * dq.tyLeQuyDoi), 0) FROM ChiTietHoaDon cthd JOIN DonViQuyDoi dq ON cthd.maQuyDoi = dq.maQuyDoi WHERE cthd.maLoThuoc = l.maLoThuoc) AS slBan, " +
             "(SELECT ISNULL(SUM(ctpx.soLuong), 0) FROM ChiTietPhieuXuat ctpx JOIN PhieuXuat px ON ctpx.maPhieuXuat = px.maPhieuXuat WHERE ctpx.maLoThuoc = l.maLoThuoc AND px.loaiPhieu = 2) AS slTraNcc, " +
             "(SELECT ISNULL(SUM(ctpx.soLuong), 0) FROM ChiTietPhieuXuat ctpx JOIN PhieuXuat px ON ctpx.maPhieuXuat = px.maPhieuXuat WHERE ctpx.maLoThuoc = l.maLoThuoc AND px.loaiPhieu = 3) AS slXuatHuy, " +
-            "(SELECT ISNULL(SUM(ctdt.soLuong), 0) FROM ChiTietDoiTra ctdt WHERE ctdt.maLoThuoc = l.maLoThuoc) AS slDoiTra " +
+            "(SELECT ISNULL(SUM(ctdt.soLuong), 0) FROM ChiTietDoiTra ctdt WHERE ctdt.maLoThuoc = l.maLoThuoc) AS slDoiTra, " +
+            
+            // 🚨 TÁCH THÀNH 2 CỘT SQL ĐỘC LẬP (DƯ VÀ THIẾU) 🚨
+            "(SELECT ISNULL(SUM(ctkk.chenhLech), 0) FROM ChiTietPhieuKiemKe ctkk JOIN PhieuKiemKe pkk ON ctkk.maPhieuKiemKe = pkk.maPhieuKiemKe WHERE ctkk.maLoThuoc = l.maLoThuoc AND pkk.trangThai = 'DA_HOAN_THANH' AND ctkk.chenhLech > 0) AS tongKkDu, " +
+            "(SELECT ISNULL(SUM(ABS(ctkk.chenhLech)), 0) FROM ChiTietPhieuKiemKe ctkk JOIN PhieuKiemKe pkk ON ctkk.maPhieuKiemKe = pkk.maPhieuKiemKe WHERE ctkk.maLoThuoc = l.maLoThuoc AND pkk.trangThai = 'DA_HOAN_THANH' AND ctkk.chenhLech < 0) AS tongKkThieu " +
+            
             "FROM LoThuoc l " +
             "LEFT JOIN NhaCungCap ncc ON l.maNhaCungCap = ncc.maNhaCungCap " +
             "WHERE l.maLoThuoc = ?";
@@ -400,31 +397,40 @@ public class GUI_QuanLyLoThuocController implements Initializable {
                 String tenNCC = rs.getString("tenNCC");
                 lblNhaCungCap.setText(tenNCC != null ? tenNCC : "Không xác định");
 
-                // Lấy các biến số lượng từ CSDL
                 int slNhap = rs.getInt("slNhapThucTe"); 
                 int slBan = rs.getInt("slBan");         
                 int slTraNcc = rs.getInt("slTraNcc");
                 int slXuatHuy = rs.getInt("slXuatHuy");
                 int slDoiTra = rs.getInt("slDoiTra");   
                 int tonKho = rs.getInt("soLuongTon");
+                
+                // Lấy 2 biến Kiểm kê độc lập
+                int kkDu = rs.getInt("tongKkDu");
+                int kkThieu = rs.getInt("tongKkThieu");
 
-    
+                // Logic tìm số nhập ban đầu (Nếu database test chưa có Phiếu Nhập)
                 if (slNhap == 0 && (tonKho > 0 || slBan > 0 || slTraNcc > 0 || slXuatHuy > 0)) {
-                    slNhap = tonKho + slBan + slTraNcc + slXuatHuy - slDoiTra;
+                    int netChenhLech = kkDu - kkThieu; // Tính lại chênh lệch tịnh để trừ ngược ra số ban đầu
+                    slNhap = tonKho + slBan + slTraNcc + slXuatHuy - slDoiTra - netChenhLech;
                     if (slNhap < 0) slNhap = 0; 
                 }
 
-                // Đổ dữ liệu lên màn hình
+                // Đổ dữ liệu nguyên bản lên màn hình
                 lblSlNhapBanDau.setText(slNhap + " " + donVi);
                 lblSlDaBan.setText(slBan + " " + donVi);
                 lblSlTraNcc.setText(slTraNcc + " " + donVi);
                 lblSlXuatHuy.setText(slXuatHuy + " " + donVi);
                 lblSlDoiTra.setText(slDoiTra + " " + donVi);
+
+                // Đổ dữ liệu vào 2 dòng Kiểm kê mới
+                lblKkDu.setText(kkDu + " " + donVi);
+                lblKkThieu.setText(kkThieu + " " + donVi);
             }
         } catch (Exception e) { 
             e.printStackTrace(); 
         }
     }
+
     private void kiemTraVaKhoaLoTuDong(List<LoThuoc> list) {
         boolean coLoBiKhoaThuDong = false;
         

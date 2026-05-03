@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox prefHeight="700.0" prefWidth="1050.0" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.dialogs.Dialog_ChiTietPhieuKiemKeController">
+    
+    <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: linear-gradient(to right, #3b82f6, #2563eb); -fx-padding: 15 25; -fx-min-height: 70px;">
+        <Label style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" text="✨ CHI TIẾT PHIẾU KIỂM KÊ KHO" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Label fx:id="lblMaPhieu" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" text="Mã phiếu: PKK_---" />
+    </HBox>
+    
+    <VBox spacing="20" style="-fx-padding: 25; -fx-background-color: white; -fx-background-radius: 10; -fx-margin: 20;" VBox.vgrow="ALWAYS">
+        
+        <TableView fx:id="tableChiTiet" stylesheets="@../../resources/css/KiemKeKho.css" VBox.vgrow="ALWAYS" style="-fx-border-color: #cbd5e1; -fx-border-radius: 5;">
+            <columns>
+                <TableColumn fx:id="colMaLo" prefWidth="120" text="Mã Lô" />
+                <TableColumn fx:id="colTenThuoc" prefWidth="250" text="Tên Thuốc" />
+                <TableColumn fx:id="colKiemTra" prefWidth="120" style="-fx-alignment: CENTER; -fx-font-weight: bold;" text="Đếm Thực Tế" />
+                <TableColumn fx:id="colChenhLech" prefWidth="120" style="-fx-alignment: CENTER;" text="Độ Lệch" />
+                <TableColumn fx:id="colLyDo" prefWidth="200" text="Lý do" />
+                <TableColumn fx:id="colGhiChu" prefWidth="200" text="Ghi chú" />
+            </columns>
+            <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+        </TableView>
+        
+        <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-padding: 10 0 0 0;">
+            <Button onAction="#handleDong" prefHeight="45.0" prefWidth="120.0" style="-fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-width: 1.5px; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-background-radius: 8; -fx-border-radius: 8; -fx-cursor: hand;" text="Đóng" />
+            <Button onAction="#handleInPhieu" prefHeight="45.0" prefWidth="160.0" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 14px;" text="IN PHIẾU ✨" />
+        </HBox>
+    </VBox>
+</VBox>

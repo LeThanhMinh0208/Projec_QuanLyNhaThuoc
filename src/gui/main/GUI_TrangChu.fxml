@@ -87,8 +87,9 @@
                               <Button onAction="#moQuanLyDonDatHang" styleClass="sub-btn" text="Quản Lý Đơn Đặt Hàng" />
                               <Button onAction="#moTrangNhapKho" styleClass="sub-btn" text="Nhập Kho" />
                               <Button onAction="#moTrangXuatKho" styleClass="sub-btn" text="Xuất Kho" />
-                              <Button styleClass="sub-btn" text="Kiểm Kê Kho" />
-                              <Button styleClass="sub-btn" text="Giải Quyết Kiểm Kho" />
+                              <Button onAction="#moTrangKiemKeKho"  styleClass="sub-btn" text="Kiểm Kê Kho" />
+                               <Button onAction="#moTrangGiaiQuyetKiemKe"  styleClass="sub-btn" text="Giải Quyết Kiểm Kê" />
+                        
                            </VBox>
                         </content>
                      </TitledPane>

@@ -101,14 +101,14 @@
 }
 
 /* ========================================================
-   BUTTONS TRANG CHÍNH (Màu mượt, không chói)
+   BUTTONS TRANG CHÍNH (Đã fix hình viên thuốc tròn xoe)
    ======================================================== */
 .btn-primary {
     -fx-background-color: linear-gradient(to bottom, #34d399, #059669); 
     -fx-text-fill: white;
     -fx-font-weight: 800;
     -fx-font-size: 14px;
-    -fx-background-radius: 10px;
+    -fx-background-radius: 30; /* Ép cong 30 thành viên thuốc */
     -fx-cursor: hand;
     -fx-effect: dropshadow(three-pass-box, rgba(5, 150, 105, 0.3), 10, 0, 0, 4);
 }
@@ -121,9 +121,9 @@
     -fx-text-fill: #475569;
     -fx-font-weight: 800;
     -fx-font-size: 14px;
-    -fx-background-radius: 10px;
+    -fx-background-radius: 30; /* Ép cong 30 thành viên thuốc */
     -fx-border-color: #cbd5e1;
-    -fx-border-radius: 10px;
+    -fx-border-radius: 30;     /* Bo luôn viền để không bị lòi góc */
     -fx-cursor: hand;
 }
 .btn-refresh:hover {
@@ -259,14 +259,14 @@
     -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.5), 12, 0, 0, 0);
 }
 
-/* --- HỆ THỐNG NÚT BẤM DIALOG DƯỚI FOOTER --- */
+/* --- HỆ THỐNG NÚT BẤM DIALOG DƯỚI FOOTER (Đã fix viên thuốc) --- */
 
 /* Nút In Phiếu & Lưu */
 .btn-print {
     -fx-background-color: linear-gradient(to bottom, #3b82f6, #2563eb);
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-background-radius: 8px;
+    -fx-background-radius: 30; /* Viên thuốc */
     -fx-cursor: hand;
     -fx-font-size: 15px;
     -fx-effect: dropshadow(three-pass-box, rgba(37, 99, 235, 0.4), 10, 0, 0, 4);
@@ -280,9 +280,9 @@
     -fx-background-color: #ffffff;
     -fx-text-fill: #64748b;
     -fx-font-weight: bold;
-    -fx-background-radius: 8px;
+    -fx-background-radius: 30; /* Viên thuốc */
     -fx-border-color: #cbd5e1;
-    -fx-border-radius: 8px;
+    -fx-border-radius: 30;     /* Bo luôn viền */
     -fx-cursor: hand;
     -fx-font-size: 15px;
 }
@@ -297,7 +297,7 @@
     -fx-background-color: linear-gradient(to bottom, #ef4444, #dc2626);
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-background-radius: 8px;
+    -fx-background-radius: 30; /* Viên thuốc */
     -fx-cursor: hand;
     -fx-font-size: 15px;
     -fx-effect: dropshadow(three-pass-box, rgba(239, 68, 68, 0.4), 10, 0, 0, 4);
@@ -311,12 +311,12 @@
     -fx-font-weight: 900;
     -fx-font-size: 26px;
 }
+
 /* =========================================================
    FIX LỖI GÓC TRẮNG TRÊN THANH CUỘN (FILLER)
    ========================================================= */
 .table-view .filler,
 .table-view .column-header-background .show-hide-columns-button {
-    /* Đổi mã màu này cho khớp đúng với màu xanh Header của sếp nhé */
     -fx-background-color: #0ea5e9; 
 }
 
@@ -361,16 +361,15 @@
 
 /* ========================================================
    STYLES CHO DÒNG ĐƯỢC CHỌN (SELECTED ROW) - MỚI CẬP NHẬT
-   (Nền xanh đậm, chữ trắng - giống header y chang ảnh sếp)
    ======================================================== */
 
 /* Màu nền xanh đậm khi dòng được click chọn */
 .dmk-table .table-row-cell:selected {
-    -fx-background-color: #38bdf8 !important; /* Lấy đúng màu xanh từ header trong ảnh sếp đưa */
+    -fx-background-color: #38bdf8 !important; 
 }
 
 /* Ép màu chữ của dòng đang chọn thành màu trắng để nổi bật */
 .dmk-table .table-row-cell:selected .table-cell {
     -fx-text-fill: #ffffff !important; 
-    -fx-font-weight: bold; /* Thêm bold cho chữ nó nét và dễ đọc hơn */
+    -fx-font-weight: bold; 
 }

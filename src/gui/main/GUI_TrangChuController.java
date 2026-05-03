@@ -252,6 +252,8 @@ public class GUI_TrangChuController {
     @FXML void handleMoQuanLyNguoiDung(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyNguoiDung.fxml"); }
     @FXML void handleMoLichSuGiaoDich(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_LichSuGiaoDich.fxml"); }
     @FXML void handleMoDoiMatKhau(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_DoiMatKhau.fxml"); }
+    @FXML void moTrangKiemKeKho(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_KiemKeKho.fxml"); }
+    @FXML void moTrangGiaiQuyetKiemKe(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_GiaiQuyetKiemKe.fxml"); }
 
     // --- SỬA CARD DASHBOARD TÌM MÀU XANH BẰNG CHỮ ---
     @FXML void handleMoBanThuoc(javafx.scene.input.MouseEvent event) { 

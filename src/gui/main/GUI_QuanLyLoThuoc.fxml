@@ -18,7 +18,8 @@
             
             <HBox spacing="15.0" alignment="CENTER_LEFT">
                <children>
-                  <Button mnemonicParsing="false" onAction="#toggleFilter" prefHeight="40.0" prefWidth="170.0" styleClass="btn-pill, btn-green-pill" text="✨ Lọc Thông Minh" />
+                  <!-- Gọi class đơn -->
+                  <Button mnemonicParsing="false" onAction="#toggleFilter" prefHeight="40.0" prefWidth="170.0" styleClass="btn-green-pill" text="✨ Lọc Thông Minh" />
                   <ComboBox fx:id="cbTrangThai" prefHeight="40.0" prefWidth="220.0" promptText="Lọc trạng thái" styleClass="xk-input" />
                </children>
             </HBox>
@@ -29,7 +30,8 @@
                      <HBox.margin><Insets left="15.0" /></HBox.margin>
                   </Label>
                   <TextField fx:id="txtTimKiem" promptText="Tìm theo mã lô, tên thuốc, nhà cung cấp..." styleClass="search-text-field" HBox.hgrow="ALWAYS" />
-                  <Button mnemonicParsing="false" onAction="#handleLamMoi" prefHeight="35.0" prefWidth="110.0" styleClass="btn-pill, btn-refresh-pill" text="Làm mới">
+                  <!-- Gọi class đơn -->
+                  <Button mnemonicParsing="false" onAction="#handleLamMoi" prefHeight="35.0" prefWidth="110.0" styleClass="btn-refresh-pill" text="Làm mới">
                      <HBox.margin><Insets right="8.0" /></HBox.margin>
                   </Button>
                </children>
@@ -69,7 +71,7 @@
    </top>
    
    <center>
-      <VBox spacing="15.0" styleClass="content-area" BorderPane.alignment="CENTER">
+      <VBox spacing="15.0" BorderPane.alignment="CENTER">
          <children>
             <TableView fx:id="tableLoThuoc" styleClass="table-view" VBox.vgrow="ALWAYS">
               <columns>
@@ -90,31 +92,50 @@
             <VBox fx:id="paneChiTiet" managed="false" styleClass="detail-info-card" visible="false">
                <children>
                   <Label text="📈 THÔNG TIN CHI TIẾT LÔ THUỐC" styleClass="detail-header-text" />
-                  <GridPane hgap="30.0" vgap="12.0">
+                  <GridPane hgap="15.0" vgap="15.0">
                      <children>
+                        <!-- Cột 1 & 2: Ngày Nhập / Giá Nhập -->
                         <Label text="Ngày nhập kho:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                         <Label fx:id="lblNgayNhap" styleClass="value-text" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0" />
                         
                         <Label text="Giá nhập gốc:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                        <Label fx:id="lblGiaNhap" styleClass="value-text, text-price" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <!-- Chỉ gọi 1 class -->
+                        <Label fx:id="lblGiaNhap" styleClass="text-price" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         
+                        <!-- Cột 3 & 4: Nhà CC / Nhập Ban Đầu -->
                         <Label text="Nhà cung cấp:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
                         <Label fx:id="lblNhaCungCap" styleClass="value-text" text="-" GridPane.columnIndex="3" GridPane.rowIndex="0" />
                         
                         <Label text="SL nhập đầu:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                        <Label fx:id="lblSlNhapBanDau" styleClass="value-text, text-blue" text="-" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                        <!-- Chỉ gọi 1 class -->
+                        <Label fx:id="lblSlNhapBanDau" styleClass="text-blue" text="-" GridPane.columnIndex="3" GridPane.rowIndex="1" />
 
+                        <!-- Cột 5 & 6: Bán / Đổi Trả -->
                         <Label text="Số lượng đã bán:" GridPane.columnIndex="4" GridPane.rowIndex="0" />
-                        <Label fx:id="lblSlDaBan" styleClass="value-text, text-green" text="-" GridPane.columnIndex="5" GridPane.rowIndex="0" />
+                        <!-- Chỉ gọi 1 class -->
+                        <Label fx:id="lblSlDaBan" styleClass="text-green" text="-" GridPane.columnIndex="5" GridPane.rowIndex="0" />
 
                         <Label text="Khách Đổi/Trả:" GridPane.columnIndex="4" GridPane.rowIndex="1" />
-                        <Label fx:id="lblSlDoiTra" styleClass="value-text, text-purple" text="-" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+                        <!-- Chỉ gọi 1 class -->
+                        <Label fx:id="lblSlDoiTra" styleClass="text-purple" text="-" GridPane.columnIndex="5" GridPane.rowIndex="1" />
                         
+                        <!-- Cột 7 & 8: Trả NCC / Xuất Hủy -->
                         <Label text="Đã trả NCC:" GridPane.columnIndex="6" GridPane.rowIndex="0" />
-                        <Label fx:id="lblSlTraNcc" styleClass="value-text, text-orange" text="-" GridPane.columnIndex="7" GridPane.rowIndex="0" />
+                        <!-- Chỉ gọi 1 class -->
+                        <Label fx:id="lblSlTraNcc" styleClass="text-orange" text="-" GridPane.columnIndex="7" GridPane.rowIndex="0" />
 
                         <Label text="Đã xuất hủy:" GridPane.columnIndex="6" GridPane.rowIndex="1" />
-                        <Label fx:id="lblSlXuatHuy" styleClass="value-text, text-red" text="-" GridPane.columnIndex="7" GridPane.rowIndex="1" />
+                        <!-- Chỉ gọi 1 class -->
+                        <Label fx:id="lblSlXuatHuy" styleClass="text-red" text="-" GridPane.columnIndex="7" GridPane.rowIndex="1" />
+
+                        <!-- CỘT 9 & 10: KIỂM KÊ -->
+                        <Label text="KK Dư:" GridPane.columnIndex="8" GridPane.rowIndex="0" />
+                        <!-- Chỉ gọi 1 class -->
+                        <Label fx:id="lblKkDu" styleClass="text-blue" text="-" GridPane.columnIndex="9" GridPane.rowIndex="0" />
+
+                        <Label text="KK Thiếu:" GridPane.columnIndex="8" GridPane.rowIndex="1" />
+                        <!-- Chỉ gọi 1 class -->
+                        <Label fx:id="lblKkThieu" styleClass="text-red" text="-" GridPane.columnIndex="9" GridPane.rowIndex="1" />
                      </children>
                   </GridPane>
                </children>
