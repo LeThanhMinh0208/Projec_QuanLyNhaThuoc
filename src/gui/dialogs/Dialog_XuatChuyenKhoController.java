@@ -1,38 +1,23 @@
 package gui.dialogs;
 
+import dao.*;
+import dao.DAO_NhatKyHoatDong;
+import entity.*;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.collections.*;
+import javafx.collections.transformation.FilteredList;
+import javafx.fxml.*;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.*;
+import javafx.stage.Stage;
+import javafx.util.StringConverter;
+import utils.*;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-
-import dao.DAO_LoThuoc;
-import dao.DAO_PhieuXuat;
-import dao.DAO_Thuoc;
-import entity.ChiTietPhieuXuat;
-import entity.LoThuoc;
-import entity.PhieuXuat;
-import entity.Thuoc;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
-import javafx.util.StringConverter;
-import utils.AlertUtils;
-import utils.UserSession;
 
 public class Dialog_XuatChuyenKhoController implements Initializable {
     @FXML private ComboBox<String> cbKhoXuat;
@@ -62,9 +47,7 @@ public class Dialog_XuatChuyenKhoController implements Initializable {
 
         txtTimNhanhThuoc.textProperty().addListener((o, oldV, newV) -> {
             filter.setPredicate(t -> newV == null || newV.isEmpty() || t.getTenThuoc().toLowerCase().contains(newV.toLowerCase()));
-            if (!newV.isEmpty()) {
-				cbChonThuoc.show();
-			}
+            if (!newV.isEmpty()) cbChonThuoc.show();
         });
 
         // ========================================================
@@ -75,12 +58,12 @@ public class Dialog_XuatChuyenKhoController implements Initializable {
             if (newV != null) {
                 // 1. Cập nhật tên kho nhận
                 txtKhoNhan.setText(newV.equals("Kho dự trữ") ? "Kho bán hàng" : "Kho dự trữ");
-
+                
                 // 2. Reset các ô chọn thuốc & chọn lô cũ
                 cbChonThuoc.getSelectionModel().clearSelection();
                 cbChonLo.getItems().clear();
                 txtSoLuongChuyen.setText("");
-
+                
                 // 3. Tải danh sách thuốc CHỈ CÓ TRONG KHO VỪA CHỌN
                 String maKho = newV.equals("Kho dự trữ") ? "KHO_DU_TRU" : "KHO_BAN_HANG";
                 danhSachThuocKho.setAll(new DAO_Thuoc().getThuocCoLoTrongKho(maKho));
@@ -137,14 +120,12 @@ public class Dialog_XuatChuyenKhoController implements Initializable {
 
     private void setupTable() {
         colSTT.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(dsXuatTam.indexOf(c.getValue()) + 1));
-
+        
         // 1. Ánh xạ Tên Thuốc
         colTenThuoc.setCellValueFactory(c -> {
             String ma = c.getValue().getMaThuoc();
             for(Thuoc t : cbChonThuoc.getItems()) {
-                if(t.getMaThuoc().equals(ma)) {
-					return new javafx.beans.property.SimpleStringProperty(t.getTenThuoc());
-				}
+                if(t.getMaThuoc().equals(ma)) return new javafx.beans.property.SimpleStringProperty(t.getTenThuoc());
             }
             return new javafx.beans.property.SimpleStringProperty(ma);
         });
@@ -153,15 +134,15 @@ public class Dialog_XuatChuyenKhoController implements Initializable {
         // 🚨 CHÚ Ý: Nếu chữ getSoLo() bị gạch đỏ, sếp hãy đổi nó thành getMaLo() hoặc getMaLoThuoc() cho khớp với file Entity ChiTietPhieuXuat nhé!
         colSoLo.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getSoLo()));
         colSoLuong.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getSoLuong()));
-
+        
         colXoa.setCellFactory(c -> new TableCell<>() {
             private final Button b = new Button("✕");
-            {
-                b.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold;");
-                b.setOnAction(e -> {
-                    dsXuatTam.remove(getTableView().getItems().get(getIndex()));
-                    tableThuocChuyen.refresh();
-                });
+            { 
+                b.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold;"); 
+                b.setOnAction(e -> { 
+                    dsXuatTam.remove(getTableView().getItems().get(getIndex())); 
+                    tableThuocChuyen.refresh(); 
+                }); 
             }
             @Override protected void updateItem(String i, boolean e) {
                 super.updateItem(i, e); setGraphic(e ? null : b); setAlignment(Pos.CENTER);
@@ -172,10 +153,8 @@ public class Dialog_XuatChuyenKhoController implements Initializable {
 
     @FXML private void handleThemThuoc() {
         Thuoc t = cbChonThuoc.getValue(); LoThuoc l = cbChonLo.getValue();
-        if (t == null || l == null || txtSoLuongChuyen.getText().isEmpty()) {
-			return;
-		}
-
+        if (t == null || l == null || txtSoLuongChuyen.getText().isEmpty()) return;
+        
         // Kiểm tra xem lô này đã được đưa vào danh sách chuyển chưa
         for(ChiTietPhieuXuat ct : dsXuatTam) {
             if(ct.getSoLo().equals(l.getMaLoThuoc())) {
@@ -183,29 +162,28 @@ public class Dialog_XuatChuyenKhoController implements Initializable {
                 return;
             }
         }
-
+        
         int sl = Integer.parseInt(txtSoLuongChuyen.getText());
         dsXuatTam.add(new ChiTietPhieuXuat(null, t.getMaThuoc(), l.getMaLoThuoc(), sl, l.getGiaNhap(), sl*l.getGiaNhap()));
     }
-    @FXML
+    @FXML 
     private void handleXacNhanChuyen() {
-        if (dsXuatTam.isEmpty()) {
-			return;
-		}
+        if (dsXuatTam.isEmpty()) return;
         String maKhoNhan = txtKhoNhan.getText().equals("Kho bán hàng") ? "KHO_BAN_HANG" : "KHO_DU_TRU";
-
+        
         // 1. GỌI HÀM SINH MÃ TỰ ĐỘNG THAY VÌ DÙNG System.currentTimeMillis()
         String maPhieuMoi = daoPX.getMaPhieuXuatMoi("CK");
-
+        
         // 2. TẠO PHIẾU VỚI MÃ VỪA SINH
         PhieuXuat px = new PhieuXuat(maPhieuMoi, null, UserSession.getInstance().getUser().getMaNhanVien(), 1, null, maKhoNhan, 0, txtGhiChu.getText()+" | VC: "+txtNguoiVanChuyen.getText());
-
+        
         // 3. LƯU VÀO DATABASE
         if (daoPX.chuyenKhoNoiBo(px, new ArrayList<>(dsXuatTam), maKhoNhan)) {
-            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chuyển kho hoàn tất! Mã phiếu: " + maPhieuMoi);
+            DAO_NhatKyHoatDong.ghiLog("TAO_PHIEU_XUAT", "Phiếu Xuất", maPhieuMoi, "Tạo phiếu xuất chuyển kho: " + maPhieuMoi);
+            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã xuất chuyển kho thành công!\nMã phiếu: " + maPhieuMoi); 
             ((Stage) txtKhoNhan.getScene().getWindow()).close();
         }
     }
-
+    
     @FXML private void handleHuyBo() { ((Stage) txtKhoNhan.getScene().getWindow()).close(); }
 }

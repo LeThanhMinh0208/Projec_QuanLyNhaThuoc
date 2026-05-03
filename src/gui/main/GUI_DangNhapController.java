@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Random;
 
 import dao.DAO_NhanVien;
+import dao.DAO_PhanQuyen;
+import dao.DAO_NhatKyHoatDong;
 import entity.NhanVien;
 import javafx.animation.Animation;
 import javafx.animation.AnimationTimer;
@@ -295,6 +297,15 @@ public class GUI_DangNhapController {
         	    return;
         	}
             UserSession.getInstance().setUser(nv);
+
+            // Load quyền vào session
+            DAO_PhanQuyen daoPhanQuyen = new DAO_PhanQuyen();
+            UserSession.getInstance().setDanhSachQuyen(daoPhanQuyen.getQuyenByNhanVien(nv.getMaNhanVien()));
+
+            // Ghi nhật ký đăng nhập
+            DAO_NhatKyHoatDong.ghiLog(nv.getMaNhanVien(), "DANG_NHAP", "Hệ thống", nv.getMaNhanVien(), 
+                nv.getHoTen() + " đã đăng nhập hệ thống");
+
             WindowUtils.closeWindow(event);
 
             try {

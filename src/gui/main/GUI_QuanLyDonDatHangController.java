@@ -225,6 +225,10 @@ List<DonDatHang> list = dao.getAllDonDatHang();
     }
 
     private void chuyenSangTrangNhapKho(DonDatHang don, ActionEvent event) {
+        if (!utils.UserSession.getInstance().hasPermission("QLK.NHAP_KHO")) {
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Không có quyền", "Bạn không có quyền truy cập trang Nhập Kho.");
+            return;
+        }
         try {
             // 1. Tải trang Nhập Kho
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/main/GUI_NhapKho.fxml"));

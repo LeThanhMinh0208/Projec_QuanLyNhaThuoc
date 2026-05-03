@@ -1,6 +1,7 @@
 package gui.dialogs;
 
 import dao.DAO_NhaCungCap;
+import dao.DAO_NhatKyHoatDong;
 import entity.NhaCungCap;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -83,7 +84,8 @@ public class Dialog_ThemNhaCungCapController {
         ncc.setCongNo(congNo);
 
         if (daoNCC.themNhaCungCap(ncc)) {
-            new Alert(Alert.AlertType.INFORMATION, "Thêm nhà cung cấp thành công!").show();
+            DAO_NhatKyHoatDong.ghiLog("THEM", "Nhà Cung Cấp", ncc.getMaNhaCungCap(), "Thêm nhà cung cấp mới: " + ncc.getTenNhaCungCap());
+            new Alert(Alert.AlertType.INFORMATION, "Thêm nhà cung cấp thành công!").showAndWait();
             handleHuy();
         } else {
             new Alert(Alert.AlertType.ERROR, "Lỗi! Không thể lưu vào CSDL.").show();

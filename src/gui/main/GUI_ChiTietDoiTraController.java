@@ -25,6 +25,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import dao.DAO_NhatKyHoatDong;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -497,6 +498,7 @@ public class GUI_ChiTietDoiTraController {
         boolean okPhieuTra = daoPhieuDoiTra.lapPhieuDoiTra(pdt, chiTiet, dsThuocDoiParam);
 
         if (okPhieuTra) {
+            DAO_NhatKyHoatDong.ghiLog("TAO_PHIEU_DOI_TRA", "Phiếu Đổi Trả", pdt.getMaPhieuDoiTra(), "Lập phiếu đổi trả từ hóa đơn: " + hoaDon.getMaHoaDon());
             // =====================================================================
             // GIAO DỊCH 2: TẠO HÓA ĐƠN CHO THUỐC ĐỔI (KHÁCH LẤY ĐI)
             // Mục đích: Ép trừ kho FEFO và tăng Số Lượng Bán trong thống kê

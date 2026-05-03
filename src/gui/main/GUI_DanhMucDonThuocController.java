@@ -139,6 +139,11 @@ public class GUI_DanhMucDonThuocController implements Initializable {
                         ButtonType.YES, ButtonType.NO);
                     confirm.showAndWait().ifPresent(btn -> {
                         if (btn == ButtonType.YES) {
+                            // Kiểm tra quyền trước khi chuyển trang
+                            if (!utils.UserSession.getInstance().hasPermission("QLBH.LAP_HOA_DON")) {
+                                new Alert(Alert.AlertType.WARNING, "Bạn không có quyền truy cập trang Bán Hàng.").show();
+                                return;
+                            }
                             // 1. Set data vào bộ nhớ đệm
                             gui.main.GUI_QuanLyBanHangController.setTaiLapData(dt);
 

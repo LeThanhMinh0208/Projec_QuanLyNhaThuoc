@@ -1,6 +1,7 @@
 package gui.main;
 
 import dao.DAO_NhanVien;
+import dao.DAO_NhatKyHoatDong;
 import entity.NhanVien;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -78,6 +79,7 @@ public class GUI_DoiMatKhauController {
 
         // 5. GỌI DAO ĐỂ LƯU
         if (dao.doiMatKhau(currentUser.getMaNhanVien(), mkMoi)) {
+            DAO_NhatKyHoatDong.ghiLog("DOI_MAT_KHAU", "Hệ thống", currentUser.getMaNhanVien(), "Đổi mật khẩu tài khoản");
             // Cập nhật luôn pass trong cái Session hiện tại để đồng bộ
             currentUser.setMatKhau(mkMoi);
 

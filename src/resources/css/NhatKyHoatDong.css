@@ -1,0 +1,152 @@
+:root {
+    -fx-primary-sky: #0ea5e9;
+    -fx-secondary-sky: #e0f2fe;
+    -fx-accent-glow: #38bdf8;
+    -fx-white: #ffffff;
+}
+
+.main-bg { -fx-background-color: #f0f9ff; }
+
+.main-title {
+    -fx-font-size: 32px;
+    -fx-font-weight: 900;
+    -fx-text-fill: linear-gradient(to bottom, #0ea5e9, #0369a1);
+    -fx-padding: 10 0 20 0;
+    -fx-text-alignment: center;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.4), 5, 0, 0, 2);
+}
+
+/* === PANEL CHÍNH === */
+.panel-white {
+    -fx-background-color: white;
+    -fx-background-radius: 20px;
+    -fx-padding: 25px;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.15), 20, 0, 0, 10);
+}
+
+.section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0369a1;
+    -fx-padding: 0 0 10 0;
+}
+
+/* === BỘ LỌC === */
+.filter-bar {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-padding: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.1), 10, 0, 0, 3);
+}
+
+.filter-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0369a1;
+}
+
+.filter-input {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 6 10;
+    -fx-font-size: 13px;
+}
+.filter-input:focused {
+    -fx-background-color: white;
+    -fx-border-color: #0ea5e9;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.3), 5, 0, 0, 0);
+}
+
+.bh-btn-secondary {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-background-radius: 20;
+    -fx-cursor: hand;
+    -fx-padding: 6 15;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 20;
+    -fx-border-width: 1.5;
+}
+.bh-btn-secondary:hover { -fx-background-color: #e2e8f0; }
+
+.bh-btn-primary {
+    -fx-background-color: linear-gradient(to bottom, #0ea5e9, #0284c7);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-background-radius: 20;
+    -fx-cursor: hand;
+    -fx-padding: 6 15;
+}
+.bh-btn-primary:hover { -fx-background-color: linear-gradient(to bottom, #38bdf8, #0ea5e9); }
+
+/* === SEARCH === */
+.search-box {
+    -fx-background-color: white;
+    -fx-background-radius: 40px;
+    -fx-border-color: linear-gradient(to right, #7dd3fc, #0ea5e9);
+    -fx-border-width: 2px;
+    -fx-border-radius: 40px;
+    -fx-padding: 8 25 8 25;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.2), 15, 0, 0, 5);
+}
+.search-input {
+    -fx-background-color: transparent;
+    -fx-font-size: 15px;
+    -fx-text-fill: #0369a1;
+    -fx-prompt-text-fill: #94a3b8;
+    -fx-background-insets: 0;
+    -fx-border-width: 0;
+}
+
+/* === BẢNG NHẬT KÝ === */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+.table-view .column-header-background {
+    -fx-background-color: #0ea5e9;
+    -fx-background-radius: 10 10 0 0;
+}
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 45px;
+}
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+.table-view .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #f1f5f9 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-cursor: hand;
+}
+.table-view .table-row-cell .label, .table-view .table-row-cell .text {
+    -fx-fill: #1e293b;
+    -fx-text-fill: #1e293b;
+}
+.table-view .table-row-cell:filled:hover { -fx-background-color: #dbeafe; }
+.table-view .table-row-cell:filled:selected {
+    -fx-background-color: #0ea5e9;
+    -fx-background-insets: 0;
+}
+.table-view .table-row-cell:filled:selected .label, 
+.table-view .table-row-cell:filled:selected .text {
+    -fx-fill: white;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+/* === BADGE HÀNH ĐỘNG === */
+.badge-login    { -fx-text-fill: #059669; -fx-font-weight: bold; }
+.badge-logout   { -fx-text-fill: #6b7280; -fx-font-weight: bold; }
+.badge-create   { -fx-text-fill: #2563eb; -fx-font-weight: bold; }
+.badge-update   { -fx-text-fill: #d97706; -fx-font-weight: bold; }
+.badge-delete   { -fx-text-fill: #dc2626; -fx-font-weight: bold; }

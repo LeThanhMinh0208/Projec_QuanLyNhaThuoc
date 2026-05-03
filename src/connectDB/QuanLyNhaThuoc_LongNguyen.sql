@@ -50,6 +50,29 @@ CREATE TABLE NhanVien (
 );
 GO
 
+-- ========================================================
+-- 1.1. BẢNG PHÂN QUYỀN & NHẬT KÝ HOẠT ĐỘNG
+-- ========================================================
+CREATE TABLE PhanQuyen (
+    maNhanVien VARCHAR(20) NOT NULL,
+    maQuyen VARCHAR(50) NOT NULL,
+    PRIMARY KEY (maNhanVien, maQuyen),
+    FOREIGN KEY (maNhanVien) REFERENCES NhanVien(maNhanVien) ON DELETE CASCADE
+);
+GO
+
+CREATE TABLE NhatKyHoatDong (
+    maLog INT IDENTITY(1,1) PRIMARY KEY,
+    maNhanVien VARCHAR(20) NOT NULL,
+    hanhDong NVARCHAR(50) NOT NULL,
+    doiTuong NVARCHAR(100),
+    maDoiTuong VARCHAR(50),
+    moTa NVARCHAR(500),
+    thoiGian DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (maNhanVien) REFERENCES NhanVien(maNhanVien)
+);
+GO
+
 CREATE TABLE DanhMucThuoc (
     maDanhMuc VARCHAR(20) PRIMARY KEY,
     tenDanhMuc NVARCHAR(100) NOT NULL,
@@ -844,6 +867,21 @@ GO
 INSERT INTO ChiTietDoiTra (maPhieuDoiTra, maQuyDoi, maLoThuoc, soLuong, tinhTrang) VALUES
 ('PDT0001', 'QD00094', 'LO01538', 1, N'Thuốc còn nguyên seal'),
 ('PDT0002', 'QD01435', 'LO01435', 1, N'Thuốc còn nguyên seal');
+GO
+
+-- ==========================================
+-- DỮ LIỆU PHÂN QUYỀN: GÁN TOÀN QUYỀN CHO NV001 (ADMIN)
+-- ==========================================
+INSERT INTO PhanQuyen (maNhanVien, maQuyen) VALUES
+('NV001', 'QLBH'), ('NV001', 'QLBH.LAP_HOA_DON'), ('NV001', 'QLBH.DANH_SACH_HOA_DON'), ('NV001', 'QLBH.XU_LY_DOI_TRA'),
+('NV001', 'QLBG'), ('NV001', 'QLBG.DANH_SACH_BANG_GIA'), ('NV001', 'QLBG.TAO_BANG_GIA_MOI'),
+('NV001', 'QLDT'), ('NV001', 'QLDT.DANH_MUC_DON_THUOC'),
+('NV001', 'QLT'), ('NV001', 'QLT.DANH_MUC_THUOC'), ('NV001', 'QLT.DON_VI_QUY_DOI'), ('NV001', 'QLT.LO_THUOC'),
+('NV001', 'QLK'), ('NV001', 'QLK.DANH_MUC_KHO'), ('NV001', 'QLK.DON_DAT_HANG'), ('NV001', 'QLK.NHAP_KHO'), ('NV001', 'QLK.XUAT_KHO'),
+('NV001', 'QLKH'), ('NV001', 'QLKH.DANH_MUC_KHACH_HANG'), ('NV001', 'QLKH.LICH_SU_GIAO_DICH'),
+('NV001', 'QLNCC'), ('NV001', 'QLNCC.DANH_MUC_NHA_CUNG_CAP'), ('NV001', 'QLNCC.CONG_NO'),
+('NV001', 'QLND'), ('NV001', 'QLND.DANH_MUC_NGUOI_DUNG'), ('NV001', 'QLND.PHAN_QUYEN'), ('NV001', 'QLND.NHAT_KY'),
+('NV001', 'BCTK'), ('NV001', 'BCTK.DOANH_THU'), ('NV001', 'BCTK.HANG_HOA'), ('NV001', 'BCTK.TON_KHO');
 GO
 
 PRINT N'✅ Khởi tạo Thành Công 100% Cấu trúc & Dữ liệu Long Nguyên Pharmacy!';

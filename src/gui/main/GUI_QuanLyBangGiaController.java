@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import dao.DAO_BangGia;
+import dao.DAO_NhatKyHoatDong;
 import entity.BangGia;
 import entity.ChiTietBangGia;
 import javafx.beans.property.SimpleStringProperty;
@@ -68,6 +69,7 @@ public class GUI_QuanLyBangGiaController {
     @FXML private TableColumn<ChiTietBangGia, String> colNhapTenThuoc;
     @FXML private TableColumn<ChiTietBangGia, String> colNhapDonVi;
     @FXML private TableColumn<ChiTietBangGia, String> colNhapGiaBan;
+    @FXML private Button btnThemBangGiaMoi, btnQuayLai1, btnQuayLai2;
 
     // ======= DAO & Data =======
     private final DAO_BangGia dao = new DAO_BangGia();
@@ -82,8 +84,31 @@ public class GUI_QuanLyBangGiaController {
         setupSearch();
         setupLoaiComboBox();
         loadDanhSach();
-        hienViewDanhSach();
         setupKeyboardNavigation();
+
+        // Xử lý phân quyền
+        boolean hasTaoMoi = utils.UserSession.getInstance().hasPermission("QLBG.TAO_BANG_GIA_MOI");
+        boolean hasDanhSach = utils.UserSession.getInstance().hasPermission("QLBG.DANH_SACH_BANG_GIA");
+
+        if (btnThemBangGiaMoi != null) {
+            btnThemBangGiaMoi.setVisible(hasTaoMoi);
+            btnThemBangGiaMoi.setManaged(hasTaoMoi);
+        }
+        if (btnQuayLai1 != null) {
+            btnQuayLai1.setVisible(hasDanhSach);
+            btnQuayLai1.setManaged(hasDanhSach);
+        }
+        if (btnQuayLai2 != null) {
+            btnQuayLai2.setVisible(hasDanhSach);
+            btnQuayLai2.setManaged(hasDanhSach);
+        }
+
+        // Chuyển view mặc định theo quyền
+        if (!hasDanhSach && hasTaoMoi) {
+            hienViewTaoBangGia();
+        } else {
+            hienViewDanhSach();
+        }
     }
 
     // ============================================================
@@ -257,6 +282,10 @@ public class GUI_QuanLyBangGiaController {
     // ============================================================
     @FXML
     public void handleThemBangGiaMoi() {
+        if (!utils.UserSession.getInstance().hasPermission("QLBG.TAO_BANG_GIA_MOI")) {
+            utils.AlertUtils.showAlert(Alert.AlertType.WARNING, "Không có quyền", "Bạn không có quyền tạo bảng giá mới.");
+            return;
+        }
         // Reset form
         txtTenBangGia.clear();
         cbLoaiBangGia.setValue(null);
@@ -296,6 +325,10 @@ public class GUI_QuanLyBangGiaController {
     // ============================================================
     @FXML
     void handleQuayLaiDanhSach(ActionEvent event) {
+        if (!utils.UserSession.getInstance().hasPermission("QLBG.DANH_SACH_BANG_GIA")) {
+            utils.AlertUtils.showAlert(Alert.AlertType.WARNING, "Không có quyền", "Bạn không có quyền xem danh sách bảng giá.");
+            return;
+        }
         hienViewDanhSach();
     }
 
@@ -412,6 +445,8 @@ public class GUI_QuanLyBangGiaController {
         // --- Lưu ---
         String err = dao.taoBangGiaMoi(bg, danhSachGia);
         if (err == null) {
+            String moTa = "Tạo bảng giá mới: " + bg.getTenBangGia() + "\n- Loại: " + bg.getLoaiBangGia() + "\n- Ngày bắt đầu: " + bg.getNgayBatDau().format(FMT) + "\n- Số lượng thuốc: " + danhSachGia.size();
+            DAO_NhatKyHoatDong.ghiLog("THEM", "Bảng Giá", bg.getMaBangGia(), moTa);
             showAlert(Alert.AlertType.INFORMATION, "Thành công", "Tạo bảng giá thành công! Mã: " + bg.getMaBangGia());
             loadDanhSach();
             hienViewDanhSach();
@@ -466,6 +501,7 @@ public class GUI_QuanLyBangGiaController {
         if (confirm.getResult() == ButtonType.YES) {
             boolean ok = dao.voHieuHoa(bg.getMaBangGia());
             if (ok) {
+                DAO_NhatKyHoatDong.ghiLog("VO_HIEU_HOA", "Bảng Giá", bg.getMaBangGia(), "Vô hiệu hóa bảng giá: " + bg.getTenBangGia());
                 showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã vô hiệu hóa bảng giá.");
                 loadDanhSach();
             } else {

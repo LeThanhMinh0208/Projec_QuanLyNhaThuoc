@@ -1,6 +1,7 @@
 package gui.main;
 import java.io.InputStream;
 
+import dao.DAO_NhatKyHoatDong;
 import dao.DAO_Thuoc;
 import entity.NhanVien;
 import entity.Thuoc;
@@ -15,17 +16,22 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import utils.UserSession;
 
 public class GUI_TrangChuController {
 
@@ -39,6 +45,23 @@ public class GUI_TrangChuController {
     private TextField txtTimKiem;
     @FXML
     private BorderPane mainBorderPane;
+
+    // === SIDEBAR TitledPane (9 nhóm) ===
+    @FXML private TitledPane tpQLBH, tpQLBG, tpQLDT, tpQLT, tpQLK, tpQLKH, tpQLNCC, tpQLND, tpBCTK;
+
+    // === SIDEBAR Button con ===
+    @FXML private Button btnLapHoaDon, btnDanhSachHoaDon, btnXuLyDoiTra;
+    @FXML private Button btnDanhSachBangGia, btnTaoBangGiaMoi;
+    @FXML private Button btnDanhMucDonThuoc;
+    @FXML private Button btnDanhMucThuoc, btnDonViQuyDoi, btnLoThuoc;
+    @FXML private Button btnDanhMucKho, btnDonDatHang, btnNhapKho, btnXuatKho;
+    @FXML private Button btnDanhMucKhachHang, btnLichSuGiaoDich;
+    @FXML private Button btnDanhMucNCC, btnCongNo;
+    @FXML private Button btnDanhMucNguoiDung, btnPhanQuyen, btnNhatKy;
+    @FXML private Button btnDoanhThu, btnHangHoa, btnTonKho;
+
+    // 3 card ở Trang Chủ
+    @FXML private javafx.scene.layout.HBox cardBanThuoc, cardDoiTra, cardBaoCao;
 
     private final DAO_Thuoc daoThuoc = new DAO_Thuoc();
     private final ObservableList<Thuoc> masterData = FXCollections.observableArrayList();
@@ -61,6 +84,104 @@ public class GUI_TrangChuController {
         utils.SceneUtils.init(mainBorderPane);
         if (mainBorderPane != null) {
             noiDungTrangChuGoc = mainBorderPane.getCenter();
+        }
+        // Áp dụng phân quyền sidebar
+        apDungPhanQuyen();
+    }
+
+    /**
+     * Ẩn/hiện các mục sidebar dựa trên quyền của nhân viên đang đăng nhập.
+     * Trang Chủ + Đổi Mật Khẩu + Đăng Xuất LUÔN HIỆN.
+     * Admin (Quản Lý) bỏ qua, hiện hết.
+     */
+    private void apDungPhanQuyen() {
+        UserSession session = UserSession.getInstance();
+        if (session.getUser() == null) return;
+
+        // Admin luôn có toàn quyền -> không cần ẩn gì
+        if ("Quản Lý".equals(session.getUser().getChucVu())) return;
+
+        // Map: TitledPane -> mã quyền cha
+        Object[][] tpMap = {
+            {tpQLBH,  "QLBH"},  {tpQLBG,  "QLBG"},  {tpQLDT,  "QLDT"},
+            {tpQLT,   "QLT"},   {tpQLK,   "QLK"},   {tpQLKH,  "QLKH"},
+            {tpQLNCC, "QLNCC"}, {tpQLND,  "QLND"},  {tpBCTK,  "BCTK"}
+        };
+
+        // Map: Button con -> mã quyền con
+        Object[][] btnMap = {
+            {btnLapHoaDon,       "QLBH.LAP_HOA_DON"},
+            {btnDanhSachHoaDon,  "QLBH.DANH_SACH_HOA_DON"},
+            {btnXuLyDoiTra,      "QLBH.XU_LY_DOI_TRA"},
+            {btnDanhSachBangGia, "QLBG.DANH_SACH_BANG_GIA"},
+            {btnTaoBangGiaMoi,   "QLBG.TAO_BANG_GIA_MOI"},
+            {btnDanhMucDonThuoc, "QLDT.DANH_MUC_DON_THUOC"},
+            {btnDanhMucThuoc,    "QLT.DANH_MUC_THUOC"},
+            {btnDonViQuyDoi,     "QLT.DON_VI_QUY_DOI"},
+            {btnLoThuoc,         "QLT.LO_THUOC"},
+            {btnDanhMucKho,      "QLK.DANH_MUC_KHO"},
+            {btnDonDatHang,      "QLK.DON_DAT_HANG"},
+            {btnNhapKho,         "QLK.NHAP_KHO"},
+            {btnXuatKho,         "QLK.XUAT_KHO"},
+            {btnDanhMucKhachHang,"QLKH.DANH_MUC_KHACH_HANG"},
+            {btnLichSuGiaoDich,  "QLKH.LICH_SU_GIAO_DICH"},
+            {btnDanhMucNCC,      "QLNCC.DANH_MUC_NHA_CUNG_CAP"},
+            {btnCongNo,          "QLNCC.CONG_NO"},
+            {btnDanhMucNguoiDung,"QLND.DANH_MUC_NGUOI_DUNG"},
+            {btnPhanQuyen,       "QLND.PHAN_QUYEN"},
+            {btnNhatKy,          "QLND.NHAT_KY"},
+            {btnDoanhThu,        "BCTK.DOANH_THU"},
+            {btnHangHoa,         "BCTK.HANG_HOA"},
+            {btnTonKho,          "BCTK.TON_KHO"}
+        };
+
+        // Ẩn button con không có quyền
+        for (Object[] pair : btnMap) {
+            Button btn = (Button) pair[0];
+            String maQuyen = (String) pair[1];
+            if (btn != null && !session.hasPermission(maQuyen)) {
+                btn.setVisible(false);
+                btn.setManaged(false);
+            }
+        }
+
+        // Ẩn TitledPane cha nếu KHÔNG có bất kỳ quyền con nào
+        for (Object[] pair : tpMap) {
+            TitledPane tp = (TitledPane) pair[0];
+            String maCha = (String) pair[1];
+            if (tp != null && !session.hasPermission(maCha)) {
+                boolean coQuyenCon = false;
+                for (Object[] btnPair : btnMap) {
+                    String maConQuyen = (String) btnPair[1];
+                    if (maConQuyen.startsWith(maCha + ".") && session.hasPermission(maConQuyen)) {
+                        coQuyenCon = true;
+                        break;
+                    }
+                }
+                if (!coQuyenCon) {
+                    tp.setVisible(false);
+                    tp.setManaged(false);
+                }
+            }
+        }
+
+        // Ẩn 3 card trên Trang Chủ nếu không có quyền
+        if (cardBanThuoc != null && !session.hasPermission("QLBH.LAP_HOA_DON")) {
+            cardBanThuoc.setVisible(false);
+            cardBanThuoc.setManaged(false);
+        }
+        if (cardDoiTra != null && !session.hasPermission("QLBH.XU_LY_DOI_TRA")) {
+            cardDoiTra.setVisible(false);
+            cardDoiTra.setManaged(false);
+        }
+        if (cardBaoCao != null) {
+            boolean coBCTK = session.hasPermission("BCTK.DOANH_THU") || 
+                             session.hasPermission("BCTK.HANG_HOA") || 
+                             session.hasPermission("BCTK.TON_KHO");
+            if (!coBCTK) {
+                cardBaoCao.setVisible(false);
+                cardBaoCao.setManaged(false);
+            }
         }
     }
 
@@ -202,7 +323,13 @@ public class GUI_TrangChuController {
     @FXML
     void handleDangXuat(ActionEvent event) {
         try {
+            // Ghi nhật ký đăng xuất
+            DAO_NhatKyHoatDong.ghiLog("DANG_XUAT", "Hệ thống", 
+                UserSession.getInstance().getUser().getMaNhanVien(),
+                UserSession.getInstance().getUser().getHoTen() + " đã đăng xuất hệ thống");
+
             nhanVienDangNhap = null;
+            UserSession.getInstance().clear();
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             currentStage.close();
             Parent root = FXMLLoader.load(getClass().getResource("GUI_DangNhap.fxml"));
@@ -237,6 +364,10 @@ public class GUI_TrangChuController {
 
     @FXML
     void handleMoBanThuoc(javafx.scene.input.MouseEvent event) {
+        if (!UserSession.getInstance().hasPermission("QLBH.LAP_HOA_DON")) {
+            new Alert(Alert.AlertType.WARNING, "Bạn không có quyền truy cập trang Bán Hàng.").show();
+            return;
+        }
         switchPage("/gui/main/GUI_QuanLyBanHang.fxml");
     }
 
@@ -267,7 +398,22 @@ public class GUI_TrangChuController {
 
     @FXML
     void handleMoXuLyDoiTraCard(javafx.scene.input.MouseEvent event) {
+        if (!UserSession.getInstance().hasPermission("QLBH.XU_LY_DOI_TRA")) {
+            new Alert(Alert.AlertType.WARNING, "Bạn không có quyền truy cập trang Xử Lý Đổi Trả.").show();
+            return;
+        }
         switchPage("/gui/main/GUI_XuLyDoiTra.fxml");
+    }
+
+    @FXML
+    void handleMoBaoCaoCard(javafx.scene.input.MouseEvent event) {
+        UserSession session = UserSession.getInstance();
+        if (!session.hasPermission("BCTK.DOANH_THU") && !session.hasPermission("BCTK.HANG_HOA") && !session.hasPermission("BCTK.TON_KHO")) {
+            new Alert(Alert.AlertType.WARNING, "Bạn không có quyền truy cập Báo Cáo Thống Kê.").show();
+            return;
+        }
+        // Mở báo cáo doanh thu mặc định
+        new Alert(Alert.AlertType.INFORMATION, "Tính năng Báo Cáo Thống Kê sẽ được cập nhật trong phiên bản tiếp theo.").show();
     }
 
     @FXML
@@ -322,6 +468,16 @@ public class GUI_TrangChuController {
     @FXML
     void handleMoThongKeDoanhThu(ActionEvent event) {
         utils.SceneUtils.switchPage("/gui/main/GUI_ThongKeDoanhThu.fxml");
+    }
+
+    @FXML
+    void handleMoPhanQuyen(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_PhanQuyen.fxml");
+    }
+
+    @FXML
+    void handleMoNhatKy(ActionEvent event) {
+        utils.SceneUtils.switchPage("/gui/main/GUI_NhatKyHoatDong.fxml");
     }
 
     @FXML
