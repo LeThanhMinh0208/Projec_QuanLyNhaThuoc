@@ -1,6 +1,7 @@
 package gui.dialogs;
 
 import dao.DAO_NhanVien;
+import dao.DAO_NhatKyHoatDong;
 import entity.NhanVien;
 import gui.main.GUI_QuanLyNguoiDungController;
 import javafx.event.ActionEvent;
@@ -16,8 +17,8 @@ public class Dialog_SuaNhanVienController {
 
     private DAO_NhanVien dao = new DAO_NhanVien();
     private GUI_QuanLyNguoiDungController parentController;
-    private NhanVien nvDangSua; 
-    
+    private NhanVien nvDangSua;
+
     // Cờ đánh dấu đã bấm reset mật khẩu chưa
     private boolean isResetPassword = false;
 
@@ -39,7 +40,7 @@ public class Dialog_SuaNhanVienController {
     private void kiemTraThayDoi() {
         boolean isNameChanged = !txtHoTen.getText().trim().equals(nvDangSua.getHoTen());
         boolean isPhoneChanged = !txtSdt.getText().trim().equals(nvDangSua.getSdt());
-        
+
         // Bật sáng nút LƯU nếu có bất kỳ thay đổi nào
         btnLuu.setDisable(!(isNameChanged || isPhoneChanged || isResetPassword));
     }
@@ -58,10 +59,10 @@ public class Dialog_SuaNhanVienController {
         if (ten.isEmpty() || sdt.isEmpty()) {
             new Alert(Alert.AlertType.WARNING, "Họ tên và SĐT không được để trống!").show(); return;
         }
-        if (!ten.matches("^[\\p{L}\\s]+$")) { 
+        if (!ten.matches("^[\\p{L}\\s]+$")) {
             new Alert(Alert.AlertType.ERROR, "Họ tên không hợp lệ!").show(); return;
         }
-        if (!sdt.matches("^0\\d{9}$")) { 
+        if (!sdt.matches("^0\\d{9}$")) {
             new Alert(Alert.AlertType.ERROR, "Số điện thoại không hợp lệ!").show(); return;
         }
 
@@ -69,7 +70,8 @@ public class Dialog_SuaNhanVienController {
         nvDangSua.setSdt(sdt);
 
         if (dao.capNhatThongTin(nvDangSua, isResetPassword)) {
-            new Alert(Alert.AlertType.INFORMATION, "Cập nhật thành công!").show();
+            DAO_NhatKyHoatDong.ghiLog("SUA", "Nhân Viên", nvDangSua.getMaNhanVien(), "Cập nhật thông tin nhân viên: " + nvDangSua.getHoTen());
+            new Alert(Alert.AlertType.INFORMATION, "Cập nhật thành công!").showAndWait();
             parentController.loadData();
             handleHuy(null);
         } else {

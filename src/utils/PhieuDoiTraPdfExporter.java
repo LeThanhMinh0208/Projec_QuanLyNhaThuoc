@@ -1,14 +1,32 @@
 package utils;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.*;
-import com.itextpdf.text.pdf.draw.DottedLineSeparator;
-import entity.PhieuDoiTraView;
-
-import java.io.*;
-import java.nio.file.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.ColumnText;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfPageEventHelper;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.draw.DottedLineSeparator;
+
+import entity.PhieuDoiTraView;
 
 public class PhieuDoiTraPdfExporter {
 
@@ -27,13 +45,17 @@ public class PhieuDoiTraPdfExporter {
                 if (new File(path).exists()) {
                     BaseFont bf = BaseFont.createFont(path, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
                     Font f = new Font(bf, size, style);
-                    if (color != null) f.setColor(color);
+                    if (color != null) {
+						f.setColor(color);
+					}
                     return f;
                 }
             }
         } catch (Exception ignored) {}
         Font f = new Font(Font.FontFamily.HELVETICA, size, style);
-        if (color != null) f.setColor(color);
+        if (color != null) {
+			f.setColor(color);
+		}
         return f;
     }
 
@@ -111,9 +133,11 @@ public class PhieuDoiTraPdfExporter {
         addInfoRow(infoTable, "Khách hàng", pdt.getTenKhachHang(), fNormal);
         addInfoRow(infoTable, "Nhân viên", pdt.getTenNhanVien(), fNormal);
         addInfoRow(infoTable, "Hình thức", pdt.getHinhThucXuLyLabel(), fNormal);
-        
+
         String lyDo = pdt.getLyDoHienThi();
-        if (lyDo == null || lyDo.isEmpty()) lyDo = "—";
+        if (lyDo == null || lyDo.isEmpty()) {
+			lyDo = "—";
+		}
         addInfoRow(infoTable, "Lý do", lyDo, fNormal);
         doc.add(infoTable);
 
@@ -150,17 +174,17 @@ public class PhieuDoiTraPdfExporter {
             }
             double phiPhat = pdt.getPhiPhat();
             double tongHoan = Math.max(0, tongTienTra - phiPhat);
-            
+
             addTongRow(tongTable, "Giá trị thuốc trả:", String.format("%,.0f đ", tongTienTra), fNormal, fNormal);
             addTongRow(tongTable, "Phí thu hoàn/phạt:", String.format("- %,.0f đ", phiPhat), fNormal, fNormal);
-            
+
             PdfPCell divider = new PdfPCell(new Phrase(""));
             divider.setBorder(Rectangle.TOP);
             divider.setColspan(2);
             divider.setPaddingTop(5);
             divider.setBorderColor(BaseColor.GRAY);
             tongTable.addCell(divider);
-            
+
             addTongRow(tongTable, "TIỀN KHÁCH NHẬN LẠI:", String.format("%,.0f đ", tongHoan), fTotalLabel, fTotal);
         }
         doc.add(tongTable);

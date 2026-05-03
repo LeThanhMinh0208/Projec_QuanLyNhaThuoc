@@ -15,7 +15,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -62,7 +71,9 @@ public class GUI_DanhSachHoaDonController {
         tableHoaDon.setOnKeyPressed(event -> {
             if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
                 HoaDonView selected = tableHoaDon.getSelectionModel().getSelectedItem();
-                if (selected != null) moDialogChiTiet(selected);
+                if (selected != null) {
+					moDialogChiTiet(selected);
+				}
                 event.consume();
             }
         });
@@ -174,15 +185,20 @@ public class GUI_DanhSachHoaDonController {
 
     /** Filter keyword trên data đã load (không query DB) */
     private void filterByKeyword(String keyword) {
-        if (filteredData == null) return;
+        if (filteredData == null) {
+			return;
+		}
         if (keyword == null || keyword.isEmpty()) {
             filteredData.setPredicate(hd -> true);
         } else {
             String lower = keyword.toLowerCase();
             filteredData.setPredicate(hd -> {
-                if (hd.getMaHoaDon() != null && hd.getMaHoaDon().toLowerCase().contains(lower)) return true;
-                if (hd.getTenKhachHang() != null && hd.getTenKhachHang().toLowerCase().contains(lower)) return true;
-                if (hd.getSdt() != null && hd.getSdt().toLowerCase().contains(lower)) return true;
+                if ((hd.getMaHoaDon() != null && hd.getMaHoaDon().toLowerCase().contains(lower)) || (hd.getTenKhachHang() != null && hd.getTenKhachHang().toLowerCase().contains(lower))) {
+					return true;
+				}
+                if (hd.getSdt() != null && hd.getSdt().toLowerCase().contains(lower)) {
+					return true;
+				}
                 return false;
             });
         }

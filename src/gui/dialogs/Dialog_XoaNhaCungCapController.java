@@ -1,6 +1,7 @@
 package gui.dialogs;
 
 import dao.DAO_NhaCungCap;
+import dao.DAO_NhatKyHoatDong;
 import entity.NhaCungCap;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -34,7 +35,8 @@ public class Dialog_XoaNhaCungCapController {
         boolean thanhCong = daoNCC.xoaNhaCungCap(nhaCungCapCanXoa.getMaNhaCungCap());
 
         if (thanhCong) {
-            new Alert(Alert.AlertType.INFORMATION, "Đã xóa thành công.").showAndWait();
+            DAO_NhatKyHoatDong.ghiLog("XOA", "Nhà Cung Cấp", nhaCungCapCanXoa.getMaNhaCungCap(), "Xóa mềm nhà cung cấp: " + nhaCungCapCanXoa.getTenNhaCungCap());
+            new Alert(Alert.AlertType.INFORMATION, "Xóa nhà cung cấp thành công!").showAndWait();
         } else {
             new Alert(Alert.AlertType.ERROR, "Có lỗi xảy ra! Vui lòng thử lại.").showAndWait();
         }

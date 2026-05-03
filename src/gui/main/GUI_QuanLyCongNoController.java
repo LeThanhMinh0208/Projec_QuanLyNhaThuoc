@@ -1,5 +1,9 @@
 package gui.main;
 
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.List;
+
 import dao.DAO_NhaCungCap;
 import dao.DAO_PhieuChi;
 import entity.NhaCungCap;
@@ -9,13 +13,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
-
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.List;
 
 public class GUI_QuanLyCongNoController {
 
@@ -38,18 +45,18 @@ public class GUI_QuanLyCongNoController {
     // CONTROLS VIEW 2 (DANH MỤC PHIẾU CHI LỊCH SỬ)
     // =======================================================
     @FXML private TextField txtTimKiemPhieuChi;
-    @FXML private TableView<PhieuChi> tablePhieuChi; 
+    @FXML private TableView<PhieuChi> tablePhieuChi;
     @FXML private TableColumn<PhieuChi, Void> colXemChiTiet;
     @FXML private TableColumn<PhieuChi, String> colMaPhieuChi, colNhaCungCapPhieu, colNhanVienChi, colHinhThuc;
     @FXML private TableColumn<PhieuChi, java.sql.Timestamp> colNgayChi;
     @FXML private TableColumn<PhieuChi, Double> colSoTienChi;
-    
+
     // =======================================================
     // DAO & FORMATTER
     // =======================================================
     private DAO_NhaCungCap daoNCC = new DAO_NhaCungCap();
     private DAO_PhieuChi daoPhieuChi = new DAO_PhieuChi();
-    
+
     private DecimalFormat df = new DecimalFormat("#,### VNĐ");
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
@@ -57,24 +64,24 @@ public class GUI_QuanLyCongNoController {
     public void initialize() {
         setupTabs();
         setupTableCongNo();
-        setupTablePhieuChi(); 
-        
-        loadDuLieuTuDatabase(); 
+        setupTablePhieuChi();
+
+        loadDuLieuTuDatabase();
     }
 
     private void setupTabs() {
         tabGroup.selectedToggleProperty().addListener((obs, oldT, newT) -> {
             if (newT == null) { oldT.setSelected(true); return; }
             boolean isLapPhieu = (newT == tabLapPhieu);
-            
+
             viewLapPhieu.setVisible(isLapPhieu);
             viewLapPhieu.setManaged(isLapPhieu);
             viewDanhSach.setVisible(!isLapPhieu);
             viewDanhSach.setManaged(!isLapPhieu);
-            
+
             // Tự động tải dữ liệu lịch sử phiếu chi khi chuyển sang tab Danh Sách
             if (!isLapPhieu) {
-                loadDanhSachPhieuChi(""); 
+                loadDanhSachPhieuChi("");
             }
         });
     }
@@ -87,7 +94,7 @@ public class GUI_QuanLyCongNoController {
         colTenNCC.setCellValueFactory(new PropertyValueFactory<>("tenNhaCungCap"));
         colSdtNCC.setCellValueFactory(new PropertyValueFactory<>("sdt"));
         colSdtNCC.setStyle("-fx-alignment: CENTER;");
-        
+
         colCongNo.setCellValueFactory(new PropertyValueFactory<>("congNo"));
         colCongNo.setCellFactory(column -> new TableCell<NhaCungCap, Double>() {
             @Override
@@ -126,20 +133,20 @@ public class GUI_QuanLyCongNoController {
     @FXML
     void handleMoFormLapPhieu(ActionEvent event) {
         NhaCungCap selected = tableCongNoNCC.getSelectionModel().getSelectedItem();
-        
+
         // Đã sử dụng AlertUtils siêu gọn
         if (selected == null) {
             utils.AlertUtils.showAlert(Alert.AlertType.WARNING, "Chưa chọn nhà cung cấp", "Vui lòng chọn một nhà cung cấp từ bảng để lập phiếu chi!");
             return;
         }
-        
+
         if (selected.getCongNo() <= 0) {
             utils.AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Không có công nợ", "Nhà cung cấp này hiện tại đã thanh toán hết công nợ (0 VNĐ).");
             return;
         }
 
         openDialog("/gui/dialogs/Dialog_LapPhieuChi.fxml", "Lập Phiếu Chi Nợ", selected);
-        loadDuLieuTuDatabase(); 
+        loadDuLieuTuDatabase();
     }
 
     private void openDialog(String path, String title, NhaCungCap data) {
@@ -148,11 +155,11 @@ public class GUI_QuanLyCongNoController {
             javafx.scene.Parent root = loader.load();
 
             Object ctrl = loader.getController();
-            
+
             // 💡 ĐÃ FIX: Cho phép truyền dữ liệu NCC sang cả 2 Form (Phiếu Chi & Phiếu Thu)
             if (ctrl instanceof gui.dialogs.Dialog_LapPhieuChiController && data != null) {
                 ((gui.dialogs.Dialog_LapPhieuChiController) ctrl).setNhaCungCap(data);
-            } 
+            }
             else if (ctrl instanceof gui.dialogs.Dialog_NCCThanhToanController && data != null) {
                 ((gui.dialogs.Dialog_NCCThanhToanController) ctrl).setNhaCungCap(data);
             }
@@ -161,7 +168,7 @@ public class GUI_QuanLyCongNoController {
             stage.setScene(new javafx.scene.Scene(root));
             stage.setTitle(title);
             stage.setResizable(false);
-            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL); 
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
             stage.showAndWait();
 
         } catch (Exception e) {
@@ -175,16 +182,17 @@ public class GUI_QuanLyCongNoController {
     // =======================================================
     private void setupTablePhieuChi() {
         colMaPhieuChi.setCellValueFactory(new PropertyValueFactory<>("maPhieuChi"));
-        
-        
+
+
         colNhaCungCapPhieu.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getNhaCungCap().getTenNhaCungCap()));
         colNhanVienChi.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getNhanVien().getHoTen()));
-        
+
 
         colSoTienChi.setCellValueFactory(new PropertyValueFactory<>("tongTienChi"));
         colSoTienChi.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: #10b981;");
         colSoTienChi.setCellFactory(col -> new TableCell<PhieuChi, Double>() {
-            protected void updateItem(Double item, boolean empty) {
+            @Override
+			protected void updateItem(Double item, boolean empty) {
                 super.updateItem(item, empty);
                 setText((empty || item == null) ? null : df.format(item));
             }
@@ -196,10 +204,13 @@ public class GUI_QuanLyCongNoController {
                 btnXem.setStyle("-fx-background-color: #e0f2fe; -fx-text-fill: #0284c7; -fx-background-radius: 15; -fx-cursor: hand;");
                 btnXem.setOnAction(e -> {
                     PhieuChi pc = getTableRow().getItem();
-                    if (pc != null) moDialogChiTietPhieuChi(pc);
+                    if (pc != null) {
+						moDialogChiTietPhieuChi(pc);
+					}
                 });
             }
-            protected void updateItem(Void item, boolean empty) {
+            @Override
+			protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 setGraphic(empty ? null : btnXem);
                 setStyle("-fx-alignment: CENTER;");
@@ -221,7 +232,7 @@ public class GUI_QuanLyCongNoController {
         try {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ChiTietPhieuChi.fxml"));
             javafx.scene.Parent root = loader.load();
-            
+
             gui.dialogs.Dialog_ChiTietPhieuChiController ctrl = loader.getController();
             ctrl.setPhieuChi(pc);
 
@@ -239,12 +250,12 @@ public class GUI_QuanLyCongNoController {
     @FXML
     void handleMoFormNCCThanhToan(ActionEvent event) {
         NhaCungCap selected = tableCongNoNCC.getSelectionModel().getSelectedItem();
-        
+
         if (selected == null) {
             utils.AlertUtils.showAlert(Alert.AlertType.WARNING, "Chưa chọn nhà cung cấp", "Vui lòng chọn một nhà cung cấp từ bảng để thu tiền!");
             return;
         }
-        
+
         // KIỂM TRA QUAN TRỌNG: Chỉ cho phép thu tiền khi NCC đang nợ mình (Công nợ bị ÂM)
         if (selected.getCongNo() >= 0) {
             utils.AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Không thể thu tiền", "Nhà cung cấp này không nợ tiền cửa hàng.\nChức năng này chỉ dùng để thu hồi tiền khi NCC nợ lại do trả hàng (Công nợ hiện số Âm).");
@@ -252,6 +263,6 @@ public class GUI_QuanLyCongNoController {
         }
 
         openDialog("/gui/dialogs/Dialog_NCCThanhToan.fxml", "Thu Tiền Nhà Cung Cấp", selected);
-        loadDuLieuTuDatabase(); 
+        loadDuLieuTuDatabase();
     }
 }

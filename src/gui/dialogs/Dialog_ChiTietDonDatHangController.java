@@ -1,11 +1,14 @@
 package gui.dialogs;
 
+import java.io.File;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Optional;
+
 import dao.DAO_DonDatHang;
 import entity.ChiTietDonDatHang;
 import entity.DonDatHang;
-import service.Print_HoaDonDatHang;
-import utils.AlertUtils; 
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -13,40 +16,45 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
-import java.io.File;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Optional;
+import utils.AlertUtils;
 
 public class Dialog_ChiTietDonDatHangController {
 
     @FXML private Label lblMaDon, lblNgayLap, lblNhaCungCap, lblNhanVien, lblGhiChu, lblTongTienDuKien;
     @FXML private TableView<ChiTietDonDatHang> tableChiTiet;
-    
+
     @FXML private TableColumn<ChiTietDonDatHang, String> colTenThuoc, colDonVi, colMaLo, colHanDung, colGiaNhap, colThanhTien, colTinhTrang, colTienDo;
     @FXML private TableColumn<ChiTietDonDatHang, Integer> colSoLuongDat, colSoLuongNhan;
-    
+
     @FXML private Button btnHuyDon;
-    
+
     private DAO_DonDatHang dao = new DAO_DonDatHang();
     private DecimalFormat df = new DecimalFormat("#,### VNĐ");
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-    
+
     private DonDatHang donHienTai;
     private List<ChiTietDonDatHang> listChiTiet;
     private double tongTienDonHang = 0; // Thêm biến lưu tổng tiền cho phần In
 
     public void setDonDatHang(DonDatHang don) {
         this.donHienTai = don;
-        
+
         lblMaDon.setText("Mã đơn: " + don.getMaDonDatHang());
         lblNgayLap.setText(sdf.format(don.getNgayDat()));
         lblNhaCungCap.setText(don.getNhaCungCap().getTenNhaCungCap());
@@ -55,18 +63,18 @@ public class Dialog_ChiTietDonDatHangController {
 
         // KHÓA NÚT HỦY ĐƠN
         String trangThai = don.getTrangThaiHang();
-        String trangThaiGocDB = don.getTrangThai(); 
+        String trangThaiGocDB = don.getTrangThai();
 
-        if (trangThai != null && 
-           (trangThai.contains("Hoàn Thành") || 
-            trangThai.contains("Hủy") || 
-            "GIAO_MOT_PHAN".equals(trangThaiGocDB) || 
-            "DONG_DON_THIEU".equals(trangThaiGocDB) || 
+        if (trangThai != null &&
+           (trangThai.contains("Hoàn Thành") ||
+            trangThai.contains("Hủy") ||
+            "GIAO_MOT_PHAN".equals(trangThaiGocDB) ||
+            "DONG_DON_THIEU".equals(trangThaiGocDB) ||
             "GIAO_DU".equals(trangThaiGocDB))) {
-            
+
             btnHuyDon.setDisable(true);
             btnHuyDon.setStyle("-fx-background-color: #fca5a5; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;");
-            
+
         } else {
             btnHuyDon.setDisable(false);
             btnHuyDon.setStyle("-fx-background-color: linear-gradient(to bottom, #ef4444, #dc2626); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;");
@@ -76,7 +84,7 @@ public class Dialog_ChiTietDonDatHangController {
 
         listChiTiet = dao.getChiTietByMaDon(don.getMaDonDatHang());
         tableChiTiet.setItems(FXCollections.observableArrayList(listChiTiet));
-        
+
         tinhTongTienDuKien();
     }
 
@@ -93,10 +101,10 @@ public class Dialog_ChiTietDonDatHangController {
     private void setupTable() {
         colTenThuoc.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getThuoc().getTenThuoc()));
         colDonVi.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getDonViQuyDoi().getTenDonVi()));
-        
+
         colSoLuongDat.setCellValueFactory(new PropertyValueFactory<>("soLuongDat"));
         colSoLuongDat.setStyle("-fx-alignment: CENTER; -fx-font-weight: bold;");
-        
+
         colSoLuongNhan.setCellValueFactory(new PropertyValueFactory<>("soLuongDaNhan"));
         colSoLuongNhan.setStyle("-fx-alignment: CENTER; -fx-font-weight: bold; -fx-text-fill: #10b981;");
 
@@ -111,10 +119,10 @@ public class Dialog_ChiTietDonDatHangController {
             return new SimpleStringProperty((hd != null && !hd.isEmpty()) ? hd : "---");
         });
         colHanDung.setStyle("-fx-alignment: CENTER;");
-        
+
         colGiaNhap.setCellValueFactory(c -> new SimpleStringProperty(df.format(c.getValue().getDonGiaDuKien())));
         colGiaNhap.setStyle("-fx-alignment: CENTER-RIGHT;");
-        
+
         colThanhTien.setCellValueFactory(c -> new SimpleStringProperty(df.format(c.getValue().getThanhTien())));
         colThanhTien.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: #ef4444;");
 
@@ -133,22 +141,30 @@ public class Dialog_ChiTietDonDatHangController {
         });
         colTinhTrang.setStyle("-fx-alignment: CENTER; -fx-text-fill: #0284c7; -fx-font-weight: bold;");
 
+        // ==========================================
+        // FIX: LOGIC CỘT TIẾN ĐỘ ĐÃ GỠ CONFLICT
+        // ==========================================
         colTienDo.setCellValueFactory(c -> {
             int dat = c.getValue().getSoLuongDat();
             int nhan = c.getValue().getSoLuongDaNhan();
             String maTrangThaiDB = donHienTai.getTrangThai();
-            
+
             String tienDoStr = "Đang Xử Lý";
             
-            if ("DA_HUY".equals(maTrangThaiDB)) { tienDoStr = "Đã Hủy"; } 
+            if ("DA_HUY".equals(maTrangThaiDB)) { 
+                tienDoStr = "Đã Hủy"; 
+            } 
             else if ("GIAO_DU".equals(maTrangThaiDB) || "GIAO_MOT_PHAN".equals(maTrangThaiDB) || "DONG_DON_THIEU".equals(maTrangThaiDB)) {
                 tienDoStr = "Hoàn Thành";
             } 
-            else if (nhan >= dat && dat > 0) { tienDoStr = "Hoàn Thành"; }
+            else if (nhan >= dat && dat > 0) { 
+                tienDoStr = "Hoàn Thành"; 
+            }
             
             return new SimpleStringProperty(tienDoStr);
         });
         
+        // TÔ MÀU CHO CỘT TIẾN ĐỘ TỰ ĐỘNG
         colTienDo.setCellFactory(column -> new TableCell<ChiTietDonDatHang, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -169,7 +185,7 @@ public class Dialog_ChiTietDonDatHangController {
             AlertUtils.showAlert(AlertType.WARNING, "Cảnh báo", "Đơn hàng này đã chốt/hoàn thành, không thể hủy!");
             return;
         }
-        
+
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("Xác nhận hủy đơn");
         alert.setHeaderText("Bạn có chắc chắn muốn HỦY đơn đặt hàng " + donHienTai.getMaDonDatHang() + " không?");
@@ -178,6 +194,7 @@ public class Dialog_ChiTietDonDatHangController {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             boolean isSuccess = dao.updateTrangThaiDonHang(donHienTai.getMaDonDatHang(), "DA_HUY");
+
             if (isSuccess) {
                 donHienTai.setTrangThai("DA_HUY");
                 tableChiTiet.refresh(); 
@@ -262,7 +279,7 @@ public class Dialog_ChiTietDonDatHangController {
         btnConfirm.setStyle("-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 20;");
         
         // =========================================================================
-        // ĐÃ SỬA: LƯU BẰNG ĐƯỜNG DẪN TƯƠNG ĐỐI VÀO THƯ MỤC EXPORTS/PHIEUDATHANG
+        // LƯU BẰNG ĐƯỜNG DẪN TƯƠNG ĐỐI VÀO THƯ MỤC EXPORTS/PHIEUDATHANG
         // =========================================================================
         btnConfirm.setOnAction(e -> {
             try {

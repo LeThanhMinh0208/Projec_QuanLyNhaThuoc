@@ -1,6 +1,7 @@
 package gui.dialogs;
 
 import dao.*;
+import dao.DAO_NhatKyHoatDong;
 import entity.*;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.*;
@@ -8,7 +9,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.*;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory; // Dòng này cực kỳ quan trọng!
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import utils.*;
@@ -16,6 +17,7 @@ import java.io.*;
 import java.net.URL;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 
@@ -42,7 +44,6 @@ public class Dialog_XuatHuyController implements Initializable {
             txtNguoiLap.setText(UserSession.getInstance().getUser().getHoTen());
         }
 
-        // 1. TẢI TẤT CẢ THUỐC CÓ HÀNG TRONG HỆ THỐNG (KHÔNG PHÂN BIỆT KHO)
         loadTatCaThuocCoHang();
         FilteredList<Thuoc> filter = new FilteredList<>(masterListThuoc, p -> true);
         cbChonThuoc.setItems(filter);
@@ -54,7 +55,6 @@ public class Dialog_XuatHuyController implements Initializable {
 
         cbChonThuoc.valueProperty().addListener((o, old, t) -> {
             if (t != null) {
-                // Tải tất cả các lô của thuốc này ở mọi kho
                 cbChonLo.setItems(FXCollections.observableArrayList(daoLo.getTatCaLoThuocTraNCC(t.getMaThuoc())));
             }
         });
@@ -96,7 +96,7 @@ public class Dialog_XuatHuyController implements Initializable {
                 while ((line = br.readLine()) != null) {
                     lineNumber++;
                     if (lineNumber == 1 && line.startsWith("\uFEFF")) line = line.substring(1);
-                    if (lineNumber == 1 || line.trim().isEmpty()) continue; // Bỏ qua tiêu đề
+                    if (lineNumber == 1 || line.trim().isEmpty()) continue;
 
                     String[] cols = line.split(line.contains(";") ? ";" : ",");
                     if (cols.length < 3) continue;
@@ -105,7 +105,6 @@ public class Dialog_XuatHuyController implements Initializable {
                     String soLo = cols[1].trim().replaceAll("^\"|\"$", "");
                     int slHuy = Integer.parseInt(cols[2].replaceAll("[^\\d]", ""));
 
-                    // Tìm lô thuốc bất kể kho
                     String sql = "SELECT l.* FROM LoThuoc l JOIN Thuoc t ON l.maThuoc = t.maThuoc " +
                                  "WHERE t.tenThuoc = ? AND l.maLoThuoc = ?";
                     try (Connection con = connectDB.ConnectDB.getInstance().getConnection();
@@ -154,13 +153,21 @@ public class Dialog_XuatHuyController implements Initializable {
     }
 
     @FXML private void handleXacNhanHuy() {
-        if (dsHuyTam.isEmpty() || txtGhiChu.getText().isEmpty()) { AlertUtils.showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng nhập đầy đủ thuốc và lý do!"); return; }
+        if (dsHuyTam.isEmpty() || txtGhiChu.getText().isEmpty()) { 
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng nhập đầy đủ thuốc và lý do!"); 
+            return; 
+        }
         double tongTien = 0; for (ChiTietPhieuXuat ct : dsHuyTam) tongTien += ct.getThanhTien();
         String ma = daoPX.getMaPhieuXuatMoi("XH");
         PhieuXuat px = new PhieuXuat(ma, null, UserSession.getInstance().getUser().getMaNhanVien(), 3, null, null, tongTien, txtGhiChu.getText());
+        
         if (daoPX.xuatHuyThuoc(px, new ArrayList<>(dsHuyTam))) {
-            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã lưu phiếu xuất hủy: " + ma);
+            // Ghi log hoạt động từ bản Incoming
+            DAO_NhatKyHoatDong.ghiLog("TAO_PHIEU_XUAT", "Phiếu Xuất", ma, "Tạo phiếu xuất hủy: " + ma);
+            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã hủy thuốc thành công!\nMã phiếu: " + ma);
             handleHuyBo();
+        } else {
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Thất bại", "Lỗi khi lưu phiếu xuất hủy!");
         }
     }
 

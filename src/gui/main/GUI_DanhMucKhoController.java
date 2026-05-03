@@ -21,6 +21,7 @@ import java.util.ResourceBundle;
 
 import utils.AlertUtils;
 import utils.SceneUtils;
+import utils.UserSession;
 
 public class GUI_DanhMucKhoController implements Initializable {
 
@@ -89,23 +90,20 @@ public class GUI_DanhMucKhoController implements Initializable {
             }
         });
 
-        // 🚨 FIX LỖI MÀU TRẠNG THÁI Ở ĐÂY
         colTrangThaiTon.setCellValueFactory(new PropertyValueFactory<>("soLuongTon"));
         colTrangThaiTon.setCellFactory(column -> new TableCell<>() {
             @Override protected void updateItem(Integer soLuong, boolean empty) {
                 super.updateItem(soLuong, empty);
                 setAlignment(Pos.CENTER);
                 
-                // Xóa sạch các class màu cũ để tránh xung đột
                 getStyleClass().removeAll("status-con-hang", "status-sap-het", "status-het-hang");
-                setStyle(""); // Reset luôn style cứng cho chắc ăn
+                setStyle(""); 
                 
                 if (empty || soLuong == null) {
                     setText(null); 
                 } else {
                     if (soLuong == 0) {
                         setText("Cạn Kho");
-                        // Ép trực tiếp màu bằng setStyle nếu CSS không ăn
                         setStyle("-fx-text-fill: #dc2626; -fx-font-weight: bold;"); 
                         getStyleClass().add("status-het-hang"); 
                     } else if (soLuong <= 100) {
@@ -146,7 +144,6 @@ public class GUI_DanhMucKhoController implements Initializable {
                               (viTriSelection.equals("Kho Bán Hàng") && "KHO_BAN_HANG".equals(lo.getViTriKho())) ||
                               (viTriSelection.equals("Kho Dự Trữ") && "KHO_DU_TRU".equals(lo.getViTriKho()));
 
-            // 💡 Cập nhật lại chuỗi trạng thái để tìm kiếm cho chuẩn
             String trangThai;
             if (lo.getSoLuongTon() == 0) {
                 trangThai = "cạn kho";
@@ -167,10 +164,16 @@ public class GUI_DanhMucKhoController implements Initializable {
     }
 
     // =========================================================================
-    // HÀM CHUYỂN TRANG: Gọi đại ca Trang Chủ và truyền chữ "Nhập Kho" / "Xuất Kho"
+    // HÀM CHUYỂN TRANG: ĐÃ GỠ CONFLICT (KẾT HỢP PHÂN QUYỀN VÀ HIGHLIGHT SIDEBAR)
     // =========================================================================
     @FXML 
     void moTrangNhapKho(ActionEvent event) { 
+        // 1. Kiểm tra quyền hạn từ Incoming
+        if (!UserSession.getInstance().hasPermission("QLK.NHAP_KHO")) {
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Không có quyền", "Bạn không có quyền truy cập trang Nhập Kho.");
+            return;
+        }
+        // 2. Chuyển trang và Highlight từ HEAD
         if (GUI_TrangChuController.getInstance() != null) {
             GUI_TrangChuController.getInstance().chuyenTrangVaHighlight("/gui/main/GUI_NhapKho.fxml", "Nhập Kho");
         }
@@ -178,6 +181,12 @@ public class GUI_DanhMucKhoController implements Initializable {
 
     @FXML 
     void handleChuyenTrangXuatKho(ActionEvent event) { 
+        // 1. Kiểm tra quyền hạn từ Incoming
+        if (!UserSession.getInstance().hasPermission("QLK.XUAT_KHO")) {
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Không có quyền", "Bạn không có quyền truy cập trang Xuất Kho.");
+            return;
+        }
+        // 2. Chuyển trang và Highlight từ HEAD
         if (GUI_TrangChuController.getInstance() != null) {
             GUI_TrangChuController.getInstance().chuyenTrangVaHighlight("/gui/main/GUI_XuatKho.fxml", "Xuất Kho");
         }

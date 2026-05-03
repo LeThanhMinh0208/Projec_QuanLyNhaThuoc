@@ -6,7 +6,9 @@ public class ValidationUtils {
      * Chuẩn hóa chuỗi: Trim khoảng trắng 2 đầu và thay thế nhiều khoảng trắng liên tiếp bằng 1 khoảng trắng
      */
     public static String normalizeString(String input) {
-        if (input == null || input.trim().isEmpty()) return "";
+        if (input == null || input.trim().isEmpty()) {
+			return "";
+		}
         return input.trim().replaceAll("\\s+", " ");
     }
 
@@ -15,8 +17,10 @@ public class ValidationUtils {
      */
     public static String capitalizeName(String input) {
         String normalized = normalizeString(input);
-        if (normalized.isEmpty()) return "";
-        
+        if (normalized.isEmpty()) {
+			return "";
+		}
+
         String[] words = normalized.split(" ");
         StringBuilder sb = new StringBuilder();
         for (String w : words) {
@@ -35,7 +39,9 @@ public class ValidationUtils {
      * Kiểm tra chuỗi phải chứa ít nhất 1 chữ cái
      */
     public static boolean containsLetter(String input) {
-        if (input == null) return false;
+        if (input == null) {
+			return false;
+		}
         return input.matches(".*[a-zA-ZÀ-ỹ].*");
     }
 
@@ -43,7 +49,9 @@ public class ValidationUtils {
      * Kiểm tra chuỗi phải chứa ít nhất 1 chữ cái HOẶC số
      */
     public static boolean containsLetterOrNumber(String input) {
-        if (input == null) return false;
+        if (input == null) {
+			return false;
+		}
         return input.matches(".*[a-zA-Z0-9À-ỹ].*");
     }
 

@@ -14,14 +14,14 @@ import java.text.SimpleDateFormat;
 public class Print_PhieuNhap {
 
     public static boolean inPhieu(PhieuNhap pn, ObservableList<ChiTietUI> listChiTiet, String path) {
-        // Căn lề A4 chuẩn như Hóa Đơn
+        // Căn lề A4 chuẩn chuyên nghiệp
         Document document = new Document(PageSize.A4, 40, 40, 50, 50); 
         try {
             PdfWriter.getInstance(document, new FileOutputStream(path));
             document.open();
 
             // =======================================================
-            // 1. CÀI ĐẶT FONT TIẾNG VIỆT
+            // 1. CÀI ĐẶT FONT TIẾNG VIỆT (Sử dụng Arial hệ thống)
             // =======================================================
             BaseFont bf = BaseFont.createFont("C:\\Windows\\Fonts\\arial.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             Font fontShopName = new Font(bf, 18, Font.BOLD, BaseColor.BLACK);
@@ -30,7 +30,7 @@ public class Print_PhieuNhap {
             Font fontBold = new Font(bf, 11, Font.BOLD, BaseColor.BLACK);
             Font fontItalic = new Font(bf, 10, Font.ITALIC, BaseColor.DARK_GRAY);
             
-            // Màu sắc đồng bộ Hóa Đơn
+            // Màu sắc đồng bộ hệ thống
             BaseColor headerBlue = new BaseColor(43, 139, 198); 
             Font fontTableHeader = new Font(bf, 11, Font.BOLD, BaseColor.WHITE);
             Font fontTotalRed = new Font(bf, 14, Font.BOLD, new BaseColor(220, 38, 38)); 
@@ -48,7 +48,7 @@ public class Print_PhieuNhap {
             
             document.add(new Paragraph(" ")); // Dòng trống
 
-            // Đường nét đứt (Dotted Line)
+            // Đường nét đứt trang trí
             DottedLineSeparator separator = new DottedLineSeparator();
             separator.setPercentage(100);
             separator.setLineColor(BaseColor.GRAY);
@@ -64,7 +64,7 @@ public class Print_PhieuNhap {
             document.add(title);
 
             // =======================================================
-            // 4. THÔNG TIN CHUNG (Dùng Lưới không viền để gióng hàng)
+            // 4. THÔNG TIN CHUNG
             // =======================================================
             PdfPTable infoTable = new PdfPTable(2);
             infoTable.setWidthPercentage(100);
@@ -84,9 +84,9 @@ public class Print_PhieuNhap {
             // =======================================================
             // 5. BẢNG CHI TIẾT HÀNG NHẬP
             // =======================================================
-            PdfPTable table = new PdfPTable(7); 
+            PdfPTable table = new PdfPTable(7);
             table.setWidthPercentage(100);
-            // Căn chỉnh độ rộng các cột cho cân đối
+            // Tỷ lệ cột tối ưu cho tên thuốc (HEAD)
             table.setWidths(new float[]{0.8f, 3.5f, 1f, 1f, 1.5f, 1.5f, 2f}); 
 
             String[] headers = {"STT", "Tên thuốc", "ĐVT", "SL", "Mã lô", "Giá nhập", "Thành tiền"};
@@ -126,7 +126,7 @@ public class Print_PhieuNhap {
             cellLabel.setBorderColor(BaseColor.LIGHT_GRAY);
             cellLabel.setPaddingTop(10f);
 
-            PdfPCell cellValue = new PdfPCell(new Phrase(df.format(pn.getTongTien()) + " đ", fontTotalRed));
+            PdfPCell cellValue = new PdfPCell(new Phrase(df.format(pn.getTongTien()) + " VNĐ", fontTotalRed));
             cellValue.setHorizontalAlignment(Element.ALIGN_RIGHT);
             cellValue.setBorder(Rectangle.TOP);
             cellValue.setBorderColor(BaseColor.LIGHT_GRAY);
@@ -152,7 +152,7 @@ public class Print_PhieuNhap {
             PdfPCell cellNguoiGiao = new PdfPCell(new Phrase("Người giao hàng", fontBold));
             cellNguoiGiao.setHorizontalAlignment(Element.ALIGN_CENTER);
             cellNguoiGiao.setBorder(Rectangle.NO_BORDER);
-            
+
             tableChuKy.addCell(cellNguoiLap);
             tableChuKy.addCell(cellNguoiGiao);
 
@@ -179,7 +179,7 @@ public class Print_PhieuNhap {
     }
 
     // =======================================================
-    // HÀM HỖ TRỢ VẼ BẢNG (HELPER METHODS)
+    // HÀM HỖ TRỢ VẼ BẢNG
     // =======================================================
     private static void addInfoRow(PdfPTable table, String label, String value, Font font) {
         PdfPCell c1 = new PdfPCell(new Phrase(label, font));

@@ -1,4 +1,4 @@
-package gui.main; 
+package gui.main;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import dao.DAO_BangGia;
+import dao.DAO_NhatKyHoatDong;
 import entity.BangGia;
 import entity.ChiTietBangGia;
 import javafx.beans.property.SimpleStringProperty;
@@ -18,7 +19,18 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -57,6 +69,7 @@ public class GUI_QuanLyBangGiaController {
     @FXML private TableColumn<ChiTietBangGia, String> colNhapTenThuoc;
     @FXML private TableColumn<ChiTietBangGia, String> colNhapDonVi;
     @FXML private TableColumn<ChiTietBangGia, String> colNhapGiaBan;
+    @FXML private Button btnThemBangGiaMoi, btnQuayLai1, btnQuayLai2;
 
     // ======= DAO & Data =======
     private final DAO_BangGia dao = new DAO_BangGia();
@@ -71,8 +84,31 @@ public class GUI_QuanLyBangGiaController {
         setupSearch();
         setupLoaiComboBox();
         loadDanhSach();
-        hienViewDanhSach();
         setupKeyboardNavigation();
+
+        // Xử lý phân quyền
+        boolean hasTaoMoi = utils.UserSession.getInstance().hasPermission("QLBG.TAO_BANG_GIA_MOI");
+        boolean hasDanhSach = utils.UserSession.getInstance().hasPermission("QLBG.DANH_SACH_BANG_GIA");
+
+        if (btnThemBangGiaMoi != null) {
+            btnThemBangGiaMoi.setVisible(hasTaoMoi);
+            btnThemBangGiaMoi.setManaged(hasTaoMoi);
+        }
+        if (btnQuayLai1 != null) {
+            btnQuayLai1.setVisible(hasDanhSach);
+            btnQuayLai1.setManaged(hasDanhSach);
+        }
+        if (btnQuayLai2 != null) {
+            btnQuayLai2.setVisible(hasDanhSach);
+            btnQuayLai2.setManaged(hasDanhSach);
+        }
+
+        // Chuyển view mặc định theo quyền
+        if (!hasDanhSach && hasTaoMoi) {
+            hienViewTaoBangGia();
+        } else {
+            hienViewDanhSach();
+        }
     }
 
     // ============================================================
@@ -92,7 +128,9 @@ public class GUI_QuanLyBangGiaController {
             int soLoai = bg.getSoLuongThuoc();
             int soDV   = bg.getSoDonVi();
             String text = soLoai + " loại";
-            if (soDV > 0) text += " (" + soDV + " đv)";
+            if (soDV > 0) {
+				text += " (" + soDV + " đv)";
+			}
             return new SimpleStringProperty(text);
         });
 
@@ -103,9 +141,13 @@ public class GUI_QuanLyBangGiaController {
                 setText(empty || item == null ? null : item);
                 getStyleClass().removeAll("text-xanh-la", "text-vang-cam", "text-do");
                 if (!empty && item != null) {
-                    if (item.contains("hiệu lực") && !item.contains("Chưa")) getStyleClass().add("text-xanh-la");
-                    else if (item.contains("Chưa")) getStyleClass().add("text-vang-cam");
-                    else getStyleClass().add("text-do");
+                    if (item.contains("hiệu lực") && !item.contains("Chưa")) {
+						getStyleClass().add("text-xanh-la");
+					} else if (item.contains("Chưa")) {
+						getStyleClass().add("text-vang-cam");
+					} else {
+						getStyleClass().add("text-do");
+					}
                 }
             }
         });
@@ -240,6 +282,10 @@ public class GUI_QuanLyBangGiaController {
     // ============================================================
     @FXML
     public void handleThemBangGiaMoi() {
+        if (!utils.UserSession.getInstance().hasPermission("QLBG.TAO_BANG_GIA_MOI")) {
+            utils.AlertUtils.showAlert(Alert.AlertType.WARNING, "Không có quyền", "Bạn không có quyền tạo bảng giá mới.");
+            return;
+        }
         // Reset form
         txtTenBangGia.clear();
         cbLoaiBangGia.setValue(null);
@@ -279,6 +325,10 @@ public class GUI_QuanLyBangGiaController {
     // ============================================================
     @FXML
     void handleQuayLaiDanhSach(ActionEvent event) {
+        if (!utils.UserSession.getInstance().hasPermission("QLBG.DANH_SACH_BANG_GIA")) {
+            utils.AlertUtils.showAlert(Alert.AlertType.WARNING, "Không có quyền", "Bạn không có quyền xem danh sách bảng giá.");
+            return;
+        }
         hienViewDanhSach();
     }
 
@@ -328,10 +378,10 @@ public class GUI_QuanLyBangGiaController {
                 String mauTen = thieu.stream().limit(5)
                         .map(ct -> " \u2022 " + ct.getTenThuoc() + " - " + ct.getTenDonVi())
                         .collect(Collectors.joining("\n"));
-                
+
                 ButtonType btnKeThua = new ButtonType("Kế thừa giá cũ", ButtonBar.ButtonData.OK_DONE);
                 ButtonType btnNhapTay = new ButtonType("Nhập tay", ButtonBar.ButtonData.CANCEL_CLOSE);
-                
+
                 Alert confirm = new Alert(Alert.AlertType.WARNING,
                         "Bảng giá mặc định phải có đầy đủ giá cho TẤT CẢ thuốc\nvà đơn vị quy đổi trong hệ thống.\n"
                         + "Còn thiếu " + thieu.size() + " đơn vị chưa có giá:\n" + mauTen
@@ -341,7 +391,7 @@ public class GUI_QuanLyBangGiaController {
                 confirm.setTitle("Không thể lưu bảng giá");
                 confirm.setHeaderText(null);
                 confirm.showAndWait();
-                
+
                 if (confirm.getResult() == btnKeThua) {
                     handleLayGiaTuDefault(null);
                 }
@@ -354,13 +404,13 @@ public class GUI_QuanLyBangGiaController {
             List<String> dsQuyDoi = danhSachGia.stream()
                     .map(ChiTietBangGia::getMaQuyDoi).collect(Collectors.toList());
             List<ChiTietBangGia> dsTrung = dao.kiemTraTrungPromo(dsQuyDoi, ngayBatDau, ngayKetThuc, null);
-            
+
             if (!dsTrung.isEmpty()) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("Không thể tạo bảng giá. Các đơn vị sau đã có giá PROMO \n");
                 sb.append("trong cùng khoảng thời gian [").append(ngayBatDau.format(FMT))
                   .append("] - [").append(ngayKetThuc.format(FMT)).append("]:\n\n");
-                
+
                 for (ChiTietBangGia ct : dsTrung) {
                     sb.append(" • ").append(ct.getTenThuoc()).append(" - ").append(ct.getTenDonVi());
                     sb.append("  →  Bảng: ").append(ct.getTenBangGia());
@@ -371,7 +421,7 @@ public class GUI_QuanLyBangGiaController {
                     sb.append(")\n");
                 }
                 sb.append("\nVui lòng bỏ các thuốc trùng khỏi bảng giá này hoặc điều chỉnh thời gian áp dụng.");
-                
+
                 showAlert(Alert.AlertType.ERROR, "Cảnh báo trùng PROMO", sb.toString());
                 return; // CHẶN LƯU
             }
@@ -395,6 +445,8 @@ public class GUI_QuanLyBangGiaController {
         // --- Lưu ---
         String err = dao.taoBangGiaMoi(bg, danhSachGia);
         if (err == null) {
+            String moTa = "Tạo bảng giá mới: " + bg.getTenBangGia() + "\n- Loại: " + bg.getLoaiBangGia() + "\n- Ngày bắt đầu: " + bg.getNgayBatDau().format(FMT) + "\n- Số lượng thuốc: " + danhSachGia.size();
+            DAO_NhatKyHoatDong.ghiLog("THEM", "Bảng Giá", bg.getMaBangGia(), moTa);
             showAlert(Alert.AlertType.INFORMATION, "Thành công", "Tạo bảng giá thành công! Mã: " + bg.getMaBangGia());
             loadDanhSach();
             hienViewDanhSach();
@@ -449,6 +501,7 @@ public class GUI_QuanLyBangGiaController {
         if (confirm.getResult() == ButtonType.YES) {
             boolean ok = dao.voHieuHoa(bg.getMaBangGia());
             if (ok) {
+                DAO_NhatKyHoatDong.ghiLog("VO_HIEU_HOA", "Bảng Giá", bg.getMaBangGia(), "Vô hiệu hóa bảng giá: " + bg.getTenBangGia());
                 showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã vô hiệu hóa bảng giá.");
                 loadDanhSach();
             } else {
@@ -466,8 +519,12 @@ public class GUI_QuanLyBangGiaController {
         LocalDate kt = bg.getNgayKetThuc();
         boolean active = bg.isTrangThai();
 
-        if (!active || (kt != null && kt.isBefore(today))) return "Đã kết thúc";
-        if (bd.isAfter(today)) return "Chưa hiệu lực";
+        if (!active || (kt != null && kt.isBefore(today))) {
+			return "Đã kết thúc";
+		}
+        if (bd.isAfter(today)) {
+			return "Chưa hiệu lực";
+		}
         return "Đang hiệu lực";
     }
 
@@ -522,7 +579,9 @@ public class GUI_QuanLyBangGiaController {
         tableBangGia.setOnKeyPressed(event -> {
             if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
                 BangGia sel = tableBangGia.getSelectionModel().getSelectedItem();
-                if (sel != null) moDialogChiTiet(sel);
+                if (sel != null) {
+					moDialogChiTiet(sel);
+				}
                 event.consume();
             } else if (event.getCode() == javafx.scene.input.KeyCode.F5) {
                 loadDanhSach();

@@ -1,6 +1,7 @@
 package gui.dialogs;
 
 import dao.*;
+import dao.DAO_NhatKyHoatDong;
 import entity.*;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.*;
@@ -180,7 +181,8 @@ public class Dialog_XuatChuyenKhoController implements Initializable {
         
         // 3. LƯU VÀO DATABASE
         if (daoPX.chuyenKhoNoiBo(px, new ArrayList<>(dsXuatTam), maKhoNhan)) {
-            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chuyển kho hoàn tất! Mã phiếu: " + maPhieuMoi); 
+            DAO_NhatKyHoatDong.ghiLog("TAO_PHIEU_XUAT", "Phiếu Xuất", maPhieuMoi, "Tạo phiếu xuất chuyển kho: " + maPhieuMoi);
+            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã xuất chuyển kho thành công!\nMã phiếu: " + maPhieuMoi); 
             ((Stage) txtKhoNhan.getScene().getWindow()).close();
         }
     }

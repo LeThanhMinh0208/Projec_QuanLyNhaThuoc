@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+
 import connectDB.ConnectDB;
 import entity.DonThuoc;
 
@@ -27,7 +28,9 @@ public class DAO_DanhMucDonThuoc {
             try (PreparedStatement pst = con.prepareStatement(sql)) {
                 pst.setString(1, tenBacSi);
                 try (ResultSet rs = pst.executeQuery()) {
-                    while (rs.next()) list.add(mapRow(rs));
+                    while (rs.next()) {
+						list.add(mapRow(rs));
+					}
                 }
             }
         } catch (Exception e) {
@@ -56,7 +59,9 @@ public class DAO_DanhMucDonThuoc {
         try {
             try (PreparedStatement pst = con.prepareStatement(sql);
                  ResultSet rs = pst.executeQuery()) {
-                while (rs.next()) list.add(mapRow(rs));
+                while (rs.next()) {
+					list.add(mapRow(rs));
+				}
             }
         } catch (Exception e) {
             System.err.println("Lỗi getAll: " + e.getMessage());
@@ -77,7 +82,9 @@ public class DAO_DanhMucDonThuoc {
                 pst.setString(2, kw);
                 pst.setString(3, kw);
                 try (ResultSet rs = pst.executeQuery()) {
-                    while (rs.next()) list.add(mapRow(rs));
+                    while (rs.next()) {
+						list.add(mapRow(rs));
+					}
                 }
             }
         } catch (Exception e) {
@@ -155,7 +162,9 @@ public class DAO_DanhMucDonThuoc {
         try {
             try (PreparedStatement pst = con.prepareStatement(sql);
                  ResultSet rs = pst.executeQuery()) {
-                while (rs.next()) list.add(rs.getString("tenBacSi"));
+                while (rs.next()) {
+					list.add(rs.getString("tenBacSi"));
+				}
             }
         } catch (Exception e) {
             System.err.println("Lỗi getDanhSachBacSi: " + e.getMessage());
@@ -171,7 +180,9 @@ public class DAO_DanhMucDonThuoc {
             try (PreparedStatement ps = con.prepareStatement(sql)) {
                 ps.setString(1, maHoaDon);
                 try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) return rs.getInt(1) > 0;
+                    if (rs.next()) {
+						return rs.getInt(1) > 0;
+					}
                 }
             }
         } catch (Exception e) {

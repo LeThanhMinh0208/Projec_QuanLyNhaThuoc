@@ -1,5 +1,8 @@
 package gui.main;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dao.DAO_DonViQuyDoi;
 import dao.DAO_Thuoc;
 import entity.DonViQuyDoi;
@@ -13,16 +16,18 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import utils.AlertUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public class GUI_DonViQuyDoiController {
 
@@ -122,13 +127,13 @@ public class GUI_DonViQuyDoiController {
 
     private void loadData() {
         masterData.clear();
-        
+
         // 1. Lấy tất cả thuốc (1 query)
         List<Thuoc> dsThuoc = daoThuoc.getAllThuocTatCa();
-        
+
         // 2. Lấy tất cả đơn vị quy đổi (1 query)
         List<DonViQuyDoi> allUnits = daoDonViQuyDoi.getAllDonViQuyDoi();
-        
+
         // 3. Nhóm đơn vị quy đổi theo maThuoc bằng Map để tra cứu nhanh O(1)
         java.util.Map<String, ArrayList<DonViQuyDoi>> unitMap = new java.util.HashMap<>();
         for (DonViQuyDoi dv : allUnits) {
@@ -146,7 +151,7 @@ public class GUI_DonViQuyDoiController {
         int stt = 1;
         for (Thuoc thuoc : dsThuoc) {
             ArrayList<DonViQuyDoi> donVi = unitMap.getOrDefault(thuoc.getMaThuoc(), new ArrayList<>());
-            
+
             // Đảm bảo list donVi được sắp xếp theo tyLeQuyDoi ASC (đã sort ở SQL nhưng check lại cho chắc)
             donVi.sort(java.util.Comparator.comparingInt(DonViQuyDoi::getTyLeQuyDoi));
 

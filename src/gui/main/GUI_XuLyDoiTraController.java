@@ -98,9 +98,7 @@ public class GUI_XuLyDoiTraController {
     private void setupTabs() {
         tabGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
             if (newToggle == null) {
-                if (oldToggle != null) {
-                    oldToggle.setSelected(true);
-                }
+                if (oldToggle != null) oldToggle.setSelected(true);
                 return;
             }
 
@@ -134,9 +132,7 @@ public class GUI_XuLyDoiTraController {
 
         colHanhDong.setCellFactory(col -> new TableCell<>() {
             private final Button btnXuLy = new Button();
-            {
-                btnXuLy.setOnAction(e -> xuLyDoiTra(getTableView().getItems().get(getIndex())));
-            }
+            { btnXuLy.setOnAction(e -> xuLyDoiTra(getTableView().getItems().get(getIndex()))); }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
@@ -150,7 +146,7 @@ public class GUI_XuLyDoiTraController {
                         soNgay = java.time.temporal.ChronoUnit.DAYS.between(hd.getNgayLap().toLocalDateTime().toLocalDate(), java.time.LocalDate.now());
                     }
                     
-                    // 💡 FIX CSS: Sử dụng Class thay vì setStyle cứng
+                    // 💡 ĐÃ GỠ CONFLICT & FIX CSS: Sử dụng Class chuẩn
                     btnXuLy.getStyleClass().removeAll("btn-detail-pill-green", "btn-detail-disabled");
                     
                     if (soNgay > 30) {
@@ -176,20 +172,14 @@ public class GUI_XuLyDoiTraController {
         colChiTietPDT.setCellFactory(col -> new TableCell<>() {
             private final Button btnChiTiet = new Button("Xem");
             {
-                // 💡 FIX CSS: Gắn class viên thuốc xanh lá
                 btnChiTiet.getStyleClass().add("btn-detail-pill-green");
                 btnChiTiet.setOnAction(e -> moChiTietPhieuDoiTra(getTableView().getItems().get(getIndex())));
             }
-
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(btnChiTiet);
-                    setAlignment(Pos.CENTER);
-                }
+                if (empty) setGraphic(null);
+                else { setGraphic(btnChiTiet); setAlignment(Pos.CENTER); }
             }
         });
         colMaPhieuDoiTra.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getMaPhieuDoiTra()));
@@ -239,9 +229,11 @@ public class GUI_XuLyDoiTraController {
         } else {
             String lower = keyword.toLowerCase();
             filteredData.setPredicate(hd -> {
-                if (hd.getMaHoaDon() != null && hd.getMaHoaDon().toLowerCase().contains(lower)) return true;
-                if (hd.getTenKhachHang() != null && hd.getTenKhachHang().toLowerCase().contains(lower)) return true;
-                return hd.getSdt() != null && hd.getSdt().toLowerCase().contains(lower);
+                // 💡 ĐÃ GỠ CONFLICT: Logic tìm kiếm gộp rành mạch
+                boolean matchMa = hd.getMaHoaDon() != null && hd.getMaHoaDon().toLowerCase().contains(lower);
+                boolean matchTen = hd.getTenKhachHang() != null && hd.getTenKhachHang().toLowerCase().contains(lower);
+                boolean matchSdt = hd.getSdt() != null && hd.getSdt().toLowerCase().contains(lower);
+                return matchMa || matchTen || matchSdt;
             });
         }
         updateFooter();
@@ -289,8 +281,6 @@ public class GUI_XuLyDoiTraController {
             stage.setTitle("Chi tiết phiếu đổi trả - " + pdt.getMaPhieuDoiTra());
             stage.setScene(new Scene(root));
             stage.showAndWait();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) { e.printStackTrace(); }
     }
 }

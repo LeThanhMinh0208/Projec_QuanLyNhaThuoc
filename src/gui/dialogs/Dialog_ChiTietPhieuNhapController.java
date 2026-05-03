@@ -37,7 +37,8 @@ public class Dialog_ChiTietPhieuNhapController {
 
     private DecimalFormat df = new DecimalFormat("#,### VNĐ");
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-    
+
+    // Biến lưu Phiếu Nhập hiện tại để In
     private PhieuNhap phieuHienTai;
 
     @FXML public void initialize() {
@@ -45,22 +46,22 @@ public class Dialog_ChiTietPhieuNhapController {
         colDonVi.setCellValueFactory(new PropertyValueFactory<>("donVi"));
         colSoLuong.setCellValueFactory(new PropertyValueFactory<>("soLuong"));
         colSoLuong.setStyle("-fx-alignment: CENTER; -fx-font-weight: bold; -fx-text-fill: #059669;");
-        
+
         colMaLo.setCellValueFactory(new PropertyValueFactory<>("maLo"));
         colMaLo.setStyle("-fx-alignment: CENTER;");
-        
+
         colNgaySX.setCellValueFactory(new PropertyValueFactory<>("ngaySXStr"));
         colHanDung.setCellValueFactory(new PropertyValueFactory<>("hanDungStr"));
-        
+
         colGiaNhap.setCellValueFactory(new PropertyValueFactory<>("giaNhapStr"));
         colGiaNhap.setStyle("-fx-alignment: CENTER-RIGHT;");
-        
+
         colThanhTien.setCellValueFactory(new PropertyValueFactory<>("thanhTienStr"));
         colThanhTien.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: #e11d48;");
     }
 
     public void setPhieuNhap(PhieuNhap pn) {
-        this.phieuHienTai = pn; 
+        this.phieuHienTai = pn; // Gán vào biến toàn cục để dành cho việc IN PDF
         
         lblMaPhieu.setText("Mã phiếu: " + pn.getMaPhieuNhap());
         lblNhaCungCap.setText(pn.getNhaCungCap().getTenNhaCungCap());
@@ -73,7 +74,8 @@ public class Dialog_ChiTietPhieuNhapController {
 
     private void loadChiTietTuDatabase(String maPhieu) {
         ObservableList<ChiTietUI> list = FXCollections.observableArrayList();
-        
+
+        // ĐÃ SỬA CÂU LỆNH SQL: Join thêm bảng DonViQuyDoi để lấy đúng tenDonVi thay vì maQuyDoi
         String sql = "SELECT t.tenThuoc, dv.tenDonVi, ctpn.soLuong, ctpn.donGiaNhap, " +
                      "lt.maLoThuoc, lt.ngaySanXuat, lt.hanSuDung " +
                      "FROM ChiTietPhieuNhap ctpn " +
@@ -82,14 +84,17 @@ public class Dialog_ChiTietPhieuNhapController {
                      "JOIN DonViQuyDoi dv ON ctpn.maQuyDoi = dv.maQuyDoi " +
                      "WHERE ctpn.maPhieuNhap = ?";
 
-        try (Connection con = ConnectDB.getInstance().getConnection();
+        ConnectDB.getInstance();
+        try (Connection con = ConnectDB.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setString(1, maPhieu);
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 ChiTietUI ct = new ChiTietUI();
                 ct.setTenThuoc(rs.getString("tenThuoc"));
-                ct.setDonVi(rs.getString("tenDonVi")); 
+                // ĐÃ SỬA: Lấy từ cột tenDonVi vừa Join
+                ct.setDonVi(rs.getString("tenDonVi"));
+
                 ct.setSoLuong(rs.getInt("soLuong"));
                 ct.setGiaNhap(rs.getDouble("donGiaNhap"));
                 ct.setMaLo(rs.getString("maLoThuoc"));
@@ -103,13 +108,17 @@ public class Dialog_ChiTietPhieuNhapController {
         }
     }
 
+    // ===============================================
+    // XỬ LÝ NÚT IN PHIẾU NHẬP (CÓ XEM TRƯỚC)
+    // ===============================================
     @FXML 
     void handleInPhieu(ActionEvent event) {
         if (phieuHienTai == null || tableChiTiet.getItems() == null || tableChiTiet.getItems().isEmpty()) {
-            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thông báo", "Phiếu này chưa có chi tiết hàng hóa, không thể in!");
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thông báo", "Phiếu này chưa có chi tiết hàng hóa, không thể in PDF!");
             return;
         }
         
+        // GIAO DIỆN XEM TRƯỚC (MODAL PREVIEW)
         Stage previewStage = new Stage();
         previewStage.setTitle("Xem trước Phiếu Nhập Kho - " + phieuHienTai.getMaPhieuNhap());
         previewStage.initModality(Modality.APPLICATION_MODAL);
@@ -179,31 +188,24 @@ public class Dialog_ChiTietPhieuNhapController {
         Button btnConfirm = new Button("✔ Xác nhận In");
         btnConfirm.setStyle("-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 20;");
         
-        // ===============================================
-        // ĐÃ SỬA: SỬ DỤNG ĐƯỜNG DẪN TƯƠNG ĐỐI (RELATIVE PATH)
-        // ===============================================
+        // XỬ LÝ LƯU FILE KHI XÁC NHẬN
         btnConfirm.setOnAction(e -> {
             try {
-                // Định nghĩa đường dẫn tương đối (tự động lấy gốc là thư mục project của máy người chạy)
+                // Sử dụng đường dẫn tương đối (Relative Path)
                 File exportDir = new File("exports" + File.separator + "phieunhap");
-                
-                // Nếu máy thành viên khác chưa có thư mục này -> Tự động tạo
-                if (!exportDir.exists()) {
-                    exportDir.mkdirs();
-                }
+                if (!exportDir.exists()) exportDir.mkdirs();
 
-                // Khai báo file đích
                 File finalFile = new File(exportDir, "PhieuNhapKho_" + phieuHienTai.getMaPhieuNhap() + ".pdf");
                 String finalPath = finalFile.getAbsolutePath();
 
-                // Gọi service In
+                // Gọi service In PDF
                 Print_PhieuNhap.inPhieu(phieuHienTai, tableChiTiet.getItems(), finalPath);
                 
                 AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã lưu phiếu thành công tại:\n" + finalPath);
                 previewStage.close();
             } catch (Exception ex) {
                 ex.printStackTrace();
-                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi Hệ Thống", "Không thể in phiếu. Chi tiết: " + ex.getMessage());
+                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi Hệ Thống", "Không thể in phiếu: " + ex.getMessage());
             }
         });
 

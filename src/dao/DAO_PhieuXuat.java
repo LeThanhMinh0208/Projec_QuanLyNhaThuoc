@@ -1,11 +1,17 @@
 package dao;
 
-import connectDB.ConnectDB;
-import entity.PhieuXuat;
-import entity.ChiTietPhieuXuat;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
+import connectDB.ConnectDB;
+import entity.ChiTietPhieuXuat;
+import entity.PhieuXuat;
 
 public class DAO_PhieuXuat {
 
@@ -28,13 +34,14 @@ public class DAO_PhieuXuat {
                 PhieuXuat px = new PhieuXuat();
                 px.setMaPhieuXuat(rs.getString("maPhieuXuat"));
                 Timestamp ts = rs.getTimestamp("ngayXuat");
-                if (ts != null)
-                    px.setNgayXuat(ts.toLocalDateTime());
+                if (ts != null) {
+					px.setNgayXuat(ts.toLocalDateTime());
+				}
                 px.setMaNhanVien(rs.getString("hoTen"));
                 px.setLoaiPhieu(rs.getInt("loaiPhieu"));
                 px.setKhoNhan(rs.getString("khoNhan"));
                 px.setGhiChu(rs.getString("ghiChu"));
-                
+
                 px.setMaNhaCungCap(rs.getString("maNhaCungCap"));
                 px.setTongTien(rs.getDouble("tongTien"));
 
@@ -73,10 +80,10 @@ public class DAO_PhieuXuat {
             PreparedStatement psUpdateKho = conn.prepareStatement(sqlUpdateKho);
 
             for (ChiTietPhieuXuat ct : listCT) {
-                psCT.setString(1, px.getMaPhieuXuat()); 
+                psCT.setString(1, px.getMaPhieuXuat());
                 psCT.setString(2, ct.getSoLo()); // Trong Java vẫn dùng getSoLo() tạm, ném xuống DB là maLoThuoc
-                psCT.setInt(3, ct.getSoLuong()); 
-                psCT.setDouble(4, ct.getDonGia()); 
+                psCT.setInt(3, ct.getSoLuong());
+                psCT.setDouble(4, ct.getDonGia());
                 psCT.setDouble(5, ct.getThanhTien());
                 psCT.addBatch();
 
@@ -92,16 +99,18 @@ public class DAO_PhieuXuat {
             return true;
         } catch (Exception e) {
             try {
-                if (conn != null)
-                    conn.rollback();
+                if (conn != null) {
+					conn.rollback();
+				}
             } catch (Exception ex) {
             }
             e.printStackTrace();
             return false;
         } finally {
             try {
-                if (conn != null)
-                    conn.setAutoCommit(true);
+                if (conn != null) {
+					conn.setAutoCommit(true);
+				}
             } catch (Exception e) {
             }
         }
@@ -153,10 +162,10 @@ public class DAO_PhieuXuat {
             PreparedStatement psGiamTon = conn.prepareStatement(sqlGiamTon);
 
             for (ChiTietPhieuXuat ct : listCT) {
-                psCT.setString(1, px.getMaPhieuXuat()); 
-                psCT.setString(2, ct.getSoLo()); 
+                psCT.setString(1, px.getMaPhieuXuat());
+                psCT.setString(2, ct.getSoLo());
                 psCT.setInt(3, ct.getSoLuong());
-                psCT.setDouble(4, ct.getDonGia()); 
+                psCT.setDouble(4, ct.getDonGia());
                 psCT.setDouble(5, ct.getThanhTien());
                 psCT.addBatch();
 
@@ -178,16 +187,18 @@ public class DAO_PhieuXuat {
             return true;
         } catch (Exception e) {
             try {
-                if (conn != null)
-                    conn.rollback();
+                if (conn != null) {
+					conn.rollback();
+				}
             } catch (Exception ex) {
             }
             e.printStackTrace();
             return false;
         } finally {
             try {
-                if (conn != null)
-                    conn.setAutoCommit(true);
+                if (conn != null) {
+					conn.setAutoCommit(true);
+				}
             } catch (Exception e) {
             }
         }
@@ -237,7 +248,7 @@ public class DAO_PhieuXuat {
             PreparedStatement psP = conn.prepareStatement(sqlP);
             psP.setString(1, px.getMaPhieuXuat());
             psP.setString(2, px.getMaNhanVien());
-            psP.setDouble(3, px.getTongTien()); 
+            psP.setDouble(3, px.getTongTien());
             psP.setString(4, px.getGhiChu());
             psP.executeUpdate();
 
@@ -249,10 +260,10 @@ public class DAO_PhieuXuat {
             PreparedStatement psGiamTon = conn.prepareStatement(sqlGiamTon);
 
             for (ChiTietPhieuXuat ct : listCT) {
-                psCT.setString(1, px.getMaPhieuXuat()); 
-                psCT.setString(2, ct.getSoLo()); 
+                psCT.setString(1, px.getMaPhieuXuat());
+                psCT.setString(2, ct.getSoLo());
                 psCT.setInt(3, ct.getSoLuong());
-                psCT.setDouble(4, ct.getDonGia()); 
+                psCT.setDouble(4, ct.getDonGia());
                 psCT.setDouble(5, ct.getThanhTien());
                 psCT.addBatch();
 
@@ -267,16 +278,18 @@ public class DAO_PhieuXuat {
             return true;
         } catch (Exception e) {
             try {
-                if (conn != null)
-                    conn.rollback();
+                if (conn != null) {
+					conn.rollback();
+				}
             } catch (Exception ex) {
             }
             e.printStackTrace();
             return false;
         } finally {
             try {
-                if (conn != null)
-                    conn.setAutoCommit(true);
+                if (conn != null) {
+					conn.setAutoCommit(true);
+				}
             } catch (Exception e) {
             }
         }

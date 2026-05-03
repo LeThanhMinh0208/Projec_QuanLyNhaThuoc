@@ -3,6 +3,7 @@ package gui.dialogs;
 import dao.DAO_DonDatHang;
 import dao.DAO_NhaCungCap;
 import dao.DAO_Thuoc;
+import dao.DAO_NhatKyHoatDong;
 import entity.ChiTietDonDatHang;
 import entity.DonDatHang;
 import entity.DonViQuyDoi;
@@ -364,9 +365,11 @@ public class Dialog_TaoDonDatHangController {
         }
 
         boolean isSuccess = daoDon.luuDonDatHangMoi(donMoi, listChiTiet);
-
+        
         if (isSuccess) {
-            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã tạo Đơn Đặt Hàng Mới thành công!");
+            String moTa = "Tạo đơn đặt hàng mới: " + donMoi.getMaDonDatHang() + "\n- Nhà cung cấp: " + donMoi.getNhaCungCap().getTenNhaCungCap() + "\n- Tổng tiền dự tính: " + df.format(tongTien) + "\n- Ghi chú: " + (donMoi.getGhiChu() != null ? donMoi.getGhiChu() : "Không");
+            DAO_NhatKyHoatDong.ghiLog("TAO_DON_DAT_HANG", "Đơn Đặt Hàng", donMoi.getMaDonDatHang(), moTa);
+            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Lập đơn đặt hàng thành công! Mã: " + donMoi.getMaDonDatHang());
             handleDong(null); 
         } else {
             AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi Database", "Có lỗi xảy ra trong quá trình lưu. Vui lòng kiểm tra lại CSDL!");

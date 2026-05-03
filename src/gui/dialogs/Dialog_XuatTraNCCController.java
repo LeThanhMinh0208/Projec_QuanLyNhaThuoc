@@ -1,6 +1,7 @@
 package gui.dialogs;
 
 import dao.*;
+import dao.DAO_NhatKyHoatDong;
 import entity.*;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -296,7 +297,8 @@ public class Dialog_XuatTraNCCController {
         );
         
         if (daoPX.traNhaCungCap(px, new ArrayList<>(dsTraTam))) {
-            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã lập phiếu Trả hàng NCC: " + maPhieuMoi); 
+            DAO_NhatKyHoatDong.ghiLog("TAO_PHIEU_XUAT", "Phiếu Xuất", maPhieuMoi, "Tạo phiếu xuất trả NCC: " + maPhieuMoi);
+            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã trả hàng cho nhà cung cấp thành công!\nMã phiếu: " + maPhieuMoi); 
             ((Stage) txtGhiChu.getScene().getWindow()).close();
         } else {
             AlertUtils.showAlert(Alert.AlertType.ERROR, "Thất bại", "Lỗi khi lưu phiếu trả hàng!");

@@ -14,14 +14,14 @@ import java.text.SimpleDateFormat;
 public class Print_PhieuChi {
 
     public static boolean inPhieu(PhieuChi pc, String path) {
-        // Dùng kích thước A5 (nửa tờ A4) cho phiếu chi sẽ đẹp hơn, hoặc dùng A4
+        // Dùng kích thước A5 (nửa tờ A4) cho phiếu chi
         Document document = new Document(PageSize.A5, 30, 30, 40, 40); 
         try {
             PdfWriter.getInstance(document, new FileOutputStream(path));
             document.open();
 
             // =======================================================
-            // 1. CÀI ĐẶT FONT TIẾNG VIỆT (Giống hệt Phiếu Nhập)
+            // 1. CÀI ĐẶT FONT TIẾNG VIỆT
             // =======================================================
             BaseFont bf = BaseFont.createFont("C:\\Windows\\Fonts\\arial.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             Font fontShopName = new Font(bf, 16, Font.BOLD, BaseColor.BLACK);
@@ -55,32 +55,33 @@ public class Print_PhieuChi {
             Paragraph title = new Paragraph("PHIẾU CHI TIỀN", fontTitle);
             title.setAlignment(Element.ALIGN_CENTER);
             title.setSpacingBefore(15f);
-            title.setSpacingAfter(20f);
+            title.setSpacingAfter(10f);
             document.add(title);
+
+            Paragraph maPhieu = new Paragraph("Mã phiếu: " + pc.getMaPhieuChi(), fontItalic);
+            maPhieu.setAlignment(Element.ALIGN_CENTER);
+            maPhieu.setSpacingAfter(20f);
+            document.add(maPhieu);
 
             // =======================================================
             // 4. THÔNG TIN PHIẾU CHI
             // =======================================================
             PdfPTable infoTable = new PdfPTable(2);
             infoTable.setWidthPercentage(100);
-            infoTable.setWidths(new float[]{2f, 3f});
+            infoTable.setWidths(new float[]{2.5f, 5f});
             infoTable.setSpacingAfter(15f);
 
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm - dd/MM/yyyy");
             DecimalFormat df = new DecimalFormat("#,### VNĐ");
 
-            // Xử lý hiển thị hình thức
-            String ht = pc.getHinhThucChi();
-            String tenHinhThuc = "Tiền Mặt";
-            if ("CHUYEN_KHOAN".equals(ht)) tenHinhThuc = "Chuyển Khoản";
-            else if ("THE".equals(ht)) tenHinhThuc = "Thẻ";
-
-            addInfoRow(infoTable, "Mã phiếu chi:", pc.getMaPhieuChi(), fontNormal);
             addInfoRow(infoTable, "Ngày chi:", pc.getNgayChi() != null ? sdf.format(pc.getNgayChi()) : "---", fontNormal);
             addInfoRow(infoTable, "Người nhận (NCC):", pc.getNhaCungCap() != null ? pc.getNhaCungCap().getTenNhaCungCap() : "---", fontBold);
             addInfoRow(infoTable, "Người lập (NV):", pc.getNhanVien() != null ? pc.getNhanVien().getHoTen() : "---", fontNormal);
-            addInfoRow(infoTable, "Hình thức chi:", tenHinhThuc, fontNormal);
-            addInfoRow(infoTable, "Lý do / Ghi chú:", pc.getGhiChu() != null ? pc.getGhiChu() : "", fontNormal);
+            addInfoRow(infoTable, "Hình thức chi:", dichHinhThuc(pc.getHinhThucChi()), fontNormal);
+            addInfoRow(infoTable, "Lý do / Ghi chú:", pc.getGhiChu() != null ? pc.getGhiChu() : "Thanh toán công nợ", fontNormal);
+            
+            // Dòng đọc số tiền bằng chữ (Tích hợp từ Incoming)
+            addInfoRow(infoTable, "Bằng chữ:", docSoThanhChu((long) pc.getTongTienChi()), fontItalic);
 
             document.add(infoTable);
 
@@ -170,5 +171,20 @@ public class Print_PhieuChi {
         
         table.addCell(c1);
         table.addCell(c2);
+    }
+
+    private static String dichHinhThuc(String ht) {
+        if ("CHUYEN_KHOAN".equals(ht)) return "Chuyển Khoản";
+        if ("THE".equals(ht)) return "Thẻ";
+        return "Tiền Mặt";
+    }
+
+    /**
+     * Hàm phụ trợ đọc số thành chữ (Demo placeholder từ bản Incoming)
+     */
+    public static String docSoThanhChu(long amount) {
+        if (amount == 0) return "Không đồng";
+        // Sếp có thể thay logic đọc số chuẩn tiếng Việt vào đây nhé
+        return "(Viết bằng chữ tương ứng số tiền trên) đồng chẵn.";
     }
 }

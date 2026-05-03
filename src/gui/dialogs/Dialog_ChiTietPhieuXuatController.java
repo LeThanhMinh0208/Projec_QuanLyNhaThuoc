@@ -1,5 +1,13 @@
 package gui.dialogs;
 
+import java.io.File;
+import java.net.URL;
+import java.text.DecimalFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
 import dao.DAO_NhaCungCap;
 import dao.DAO_PhieuXuat;
 import entity.ChiTietPhieuXuat;
@@ -31,19 +39,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import utils.AlertUtils;
 
-import java.io.File;
-import java.net.URL;
-import java.text.DecimalFormat;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-
 public class Dialog_ChiTietPhieuXuatController implements Initializable {
 
     @FXML private Label lblMaPhieu, lblNgayLap, lblNguoiLap, lblLoaiPhieu;
     @FXML private Label lblNoiXuat, lblNoiNhan, lblGhiChu, lblNguoiVanChuyen; 
-    
     @FXML private Label lblTextTongTien, lblTongTien; 
 
     @FXML private TableView<ChiTietPhieuXuat> tableChiTiet;
@@ -55,7 +54,6 @@ public class Dialog_ChiTietPhieuXuatController implements Initializable {
     private DecimalFormat df = new DecimalFormat("#,##0");
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     
-    // Biến toàn cục để giữ thông tin in
     private PhieuXuat phieuHienTai;
     private double tongTienPhieu = 0;
 
@@ -66,7 +64,7 @@ public class Dialog_ChiTietPhieuXuatController implements Initializable {
 
     private void setupTable() {
         colSTT.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(tableChiTiet.getItems().indexOf(c.getValue()) + 1));
-        colTenThuoc.setCellValueFactory(new PropertyValueFactory<>("maThuoc")); 
+        colTenThuoc.setCellValueFactory(new PropertyValueFactory<>("maThuoc"));
         colSoLo.setCellValueFactory(new PropertyValueFactory<>("soLo"));
         colSoLuong.setCellValueFactory(new PropertyValueFactory<>("soLuong"));
 
@@ -95,6 +93,7 @@ public class Dialog_ChiTietPhieuXuatController implements Initializable {
         lblNguoiLap.setText(px.getMaNhanVien());
         lblNgayLap.setText(px.getNgayXuat() != null ? dtf.format(px.getNgayXuat()) : "");
         
+        // TÁCH CHUỖI GHI CHÚ ĐỂ LẤY NGƯỜI VẬN CHUYỂN
         String ghiChuGoc = px.getGhiChu();
         if (ghiChuGoc != null && ghiChuGoc.contains("| VC:")) {
             String[] parts = ghiChuGoc.split("\\s*\\| VC:\\s*"); 
@@ -108,14 +107,18 @@ public class Dialog_ChiTietPhieuXuatController implements Initializable {
         if (px.getLoaiPhieu() == 1) { 
             lblLoaiPhieu.setText("LỆNH CHUYỂN KHO NỘI BỘ");
             String kn = px.getKhoNhan();
-            if ("KHO_BAN_HANG".equals(kn)) { lblNoiXuat.setText("Kho Dự Trữ"); lblNoiNhan.setText("Kho Bán Hàng"); } 
-            else if ("KHO_DU_TRU".equals(kn)) { lblNoiXuat.setText("Kho Bán Hàng"); lblNoiNhan.setText("Kho Dự Trữ"); } 
-            else { lblNoiXuat.setText("Kho Nội Bộ"); lblNoiNhan.setText(kn); }
+            if ("KHO_BAN_HANG".equals(kn)) { 
+                lblNoiXuat.setText("Kho Dự Trữ"); lblNoiNhan.setText("Kho Bán Hàng"); 
+            } else if ("KHO_DU_TRU".equals(kn)) { 
+                lblNoiXuat.setText("Kho Bán Hàng"); lblNoiNhan.setText("Kho Dự Trữ"); 
+            } else { 
+                lblNoiXuat.setText("Kho Nội Bộ"); lblNoiNhan.setText(kn); 
+            }
             
             colDonGia.setVisible(false); colThanhTien.setVisible(false);
             lblTextTongTien.setVisible(false); lblTongTien.setVisible(false);
 
-        } else if (px.getLoaiPhieu() == 2) { 
+        } else if (px.getLoaiPhieu() == 2) {
             lblLoaiPhieu.setText("PHIẾU TRẢ NHÀ CUNG CẤP");
             lblNoiXuat.setText("Kho Nội Bộ");
             NhaCungCap ncc = new DAO_NhaCungCap().getNhaCungCapByMa(px.getMaNhaCungCap());
@@ -125,7 +128,7 @@ public class Dialog_ChiTietPhieuXuatController implements Initializable {
             colDonGia.setVisible(true); colThanhTien.setVisible(true);
             lblTextTongTien.setVisible(true); lblTongTien.setVisible(true);
 
-        } else if (px.getLoaiPhieu() == 3) { 
+        } else if (px.getLoaiPhieu() == 3) {
             lblLoaiPhieu.setText("LỆNH XUẤT HỦY THUỐC");
             lblNoiXuat.setText("Kho Nội Bộ");
             lblNoiNhan.setText("Khu vực Hủy rác y tế");
@@ -146,9 +149,6 @@ public class Dialog_ChiTietPhieuXuatController implements Initializable {
         }
     }
 
-    // =========================================================================
-    // HÀM XỬ LÝ NÚT IN PHIẾU (HIỂN THỊ PREVIEW UI RỒI MỚI XUẤT FILE)
-    // =========================================================================
     @FXML 
     void handleInPhieu(ActionEvent event) {
         if (phieuHienTai == null || tableChiTiet.getItems().isEmpty()) {
@@ -156,7 +156,6 @@ public class Dialog_ChiTietPhieuXuatController implements Initializable {
             return;
         }
 
-        // 1. TẠO CỬA SỔ PREVIEW
         Stage previewStage = new Stage();
         previewStage.setTitle("Xem trước Phiếu Xuất - " + phieuHienTai.getMaPhieuXuat());
         previewStage.initModality(Modality.APPLICATION_MODAL);
@@ -165,7 +164,6 @@ public class Dialog_ChiTietPhieuXuatController implements Initializable {
         paper.setStyle("-fx-background-color: white; -fx-padding: 40; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 0);");
         paper.setMaxWidth(750);
 
-        // 2. XÁC ĐỊNH LOẠI PHIẾU
         String tieuDe = "";
         String labelDoiTac = "Nơi nhận:";
         String prefixFileName = "";
@@ -204,7 +202,6 @@ public class Dialog_ChiTietPhieuXuatController implements Initializable {
 
         tablePreview.getColumns().addAll(cTen, cLo, cSL);
 
-        // NẾU LÀ PHIẾU TRẢ MỚI HIỆN CỘT TIỀN
         if (phieuHienTai.getLoaiPhieu() == 2) {
             TableColumn<ChiTietPhieuXuat, String> cGia = new TableColumn<>("Đơn giá"); cGia.setCellValueFactory(c -> new SimpleStringProperty(df.format(c.getValue().getDonGia()))); cGia.setPrefWidth(100);
             TableColumn<ChiTietPhieuXuat, String> cTT = new TableColumn<>("Thành tiền"); cTT.setCellValueFactory(c -> new SimpleStringProperty(df.format(c.getValue().getThanhTien()))); cTT.setPrefWidth(120);
@@ -221,8 +218,7 @@ public class Dialog_ChiTietPhieuXuatController implements Initializable {
             paperContent.getChildren().add(lblTotal);
         }
 
-        paperContent.setSpacing(10);
-        paperContent.setAlignment(Pos.TOP_CENTER);
+        paperContent.setSpacing(10); paperContent.setAlignment(Pos.TOP_CENTER);
         paper.getChildren().add(paperContent);
         paper.setAlignment(Pos.TOP_CENTER);
 
@@ -233,13 +229,11 @@ public class Dialog_ChiTietPhieuXuatController implements Initializable {
         Button btnConfirm = new Button("✔ Xác nhận");
         btnConfirm.setStyle("-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 20;");
 
-        // Khai báo final để truyền vào event của Button
         final String finalTieuDe = tieuDe;
         final String finalLabelDoiTac = labelDoiTac;
         final String finalPrefixFileName = prefixFileName;
 
         btnConfirm.setOnAction(e -> {
-            // Gom data sang mảng String để chuyển cho Service in PDF
             List<String[]> dataPdf = new ArrayList<>();
             int stt = 1;
             for (ChiTietPhieuXuat ct : tableChiTiet.getItems()) {
@@ -249,12 +243,10 @@ public class Dialog_ChiTietPhieuXuatController implements Initializable {
             }
 
             try {
-                // Tạo đường dẫn lưu file
                 File exportDir = new File(System.getProperty("user.dir") + File.separator + "exports" + File.separator + "phieuxuat");
                 if (!exportDir.exists()) exportDir.mkdirs();
                 String finalPath = new File(exportDir, finalPrefixFileName + phieuHienTai.getMaPhieuXuat() + ".pdf").getAbsolutePath();
 
-                // Chuyển sang Service để render PDF
                 boolean isThanhCong = service.Print_PhieuXuat.inPhieu(
                     finalTieuDe, phieuHienTai.getMaPhieuXuat(), lblNgayLap.getText(), lblNguoiLap.getText(),
                     finalLabelDoiTac, lblNoiNhan.getText(), lblGhiChu.getText(), tongTienPhieu, dataPdf, finalPath
@@ -266,13 +258,13 @@ public class Dialog_ChiTietPhieuXuatController implements Initializable {
                 } else {
                     AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Quá trình tạo file PDF thất bại!");
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            } catch (Exception ex) { ex.printStackTrace(); }
         });
 
-        HBox actionBox = new HBox(15, btnCancel, btnConfirm); actionBox.setAlignment(Pos.CENTER_RIGHT); actionBox.setPadding(new Insets(15, 0, 0, 0));
-        VBox root = new VBox(15, new ScrollPane(paper), actionBox); root.setStyle("-fx-background-color: #f8fafc; -fx-padding: 20;"); root.setAlignment(Pos.CENTER);
+        HBox actionBox = new HBox(15, btnCancel, btnConfirm); 
+        actionBox.setAlignment(Pos.CENTER_RIGHT); actionBox.setPadding(new Insets(15, 0, 0, 0));
+        VBox root = new VBox(15, new ScrollPane(paper), actionBox); 
+        root.setStyle("-fx-background-color: #f8fafc; -fx-padding: 20;"); root.setAlignment(Pos.CENTER);
         previewStage.setScene(new Scene(root, 800, 700)); previewStage.show();
     }
 

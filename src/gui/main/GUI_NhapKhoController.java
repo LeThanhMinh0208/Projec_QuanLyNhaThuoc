@@ -2,6 +2,7 @@ package gui.main;
 
 import dao.DAO_DonDatHang;
 import dao.DAO_PhieuNhap;
+import dao.DAO_NhatKyHoatDong;
 import entity.ChiTietDonDatHang;
 import entity.DonDatHang;
 import entity.PhieuNhap;
@@ -435,12 +436,14 @@ public class GUI_NhapKhoController {
         pn.setNhanVien(nv);
 
         boolean tc = daoPhieuNhap.luuPhieuNhapVaCapNhatDon(pn, listChiTietHienTai, donHienTai, soNgayHen);
-        
         if (tc) {
             double tongTienNhap = 0;
             for (ChiTietDonDatHang ct : listChiTietHienTai) {
                 tongTienNhap += ct.getSoLuongDaNhan() * ct.getDonGiaDuKien();
             }
+            String moTa = "Tạo phiếu nhập mới: " + pn.getMaPhieuNhap() + "\n- Đơn đặt hàng: " + donHienTai.getMaDonDatHang() + "\n- Nhà cung cấp: " + donHienTai.getNhaCungCap().getTenNhaCungCap() + "\n- Tổng tiền: " + df.format(tongTienNhap);
+            DAO_NhatKyHoatDong.ghiLog("TAO_PHIEU_NHAP", "Phiếu Nhập", pn.getMaPhieuNhap(), moTa);
+            new Alert(Alert.AlertType.INFORMATION, "Lưu phiếu nhập kho thành công!").showAndWait();
             
             dao.DAO_NhaCungCap daoNCC = new dao.DAO_NhaCungCap();
             daoNCC.congCongNoNhaCungCap(donHienTai.getNhaCungCap().getMaNhaCungCap(), tongTienNhap);

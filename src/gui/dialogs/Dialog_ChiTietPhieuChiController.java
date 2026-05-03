@@ -1,5 +1,9 @@
 package gui.dialogs;
 
+import java.io.File;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+
 import entity.PhieuChi;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -14,10 +18,6 @@ import javafx.stage.Stage;
 import utils.AlertUtils;
 import service.Print_PhieuChi;
 
-import java.io.File;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-
 public class Dialog_ChiTietPhieuChiController {
 
     @FXML private Label lblMaPhieu, lblNgayChi, lblNhanVien, lblNhaCungCap, lblTongTien, lblHinhThuc;
@@ -30,17 +30,22 @@ public class Dialog_ChiTietPhieuChiController {
 
     public void setPhieuChi(PhieuChi pc) {
         this.phieuHienTai = pc;
-        
+
         lblMaPhieu.setText(pc.getMaPhieuChi());
         lblNgayChi.setText(pc.getNgayChi() != null ? sdf.format(pc.getNgayChi()) : "---");
         lblNhanVien.setText(pc.getNhanVien() != null ? pc.getNhanVien().getHoTen() : "---");
         lblNhaCungCap.setText(pc.getNhaCungCap() != null ? pc.getNhaCungCap().getTenNhaCungCap() : "---");
         lblTongTien.setText(df.format(pc.getTongTienChi()));
-        
+
+        // VIỆT HÓA HÌNH THỨC CHI
         String ht = pc.getHinhThucChi();
-        if ("CHUYEN_KHOAN".equals(ht)) lblHinhThuc.setText("Chuyển Khoản");
-        else if ("THE".equals(ht)) lblHinhThuc.setText("Thẻ");
-        else lblHinhThuc.setText("Tiền Mặt");
+        if ("CHUYEN_KHOAN".equals(ht)) {
+            lblHinhThuc.setText("Chuyển Khoản");
+        } else if ("THE".equals(ht)) {
+            lblHinhThuc.setText("Thẻ");
+        } else {
+            lblHinhThuc.setText("Tiền Mặt");
+        }
 
         txtGhiChu.setText(pc.getGhiChu() != null ? pc.getGhiChu() : "Không có ghi chú");
     }
@@ -61,7 +66,7 @@ public class Dialog_ChiTietPhieuChiController {
 
         VBox paper = new VBox(10);
         paper.setStyle("-fx-background-color: white; -fx-padding: 40; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 0);");
-        paper.setMaxWidth(600); // Gọn hơn phiếu nhập vì không có bảng chi tiết
+        paper.setMaxWidth(600); 
 
         Label lblHeader = new Label("NHÀ THUỐC LONG NGUYÊN");
         lblHeader.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e293b;");
@@ -95,9 +100,7 @@ public class Dialog_ChiTietPhieuChiController {
         Button btnConfirm = new Button("✔ Xác nhận In");
         btnConfirm.setStyle("-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 20;");
         
-        // ===============================================
-        // LOGIC XUẤT FILE PDF TƯƠNG TỰ PHIẾU NHẬP
-        // ===============================================
+        // LOGIC XUẤT FILE PDF
         btnConfirm.setOnAction(e -> {
             try {
                 File exportDir = new File("exports" + File.separator + "phieuchi");
@@ -108,7 +111,7 @@ public class Dialog_ChiTietPhieuChiController {
                 File finalFile = new File(exportDir, "PhieuChi_" + phieuHienTai.getMaPhieuChi() + ".pdf");
                 String finalPath = finalFile.getAbsolutePath();
 
-                // Gọi service In
+                // Gọi service In (Đã tích hợp từ bản Incoming)
                 Print_PhieuChi.inPhieu(phieuHienTai, finalPath);
                 
                 AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã lưu phiếu chi thành công tại:\n" + finalPath);
@@ -127,7 +130,7 @@ public class Dialog_ChiTietPhieuChiController {
         root.setStyle("-fx-background-color: #f8fafc; -fx-padding: 20;");
         root.setAlignment(Pos.CENTER);
 
-        Scene scene = new Scene(root, 700, 500); // Kích thước nhỏ hơn Phiếu Nhập
+        Scene scene = new Scene(root, 700, 500); 
         previewStage.setScene(scene);
         previewStage.show();
     }

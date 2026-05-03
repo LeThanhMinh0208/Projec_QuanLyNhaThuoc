@@ -1,10 +1,12 @@
 package gui.main;
 
+import java.util.Optional;
+
 import dao.DAO_NhanVien;
+import dao.DAO_NhatKyHoatDong;
 import entity.NhanVien;
 import gui.dialogs.Dialog_SuaNhanVienController;
 import gui.dialogs.Dialog_ThemNhanVienController;
-
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,13 +17,18 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
-import java.util.Optional;
 
 public class GUI_QuanLyNguoiDungController {
 
@@ -56,6 +63,9 @@ public class GUI_QuanLyNguoiDungController {
                     NhanVien nv = getTableView().getItems().get(getIndex());
                     int trangThaiMoi = nv.getTrangThai() == 1 ? 2 : 1; // 1: Mở, 2: Khóa
                     if (daoNhanVien.capNhatTrangThai(nv.getMaNhanVien(), trangThaiMoi)) {
+                        String hd = (trangThaiMoi == 1) ? "MO_KHOA_TAI_KHOAN" : "KHOA_TAI_KHOAN";
+                        String moTa = (trangThaiMoi == 1) ? "Mở khóa tài khoản: " : "Khóa tài khoản: ";
+                        DAO_NhatKyHoatDong.ghiLog(hd, "Nhân Viên", nv.getMaNhanVien(), moTa + nv.getHoTen());
                         nv.setTrangThai(trangThaiMoi);
                         updateItem(nv, false); // Cập nhật lại UI nút ngay lập tức
                     }
@@ -100,11 +110,13 @@ public class GUI_QuanLyNguoiDungController {
         FilteredList<NhanVien> filteredData = new FilteredList<>(dsNhanVien, p -> true);
         txtTimKiem.textProperty().addListener((obs, oldV, newV) -> {
             filteredData.setPredicate(nv -> {
-                if (newV == null || newV.isEmpty()) return true;
+                if (newV == null || newV.isEmpty()) {
+					return true;
+				}
                 String key = newV.toLowerCase();
-                return nv.getHoTen().toLowerCase().contains(key) || 
+                return nv.getHoTen().toLowerCase().contains(key) ||
                        nv.getMaNhanVien().toLowerCase().contains(key) ||
-                       nv.getSdt().contains(key) || 
+                       nv.getSdt().contains(key) ||
                        nv.getTenDangNhap().toLowerCase().contains(key);
             });
         });
@@ -120,7 +132,7 @@ public class GUI_QuanLyNguoiDungController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ThemNhanVien.fxml"));
             Parent root = loader.load();
             Dialog_ThemNhanVienController controller = loader.getController();
-            controller.setParentController(this); 
+            controller.setParentController(this);
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setTitle("Thêm Người Dùng Mới");
@@ -144,7 +156,7 @@ public class GUI_QuanLyNguoiDungController {
             Parent root = loader.load();
             Dialog_SuaNhanVienController controller = loader.getController();
             controller.setParentController(this);
-            controller.setNhanVien(nvCanSua); 
+            controller.setNhanVien(nvCanSua);
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
@@ -160,7 +172,7 @@ public class GUI_QuanLyNguoiDungController {
             new Alert(Alert.AlertType.WARNING, "Vui lòng chọn nhân viên cần xóa!").show();
             return;
         }
-        
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Xác nhận xóa mềm");
         alert.setHeaderText("Bạn có chắc chắn muốn xóa nhân viên: " + selected.getHoTen() + " ?");
@@ -169,7 +181,8 @@ public class GUI_QuanLyNguoiDungController {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             if (daoNhanVien.xoaMemNhanVien(selected.getMaNhanVien())) {
-                new Alert(Alert.AlertType.INFORMATION, "Đã đưa nhân viên vào danh sách Xóa!").show();
+                DAO_NhatKyHoatDong.ghiLog("XOA", "Nhân Viên", selected.getMaNhanVien(), "Xóa mềm nhân viên: " + selected.getHoTen());
+                new Alert(Alert.AlertType.INFORMATION, "Xóa thành công!").show();
                 loadData();
             } else {
                 new Alert(Alert.AlertType.ERROR, "Xóa thất bại!").show();
