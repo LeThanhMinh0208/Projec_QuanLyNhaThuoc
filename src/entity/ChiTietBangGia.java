@@ -11,7 +11,7 @@ public class ChiTietBangGia {
     private String tenDonVi;
     private String maThuoc;
     private int tyLeQuyDoi; // display only — join từ DonViQuyDoi
-    
+
     // Thêm các trường hỗ trợ hiển thị trùng PROMO
     private String tenBangGia;
     private java.time.LocalDate ngayBatDau;

@@ -1,0 +1,403 @@
+/* ========================================================
+   FULL CODE CSS KIỂM KÊ KHO - ĐÃ ĐỒNG BỘ GIAO DIỆN & FIX LỖI
+   ======================================================== */
+
+.kk-main-bg { 
+    -fx-background-color: transparent; 
+}
+
+.main-title { 
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-font-size: 32px; 
+    -fx-font-weight: 900; 
+    -fx-text-fill: linear-gradient(to bottom, #0ea5e9, #0369a1); 
+    -fx-text-transform: uppercase; 
+    -fx-padding: 0 0 5 0; 
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.4), 5, 0, 0, 2); 
+}
+
+.xk-title-line { 
+    -fx-background-color: linear-gradient(to right, #0ea5e9, #38bdf8); 
+    -fx-min-height: 3px; 
+    -fx-max-height: 3px; 
+    -fx-max-width: 250px; 
+    -fx-background-radius: 5; 
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.3), 4, 0, 0, 1); 
+    -fx-translate-y: -10px; 
+}
+
+.kk-search-wrapper { 
+    -fx-background-color: white; 
+    -fx-background-radius: 25; 
+    -fx-border-color: #cbd5e1; 
+    -fx-border-radius: 25; 
+    -fx-padding: 0 15 0 15; 
+    -fx-border-width: 1.5px; 
+}
+
+.search-input { 
+    -fx-background-color: transparent; 
+    -fx-font-weight: bold; 
+}
+
+/* ========================================================
+   CÁC CLASS DÙNG CHUNG (ĐÃ KHÔI PHỤC .BTN-PILL CHO TRONG JAVA)
+   ======================================================== */
+.btn-pill {
+    -fx-background-radius: 30 !important; 
+    -fx-border-radius: 30 !important;
+    -fx-cursor: hand !important; 
+    -fx-font-weight: 900 !important; 
+    -fx-font-size: 14px !important;
+    -fx-alignment: CENTER !important;
+}
+
+/* ========================================================
+   CÁC NÚT CHỨC NĂNG CHÍNH
+   ======================================================== */
+
+/* --- 1. Fix riêng cho MenuButton VÀ Button thường (Nộp Phiếu) --- */
+.btn-green { 
+    -fx-background-color: #10b981 !important; 
+    -fx-text-fill: white !important; /* 🚨 FIX LỖI CHỮ ĐEN CỦA NÚT NỘP PHIẾU 🚨 */
+    -fx-background-radius: 30 !important; 
+    -fx-border-radius: 30 !important;
+    -fx-cursor: hand !important; 
+    -fx-font-weight: 900 !important; 
+    -fx-font-size: 14px !important;
+    -fx-border-color: transparent !important;
+    -fx-padding: 0 15 0 15 !important; 
+}
+.btn-green > .label { 
+    -fx-text-fill: white !important; 
+    -fx-alignment: CENTER !important; 
+}
+.btn-green > .arrow-button {
+    -fx-background-color: transparent !important;
+    -fx-padding: 0 10 0 0 !important;
+}
+.btn-green > .arrow-button > .arrow { 
+    -fx-background-color: white !important; 
+}
+.btn-green:hover { -fx-background-color: #059669 !important; }
+
+/* --- 2. Các Button màu khác --- */
+.btn-blue { 
+    -fx-background-color: #0ea5e9 !important; 
+    -fx-text-fill: white !important; 
+    -fx-font-weight: 900 !important; 
+    -fx-font-size: 14px !important;
+    -fx-background-radius: 30 !important; 
+    -fx-border-radius: 30 !important;
+    -fx-cursor: hand !important; 
+    -fx-alignment: CENTER !important;
+    -fx-border-color: transparent !important;
+}
+.btn-blue:hover { -fx-background-color: #0284c7 !important; }
+
+.btn-orange { 
+    -fx-background-color: #f59e0b !important; 
+    -fx-text-fill: white !important; 
+    -fx-font-weight: 900 !important; 
+    -fx-font-size: 14px !important;
+    -fx-background-radius: 30 !important; 
+    -fx-border-radius: 30 !important;
+    -fx-cursor: hand !important; 
+    -fx-alignment: CENTER !important;
+    -fx-border-color: transparent !important;
+}
+.btn-orange:hover { -fx-background-color: #d97706 !important; }
+
+.btn-yellow { 
+    -fx-background-color: #eab308 !important; 
+    -fx-text-fill: white !important; 
+    -fx-font-weight: 900 !important; 
+    -fx-font-size: 14px !important;
+    -fx-background-radius: 30 !important; 
+    -fx-border-radius: 30 !important;
+    -fx-cursor: hand !important; 
+    -fx-alignment: CENTER !important;
+    -fx-border-color: transparent !important;
+    -fx-effect: dropshadow(three-pass-box, rgba(234, 179, 8, 0.4), 8, 0, 0, 2) !important; 
+    -fx-transition: all 0.2s ease-in-out;
+}
+.btn-yellow:hover { 
+    -fx-background-color: #ca8a04 !important; 
+    -fx-translate-y: -2px; 
+    -fx-effect: dropshadow(three-pass-box, rgba(202, 138, 4, 0.6), 12, 0, 0, 4) !important; 
+}
+.btn-yellow:pressed {
+    -fx-translate-y: 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(202, 138, 4, 0.2), 4, 0, 0, 1) !important; 
+}
+
+/* ========================================================
+   CÁC NÚT MỚI CHO TRANG GIẢI QUYẾT KIỂM KÊ
+   ======================================================== */
+.btn-yellow-light {
+    -fx-background-color: #fef08a !important; 
+    -fx-text-fill: #a16207 !important; 
+    -fx-font-weight: 900 !important; 
+    -fx-font-size: 14px !important;
+    -fx-background-radius: 30 !important; 
+    -fx-border-radius: 30 !important;
+    -fx-cursor: hand !important; 
+    -fx-alignment: CENTER !important;
+    -fx-padding: 0 20 0 20 !important;
+    -fx-border-color: transparent !important;
+    -fx-transition: all 0.2s;
+}
+.btn-yellow-light:hover { -fx-background-color: #fde047 !important; -fx-translate-y: -1px; }
+.btn-yellow-light:pressed { -fx-translate-y: 1px; }
+
+.btn-red {
+    -fx-background-color: #dc2626 !important; 
+    -fx-text-fill: white !important; 
+    -fx-font-weight: 900 !important; 
+    -fx-font-size: 16px !important;
+    -fx-background-radius: 30 !important; 
+    -fx-border-radius: 30 !important;
+    -fx-cursor: hand !important; 
+    -fx-alignment: CENTER !important;
+    -fx-border-color: transparent !important;
+    -fx-effect: dropshadow(three-pass-box, rgba(220, 38, 38, 0.4), 8, 0, 0, 2) !important; 
+}
+.btn-red:hover { -fx-background-color: #b91c1c !important; -fx-translate-y: -2px; }
+.btn-red:pressed { -fx-translate-y: 1px; }
+
+/* ========================================================
+   🚨 FIX NÚT XÁM TRONG BẢNG (XEM CHI TIẾT) 🚨
+   ======================================================== */
+.btn-outline-gray { 
+    -fx-background-color: white !important; 
+    -fx-border-color: #cbd5e1 !important; 
+    -fx-border-width: 1.5px !important; 
+    -fx-text-fill: #475569 !important; 
+    -fx-font-weight: 900 !important;
+    -fx-background-radius: 30 !important; 
+    -fx-border-radius: 30 !important;
+    -fx-cursor: hand !important;
+    -fx-padding: 5 15 !important;
+}
+.btn-outline-gray:hover { 
+    -fx-background-color: #f1f5f9 !important; 
+    -fx-text-fill: #0ea5e9 !important; 
+    -fx-border-color: #0ea5e9 !important;
+}
+
+/* Ép lại màu cho nút Xám khi dòng được chọn bôi đen (để không bị tàng hình) */
+.table-row-cell:selected .btn-outline-gray {
+    -fx-background-color: white !important;
+    -fx-text-fill: #0ea5e9 !important;
+}
+
+/* CSS Dropdown Menu NhomThuoc */
+.menu-item { -fx-padding: 5 15; -fx-cursor: hand; }
+.menu-item:focused { -fx-background-color: #e0f2fe; }
+
+/* ========================================================
+   BẢNG & CỘT NHẬP LIỆU
+   ======================================================== */
+.panel-white { 
+    -fx-background-color: white; 
+    -fx-background-radius: 15; 
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4); 
+    -fx-padding: 10; 
+}
+
+.table-view { 
+    -fx-background-color: transparent; 
+    -fx-border-color: #e2e8f0; 
+    -fx-border-radius: 10; 
+}
+
+.table-view .column-header-background { 
+    -fx-background-color: #0ea5e9; 
+    -fx-background-radius: 8 8 0 0; 
+}
+
+.table-view .column-header, .table-view .filler { 
+    -fx-background-color: transparent; 
+}
+
+.table-view .column-header .label { 
+    -fx-text-fill: white; 
+    -fx-font-weight: bold; 
+    -fx-font-size: 13px; 
+}
+
+.table-row-cell:odd { -fx-background-color: #f8fafc; }
+.table-row-cell:even { -fx-background-color: white; }
+
+/* Dòng được chọn (Xanh đậm, chữ trắng) */
+.table-row-cell:selected { 
+    -fx-background-color: #0ea5e9 !important; 
+}
+.table-row-cell:selected .text,
+.table-row-cell:selected .label { 
+    -fx-fill: white !important; 
+    -fx-text-fill: white !important;
+    -fx-font-weight: bold !important;
+}
+.table-row-cell:selected .col-nhap-lieu,
+.table-row-cell:selected .col-nhap-lieu .text {
+    -fx-text-fill: white !important;
+    -fx-fill: white !important;
+}
+
+/* CỘT NHẬP LIỆU */
+.col-nhap-lieu { 
+    -fx-alignment: CENTER !important; 
+    -fx-background-color: transparent; 
+    -fx-text-fill: #0ea5e9 !important; 
+    -fx-font-weight: 900 !important; 
+    -fx-font-size: 14px !important;
+}
+.col-nhap-lieu .text { 
+    -fx-fill: #0ea5e9 !important; 
+}
+.col-nhap-lieu .text-field { 
+    -fx-text-fill: #0284c7 !important; 
+    -fx-font-weight: 900 !important; 
+    -fx-alignment: CENTER !important; 
+    -fx-border-color: #0ea5e9 !important; 
+    -fx-border-radius: 4 !important; 
+    -fx-background-color: white !important; 
+}
+
+/* ========================================================
+   GLOBAL SCROLLBAR TÓT ĐỘ
+   ======================================================== */
+.scroll-bar:vertical { -fx-background-color: transparent; -fx-pref-width: 8; }
+.scroll-bar:horizontal { -fx-background-color: transparent; -fx-pref-height: 8; }
+.scroll-bar:vertical .track, .scroll-bar:horizontal .track { -fx-background-color: transparent; -fx-border-color: transparent; }
+.scroll-bar:vertical .thumb, .scroll-bar:horizontal .thumb { -fx-background-color: #cbd5e1; -fx-background-radius: 10; -fx-cursor: hand; }
+.scroll-bar:vertical .thumb:hover, .scroll-bar:horizontal .thumb:hover, .scroll-bar:vertical .thumb:pressed, .scroll-bar:horizontal .thumb:pressed { -fx-background-color: #94a3b8; }
+.scroll-bar:vertical .increment-button, .scroll-bar:vertical .decrement-button, .scroll-bar:horizontal .increment-button, .scroll-bar:horizontal .decrement-button { -fx-background-color: transparent; -fx-padding: 0; }
+.scroll-bar .increment-arrow, .scroll-bar .decrement-arrow { -fx-shape: " "; -fx-padding: 0; }
+.corner { -fx-background-color: transparent; }
+.scroll-pane { -fx-background-color: transparent; -fx-background-insets: 0; -fx-padding: 0; }
+.scroll-pane > .viewport { -fx-background-color: transparent; }
+/* ========================================================
+   🚨 FIX LỖI GIAO DIỆN BẢNG GIẢI QUYẾT KIỂM KÊ 🚨
+   ======================================================== */
+
+/* 1. Tách biệt Header và cấu trúc bảng */
+.table-view { 
+    -fx-background-color: transparent; 
+    -fx-border-color: #e2e8f0; 
+    -fx-border-radius: 10; 
+}
+.table-view .column-header-background { 
+    -fx-background-color: #0ea5e9; /* Xanh Header */
+    -fx-background-radius: 8 8 0 0; 
+}
+.table-view .column-header, .table-view .filler { 
+    -fx-background-color: transparent; 
+    -fx-border-width: 0 1px 0 0;
+    -fx-border-color: rgba(255, 255, 255, 0.2); /* Vạch kẻ mờ giữa các cột Header */
+}
+.table-view .column-header .label { 
+    -fx-text-fill: white; 
+    -fx-font-weight: bold; 
+    -fx-font-size: 13px; 
+}
+
+/* ========================================================
+   🚨 BẢN FIX TẬN GỐC: DIỆT SẠCH LỖI MẤT MÀU SAU KHI CLICK 🚨
+   ======================================================== */
+
+.table-row-cell {
+    -fx-cell-size: 45px; 
+    -fx-border-width: 0 0 1px 0;
+    -fx-border-color: #f1f5f9;
+}
+.table-row-cell:odd { -fx-background-color: #f8fafc; }
+.table-row-cell:even { -fx-background-color: white; }
+
+/* Dòng được chọn */
+.table-row-cell:selected { 
+    -fx-background-color: #0ea5e9 !important; 
+}
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-border-color: rgba(255, 255, 255, 0.3);
+    -fx-border-width: 0 1px 0 0;
+}
+
+/* =========================================
+   THAY THẾ CODE JAVA: CHUYỂN NÚT BẤM SANG CSS 
+   ========================================= */
+.btn-giai-quyet {
+    -fx-background-color: #ffedd5;
+    -fx-text-fill: #ea580c;
+}
+.btn-xem-chi-tiet {
+    -fx-background-color: #e0f2fe;
+    -fx-text-fill: #0284c7;
+}
+/* Chống đổi màu chữ nút bấm khi dòng bị bôi xanh */
+.table-row-cell:selected .btn-giai-quyet { -fx-text-fill: #ea580c !important; }
+.table-row-cell:selected .btn-xem-chi-tiet { -fx-text-fill: #0284c7 !important; }
+
+/* CHUYỂN MÀU CỘT CHÊNH LỆCH SANG CSS */
+.text-lech-am { -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-alignment: CENTER; }
+.text-lech-du { -fx-text-fill: #ea580c; -fx-font-weight: bold; -fx-alignment: CENTER; }
+.text-lech-khop { -fx-text-fill: #059669; -fx-font-weight: bold; -fx-alignment: CENTER; }
+
+/* Lên nền xanh thì chữ Chênh Lệch biến thành trắng cho dễ nhìn */
+.table-row-cell:selected .text-lech-am,
+.table-row-cell:selected .text-lech-du,
+.table-row-cell:selected .text-lech-khop {
+    -fx-text-fill: white !important; 
+}
+
+/* CHUYỂN TEXTFIELD VÀ COMBOBOX SANG CSS */
+.kk-combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+.kk-combo-box .list-cell {
+    -fx-text-fill: #1e293b;
+    -fx-font-weight: bold;
+    -fx-background-color: transparent;
+}
+
+.kk-text-field {
+    -fx-background-color: white;
+    -fx-border-color: #0ea5e9;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 3 8;
+    -fx-text-fill: #1e293b;
+    -fx-font-weight: bold;
+}
+
+/* Giữ chữ đen cho Textfield/Combobox dù dòng bị bôi xanh */
+.table-row-cell:selected .kk-combo-box .list-cell,
+.table-row-cell:selected .kk-combo-box .text,
+.table-row-cell:selected .kk-text-field {
+    -fx-text-fill: #1e293b !important;
+    -fx-fill: #1e293b !important;
+}
+
+/* Popup Danh sách của ComboBox */
+.combo-box-popup .list-view {
+    -fx-background-color: white !important;
+    -fx-border-color: #cbd5e1 !important;
+    -fx-border-radius: 4 !important;
+}
+.combo-box-popup .list-view .list-cell {
+    -fx-text-fill: #1e293b !important;
+    -fx-background-color: white !important;
+    -fx-padding: 8 10 !important;
+}
+.combo-box-popup .list-view .list-cell:filled:hover,
+.combo-box-popup .list-view .list-cell:filled:selected {
+    -fx-background-color: #e0f2fe !important; 
+    -fx-text-fill: #0ea5e9 !important;        
+    -fx-font-weight: bold !important;
+}

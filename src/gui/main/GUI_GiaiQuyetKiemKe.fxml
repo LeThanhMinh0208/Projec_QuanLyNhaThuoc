@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="850.0" prefWidth="1200.0" spacing="20.0" styleClass="main-bg" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.GUI_GiaiQuyetKiemKeController">
+    <stylesheets>
+        <URL value="@../../resources/css/KiemKeKho.css" />
+        <URL value="@../../resources/css/TrangChu.css" />
+    </stylesheets>
+    <padding><Insets bottom="30.0" left="40.0" right="40.0" top="30.0" /></padding>
+
+    <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity">
+        <children>
+            <Label styleClass="main-title" text="GIẢI QUYẾT KIỂM KÊ" />
+            <Region prefHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+        </children>
+    </VBox>
+
+    <StackPane VBox.vgrow="ALWAYS">
+        <VBox fx:id="viewDanhSach" spacing="15">
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <HBox alignment="CENTER_LEFT" styleClass="kk-search-wrapper" prefHeight="40.0" prefWidth="400">
+                    <Label style="-fx-text-fill:#0ea5e9;" text="🔍" />
+                    <TextField fx:id="txtTimKiem" promptText="Tìm mã phiếu..." styleClass="search-input" HBox.hgrow="ALWAYS" />
+                </HBox>
+                <Button text="Làm mới" onAction="#loadDanhSach" styleClass="btn-blue" prefHeight="40" prefWidth="120" />
+            </HBox>
+            <VBox styleClass="panel-white" VBox.vgrow="ALWAYS">
+                <TableView fx:id="tableDanhSach" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colMaPhieu" text="Mã Phiếu" prefWidth="120" />
+                        <TableColumn fx:id="colNguoiLap" text="Người Lập" prefWidth="200" />
+                        <TableColumn fx:id="colNgayTao" text="Ngày Tạo" prefWidth="180" />
+                        <TableColumn fx:id="colTrangThai" text="Trạng Thái" prefWidth="150" style="-fx-alignment: CENTER;" />
+                        <TableColumn fx:id="colThaoTac" text="Thao Tác" prefWidth="150" style="-fx-alignment: CENTER;" />
+                    </columns>
+                    <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+                </TableView>
+            </VBox>
+        </VBox>
+
+        <VBox fx:id="viewDuyet" managed="false" visible="false" spacing="15">
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <Button onAction="#handleQuayLai" text="⬅ Quay Lại" styleClass="btn-blue" prefHeight="40" prefWidth="120"/>
+                <Label style="-fx-font-size: 22px; -fx-font-weight: 900; -fx-text-fill: #1e293b;" text="ĐỐI SOÁT &amp; PHÊ DUYỆT" />
+                <HBox HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleTinhToanChenhLech" text="[Tính toán chênh lệch]" styleClass="btn-yellow-light" prefHeight="40" />
+            </HBox>
+            <VBox styleClass="panel-white" VBox.vgrow="ALWAYS">
+                <TableView fx:id="tableChiTiet" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colMaLoCT" prefWidth="100" text="Mã Lô" />
+                        <TableColumn fx:id="colTenThuocCT" prefWidth="200" text="Tên Thuốc" />
+                        <TableColumn fx:id="colTonSnapshotCT" prefWidth="100" style="-fx-alignment: CENTER;" text="Snapshot" />
+                        <TableColumn fx:id="colTonKyVongCT" prefWidth="100" style="-fx-alignment: CENTER; -fx-font-weight: bold; -fx-text-fill: #0284c7;" text="Kỳ Vọng" />
+                        <TableColumn fx:id="colThucTeCT" prefWidth="100" style="-fx-alignment: CENTER;" text="Thực Tế" />
+                        <TableColumn fx:id="colChenhLechCT" prefWidth="100" style="-fx-alignment: CENTER;" text="Lệch" />
+                        <TableColumn fx:id="colLyDoCT" prefWidth="180" text="Lý do" />
+                        <TableColumn fx:id="colGhiChuCT" prefWidth="200" text="Ghi chú" />
+                    </columns>
+                    <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+                </TableView>
+            </VBox>
+            <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                <!-- 🚨 ĐÃ THÊM NÚT HỦY PHIẾU Ở ĐÂY 🚨 -->
+                <Button onAction="#handleHuyKiemKe" prefHeight="50.0" prefWidth="180.0" styleClass="btn-outline-gray" style="-fx-font-size: 16px;" text="[Hủy Phiếu]" />
+                <Button fx:id="btnXacNhan" onAction="#handleXacNhanDuyet" prefHeight="50.0" prefWidth="250.0" styleClass="btn-red" text="[Xác nhận Chốt Kho]" />
+            </HBox>
+        </VBox>
+    </StackPane>
+</VBox>

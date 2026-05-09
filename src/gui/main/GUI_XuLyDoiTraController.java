@@ -14,6 +14,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -97,9 +98,7 @@ public class GUI_XuLyDoiTraController {
     private void setupTabs() {
         tabGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
             if (newToggle == null) {
-                if (oldToggle != null) {
-                    oldToggle.setSelected(true);
-                }
+                if (oldToggle != null) oldToggle.setSelected(true);
                 return;
             }
 
@@ -126,23 +125,43 @@ public class GUI_XuLyDoiTraController {
                 d.getValue().getNgayLap() != null ? d.getValue().getNgayLap().toLocalDateTime().format(FMT) : ""));
         colKhachHang.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTenKhachHang()));
         colNhanVien.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTenNhanVien()));
-        colTamTinh.setCellValueFactory(d -> new SimpleStringProperty(String.format("%,.0f VND", d.getValue().getTamTinh())));
+        colTamTinh.setCellValueFactory(d -> new SimpleStringProperty(String.format("%,.0f ₫", d.getValue().getTamTinh())));
         colVAT.setCellValueFactory(d -> new SimpleStringProperty(String.format("%.0f%%", d.getValue().getThueVAT())));
-        colTongSauVAT.setCellValueFactory(d -> new SimpleStringProperty(String.format("%,.0f VND", d.getValue().getTongSauVAT())));
+        colTongSauVAT.setCellValueFactory(d -> new SimpleStringProperty(String.format("%,.0f ₫", d.getValue().getTongSauVAT())));
         colHinhThuc.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getHinhThucLabel()));
 
         colHanhDong.setCellFactory(col -> new TableCell<>() {
-            private final Button btnXuLy = new Button("Xử lý đổi trả");
-            private final HBox actions = new HBox(8, btnXuLy);
-            {
-                btnXuLy.setStyle("-fx-background-color:#16a34a;-fx-text-fill:white;-fx-font-size:12px;-fx-padding:4 10;-fx-cursor:hand;");
-                btnXuLy.setOnAction(e -> xuLyDoiTra(getTableView().getItems().get(getIndex())));
-            }
+            private final Button btnXuLy = new Button();
+            { btnXuLy.setOnAction(e -> xuLyDoiTra(getTableView().getItems().get(getIndex()))); }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : actions);
+                if (empty || getTableView().getItems().get(getIndex()) == null) {
+                    setGraphic(null);
+                } else {
+                    HoaDonView hd = getTableView().getItems().get(getIndex());
+                    long soNgay = -1;
+                    if (hd.getNgayLap() != null) {
+                        soNgay = java.time.temporal.ChronoUnit.DAYS.between(hd.getNgayLap().toLocalDateTime().toLocalDate(), java.time.LocalDate.now());
+                    }
+                    
+                    // 💡 ĐÃ GỠ CONFLICT & FIX CSS: Sử dụng Class chuẩn
+                    btnXuLy.getStyleClass().removeAll("btn-detail-pill-green", "btn-detail-disabled");
+                    
+                    if (soNgay > 30) {
+                        btnXuLy.setDisable(true);
+                        btnXuLy.getStyleClass().add("btn-detail-disabled");
+                        btnXuLy.setText("Quá 30 ngày");
+                    } else {
+                        btnXuLy.setDisable(false);
+                        btnXuLy.getStyleClass().add("btn-detail-pill-green");
+                        btnXuLy.setText("Xử lý đổi trả");
+                    }
+                    
+                    setGraphic(btnXuLy);
+                    setAlignment(Pos.CENTER);
+                }
             }
         });
 
@@ -151,16 +170,16 @@ public class GUI_XuLyDoiTraController {
 
     private void setupTablePhieuDoiTra() {
         colChiTietPDT.setCellFactory(col -> new TableCell<>() {
-            private final Button btnChiTiet = new Button("Chi tiết");
+            private final Button btnChiTiet = new Button("Xem");
             {
-                btnChiTiet.setStyle("-fx-background-color:#2563eb;-fx-text-fill:white;-fx-font-size:12px;-fx-padding:4 10;-fx-cursor:hand;");
+                btnChiTiet.getStyleClass().add("btn-detail-pill-green");
                 btnChiTiet.setOnAction(e -> moChiTietPhieuDoiTra(getTableView().getItems().get(getIndex())));
             }
-
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : btnChiTiet);
+                if (empty) setGraphic(null);
+                else { setGraphic(btnChiTiet); setAlignment(Pos.CENTER); }
             }
         });
         colMaPhieuDoiTra.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getMaPhieuDoiTra()));
@@ -173,7 +192,7 @@ public class GUI_XuLyDoiTraController {
         colPhiPhatPDT.setCellValueFactory(d -> new SimpleStringProperty(
                 d.getValue().isDoiSanPham()
                         ? d.getValue().getMoTaChenhLechDoiSanPham()
-                        : String.format("%,.0f VND", d.getValue().getPhiPhat())));
+                        : String.format("%,.0f ₫", d.getValue().getPhiPhat())));
         colLyDoPDT.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getLyDoHienThi()));
         tablePhieuDoiTra.setItems(dsPhieuDoiTra);
     }
@@ -184,18 +203,10 @@ public class GUI_XuLyDoiTraController {
         String hinhThuc = null;
         if (cbHinhThuc.getValue() != null) {
             switch (cbHinhThuc.getValue()) {
-                case "Tiền mặt":
-                    hinhThuc = "TIEN_MAT";
-                    break;
-                case "Chuyển khoản":
-                    hinhThuc = "CHUYEN_KHOAN";
-                    break;
-                case "Thẻ tín dụng":
-                    hinhThuc = "THE";
-                    break;
-                default:
-                    hinhThuc = null;
-                    break;
+                case "Tiền mặt": hinhThuc = "TIEN_MAT"; break;
+                case "Chuyển khoản": hinhThuc = "CHUYEN_KHOAN"; break;
+                case "Thẻ tín dụng": hinhThuc = "THE"; break;
+                default: hinhThuc = null; break;
             }
         }
 
@@ -212,21 +223,17 @@ public class GUI_XuLyDoiTraController {
     }
 
     private void filterByKeyword(String keyword) {
-        if (filteredData == null) {
-            return;
-        }
+        if (filteredData == null) return;
         if (keyword == null || keyword.isEmpty()) {
             filteredData.setPredicate(hd -> true);
         } else {
             String lower = keyword.toLowerCase();
             filteredData.setPredicate(hd -> {
-                if (hd.getMaHoaDon() != null && hd.getMaHoaDon().toLowerCase().contains(lower)) {
-                    return true;
-                }
-                if (hd.getTenKhachHang() != null && hd.getTenKhachHang().toLowerCase().contains(lower)) {
-                    return true;
-                }
-                return hd.getSdt() != null && hd.getSdt().toLowerCase().contains(lower);
+                // 💡 ĐÃ GỠ CONFLICT: Logic tìm kiếm gộp rành mạch
+                boolean matchMa = hd.getMaHoaDon() != null && hd.getMaHoaDon().toLowerCase().contains(lower);
+                boolean matchTen = hd.getTenKhachHang() != null && hd.getTenKhachHang().toLowerCase().contains(lower);
+                boolean matchSdt = hd.getSdt() != null && hd.getSdt().toLowerCase().contains(lower);
+                return matchMa || matchTen || matchSdt;
             });
         }
         updateFooter();
@@ -236,13 +243,10 @@ public class GUI_XuLyDoiTraController {
         int count = filteredData != null ? filteredData.size() : masterData.size();
         lblTongHoaDon.setText("Tổng: " + count + " hóa đơn");
         double tongDT = (filteredData != null ? filteredData : masterData).stream().mapToDouble(HoaDonView::getTongSauVAT).sum();
-        lblTongDoanhThu.setText(String.format("%,.0f VND", tongDT));
+        lblTongDoanhThu.setText(String.format("%,.0f ₫", tongDT));
     }
 
-    @FXML
-    void handleTimKiem(ActionEvent event) {
-        loadHoaDon();
-    }
+    @FXML void handleTimKiem(ActionEvent event) { loadHoaDon(); }
 
     @FXML
     void handleXoaBoLoc(ActionEvent event) {
@@ -277,8 +281,6 @@ public class GUI_XuLyDoiTraController {
             stage.setTitle("Chi tiết phiếu đổi trả - " + pdt.getMaPhieuDoiTra());
             stage.setScene(new Scene(root));
             stage.showAndWait();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) { e.printStackTrace(); }
     }
 }

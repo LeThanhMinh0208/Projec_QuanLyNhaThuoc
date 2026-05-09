@@ -3,6 +3,7 @@
 <?import java.net.URL?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.geometry.Insets?>
 
 <VBox prefHeight="900.0" prefWidth="1200.0" spacing="0.0" styleClass="main-bg"
@@ -18,8 +19,13 @@
     <padding><Insets bottom="30.0" left="40.0" right="40.0" top="30.0" /></padding>
 
     <!-- Header -->
-    <HBox alignment="CENTER_LEFT" spacing="20" VBox.vgrow="NEVER">
-        <Label styleClass="main-title" text="QUẢN LÝ BẢNG GIÁ" />
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity">
+            <children>
+                <Label styleClass="main-title" text="QUẢN LÝ BẢNG GIÁ" />
+                <Region prefHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+            </children>
+        </VBox>
     </HBox>
 
     <!-- StackPane: toggle giữa 2 view -->
@@ -33,7 +39,7 @@
 
             <!-- Action bar -->
             <HBox alignment="CENTER_LEFT" spacing="15.0">
-                <Button onAction="#handleThemBangGiaMoi" prefHeight="50.0"
+                <Button fx:id="btnThemBangGiaMoi" onAction="#handleThemBangGiaMoi" prefHeight="50.0"
                         styleClass="top-card, card-green, btn-action"
                         text="  + Thêm Bảng Giá Mới  " textFill="WHITE" />
                 <HBox HBox.hgrow="ALWAYS" />
@@ -76,7 +82,7 @@
 
             <!-- Sub-header with back button -->
             <HBox alignment="CENTER_LEFT" spacing="15.0" VBox.vgrow="NEVER">
-                <Button text="← Quay Lại" onAction="#handleQuayLaiDanhSach" styleClass="bh-btn-secondary"
+                <Button fx:id="btnQuayLai1" text="← Quay Lại" onAction="#handleQuayLaiDanhSach" styleClass="bh-btn-secondary"
                         prefHeight="40.0" />
                 <Label text="TẠO BẢNG GIÁ MỚI" styleClass="bh-section-title"
                        style="-fx-font-size:18px;" />
@@ -163,7 +169,7 @@
 
                     <!-- Nút lưu -->
                     <HBox alignment="CENTER_RIGHT" spacing="12.0">
-                        <Button text="Hủy" onAction="#handleQuayLaiDanhSach" styleClass="bh-btn-secondary"
+                        <Button fx:id="btnQuayLai2" text="Hủy" onAction="#handleQuayLaiDanhSach" styleClass="bh-btn-secondary"
                                 prefHeight="44.0" prefWidth="120.0" />
                         <Button text="💾  Lưu Bảng Giá" onAction="#handleLuuBangGia"
                                 styleClass="bh-btn-success" prefHeight="44.0" prefWidth="180.0" />

@@ -1,12 +1,15 @@
 package dao;
 
-import connectDB.ConnectDB;
-import entity.DonViQuyDoi;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+import connectDB.ConnectDB;
+import entity.DonViQuyDoi;
 
 public class DAO_DonViQuyDoi {
 
@@ -37,7 +40,7 @@ public class DAO_DonViQuyDoi {
     /** Lấy 1 đơn vị theo maQuyDoi */
     public DonViQuyDoi getByMaQuyDoi(String maQuyDoi) {
         String sql = "SELECT * FROM DonViQuyDoi WHERE maQuyDoi = ?";
-        try (Connection con = ConnectDB.getConnection(); 
+        try (Connection con = ConnectDB.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setString(1, maQuyDoi);
             ResultSet rs = pst.executeQuery();
@@ -224,6 +227,25 @@ public class DAO_DonViQuyDoi {
         return lastError;
     }
 
+    /**
+     * Lấy TẤT CẢ đơn vị quy đổi của tất cả các thuốc trong 1 lần query.
+     * Giúp tối ưu hiệu năng cho trang Danh mục đơn vị quy đổi (tránh N+1 query).
+     */
+    public ArrayList<DonViQuyDoi> getAllDonViQuyDoi() {
+        ArrayList<DonViQuyDoi> list = new ArrayList<>();
+        String sql = "SELECT * FROM DonViQuyDoi ORDER BY maThuoc, tyLeQuyDoi ASC";
+        try (Connection con = ConnectDB.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql);
+             ResultSet rs = pst.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapDonVi(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     private DonViQuyDoi mapDonVi(ResultSet rs) throws SQLException {
         return new DonViQuyDoi(
                 rs.getString("maQuyDoi"),
@@ -261,14 +283,14 @@ public class DAO_DonViQuyDoi {
     public DonViQuyDoi getDonViLonNhatCuaThuoc(String maThuoc) {
         DonViQuyDoi dvMax = null;
         String sql = "SELECT TOP 1 * FROM DonViQuyDoi WHERE maThuoc = ? ORDER BY tyLeQuyDoi DESC";
-        
+
         ConnectDB.getInstance();
 		try (Connection con = ConnectDB.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
-            
+
             pst.setString(1, maThuoc);
             ResultSet rs = pst.executeQuery();
-            
+
             if (rs.next()) {
                 dvMax = mapDonVi(rs);
             }

@@ -46,11 +46,11 @@ public class Dialog_ThemKhachHangController {
     @FXML
     void handleLuu(ActionEvent event) {
         boolean valid = true;
-        
+
         String ten = txtHoTen.getText();
         String sdt = txtSdt.getText();
         String diaChi = txtDiaChi.getText();
-        
+
         ten = utils.ValidationUtils.capitalizeName(ten);
         sdt = utils.ValidationUtils.normalizeString(sdt);
         diaChi = utils.ValidationUtils.normalizeString(diaChi);
@@ -88,7 +88,7 @@ public class Dialog_ThemKhachHangController {
                 lblErrSdt.setManaged(false);
             }
         }
-        
+
         if (!utils.ValidationUtils.isValidDiaChi(diaChi)) {
             lblErrDiaChi.setText("Địa chỉ phải từ 2-255 ký tự và chứa ít nhất 1 chữ cái hoặc số!");
             lblErrDiaChi.setVisible(true);
@@ -110,7 +110,7 @@ public class Dialog_ThemKhachHangController {
         // Để controller gọi DAO riêng, tránh insert trùng
         this.resultKhachHang = new KhachHang(txtMa.getText(), ten, sdt, diaChi, 0);
         this.savedToDb = false;
-        
+
         closeDialog();
     }
 

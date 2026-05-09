@@ -1,13 +1,20 @@
 package gui.dialogs;
 
+import java.text.DecimalFormat;
+
 import dao.DAO_PhieuChi;
 import entity.NhaCungCap;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import utils.AlertUtils;
-import java.text.DecimalFormat;
 
 public class Dialog_LapPhieuChiController {
 
@@ -53,7 +60,7 @@ public class Dialog_LapPhieuChiController {
     @FXML
     void handleXacNhan(ActionEvent event) {
         String tienStr = txtSoTien.getText().replaceAll("[,\\s]", "");
-        
+
         if (tienStr.isEmpty()) {
             AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Vui lòng nhập số tiền cần chi!");
             return;
@@ -62,41 +69,46 @@ public class Dialog_LapPhieuChiController {
         double soTienChi = 0;
         try {
             soTienChi = Double.parseDouble(tienStr);
-            if (soTienChi <= 0) throw new Exception();
+            if (soTienChi <= 0) {
+				throw new Exception();
+			}
         } catch (Exception e) {
             AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Số tiền chi phải là số lớn hơn 0!");
             return;
         }
 
         if (soTienChi > nccHienTai.getCongNo()) {
-            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi Nghiệp Vụ", 
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi Nghiệp Vụ",
                 "Số tiền chi vượt quá công nợ hiện tại!");
             return;
         }
 
         // ĐÃ FIX: Lấy mã nhân viên thực tế từ UserSession của sếp
-        String maNhanVienDangNhap = utils.UserSession.getInstance().getUser().getMaNhanVien(); 
+        String maNhanVienDangNhap = utils.UserSession.getInstance().getUser().getMaNhanVien();
 
         // Bộ phiên dịch hình thức chi
         String hinhThucUI = cbHinhThuc.getValue();
-        String hinhThucDB = "TIEN_MAT"; 
+        String hinhThucDB = "TIEN_MAT";
         if (hinhThucUI != null) {
-            if (hinhThucUI.equals("Chuyển Khoản")) hinhThucDB = "CHUYEN_KHOAN";
-            else if (hinhThucUI.equals("Thẻ")) hinhThucDB = "THE";
+            if (hinhThucUI.equals("Chuyển Khoản")) {
+				hinhThucDB = "CHUYEN_KHOAN";
+			} else if (hinhThucUI.equals("Thẻ")) {
+				hinhThucDB = "THE";
+			}
         }
 
         // Lưu xuống Database
         boolean thanhCong = daoPhieuChi.lapPhieuChi(
-            nccHienTai.getMaNhaCungCap(), 
-            maNhanVienDangNhap, 
-            soTienChi, 
-            hinhThucDB, 
+            nccHienTai.getMaNhaCungCap(),
+            maNhanVienDangNhap,
+            soTienChi,
+            hinhThucDB,
             txtGhiChu.getText()
         );
 
         if (thanhCong) {
             utils.AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã tạo Phiếu Chi thành công!");
-            handleHuy(null); 
+            handleHuy(null);
         } else {
             utils.AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Thao tác thất bại!");
         }

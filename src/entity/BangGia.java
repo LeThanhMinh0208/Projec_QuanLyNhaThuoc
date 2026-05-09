@@ -64,9 +64,15 @@ public class BangGia {
      */
     public String getTrangThaiHienThi() {
         LocalDate now = LocalDate.now();
-        if (!trangThai) return "Đã kết thúc";
-        if (ngayBatDau.isAfter(now)) return "Chưa hiệu lực";
-        if (ngayKetThuc != null && ngayKetThuc.isBefore(now)) return "Đã kết thúc";
+        if (!trangThai) {
+			return "Đã kết thúc";
+		}
+        if (ngayBatDau.isAfter(now)) {
+			return "Chưa hiệu lực";
+		}
+        if (ngayKetThuc != null && ngayKetThuc.isBefore(now)) {
+			return "Đã kết thúc";
+		}
         return "Đang hiệu lực";
     }
 

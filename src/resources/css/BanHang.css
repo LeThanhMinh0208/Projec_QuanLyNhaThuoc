@@ -14,6 +14,15 @@
     -fx-font-family: "Segoe UI", Arial, sans-serif;
 }
 
+.main-title {
+    -fx-font-size: 32px;
+    -fx-font-weight: 900;
+    -fx-text-fill: linear-gradient(to bottom, #0ea5e9, #0369a1);
+    -fx-padding: 10 0 20 0;
+    -fx-text-alignment: center;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.4), 5, 0, 0, 2);
+}
+
 /* ========================================================
    TABS ĐIỀU HƯỚNG BÁN HÀNG & CHUYỂN ĐỔI (Đồng bộ đổi trả)
    ======================================================== */
@@ -373,8 +382,10 @@
     -fx-font-size: 13px;
     -fx-background-radius: 6;
     -fx-cursor: hand;
-    -fx-padding: 3 9;
+    -fx-padding: 4 8 4 8;
     -fx-border-color: transparent;
+    -fx-min-width: 36px;
+    -fx-pref-width: 36px;
 }
 
 .bh-btn-remove:hover {

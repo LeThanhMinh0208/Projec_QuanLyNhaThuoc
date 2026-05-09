@@ -1,162 +1,76 @@
-.dialog-root {
-    -fx-background-color: linear-gradient(to bottom, #f8fbff, #f1f5f9);
-    -fx-background-radius: 12;
-    -fx-font-family: "Segoe UI";
+/* ========================================================
+   1. ĐỒNG BỘ TIÊU ĐỀ (GIỐNG DANH MỤC THUỐC)
+   ======================================================== */
+.xk-title-line {
+    -fx-background-color: #0ea5e9; /* Xanh dương đặc trưng */
+    -fx-min-height: 4px;
+    -fx-max-height: 4px;
+    -fx-background-radius: 2px;
 }
 
-.dvqd-page {
-    -fx-background-color: linear-gradient(to bottom, #f6fbff, #eef5fb);
-}
-
-.dvqd-hero {
-    -fx-background-color: linear-gradient(to right, #2563eb, #3b82f6, #60a5fa);
-    -fx-background-radius: 14;
-    -fx-border-color: #bfdbfe;
-    -fx-border-radius: 14;
-    -fx-border-width: 1;
-    -fx-effect: dropshadow(three-pass-box, rgba(37, 99, 235, 0.22), 14, 0, 0, 4);
-}
-
-.dvqd-hero-title {
-    -fx-text-fill: white;
-    -fx-font-size: 30px;
-    -fx-font-weight: 900;
-    -fx-letter-spacing: 0.8px;
-}
-
-.dvqd-search-card {
-    -fx-background-color: linear-gradient(to bottom, #eff7ff, #e8f3ff);
-    -fx-background-radius: 14;
-    -fx-border-color: #bfdbfe;
-    -fx-border-radius: 14;
-    -fx-border-width: 1.2;
-}
-
-.dvqd-page .search-box {
-    -fx-background-color: #f8fcff;
-    -fx-background-radius: 12;
-    -fx-border-color: #b6d9ff;
-    -fx-border-radius: 12;
-    -fx-border-width: 1.2;
-}
-
+/* Khung bọc trắng (Card) */
 .dvqd-content-card {
-    -fx-background-color: #fafdff;
-    -fx-background-radius: 16;
-    -fx-border-color: #bcd8f7;
-    -fx-border-radius: 16;
-    -fx-border-width: 1.2;
-    -fx-effect: dropshadow(three-pass-box, rgba(15, 92, 150, 0.09), 10, 0, 0, 2);
-}
-
-.dvqd-table {
     -fx-background-color: #ffffff;
-    -fx-background-radius: 12;
-    -fx-border-color: #c8def5;
-    -fx-border-radius: 12;
-    -fx-border-width: 1;
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 10, 0, 0, 4);
+    -fx-padding: 15;
 }
 
-.dialog-title {
-    -fx-font-size: 21px;
+/* ========================================================
+   2. HỆ THỐNG NÚT THAO TÁC TRONG BẢNG (DÁNG VIÊN THUỐC)
+   ======================================================== */
+.btn-edit-pill {
+    -fx-background-color: #fffbeb; /* Vàng nhạt */
+    -fx-text-fill: #d97706;        /* Chữ cam đậm */
     -fx-font-weight: 900;
-    -fx-text-fill: #0b76b7;
-    -fx-padding: 2 0 4 0;
+    -fx-font-size: 13px;
+    -fx-background-radius: 20px;
+    -fx-cursor: hand;
+    -fx-padding: 5px 18px;
+    -fx-border-width: 0;
 }
+.btn-edit-pill:hover { -fx-background-color: #fef3c7; }
 
-.section-card {
-    -fx-background-color: #edf4fc;
-    -fx-background-radius: 10;
-    -fx-border-color: #cde7ff;
-    -fx-border-radius: 10;
-    -fx-effect: dropshadow(three-pass-box, rgba(14, 116, 144, 0.10), 6, 0, 0, 1);
+.btn-delete-pill {
+    -fx-background-color: #fef2f2; /* Đỏ nhạt */
+    -fx-text-fill: #dc2626;        /* Chữ đỏ đậm */
+    -fx-font-weight: 900;
+    -fx-font-size: 13px;
+    -fx-background-radius: 20px;
+    -fx-cursor: hand;
+    -fx-padding: 5px 18px;
+    -fx-border-width: 0;
 }
+.btn-delete-pill:hover { -fx-background-color: #fee2e2; }
 
-.section-title-strong {
-    -fx-text-fill: #0f766e;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-letter-spacing: 0.3px;
-}
-
-.hint-text {
-    -fx-text-fill: #64748b;
-    -fx-font-size: 12px;
-    -fx-font-style: italic;
-}
-
-.text-field,
-.combo-box,
-.spinner {
-    -fx-font-family: "Segoe UI";
-    -fx-font-size: 14px;
-}
-
-.dvqd-table .column-header-background {
-    -fx-background-color: linear-gradient(to right, #34a8df, #2797da, #157fcf);
-    -fx-background-radius: 12 12 0 0;
-}
-
-.dvqd-table .column-header,
-.dvqd-table .filler {
-    -fx-size: 52;
+/* ========================================================
+   3. TÙY CHỈNH BẢNG (ĐỒNG BỘ DANH MỤC THUỐC)
+   ======================================================== */
+.dvqd-table {
     -fx-background-color: transparent;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+}
+
+/* Màu Header xanh Sky đặc trưng */
+.dvqd-table .column-header-background {
+    -fx-background-color: #0ea5e9; 
+    -fx-background-radius: 10px 10px 0 0;
 }
 
 .dvqd-table .column-header .label {
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 15px;
-    -fx-font-weight: 800;
-}
-
-.dvqd-table .table-cell {
-    -fx-font-size: 14px;
-    -fx-text-fill: #1e3a5f;
-    -fx-padding: 10 8;
-}
-
-.dvqd-table .table-row-cell:filled:hover {
-    -fx-background-color: #ebf6ff;
-}
-
-.dvqd-table .table-row-cell:filled:selected {
-    -fx-background-color: #cfe8ff;
-}
-
-.dvqd-table .table-row-cell:filled:selected .text {
-    -fx-text-fill: #0f3f70;
-}
-
-.dvqd-btn-save {
-    -fx-background-color: linear-gradient(to bottom, #0ea5e9, #0284c7);
     -fx-text-fill: white;
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-    -fx-background-radius: 8;
-    -fx-cursor: hand;
+    -fx-font-weight: 900;
+    -fx-text-transform: uppercase;
 }
 
-.dvqd-btn-save:hover {
-    -fx-background-color: linear-gradient(to bottom, #38bdf8, #0ea5e9);
+/* Ép màu khi dòng được chọn (Xanh Sky + Chữ trắng) */
+.dvqd-table .table-row-cell:selected {
+    -fx-background-color: #0ea5e9 !important;
 }
 
-.dvqd-btn-save:disabled {
-    -fx-background-color: #cbd5e1;
-    -fx-text-fill: #ffffff;
-    -fx-opacity: 1;
-}
-
-.dvqd-btn-cancel {
-    -fx-background-color: #f1f5f9;
-    -fx-text-fill: #475569;
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-    -fx-background-radius: 8;
-    -fx-border-color: #cbd5e1;
-    -fx-border-radius: 8;
-    -fx-cursor: hand;
-}
-
-.dvqd-btn-cancel:hover {
-    -fx-background-color: #e2e8f0;
+.dvqd-table .table-row-cell:selected .table-cell {
+    -fx-text-fill: white !important;
+    -fx-font-weight: bold !important;
 }

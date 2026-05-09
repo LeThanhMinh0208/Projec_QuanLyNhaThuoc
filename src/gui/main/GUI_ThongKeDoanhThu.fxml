@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane fitToWidth="true" pannable="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="gui.main.GUI_ThongKeDoanhThuController">
+
+    <stylesheets>
+        <URL value="@../../resources/css/TrangChu.css" />
+        <URL value="@../../resources/css/ThongKeDoanhThu.css" />
+    </stylesheets>
+
+    <content>
+        <VBox styleClass="main-bg" spacing="0.0">
+            <padding><Insets bottom="30.0" left="40.0" right="40.0" top="30.0" /></padding>
+
+    <!-- HEADER -->
+    <VBox spacing="15" VBox.vgrow="NEVER">
+        <HBox alignment="CENTER_LEFT" spacing="20" minHeight="-Infinity" style="-fx-padding: 0 0 10 0;">
+            <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity" minHeight="-Infinity">
+                <children>
+                    <Label styleClass="main-title" text="THỐNG KÊ DOANH THU" />
+                    <Region prefHeight="4.0" minHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+                </children>
+            </VBox>
+        </HBox>
+
+        <!-- FILTER SECTION -->
+        <VBox styleClass="filter-panel">
+            <VBox spacing="10">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Từ ngày:" styleClass="filter-label" prefWidth="90" />
+                    <DatePicker fx:id="dpTuNgay" styleClass="filter-datepicker" prefWidth="150" />
+
+                    <Label text="Đến ngày:" styleClass="filter-label" prefWidth="90" />
+                    <DatePicker fx:id="dpDenNgay" styleClass="filter-datepicker" prefWidth="150" />
+
+                    <Label text="Thống kê nhanh:" styleClass="filter-label" prefWidth="120" />
+                    <ComboBox fx:id="cbKhoangNhanh" styleClass="filter-combo" prefWidth="160" promptText="Tùy chọn" />
+                </HBox>
+
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Loại hóa đơn:" styleClass="filter-label" prefWidth="90" />
+                    <ComboBox fx:id="cbLoaiBan" styleClass="filter-combo" prefWidth="150" promptText="Tất cả" />
+
+                    <Label text="Hình thức TT:" styleClass="filter-label" prefWidth="90" />
+                    <ComboBox fx:id="cbHinhThuc" styleClass="filter-combo" prefWidth="150" promptText="Tất cả" />
+
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button text="Xóa chọn" onAction="#handleXoaBoLoc" styleClass="tk-btn-clear" prefHeight="36" prefWidth="110" />
+                </HBox>
+            </VBox>
+        </VBox>
+    </VBox>
+
+    <!-- KPI CARDS -->
+    <HBox spacing="20" VBox.vgrow="NEVER" style="-fx-padding: 20 0 0 0;">
+        <!-- Tổng Doanh Thu -->
+        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+            <Label text="Tổng Doanh Thu (VNĐ)" styleClass="kpi-label" />
+            <HBox spacing="10" alignment="BOTTOM_LEFT">
+                <Label fx:id="lblTongDoanhThu" text="₫245,678,000" styleClass="kpi-value" />
+                <Label fx:id="lblTongDoanhThuPercent" text="+8.5%" styleClass="kpi-percent kpi-percent-up" />
+            </HBox>
+        </VBox>
+
+        <!-- Tổng Đơn Hàng -->
+        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+            <Label text="Tổng Đơn Hàng" styleClass="kpi-label" />
+            <HBox spacing="10" alignment="BOTTOM_LEFT">
+                <Label fx:id="lblTongDonHang" text="164Đ" styleClass="kpi-value" />
+                <Label fx:id="lblTongDonHangPercent" text="+5.2%" styleClass="kpi-percent kpi-percent-up" />
+            </HBox>
+        </VBox>
+
+        <!-- Giá Trị Trung Bình -->
+        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+            <Label text="Giá Trị Trung Bình/Đơn" styleClass="kpi-label" />
+            <HBox spacing="10" alignment="BOTTOM_LEFT">
+                <Label fx:id="lblGiaTrungBinh" text="d1,498,000" styleClass="kpi-value" />
+                <Label fx:id="lblGiaTrungBinhPercent" text="-1.1%" styleClass="kpi-percent kpi-percent-down" />
+            </HBox>
+        </VBox>
+
+        <!-- Số Khách Hàng -->
+        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+            <Label text="Số Khách Hàng" styleClass="kpi-label" />
+            <HBox spacing="10" alignment="BOTTOM_LEFT">
+                <Label fx:id="lblSoKhachHang" text="85N" styleClass="kpi-value" />
+                <Label fx:id="lblSoKhachHangPercent" text="+0.7%" styleClass="kpi-percent kpi-percent-up" />
+            </HBox>
+        </VBox>
+    </HBox>
+
+    <!-- CHARTS SECTION -->
+    <HBox spacing="20" VBox.vgrow="ALWAYS" style="-fx-padding: 20 0 0 0; -fx-min-height: 350; -fx-pref-height: 350;">
+        <!-- BIỂU ĐỒ DOANH THU THEO THỜI GIAN -->
+        <VBox styleClass="chart-panel" HBox.hgrow="ALWAYS" style="-fx-min-height: 350; -fx-pref-height: 350;">
+            <Label fx:id="lblChartThoiGianTitle" text="Doanh Thu Theo Thời Gian (Tháng 4)" styleClass="chart-title" />
+            <LineChart fx:id="chartThoiGian" style="-fx-font-size: 12px; -fx-padding: 10;" VBox.vgrow="ALWAYS" minHeight="300" prefHeight="300">
+                <xAxis>
+                    <CategoryAxis fx:id="xAxisThoiGian" label="Ngày" styleClass="axis-label" />
+                </xAxis>
+                <yAxis>
+                    <NumberAxis fx:id="yAxisThoiGian" label="Doanh thu (triệu)" styleClass="axis-label" />
+                </yAxis>
+            </LineChart>
+        </VBox>
+
+        <!-- BIỂU ĐỒ CƠ CẤU DOANH THU -->
+        <VBox styleClass="chart-panel" HBox.hgrow="ALWAYS" style="-fx-min-height: 350; -fx-pref-height: 350;">
+            <Label text="Cơ Cấu Doanh Thu Theo Nhóm Thuốc" styleClass="chart-title" />
+            <PieChart fx:id="chartCoCAu" style="-fx-font-size: 12px; -fx-padding: 10;" VBox.vgrow="ALWAYS" minHeight="300" prefHeight="300" />
+        </VBox>
+    </HBox>
+
+    <!-- TOP PRODUCTS SECTION -->
+    <VBox spacing="20" VBox.vgrow="ALWAYS" style="-fx-padding: 36 0 0 0; -fx-min-height: 300; -fx-pref-height: 300;">
+        <!-- TOP 10 SẢN PHẨM -->
+        <VBox styleClass="chart-panel" VBox.vgrow="ALWAYS" style="-fx-min-height: 300; -fx-pref-height: 300;">
+            <Label text="Top 10 Sản Phẩm Bán Chạy Nhất (Số Lượng)" styleClass="chart-title" />
+            <BarChart fx:id="chartTopSanPham" style="-fx-font-size: 12px; -fx-padding: 10;" VBox.vgrow="ALWAYS" minHeight="250" prefHeight="250">
+                <xAxis>
+                    <CategoryAxis label="Sản Phẩm" styleClass="axis-label" />
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="Số Lượng" styleClass="axis-label" />
+                </yAxis>
+            </BarChart>
+        </VBox>
+    </VBox>
+
+    <!-- TABLES SECTION -->
+    <HBox spacing="28" VBox.vgrow="ALWAYS" style="-fx-padding: 44 0 0 0; -fx-min-height: 280;">
+        <!-- TOP 5 KHÁCH HÀNG -->
+        <VBox styleClass="chart-panel" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-min-height: 280;">
+            <Label text="Top 5 Khách Hàng Mua Nhiều Nhất (Tháng)" styleClass="chart-title" />
+            <TableView fx:id="tableTopKhachHang" VBox.vgrow="ALWAYS" style="-fx-padding: 0;" styleClass="stat-table-view" minHeight="240" prefHeight="240">
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                </columnResizePolicy>
+                <placeholder>
+                    <Label text="Chưa có dữ liệu" style="-fx-text-fill:#94a3b8; -fx-font-size:13px;" />
+                </placeholder>
+                <columns>
+                    <TableColumn fx:id="colSTT1" text="STT" prefWidth="50" />
+                    <TableColumn fx:id="colTenKhachHang" text="Tên Khách Hàng" prefWidth="120" />
+                    <TableColumn fx:id="colSoDon" text="Số Đơn" prefWidth="80" />
+                    <TableColumn fx:id="colTongDoanhThuKH" text="Tổng Doanh Thu" prefWidth="150" />
+                </columns>
+            </TableView>
+        </VBox>
+
+        <!-- SẢN PHẨM "DEAD" - TỒN KHO KHÔNG CHUYỂN ĐỘNG -->
+        <VBox styleClass="chart-panel" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-min-height: 280;">
+            <Label text="Sản Phẩm 'Dead' - Tồn Kho Không Chuyển Động (Cảnh Báo)" styleClass="chart-title" />
+            <TableView fx:id="tableProductDead" VBox.vgrow="ALWAYS" style="-fx-padding: 0;" styleClass="stat-table-view" minHeight="240" prefHeight="240">
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                </columnResizePolicy>
+                <placeholder>
+                    <Label text="Chưa có dữ liệu" style="-fx-text-fill:#94a3b8; -fx-font-size:13px;" />
+                </placeholder>
+                <columns>
+                    <TableColumn fx:id="colSTT2" text="STT" prefWidth="50" />
+                    <TableColumn fx:id="colTenSanPham" text="Tên Sản Phẩm" prefWidth="120" />
+                    <TableColumn fx:id="colNhom" text="Nhóm" prefWidth="80" />
+                    <TableColumn fx:id="colSoNgayKhongBan" text="Số Ngày Không Bán" prefWidth="140" />
+                    <TableColumn fx:id="colTonKho" text="Tồn Kho" prefWidth="100" />
+                </columns>
+            </TableView>
+        </VBox>
+    </HBox>
+
+    <!-- FOOTER -->
+    <HBox alignment="CENTER_RIGHT" spacing="15" VBox.vgrow="NEVER" style="-fx-padding: 20 0 0 0; -fx-min-height: 50;">
+        <Button text="📊 Xuất Excel" onAction="#handleXuatExcel" styleClass="tk-btn-export" prefHeight="36" />
+        <Button text="🖨️ In báo cáo" onAction="#handleInBaoCao" styleClass="tk-btn-primary" prefHeight="36" />
+    </HBox>
+
+        </VBox>
+    </content>
+
+</ScrollPane>

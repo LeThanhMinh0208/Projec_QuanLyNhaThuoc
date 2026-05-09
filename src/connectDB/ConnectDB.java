@@ -6,11 +6,11 @@ import java.sql.SQLException;
 public class ConnectDB {
     private static ConnectDB instance = new ConnectDB();
     private static Connection con;
-    
+
     public static ConnectDB getInstance() {
         return instance;
     }
-    
+
     public void connect() {
     	 try {
              if (con == null || con.isClosed()) {
@@ -19,7 +19,7 @@ public class ConnectDB {
 
                  String url = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyNhaThuoc_LongNguyen;encrypt=true;trustServerCertificate=true;";
                  String user = "sa";
-                 String password = "sapassword";
+                 String password = "123456";
                  con = DriverManager.getConnection(url, user, password);
              }
             System.out.println("Kết nối CSDL thành công!");
@@ -29,10 +29,10 @@ public class ConnectDB {
             System.out.println("Không tìm thấy driver: " + e.getMessage());
         }
     }
-    
+
     public void disconnect() {
         if (con != null) {
-            try { con.close(); } 
+            try { con.close(); }
             catch (SQLException e) { e.printStackTrace(); }
         }
     }
@@ -45,7 +45,7 @@ public class ConnectDB {
 
                 String url = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyNhaThuoc_LongNguyen;encrypt=true;trustServerCertificate=true;";
                 String user = "sa";
-                String password = "sapassword";
+                String password = "123456";
                 con = DriverManager.getConnection(url, user, password);
             }
         } catch (SQLException e) {

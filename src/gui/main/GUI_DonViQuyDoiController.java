@@ -1,5 +1,8 @@
 package gui.main;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dao.DAO_DonViQuyDoi;
 import dao.DAO_Thuoc;
 import entity.DonViQuyDoi;
@@ -10,18 +13,21 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import utils.AlertUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public class GUI_DonViQuyDoiController {
 
@@ -67,11 +73,13 @@ public class GUI_DonViQuyDoiController {
         colThaoTac.setCellFactory(column -> new TableCell<>() {
             private final Button btnSua = new Button("Sửa");
             private final Button btnXoa = new Button("Xóa");
-            private final HBox actions = new HBox(8, btnSua, btnXoa);
+            private final HBox actions = new HBox(10, btnSua, btnXoa); // Tăng khoảng cách lên 10
 
             {
-                btnSua.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6;");
-                btnXoa.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6;");
+                // Gán class CSS thay vì setStyle cứng
+                btnSua.getStyleClass().add("btn-edit-pill");
+                btnXoa.getStyleClass().add("btn-delete-pill");
+                actions.setAlignment(Pos.CENTER);
 
                 btnSua.setOnAction(e -> {
                     DonViQuyDoiRow row = getTableView().getItems().get(getIndex());
@@ -87,7 +95,11 @@ public class GUI_DonViQuyDoiController {
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : actions);
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(actions);
+                }
             }
         });
     }
@@ -115,25 +127,34 @@ public class GUI_DonViQuyDoiController {
 
     private void loadData() {
         masterData.clear();
+
+        // 1. Lấy tất cả thuốc (1 query)
         List<Thuoc> dsThuoc = daoThuoc.getAllThuocTatCa();
+
+        // 2. Lấy tất cả đơn vị quy đổi (1 query)
+        List<DonViQuyDoi> allUnits = daoDonViQuyDoi.getAllDonViQuyDoi();
+
+        // 3. Nhóm đơn vị quy đổi theo maThuoc bằng Map để tra cứu nhanh O(1)
+        java.util.Map<String, ArrayList<DonViQuyDoi>> unitMap = new java.util.HashMap<>();
+        for (DonViQuyDoi dv : allUnits) {
+            unitMap.computeIfAbsent(dv.getMaThuoc(), k -> new ArrayList<>()).add(dv);
+        }
+
+        // 4. Sắp xếp danh sách thuốc
         dsThuoc.sort((a, b) -> {
-            String maA = a == null ? null : a.getMaThuoc();
-            String maB = b == null ? null : b.getMaThuoc();
-            if (Objects.equals(maA, maB)) {
-                return 0;
-            }
-            if (maA == null) {
-                return 1;
-            }
-            if (maB == null) {
-                return -1;
-            }
+            String maA = a == null ? "" : a.getMaThuoc();
+            String maB = b == null ? "" : b.getMaThuoc();
             return maB.compareTo(maA);
         });
 
+        // 5. Build dữ liệu cho table
         int stt = 1;
         for (Thuoc thuoc : dsThuoc) {
-            ArrayList<DonViQuyDoi> donVi = daoDonViQuyDoi.getDonViByMaThuocOrderAsc(thuoc.getMaThuoc());
+            ArrayList<DonViQuyDoi> donVi = unitMap.getOrDefault(thuoc.getMaThuoc(), new ArrayList<>());
+
+            // Đảm bảo list donVi được sắp xếp theo tyLeQuyDoi ASC (đã sort ở SQL nhưng check lại cho chắc)
+            donVi.sort(java.util.Comparator.comparingInt(DonViQuyDoi::getTyLeQuyDoi));
+
             String bac1 = formatBac1(thuoc, donVi);
             String bac2 = "--";
             String bac3 = "--";

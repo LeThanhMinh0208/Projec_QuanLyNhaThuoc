@@ -2,6 +2,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.Region?>
 
 
 <VBox prefHeight="850.0" spacing="20.0" styleClass="nk-main-bg" stylesheets="@../../resources/css/NhapKho.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.GUI_NhapKhoController">
@@ -9,10 +10,10 @@
    <children>
       <HBox alignment="CENTER_LEFT" spacing="30.0">
          <children>
-            <VBox spacing="5.0">
+            <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity">
                <children>
-                  <Label styleClass="nk-page-title" text="LẬP PHIẾU NHẬP KHO" />
-                  <Region prefHeight="4.0" prefWidth="150.0" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+                  <Label styleClass="main-title" text="LẬP PHIẾU NHẬP KHO" />
+                  <Region prefHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
                </children>
             </VBox>
             
@@ -32,41 +33,69 @@
             
             <HBox fx:id="viewTaoPhieu" spacing="25.0">
                <children>
-                  <VBox prefWidth="350.0" spacing="15.0" styleClass="box-nhap-lieu">
+                 <VBox prefWidth="350.0" spacing="15.0" styleClass="box-nhap-lieu">
                      <children>
                         <Label text="Thông Tin Phiếu Nhập" styleClass="label-header" />
                         <Region prefHeight="1.0" style="-fx-background-color: #bae6fd;" />
-                        <GridPane vgap="15.0" hgap="10.0">
-                      <columnConstraints>
-   <ColumnConstraints minWidth="-Infinity" />
-   <ColumnConstraints hgrow="ALWAYS" />
-</columnConstraints>
+                        
+                        <VBox spacing="15.0">
                            <children>
-                              <Label text="Mã Đơn Đặt (*):" styleClass="input-label-title" GridPane.rowIndex="0" />
-                              <ComboBox fx:id="cbMaDon" prefWidth="250.0" promptText="Chọn mã đơn..." styleClass="input-field" GridPane.rowIndex="0" GridPane.columnIndex="1" />
-                              
-                              <Label text="Nhà Cung Cấp:" styleClass="input-label-title" GridPane.rowIndex="1" />
-                              <TextField fx:id="txtNhaCungCap" editable="false" styleClass="input-field-readonly" GridPane.rowIndex="1" GridPane.columnIndex="1" />
-                              
-                              <Label text="Người Giao:" styleClass="input-label-title" GridPane.rowIndex="2" />
-                              <TextField fx:id="txtNguoiGiao" promptText="Nguyễn Văn A..." styleClass="input-field" GridPane.rowIndex="2" GridPane.columnIndex="1" />
-                              
-                              <Label text="Ngày Nhập:" styleClass="input-label-title" GridPane.rowIndex="3" />
-                              <DatePicker fx:id="dpNgayNhap" prefWidth="250.0" styleClass="input-field" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                              <VBox spacing="5.0">
+                                 <children>
+                                    <Label text="Mã Đơn Đặt (*):" styleClass="input-label-title" />
+                                    <ComboBox fx:id="cbMaDon" prefHeight="40.0" maxWidth="Infinity" promptText="-- Chọn mã đơn --" styleClass="input-field" />
+                                 </children>
+                              </VBox>
+
+                              <VBox spacing="5.0">
+                                 <children>
+                                    <Label text="Nhà Cung Cấp:" styleClass="input-label-title" />
+                                    <TextField fx:id="txtNhaCungCap" prefHeight="40.0" editable="false" styleClass="input-field, input-field-readonly" />
+                                 </children>
+                              </VBox>
+
+                              <VBox spacing="5.0">
+                                 <children>
+                                    <Label text="Người Giao:" styleClass="input-label-title" />
+                                    <TextField fx:id="txtNguoiGiao" prefHeight="40.0" promptText="VD: Nguyễn Văn A..." styleClass="input-field" />
+                                 </children>
+                              </VBox>
+
+                              <VBox spacing="5.0">
+                                 <children>
+                                    <Label text="Ngày Nhập:" styleClass="input-label-title" />
+                                    <DatePicker fx:id="dpNgayNhap" prefHeight="40.0" maxWidth="Infinity" styleClass="input-field" />
+                                 </children>
+                              </VBox>
                            </children>
-                        </GridPane>
+                        </VBox>
+                        
                         <VBox spacing="5.0" VBox.vgrow="ALWAYS">
-                           <Label text="Ghi Chú:" styleClass="input-label-title" />
-                           <TextArea fx:id="txtGhiChu" prefRowCount="4" promptText="Ghi chú thêm về lô hàng nhập..." wrapText="true" styleClass="input-field" VBox.vgrow="ALWAYS" />
+                           <children>
+                              <Label text="Ghi Chú:" styleClass="input-label-title" />
+                              <TextArea fx:id="txtGhiChu" prefRowCount="4" promptText="Ghi chú thêm về lô hàng nhập..." wrapText="true" styleClass="input-field" VBox.vgrow="ALWAYS" />
+                           </children>
                         </VBox>
                      </children>
                   </VBox>
+              
 
                   <VBox spacing="15.0" HBox.hgrow="ALWAYS">
                      <children>
-                        <VBox styleClass="nk-card" VBox.vgrow="ALWAYS">
+                <VBox styleClass="nk-card" VBox.vgrow="ALWAYS">
                            <children>
-                              <Label text="Chi Tiết Hàng Thực Nhận" styleClass="label-header" style="-fx-padding: 15 15 5 15;" />
+                              
+                              <HBox alignment="CENTER_LEFT">
+                                 <children>
+                                    <Label style="-fx-padding: 15 15 5 15;" styleClass="label-header" text="Chi Tiết Hàng Thực Nhận" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Button onAction="#handleImportCSV" prefHeight="35.0" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 8;" text="📥 Nhập từ file CSV" />
+                                 </children>
+                                 <padding>
+                                    <Insets right="15.0" top="10.0" />
+                                 </padding>
+                              </HBox>
+
                               <TableView fx:id="tableNhapKho" editable="true" styleClass="nk-table" VBox.vgrow="ALWAYS">
                                  <columns>
                                     <TableColumn fx:id="colTenThuoc" prefWidth="200.0" text="TÊN THUỐC" />
@@ -78,8 +107,11 @@
                                     <TableColumn fx:id="colHanDung" prefWidth="120.0" text="HẠN DÙNG" />
                                     <TableColumn fx:id="colGiaNhap" prefWidth="120.0" text="GIÁ/ĐV" />
                                  </columns>
-                                 <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+                                 <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
                               </TableView>
+
                            </children>
                            <padding>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

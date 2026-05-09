@@ -1,6 +1,7 @@
 package gui.dialogs;
 
 import dao.DAO_KhachHang;
+import dao.DAO_NhatKyHoatDong;
 import entity.KhachHang;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -34,7 +35,8 @@ public class Dialog_XoaKhachHangController {
         boolean thanhCong = daoKhachHang.xoaKhachHang(khachHangCanXoa.getMaKhachHang());
 
         if (thanhCong) {
-            new Alert(Alert.AlertType.INFORMATION, "Đã xóa thành công.").showAndWait();
+            DAO_NhatKyHoatDong.ghiLog("XOA", "Khách Hàng", khachHangCanXoa.getMaKhachHang(), "Xóa mềm khách hàng: " + khachHangCanXoa.getHoTen());
+            new Alert(Alert.AlertType.INFORMATION, "Xóa khách hàng thành công!").showAndWait();
         } else {
             new Alert(Alert.AlertType.ERROR, "Có lỗi xảy ra! Vui lòng thử lại.").showAndWait();
         }

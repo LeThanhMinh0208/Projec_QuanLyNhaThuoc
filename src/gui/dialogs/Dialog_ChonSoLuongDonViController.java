@@ -1,21 +1,21 @@
 package gui.dialogs;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import dao.DAO_BangGia;
 import dao.DAO_DonViQuyDoi;
 import dao.DAO_LoThuoc;
 import entity.DonViQuyDoi;
 import entity.LoThuoc;
 import entity.Thuoc;
-import javafx.scene.control.Button;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.stage.Stage;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 public class Dialog_ChonSoLuongDonViController {
 
@@ -43,7 +43,7 @@ public class Dialog_ChonSoLuongDonViController {
     public void setThuoc(Thuoc thuoc) {
         this.thuoc = thuoc;
         lblTenThuoc.setText(thuoc.getTenThuoc());
-        
+
         try {
             if (thuoc.getHinhAnh() != null && !thuoc.getHinhAnh().isEmpty()) {
                 javafx.scene.image.Image img = new javafx.scene.image.Image(getClass().getResourceAsStream("/resources/images/images_thuoc/" + thuoc.getHinhAnh()));
@@ -117,8 +117,10 @@ public class Dialog_ChonSoLuongDonViController {
             return;
         }
         Integer valueObj = spSoLuong.getValue();
-        if (valueObj == null) return;
-        
+        if (valueObj == null) {
+			return;
+		}
+
         int value = valueObj;
         if (value > soLuongToiDaTheoDonVi) {
             lblCanhBao.setText("Số lượng vượt quá tồn cho đơn vị này.");
@@ -134,7 +136,9 @@ public class Dialog_ChonSoLuongDonViController {
             return;
         }
         Integer slObj = spSoLuong.getValue();
-        if (slObj == null) return;
+        if (slObj == null) {
+			return;
+		}
         int sl = slObj;
         if (sl <= 0 || sl > soLuongToiDaTheoDonVi) {
             return;

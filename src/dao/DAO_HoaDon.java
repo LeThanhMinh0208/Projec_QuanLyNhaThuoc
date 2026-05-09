@@ -1,10 +1,15 @@
 package dao;
 
-import connectDB.ConnectDB;
-import entity.HoaDon;
-import entity.ChiTietHoaDon;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
+
+import connectDB.ConnectDB;
+import entity.ChiTietHoaDon;
+import entity.HoaDon;
 
 public class DAO_HoaDon {
     public boolean thanhToan(HoaDon hd, List<ChiTietHoaDon> dsCT) {
@@ -50,7 +55,9 @@ public class DAO_HoaDon {
                     ResultSet rsTyLe = psTyLe.executeQuery();
                     if (rsTyLe.next()) {
                         tyLeQuyDoi = rsTyLe.getInt("tyLeQuyDoi");
-                        if (tyLeQuyDoi <= 0) tyLeQuyDoi = 1;
+                        if (tyLeQuyDoi <= 0) {
+							tyLeQuyDoi = 1;
+						}
                     }
                 }
 
@@ -76,7 +83,9 @@ public class DAO_HoaDon {
                     } else {
                         // Lô giữa: tính nguyên số đơn vị bán lấy được
                         soLuongBanTuLo = truTuLo / tyLeQuyDoi;
-                        if (soLuongBanTuLo <= 0) soLuongBanTuLo = 1; // tối thiểu 1
+                        if (soLuongBanTuLo <= 0) {
+							soLuongBanTuLo = 1; // tối thiểu 1
+						}
                     }
 
                     // INSERT ChiTietHoaDon cho lô này — soLuong > 0 luôn
@@ -112,12 +121,13 @@ public class DAO_HoaDon {
             con.setAutoCommit(true);
             return true;
         } catch (SQLException e) {
-            if (con != null)
-                try {
+            if (con != null) {
+				try {
                     con.rollback();
                     con.setAutoCommit(true);
                 } catch (SQLException ex) {
                 }
+			}
             e.printStackTrace();
             return false;
         }
@@ -220,7 +230,7 @@ public class DAO_HoaDon {
     }
 
     public entity.HoaDonView getHoaDonViewByMa(String maHoaDon) {
-        String sql = 
+        String sql =
             "SELECT hd.maHoaDon, hd.ngayLap, kh.hoTen AS tenKhachHang, kh.sdt, " +
             "       nv.hoTen AS tenNhanVien, hd.thueVAT, hd.hinhThucThanhToan, hd.ghiChu, hd.loaiBan, " +
             "       SUM(ct.soLuong * ct.donGia) AS tamTinh, " +
@@ -284,6 +294,34 @@ public class DAO_HoaDon {
                     rs.getInt("soLuong"),
                     rs.getDouble("donGia"),
                     rs.getDouble("thanhTien")
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    /**
+     * Lấy dữ liệu chi tiết hóa đơn chuyên dụng cho tính năng Tái Lập Đơn Thuốc
+     */
+    public List<Object[]> getChiTietRebuildCart(String maHoaDon) {
+        List<Object[]> list = new java.util.ArrayList<>();
+        String sql = "SELECT dv.maThuoc, ct.maQuyDoi, ct.soLuong, ct.donGia, ct.maBangGia, dv.tenDonVi " +
+                     "FROM ChiTietHoaDon ct " +
+                     "JOIN DonViQuyDoi dv ON ct.maQuyDoi = dv.maQuyDoi " +
+                     "WHERE ct.maHoaDon = ?";
+        try (Connection con = ConnectDB.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, maHoaDon);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                list.add(new Object[]{
+                    rs.getString("maThuoc"),
+                    rs.getString("maQuyDoi"),
+                    rs.getInt("soLuong"),
+                    rs.getDouble("donGia"),
+                    rs.getString("maBangGia"),
+                    rs.getString("tenDonVi")
                 });
             }
         } catch (SQLException e) {
