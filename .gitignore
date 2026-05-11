@@ -10,7 +10,7 @@ exports/
 # Chặn các cài đặt cá nhân của người dùng (giao diện, vị trí cửa sổ...)
 .settings/
 .metadata/
-
+.vpprefdata/
 # LƯU Ý QUAN TRỌNG: 
 # Vì bạn KHÔNG dùng Maven, bạn PHẢI cho phép Git lưu 2 file sau 
 # để team bạn đồng bộ được thư viện trong mục 'libs'.
