@@ -9,6 +9,8 @@ import java.util.Random;
 import java.util.ResourceBundle;
 
 import dao.DAO_NhatKyHoatDong;
+import dao.DAO_LoThuoc;
+import dao.DAO_ThongKeDoanhThu;
 import dao.DAO_Thuoc;
 import entity.NhanVien;
 import entity.Thuoc;
@@ -44,8 +46,7 @@ import utils.UserSession;
 public class GUI_TrangChuController {
 
     @FXML private TableView<Thuoc> tableThuoc;
-    @FXML private TableColumn<Thuoc, String> colMaThuoc, colHinhAnh, colTenThuoc, colTrieuChung, colDVT, colTrangThai;
-    @FXML private TableColumn<Thuoc, Boolean> colKeDon;
+    @FXML private TableColumn<Thuoc, String> colMaThuoc, colHinhAnh, colTenThuoc, colTrieuChung, colTrangThai;
     @FXML private TextField txtTimKiem;
     @FXML private BorderPane mainBorderPane;
 
@@ -65,9 +66,33 @@ public class GUI_TrangChuController {
 
     // 3 card ở Trang Chủ
     @FXML private javafx.scene.layout.HBox cardBanThuoc, cardDoiTra, cardBaoCao;
+    
+    // === EXPANDED DASHBOARD TABLES ===
+    @FXML private TableView<WarningItem> tableSapHetHan;
+    @FXML private TableColumn<WarningItem, String> colHsdTen, colHsdLo, colHsdNgay;
+    
+    @FXML private TableView<WarningItem> tableSapHetTon;
+    @FXML private TableColumn<WarningItem, String> colTonTen, colTonLo, colTonSoLuong;
+    
+    @FXML private Label lblMaHDGanNhat, lblLoaiHDGanNhat, lblTienHDGanNhat;
+
+    // Class dữ liệu để hiển thị cảnh báo
+    public static class WarningItem {
+        private String name, lo, detail;
+        private int urgency; // 0 = Green/Gray, 1 = Orange, 2 = Dark Red
+
+        public WarningItem(String name, String lo, String detail, int urgency) {
+            this.name = name; this.lo = lo; this.detail = detail; this.urgency = urgency;
+        }
+        public String getName() { return name; }
+        public String getLo() { return lo; }
+        public String getDetail() { return detail; }
+        public int getUrgency() { return urgency; }
+    }
 
     private final DAO_Thuoc daoThuoc = new DAO_Thuoc();
     private final ObservableList<Thuoc> masterData = FXCollections.observableArrayList();
+    private java.util.Map<String, Integer> stockMap = new java.util.HashMap<>();
     private static NhanVien nhanVienDangNhap;
     private Node noiDungTrangChuGoc;
 
@@ -81,7 +106,9 @@ public class GUI_TrangChuController {
     public void initialize() {
         instance = this; 
         setupTable();
+        setupWarningTables(); // Khởi tạo giao diện Dashboard mới
         loadDataFromServer();
+        loadDashboardStats();
         setupSearchLogic();
         utils.SceneUtils.init(mainBorderPane);
         if (mainBorderPane != null) {
@@ -170,6 +197,94 @@ public class GUI_TrangChuController {
         }
     }
 
+    // Nạp định dạng cột cho các bảng cảnh báo
+    private void setupWarningTables() {
+        // 1. SETUP SẮP HẾT HẠN
+        colHsdTen.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getName()));
+        colHsdLo.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getLo()));
+        colHsdNgay.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getDetail()));
+        colHsdNgay.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                getStyleClass().removeAll("text-dark-red", "text-orange", "text-green");
+                if (empty || item == null) { setText(null); } else {
+                    setText(item);
+                    getStyleClass().add("text-dark-red");
+                }
+            }
+        });
+
+        // 2. SETUP SẮP HẾT HÀNG
+        colTonTen.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getName()));
+        colTonLo.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getLo()));
+        colTonSoLuong.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getDetail()));
+        colTonSoLuong.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                getStyleClass().removeAll("text-dark-red", "text-orange", "text-green");
+                if (empty || item == null) { setText(null); } else {
+                    setText(item);
+                    getStyleClass().add("text-dark-red");
+                }
+            }
+        });
+    }
+
+    private void loadDashboardStats() {
+        new Thread(() -> {
+            try {
+                // 1. Lấy danh sách lô thuốc từ DB
+                DAO_LoThuoc daoLo = new DAO_LoThuoc();
+                List<entity.LoThuoc> dsLo = daoLo.getAllLoThuoc();
+                java.time.LocalDate today = java.time.LocalDate.now();
+                
+                List<WarningItem> sapHetHanList = new ArrayList<>();
+                List<WarningItem> sapHetTonList = new ArrayList<>();
+                java.util.Map<String, Integer> newStockMap = new java.util.HashMap<>();
+                
+                for (entity.LoThuoc lo : dsLo) {
+                    if (lo.getTrangThai() == 1) { // Chỉ tính lô đang hoạt động
+                        String maThuoc = lo.getThuoc() != null ? lo.getThuoc().getMaThuoc() : null;
+                        int ton = lo.getSoLuongTon();
+                        
+                        if (maThuoc != null) {
+                            newStockMap.put(maThuoc, newStockMap.getOrDefault(maThuoc, 0) + ton);
+                        }
+
+                        String tenThuoc = lo.getThuoc() != null ? lo.getThuoc().getTenThuoc() : "Không xác định";
+                        String maLo = lo.getMaLoThuoc() != null ? lo.getMaLoThuoc() : "N/A";
+                        String donVi = lo.getThuoc() != null && lo.getThuoc().getDonViCoBan() != null ? lo.getThuoc().getDonViCoBan() : "Đơn vị";
+                        
+                        // Xử lý tồn kho
+                        if (ton >= 0 && ton < 100) {
+                            int urgency = (ton <= 30) ? 2 : (ton <= 60 ? 1 : 0);
+                            sapHetTonList.add(new WarningItem(tenThuoc, maLo, ton + " " + donVi, urgency));
+                        }
+                        
+                        // Xử lý hạn sử dụng
+                        if (lo.getHanSuDung() != null && ton > 0) {
+                            long days = java.time.temporal.ChronoUnit.DAYS.between(today, lo.getHanSuDung().toLocalDate());
+                            if (days >= 0 && days <= 90) {
+                                int urgency = (days <= 30) ? 2 : (days <= 60 ? 1 : 0);
+                                sapHetHanList.add(new WarningItem("⏳ " + tenThuoc, maLo, days + " ngày", urgency));
+                            }
+                        }
+                    }
+                }
+
+                // Cập nhật giao diện trên JavaFX Application Thread
+                javafx.application.Platform.runLater(() -> {
+                    stockMap = newStockMap;
+                    // Cập nhật bảng dữ liệu
+                    tableSapHetHan.setItems(FXCollections.observableArrayList(sapHetHanList));
+                    tableSapHetTon.setItems(FXCollections.observableArrayList(sapHetTonList));
+                    tableThuoc.refresh(); // Cập nhật lại cột số lượng tồn
+                });
+
+            } catch (Exception e) { e.printStackTrace(); }
+        }).start();
+    }
+
     public void chuyenTrangVaHighlight(String fxmlPath, String buttonTextToMatch) {
         switchPage(fxmlPath);
         javafx.application.Platform.runLater(() -> {
@@ -204,29 +319,28 @@ public class GUI_TrangChuController {
         colMaThuoc.setCellValueFactory(new PropertyValueFactory<>("maThuoc"));
         colTenThuoc.setCellValueFactory(new PropertyValueFactory<>("tenThuoc"));
         colTrieuChung.setCellValueFactory(new PropertyValueFactory<>("trieuChung"));
-        colDVT.setCellValueFactory(new PropertyValueFactory<>("donViCoBan"));
 
-        colKeDon.setCellValueFactory(new PropertyValueFactory<>("canKeDon"));
-        colKeDon.setCellFactory(column -> new TableCell<>() {
-            @Override protected void updateItem(Boolean item, boolean empty) {
-                super.updateItem(item, empty);
-                getStyleClass().removeAll("text-do", "text-xanh-la");
-                if (empty || item == null) { setText(null); } 
-                else { setText(item ? "Có" : "Không"); getStyleClass().add(item ? "text-do" : "text-xanh-la"); }
-            }
-        });
-
+        // Hiển thị Trạng Thái Tồn Kho thay vì trạng thái bán (để đáp ứng Highlight Đỏ)
         colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
         colTrangThai.setCellFactory(column -> new TableCell<>() {
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                getStyleClass().removeAll("text-xanh-bien", "text-vang-cam", "text-do");
+                getStyleClass().removeAll("text-xanh-bien", "text-vang-cam", "text-do", "text-dark-red", "text-green");
                 if (empty || item == null) { setText(null); } 
                 else {
-                    if ("DANG_BAN".equals(item)) { setText("Đang Bán"); getStyleClass().add("text-xanh-bien"); } 
-                    else if ("HET_HANG".equals(item)) { setText("Hết Hàng"); getStyleClass().add("text-vang-cam"); } 
-                    else if ("NGUNG_BAN".equals(item)) { setText("Ngừng Bán"); getStyleClass().add("text-do"); } 
-                    else { setText(item); }
+                    Thuoc t = getTableRow().getItem();
+                    if (t != null) {
+                        int ton = stockMap.getOrDefault(t.getMaThuoc(), 0);
+                        setText(String.valueOf(ton)); 
+                        if (ton == 0) {
+                            getStyleClass().add("text-dark-red");
+                        } else if (ton <= 30) {
+                            getStyleClass().add("text-orange");
+                        } else {
+                            getStyleClass().add("text-green");
+                        }
+                        setStyle("-fx-font-weight: bold;");
+                    }
                 }
             }
         });
@@ -400,5 +514,8 @@ public class GUI_TrangChuController {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public void loadDataTrangChu() { masterData.setAll(daoThuoc.getAllThuoc()); }
+    public void loadDataTrangChu() { 
+        masterData.setAll(daoThuoc.getAllThuoc()); 
+        loadDashboardStats(); // Load lại cả số liệu cảnh báo khi quay về
+    }
 }

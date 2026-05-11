@@ -19,12 +19,18 @@
         <VBox fx:id="viewLapPhieu" spacing="15">
             <HBox spacing="15" alignment="CENTER_LEFT">
                 <MenuButton fx:id="mbNhomThuoc" text="✨Chọn Nhóm Thuốc" styleClass="btn-green" prefHeight="40" prefWidth="230" />
-                <Button text="⚡ Kiểm Thông Minh" onAction="#handleKiemKeThongMinh" styleClass="btn-blue" prefHeight="40" prefWidth="230" />
+                <Button text="⚡ Kiểm Biến Động" onAction="#handleKiemKeThongMinh" styleClass="btn-blue" prefHeight="40" prefWidth="230" />
                 <Button text="✔ Kiểm Tất Cả" onAction="#handleKiemTatCa" styleClass="btn-orange" prefHeight="40" prefWidth="230" />
                 
                 <Button text="📂 Import CSV" onAction="#handleImportCSVChonThuoc" styleClass="btn-yellow" prefHeight="40" prefWidth="230" />
                 
                 <HBox HBox.hgrow="ALWAYS" />
+<Button text="☑ Lọc đã chọn" 
+        onAction="#handleDuaChonLenDau" 
+        styleClass="btn-purple" 
+        prefHeight="40.0" 
+        minWidth="-Infinity" />
+
                 <HBox alignment="CENTER_LEFT" styleClass="kk-search-wrapper" prefHeight="40.0" prefWidth="300">
                     <Label style="-fx-text-fill:#0ea5e9;" text="🔍" />
                     <TextField fx:id="txtTimKiemThuoc" promptText="Tìm lô thuốc, tên thuốc..." styleClass="search-input" HBox.hgrow="ALWAYS" />

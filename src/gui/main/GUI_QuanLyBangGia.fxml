@@ -39,9 +39,9 @@
 
             <!-- Action bar -->
             <HBox alignment="CENTER_LEFT" spacing="15.0">
-                <Button fx:id="btnThemBangGiaMoi" onAction="#handleThemBangGiaMoi" prefHeight="50.0"
-                        styleClass="top-card, card-green, btn-action"
-                        text="  + Thêm Bảng Giá Mới  " textFill="WHITE" />
+              <Button fx:id="btnThemBangGiaMoi" onAction="#handleThemBangGiaMoi" prefHeight="40.0"
+        styleClass="bg-btn-add-new"
+        text="➕ Thêm Bảng Giá Mới" />
                 <HBox HBox.hgrow="ALWAYS" />
                 <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="350.0" styleClass="search-box">
                     <Label styleClass="search-icon" text="🔍" />
@@ -137,8 +137,8 @@
                         <HBox alignment="CENTER_LEFT" spacing="15.0">
                             <Label text="DANH SÁCH THUỐC VÀ GIÁ BÁN" styleClass="bh-section-title"
                                    VBox.vgrow="NEVER" HBox.hgrow="ALWAYS" />
-                            <Button text="Lấy giá từ bảng mặc định hiện tại" onAction="#handleLayGiaTuDefault"
-                                    style="-fx-background-color:#7c3aed; -fx-text-fill:white; -fx-font-size:12px; -fx-padding:6 12; -fx-cursor:hand; -fx-background-radius:6;">
+                            <Button text="Lấy giá từ bảng mặc định" onAction="#handleLayGiaTuDefault"
+                                    style="-fx-background-color: linear-gradient(to right, #38bdf8, #0ea5e9); -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 8 15; -fx-cursor: hand; -fx-background-radius: 8;">
                                 <tooltip>
                                     <Tooltip text="Lấy giá từ bảng giá mặc định đang hiệu lực cho các thuốc chưa có giá" />
                                 </tooltip>
