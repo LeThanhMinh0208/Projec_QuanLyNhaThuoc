@@ -8,9 +8,9 @@ public class LoThuoc {
     private Date hanSuDung;
     private int soLuongTon;
     private double giaNhap;
-    private String viTriKho; 
+    private String viTriKho;
     private Thuoc thuoc;
-    private int trangThai; 
+    private int trangThai;
     private Date ngayNhapKho;
     private NhaCungCap nhaCungCap;
 

@@ -1,0 +1,36 @@
+/* --- CARDS 3 NÚT CHỨC NĂNG (DÁNG VIÊN THUỐC) --- */
+.top-card {
+    -fx-background-radius: 35px; 
+    -fx-cursor: hand;
+    -fx-font-size: 16px;
+    -fx-font-weight: 900;
+    -fx-text-fill: white;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.15), 10, 0, 0, 4);
+    -fx-transition: all 0.3s ease;
+}
+.top-card:hover { 
+    -fx-translate-y: -3px; 
+}
+
+/* Màu sắc cho các Card */
+.card-green { -fx-background-color: linear-gradient(to bottom right, #34d399, #10b981); }
+.card-green:hover { -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.6), 20, 0, 0, 8); }
+
+.card-blue { -fx-background-color: linear-gradient(to bottom right, #38bdf8, #0ea5e9); }
+.card-blue:hover { -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.6), 20, 0, 0, 8); }
+
+.card-orange { -fx-background-color: linear-gradient(to bottom right, #fbbf24, #f59e0b); }
+.card-orange:hover { -fx-effect: dropshadow(three-pass-box, rgba(245, 158, 11, 0.6), 20, 0, 0, 8); }
+
+/* Custom cho bảng của trang này */
+.panel-white {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12px;
+    -fx-padding: 15;
+}
+
+.table-view {
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+}

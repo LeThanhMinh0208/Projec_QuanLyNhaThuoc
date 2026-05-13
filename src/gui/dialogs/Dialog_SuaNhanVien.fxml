@@ -41,7 +41,7 @@
             </VBox>
 
             <HBox alignment="CENTER_RIGHT" spacing="15" style="-fx-padding: 10 0 0 0;">
-                <Button text="Hủy Bỏ" onAction="#handleHuy" prefWidth="100" prefHeight="40" styleClass="btn-cancel" />
+                <Button text="Hủy Bỏ" onAction="#handleHuy" prefWidth="130" prefHeight="40" styleClass="btn-cancel" />
                 <Button fx:id="btnLuu" disable="true" text="💾 LƯU THAY ĐỔI" onAction="#handleLuu" prefWidth="180" prefHeight="40" styleClass="btn-save" />
             </HBox>
         </VBox>

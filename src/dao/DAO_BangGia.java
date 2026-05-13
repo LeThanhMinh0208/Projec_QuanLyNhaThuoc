@@ -1,15 +1,20 @@
 package dao;
 
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import connectDB.ConnectDB;
 import entity.BangGia;
 import entity.ChiTietBangGia;
 import entity.Thuoc;
-
-import java.math.BigDecimal;
-import java.sql.*;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DAO_BangGia {
 
@@ -59,7 +64,9 @@ public class DAO_BangGia {
              PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setString(1, maBangGia);
             ResultSet rs = pst.executeQuery();
-            if (rs.next()) return mapBangGia(rs);
+            if (rs.next()) {
+				return mapBangGia(rs);
+			}
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -96,7 +103,9 @@ public class DAO_BangGia {
         try (Connection con = ConnectDB.getConnection();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
-            if (rs.next()) return mapBangGia(rs);
+            if (rs.next()) {
+				return mapBangGia(rs);
+			}
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -172,7 +181,9 @@ public class DAO_BangGia {
             con.commit();
             return null; // Thành công
         } catch (SQLException e) {
-            try { if (con != null) con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            try { if (con != null) {
+				con.rollback();
+			} } catch (SQLException ex) { ex.printStackTrace(); }
             e.printStackTrace();
             return "Lỗi cơ sở dữ liệu: " + e.getMessage();
         } finally {
@@ -228,7 +239,9 @@ public class DAO_BangGia {
              PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setString(1, maBangGiaHienTai);
             ResultSet rs = pst.executeQuery();
-            if (rs.next()) return rs.getInt(1) > 0;
+            if (rs.next()) {
+				return rs.getInt(1) > 0;
+			}
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -407,7 +420,9 @@ public class DAO_BangGia {
     // ============================================================
     public boolean xoaBangGia(String maBangGia) {
         BangGia bg = getBangGiaById(maBangGia);
-        if (bg == null) return false;
+        if (bg == null) {
+			return false;
+		}
 
         Connection con = null;
         try {
@@ -520,7 +535,9 @@ public class DAO_BangGia {
                      "FROM BangGia WHERE loaiBangGia = 'DEFAULT' AND trangThai = 1 AND ngayKetThuc IS NULL";
         try (Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
-            if (rs.next()) return mapBangGia(rs);
+            if (rs.next()) {
+				return mapBangGia(rs);
+			}
         }
         return null;
     }
@@ -557,13 +574,17 @@ public class DAO_BangGia {
     public List<ChiTietBangGia> kiemTraTrungPromo(
             List<String> dsQuyDoi, LocalDate ngayBD, LocalDate ngayKT, String maBangGiaMoi) {
         List<ChiTietBangGia> result = new ArrayList<>();
-        if (dsQuyDoi == null || dsQuyDoi.isEmpty()) return result;
-        
+        if (dsQuyDoi == null || dsQuyDoi.isEmpty()) {
+			return result;
+		}
+
         // Tạo chuỗi tham số cho IN (?)
         StringBuilder placeholders = new StringBuilder();
         for (int i = 0; i < dsQuyDoi.size(); i++) {
             placeholders.append("?");
-            if (i < dsQuyDoi.size() - 1) placeholders.append(",");
+            if (i < dsQuyDoi.size() - 1) {
+				placeholders.append(",");
+			}
         }
 
         String sql = "SELECT t.tenThuoc, dv.tenDonVi, bg.tenBangGia, bg.ngayBatDau, bg.ngayKetThuc, ctbg.maQuyDoi " +
@@ -577,7 +598,7 @@ public class DAO_BangGia {
                      "  AND bg.maBangGia <> ? " +
                      "  AND bg.ngayBatDau <= ? " +
                      "  AND (bg.ngayKetThuc IS NULL OR bg.ngayKetThuc >= ?)";
-        
+
         try (Connection con = ConnectDB.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
             int idx = 1;
@@ -587,7 +608,7 @@ public class DAO_BangGia {
             pst.setString(idx++, maBangGiaMoi == null ? "" : maBangGiaMoi);
             pst.setDate(idx++, Date.valueOf(ngayKT != null ? ngayKT : LocalDate.now().plusYears(100)));
             pst.setDate(idx++, Date.valueOf(ngayBD));
-            
+
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 ChiTietBangGia ct = new ChiTietBangGia();
@@ -596,7 +617,9 @@ public class DAO_BangGia {
                 ct.setTenBangGia(rs.getString("tenBangGia"));
                 ct.setNgayBatDau(rs.getDate("ngayBatDau").toLocalDate());
                 Date kt = rs.getDate("ngayKetThuc");
-                if (kt != null) ct.setNgayKetThuc(kt.toLocalDate());
+                if (kt != null) {
+					ct.setNgayKetThuc(kt.toLocalDate());
+				}
                 ct.setMaQuyDoi(rs.getString("maQuyDoi"));
                 result.add(ct);
             }

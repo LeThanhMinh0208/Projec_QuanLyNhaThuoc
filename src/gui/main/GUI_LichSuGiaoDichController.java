@@ -1,5 +1,11 @@
 package gui.main;
 
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Locale;
+
 import dao.DAO_GiaoDichKhachHang;
 import entity.GiaoDichKhachHang;
 import entity.HoaDonView;
@@ -7,34 +13,36 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Locale;
 
 public class GUI_LichSuGiaoDichController {
 
     @FXML private TextField txtTimKiem;
     @FXML private ComboBox<String> cbHinhThuc;
     @FXML private DatePicker dpTuNgay, dpDenNgay;
-    
+
     @FXML private TableView<GiaoDichKhachHang> tableGiaoDich;
-    // Khai báo cột mới
     @FXML private TableColumn<GiaoDichKhachHang, String> colMaHD, colNgayLap, colKhachHang, colSdt;
     @FXML private TableColumn<GiaoDichKhachHang, String> colTamTinh, colVAT, colTongTT, colHinhThuc;
     @FXML private TableColumn<GiaoDichKhachHang, Void> colHanhDong;
-    
+
     @FXML private Label lblTongGiaoDich, lblTongDoanhThu;
 
     private final DAO_GiaoDichKhachHang dao = new DAO_GiaoDichKhachHang();
@@ -48,7 +56,7 @@ public class GUI_LichSuGiaoDichController {
     public void initialize() {
         setupComboBox();
         setupTable();
-        loadData(); 
+        loadData();
         setupFilter();
     }
 
@@ -61,40 +69,52 @@ public class GUI_LichSuGiaoDichController {
 
     private void setupTable() {
         colMaHD.setCellValueFactory(new PropertyValueFactory<>("maHoaDon"));
+        
+        // ĐÃ GỘP: Gán dữ liệu cột Khách hàng & SĐT kèm chú thích
         colKhachHang.setCellValueFactory(new PropertyValueFactory<>("tenKhachHang")); // Cột Khách hàng
         colSdt.setCellValueFactory(new PropertyValueFactory<>("sdtKhachHang"));       // Cột SĐT
-        
+
         colNgayLap.setCellValueFactory(c -> new SimpleStringProperty(
             c.getValue().getNgayLap() != null ? dateFormat.format(c.getValue().getNgayLap()) : ""));
-            
+
         colTamTinh.setCellValueFactory(c -> new SimpleStringProperty(currencyFormat.format(c.getValue().getTamTinh())));
         colVAT.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getThueVAT() + "%"));
         colTongTT.setCellValueFactory(c -> new SimpleStringProperty(currencyFormat.format(c.getValue().getTongSauVAT())));
         colHinhThuc.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getHinhThucLabel()));
 
         colHanhDong.setCellFactory(param -> new TableCell<>() {
-            private final Button btn = new Button("👁 Chi tiết");
+            private final Button btn = new Button("Xem");
             {
-                btn.setStyle("-fx-background-color:#2563eb;-fx-text-fill:white;-fx-font-size:12px;-fx-padding:4 10;-fx-cursor:hand;");
+                btn.getStyleClass().add("btn-view-pill");
                 btn.setOnAction(e -> moDialogChiTiet(getTableView().getItems().get(getIndex())));
             }
             @Override protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : btn);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(btn);
+                    setAlignment(Pos.CENTER);
+                }
             }
         });
     }
 
     private void loadData() {
-        List<GiaoDichKhachHang> list = dao.getAllGiaoDich(); 
+        List<GiaoDichKhachHang> list = dao.getAllGiaoDich();
         masterData.setAll(list);
     }
 
     private void setupFilter() {
         filteredData = new FilteredList<>(masterData, p -> true);
-        tableGiaoDich.setItems(filteredData);
-        applyFilter(); 
         
+        // 💡 GIỮ LOGIC TỪ HEAD: Bọc SortedList để người dùng có thể click sắp xếp các cột mượt mà
+        SortedList<GiaoDichKhachHang> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(tableGiaoDich.comparatorProperty());
+        
+        tableGiaoDich.setItems(sortedData);
+        applyFilter(); 
+
         txtTimKiem.textProperty().addListener((obs, oldVal, newVal) -> applyFilter());
     }
 
@@ -112,27 +132,31 @@ public class GUI_LichSuGiaoDichController {
         filteredData.setPredicate(gd -> {
             String keyword = txtTimKiem.getText().toLowerCase().trim();
             
-            // Tìm theo Mã HĐ, Tên KH, hoặc SĐT KH
+            // ĐÃ GỘP: Tìm theo Mã HĐ, Tên KH, hoặc SĐT KH kèm chú thích rành mạch
             boolean matchText = keyword.isEmpty() || 
                                 (gd.getMaHoaDon() != null && gd.getMaHoaDon().toLowerCase().contains(keyword)) ||
                                 (gd.getTenKhachHang() != null && gd.getTenKhachHang().toLowerCase().contains(keyword)) ||
                                 (gd.getSdtKhachHang() != null && gd.getSdtKhachHang().contains(keyword));
-                                
+
             String ht = cbHinhThuc.getValue();
             boolean matchHT = "Tất cả".equals(ht) || ht == null || (gd.getHinhThucLabel() != null && gd.getHinhThucLabel().equals(ht));
-            
+
             boolean matchDate = true;
             if (gd.getNgayLap() != null) {
                 LocalDate date = gd.getNgayLap().toLocalDateTime().toLocalDate();
-                if (dpTuNgay.getValue() != null && date.isBefore(dpTuNgay.getValue())) matchDate = false;
-                if (dpDenNgay.getValue() != null && date.isAfter(dpDenNgay.getValue())) matchDate = false;
+                if (dpTuNgay.getValue() != null && date.isBefore(dpTuNgay.getValue())) {
+                    matchDate = false;
+                }
+                if (dpDenNgay.getValue() != null && date.isAfter(dpDenNgay.getValue())) {
+                    matchDate = false;
+                }
             }
             return matchText && matchHT && matchDate;
         });
-        
+
         double tongThu = 0;
         for(GiaoDichKhachHang gd : filteredData) { tongThu += gd.getTongSauVAT(); }
-        
+
         lblTongGiaoDich.setText("Tổng: " + filteredData.size() + " giao dịch");
         lblTongDoanhThu.setText(currencyFormat.format(tongThu));
     }
@@ -142,7 +166,7 @@ public class GUI_LichSuGiaoDichController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ChiTietHoaDon.fxml"));
             Parent root = loader.load();
             gui.dialogs.Dialog_ChiTietHoaDonController ctrl = loader.getController();
-            
+
             HoaDonView hd = new HoaDonView();
             hd.setMaHoaDon(gd.getMaHoaDon());
             hd.setNgayLap(gd.getNgayLap());
@@ -155,7 +179,7 @@ public class GUI_LichSuGiaoDichController {
             hd.setHinhThucThanhToan(gd.getHinhThucThanhToan());
             hd.setGhiChu(gd.getGhiChu());
             ctrl.setHoaDon(hd);
-            
+
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("Chi Tiết Hóa Đơn — " + gd.getMaHoaDon());

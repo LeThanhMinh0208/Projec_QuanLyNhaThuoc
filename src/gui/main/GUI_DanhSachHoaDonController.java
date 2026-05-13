@@ -12,9 +12,19 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -61,7 +71,9 @@ public class GUI_DanhSachHoaDonController {
         tableHoaDon.setOnKeyPressed(event -> {
             if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
                 HoaDonView selected = tableHoaDon.getSelectionModel().getSelectedItem();
-                if (selected != null) moDialogChiTiet(selected);
+                if (selected != null) {
+					moDialogChiTiet(selected);
+				}
                 event.consume();
             }
         });
@@ -101,30 +113,36 @@ public class GUI_DanhSachHoaDonController {
                 super.updateItem(val, empty);
                 if (empty || val == null) {
                     setText(null);
-                    setStyle("");
-                } else if ("BAN_THEO_DON".equals(val)) {
-                    setText("Theo đơn");
-                    setStyle("-fx-text-fill: #1565C0; -fx-font-weight: bold;");
+                    getStyleClass().removeAll("text-theo-don", "text-ban-le");
                 } else {
-                    setText("Bán lẻ");
-                    setStyle("-fx-text-fill: #2E7D32;");
+                    getStyleClass().removeAll("text-theo-don", "text-ban-le");
+                    if ("BAN_THEO_DON".equals(val)) {
+                        setText("Theo đơn");
+                        getStyleClass().add("text-theo-don"); // Class trong Danhsachhoadon.css
+                    } else {
+                        setText("Bán lẻ");
+                        getStyleClass().add("text-ban-le"); // Class trong Danhsachhoadon.css
+                    }
                 }
             }
         });
 
+        // Nút HÀNH ĐỘNG (XEM) - Dáng viên thuốc chuẩn Pill-shape
         colHanhDong.setCellFactory(col -> new TableCell<>() {
-            private final Button btn = new Button("👁 Chi tiết");
+            private final Button btn = new Button("Xem");
             {
-                btn.setStyle("-fx-background-color:#2563eb;-fx-text-fill:white;-fx-font-size:12px;-fx-padding:4 10;-fx-cursor:hand;");
+                btn.getStyleClass().add("btn-view-pill"); // Ăn class từ Danhsachhoadon.css
                 btn.setOnAction(e -> moDialogChiTiet(getTableView().getItems().get(getIndex())));
             }
             @Override protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : btn);
+                if (empty) setGraphic(null); 
+                else {
+                    setGraphic(btn);
+                    setAlignment(Pos.CENTER);
+                }
             }
         });
-
-        tableHoaDon.setItems(filteredData != null ? filteredData : data);
     }
 
     private void loadData() {
@@ -167,15 +185,20 @@ public class GUI_DanhSachHoaDonController {
 
     /** Filter keyword trên data đã load (không query DB) */
     private void filterByKeyword(String keyword) {
-        if (filteredData == null) return;
+        if (filteredData == null) {
+			return;
+		}
         if (keyword == null || keyword.isEmpty()) {
             filteredData.setPredicate(hd -> true);
         } else {
             String lower = keyword.toLowerCase();
             filteredData.setPredicate(hd -> {
-                if (hd.getMaHoaDon() != null && hd.getMaHoaDon().toLowerCase().contains(lower)) return true;
-                if (hd.getTenKhachHang() != null && hd.getTenKhachHang().toLowerCase().contains(lower)) return true;
-                if (hd.getSdt() != null && hd.getSdt().toLowerCase().contains(lower)) return true;
+                if ((hd.getMaHoaDon() != null && hd.getMaHoaDon().toLowerCase().contains(lower)) || (hd.getTenKhachHang() != null && hd.getTenKhachHang().toLowerCase().contains(lower))) {
+					return true;
+				}
+                if (hd.getSdt() != null && hd.getSdt().toLowerCase().contains(lower)) {
+					return true;
+				}
                 return false;
             });
         }
@@ -199,6 +222,12 @@ public class GUI_DanhSachHoaDonController {
     @FXML
     void onFilterLoaiBan(ActionEvent event) {
         // Khi thay đổi ComboBox loại bán → reload data từ DB
+        loadData();
+    }
+
+    @FXML
+    void onFilterHinhThuc(ActionEvent event) {
+        // Khi thay đổi ComboBox hình thức TT → reload data từ DB
         loadData();
     }
 

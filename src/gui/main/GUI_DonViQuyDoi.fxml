@@ -22,14 +22,17 @@
     </padding>
 
     <children>
-        <VBox spacing="4.0">
+        <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity" minHeight="-Infinity">
             <children>
                 <Label styleClass="main-title" text="DANH SÁCH QUY ĐỔI ĐƠN VỊ THUỐC" />
-                <Region prefHeight="4.0" prefWidth="260.0" style="-fx-background-color: #0ea5e9; -fx-background-radius: 8;" />
+              <Region maxWidth="Infinity" styleClass="xk-title-line" />
             </children>
         </VBox>
 
-        <HBox alignment="CENTER_LEFT" spacing="14.0">
+        <HBox alignment="CENTER_LEFT" spacing="14.0" styleClass="dvqd-search-card">
+            <padding>
+                <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
+            </padding>
             <children>
                 <HBox alignment="CENTER_LEFT" prefHeight="46.0" styleClass="search-box" HBox.hgrow="ALWAYS">
                     <children>
@@ -43,7 +46,7 @@
             </children>
         </HBox>
 
-        <VBox styleClass="panel-white" VBox.vgrow="ALWAYS">
+        <VBox styleClass="panel-white dvqd-content-card" VBox.vgrow="ALWAYS">
             <children>
                 <TableView fx:id="tableQuyDoi" prefHeight="620.0" styleClass="table-view dvqd-table" VBox.vgrow="ALWAYS">
                     <columnResizePolicy>
@@ -53,9 +56,9 @@
                         <TableColumn fx:id="colStt" prefWidth="68.0" text="STT" />
                         <TableColumn fx:id="colMaThuoc" prefWidth="118.0" text="Mã Thuốc" />
                         <TableColumn fx:id="colTenThuoc" prefWidth="260.0" text="Tên Thuốc" />
-                        <TableColumn fx:id="colDonViBac1" prefWidth="145.0" text="Đơn Vị Bậc 1" />
-                        <TableColumn fx:id="colDonViBac2" prefWidth="145.0" text="Đơn Vị Bậc 2" />
-                        <TableColumn fx:id="colDonViBac3" prefWidth="145.0" text="Đơn Vị Bậc 3" />
+                        <TableColumn fx:id="colDonViBac1" prefWidth="145.0" text="Đơn Vị 1" />
+                        <TableColumn fx:id="colDonViBac2" prefWidth="145.0" text="Đơn Vị 2" />
+                        <TableColumn fx:id="colDonViBac3" prefWidth="145.0" text="Đơn Vị 3" />
                         <TableColumn fx:id="colThaoTac" prefWidth="130.0" text="Thao Tác" />
                     </columns>
                 </TableView>

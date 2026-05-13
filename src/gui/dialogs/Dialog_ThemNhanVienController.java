@@ -1,6 +1,10 @@
 package gui.dialogs;
 
+import java.text.Normalizer;
+import java.util.regex.Pattern;
+
 import dao.DAO_NhanVien;
+import dao.DAO_NhatKyHoatDong;
 import entity.NhanVien;
 import gui.main.GUI_QuanLyNguoiDungController;
 import javafx.event.ActionEvent;
@@ -8,8 +12,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import java.text.Normalizer;
-import java.util.regex.Pattern;
 
 public class Dialog_ThemNhanVienController {
     @FXML private TextField txtHoTen, txtSdt, txtTaiKhoan;
@@ -22,7 +24,9 @@ public class Dialog_ThemNhanVienController {
     @FXML
     public void initialize() {
         txtHoTen.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
-            if (!isNowFocused) taoTaiKhoanTuDong();
+            if (!isNowFocused) {
+				taoTaiKhoanTuDong();
+			}
         });
     }
 
@@ -54,10 +58,10 @@ public class Dialog_ThemNhanVienController {
         if (ten.isEmpty() || sdt.isEmpty()) {
             new Alert(Alert.AlertType.WARNING, "Vui lòng nhập đủ Họ tên và Số điện thoại!").show(); return;
         }
-        if (!ten.matches("^[\\p{L}\\s]+$")) { 
+        if (!ten.matches("^[\\p{L}\\s]+$")) {
             new Alert(Alert.AlertType.ERROR, "Họ tên không hợp lệ (Không chứa số hoặc ký tự đặc biệt)!").show(); return;
         }
-        if (!sdt.matches("^0\\d{9}$")) { 
+        if (!sdt.matches("^0\\d{9}$")) {
             new Alert(Alert.AlertType.ERROR, "Số điện thoại không hợp lệ (Phải bắt đầu bằng số 0 và đủ 10 số)!").show(); return;
         }
 
@@ -79,7 +83,8 @@ public class Dialog_ThemNhanVienController {
         } else {
             NhanVien nv = new NhanVien(dao.phatSinhMaMoi(), taiKhoanMoi, "123456", ten, "Nhân Viên", "", sdt, 1);
             if (dao.themNhanVien(nv)) {
-                new Alert(Alert.AlertType.INFORMATION, "Thêm nhân viên mới thành công!").show();
+                DAO_NhatKyHoatDong.ghiLog("THEM", "Nhân Viên", nv.getMaNhanVien(), "Thêm nhân viên mới: " + nv.getHoTen());
+                new Alert(Alert.AlertType.INFORMATION, "Thêm nhân viên thành công!").showAndWait();
                 parentController.loadData(); handleHuy(null);
             }
         }

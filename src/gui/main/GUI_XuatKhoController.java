@@ -1,19 +1,5 @@
 package gui.main;
 
-import dao.DAO_PhieuXuat;
-import entity.PhieuXuat;
-import gui.dialogs.Dialog_ChiTietPhieuXuatController;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.fxml.*;
-import javafx.geometry.Pos;
-import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.*;
-
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
@@ -21,14 +7,37 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
+import dao.DAO_PhieuXuat;
+import entity.PhieuXuat;
+import gui.dialogs.Dialog_ChiTietPhieuXuatController;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+
 public class GUI_XuatKhoController implements Initializable {
     @FXML private TableView<PhieuXuat> tableDanhMucPhieuXuat;
     @FXML private TableColumn<PhieuXuat, Integer> colSTT, colLoaiPhieu;
     @FXML private TableColumn<PhieuXuat, String> colMaPhieu, colNguoiLap, colKhoNhan;
     @FXML private TableColumn<PhieuXuat, LocalDateTime> colThoiGian;
     @FXML private TableColumn<PhieuXuat, Void> colThaoTac;
-    
-    // Khai báo thêm các component lọc
+
     @FXML private TextField txtTimPhieu;
     @FXML private ComboBox<String> cbLocLoaiPhieu;
     @FXML private DatePicker dpTuNgay;
@@ -48,12 +57,13 @@ public class GUI_XuatKhoController implements Initializable {
         colSTT.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(tableDanhMucPhieuXuat.getItems().indexOf(p.getValue()) + 1));
         colMaPhieu.setCellValueFactory(new PropertyValueFactory<>("maPhieuXuat"));
         colNguoiLap.setCellValueFactory(new PropertyValueFactory<>("maNhanVien"));
+
+        // =======================================================
+        // 1. CỘT NƠI NHẬN (Đồng bộ màu sắc và tên hiển thị)
+        // =======================================================
         colKhoNhan.setCellValueFactory(new PropertyValueFactory<>("khoNhan"));
-        
-        // Fix hiển thị cột Kho Nhận mượt mà
         colKhoNhan.setCellFactory(c -> new TableCell<>() {
-            // Khởi tạo DAO để lấy tên NCC
-            private dao.DAO_NhaCungCap daoNCC = new dao.DAO_NhaCungCap(); 
+            private dao.DAO_NhaCungCap daoNCC = new dao.DAO_NhaCungCap();
 
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -61,36 +71,51 @@ public class GUI_XuatKhoController implements Initializable {
                     setText(null); setStyle("");
                 } else {
                     PhieuXuat px = getTableRow().getItem();
-                    
-                    if (px.getLoaiPhieu() == 2) {
-                        // NẾU LÀ TRẢ NCC -> TÌM TÊN NHÀ CUNG CẤP VÀ HIỂN THỊ
+                    if (px.getLoaiPhieu() == 1) {
+                        String tenKho = "KHO_BAN_HANG".equals(item) ? "Kho Bán Hàng" : ("KHO_DU_TRU".equals(item) ? "Kho Dự Trữ" : item);
+                        setText(tenKho); setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+                    } else if (px.getLoaiPhieu() == 2) {
                         String tenNCC = "Không rõ NCC";
                         if (px.getMaNhaCungCap() != null) {
                             entity.NhaCungCap ncc = daoNCC.getNhaCungCapByMa(px.getMaNhaCungCap());
-                            if (ncc != null) {
-                                tenNCC = ncc.getTenNhaCungCap();
-                            }
+                            if (ncc != null) tenNCC = ncc.getTenNhaCungCap();
                         }
-                        setText(tenNCC); 
-                        setStyle("-fx-text-fill: #f59e0b; -fx-font-weight: bold;"); // Màu cam in đậm cho nổi bật
-                        
+                        setText(tenNCC); setStyle("-fx-text-fill: #0ea5e9; -fx-font-weight: bold;");
                     } else if (px.getLoaiPhieu() == 3) {
-                        setText("Hủy rác y tế"); 
-                        setStyle("-fx-text-fill: #ef4444; -fx-font-style: italic;");
-                    } else if ("KHO_BAN_HANG".equals(item)) {
-                        setText("Kho Bán Hàng"); 
-                        setStyle("-fx-text-fill: #15803d; -fx-font-weight: bold;");
-                    } else if ("KHO_DU_TRU".equals(item)) {
-                        setText("Kho Dự Trữ"); 
-                        setStyle("-fx-text-fill: #b91c1c; -fx-font-weight: bold;");
+                        setText("Hủy rác y tế"); setStyle("-fx-text-fill: #fb8500; -fx-font-weight: bold;");
                     } else {
-                        setText(item == null ? "---" : item); 
-                        setStyle("");
+                        setText(item == null ? "---" : item); setStyle("");
                     }
                 }
             }
         });
 
+        // =======================================================
+        // 2. CỘT LOẠI PHIẾU
+        // =======================================================
+        colLoaiPhieu.setCellValueFactory(new PropertyValueFactory<>("loaiPhieu"));
+        colLoaiPhieu.setCellFactory(c -> new TableCell<>() {
+            @Override protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null); setStyle("");
+                } else {
+                    if (item == 1) {
+                        setText("🚚 Chuyển Kho"); setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+                    } else if (item == 2) {
+                        setText("🔙 Trả NCC"); setStyle("-fx-text-fill: #0ea5e9; -fx-font-weight: bold;");
+                    } else if (item == 3) {
+                        setText("🗑 Xuất Hủy"); setStyle("-fx-text-fill: #fb8500; -fx-font-weight: bold;");
+                    } else {
+                        setText("---"); setStyle("");
+                    }
+                }
+            }
+        });
+
+        // =======================================================
+        // 3. THỜI GIAN VÀ THAO TÁC
+        // =======================================================
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         colThoiGian.setCellValueFactory(new PropertyValueFactory<>("ngayXuat"));
         colThoiGian.setCellFactory(c -> new TableCell<>() {
@@ -100,53 +125,40 @@ public class GUI_XuatKhoController implements Initializable {
             }
         });
 
-        colLoaiPhieu.setCellValueFactory(new PropertyValueFactory<>("loaiPhieu"));
-        colLoaiPhieu.setCellFactory(c -> new TableCell<>() {
-            @Override protected void updateItem(Integer item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) { setText(null); setStyle(""); }
-                else {
-                    if (item == 1) { setText("🚚 Chuyển Kho"); setStyle("-fx-text-fill: #0ea5e9; -fx-font-weight: bold;"); }
-                    else if (item == 2) { setText("🔙 Trả NCC"); setStyle("-fx-text-fill: #f59e0b; -fx-font-weight: bold;"); }
-                    else { setText("🗑 Xuất Hủy"); setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold;"); }
-                }
-            }
-        });
-
         colThaoTac.setCellFactory(c -> new TableCell<>() {
+            // Đã gỡ conflict: Kết hợp Icon và Class CSS chuyên nghiệp
             private final Button btn = new Button("👁 Xem");
             { 
-                btn.setStyle("-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-cursor: hand;");
+                btn.getStyleClass().add("btn-view-detail"); // Sử dụng class từ HEAD
                 btn.setOnAction(e -> handleXemChiTiet(getTableView().getItems().get(getIndex())));
             }
             @Override protected void updateItem(Void i, boolean e) {
                 super.updateItem(i, e);
-                if (e) setGraphic(null); else { setGraphic(btn); setAlignment(Pos.CENTER); }
+                if (e) {
+                    setGraphic(null);
+                } else { 
+                    setGraphic(btn); 
+                    setAlignment(Pos.CENTER); 
+                }
             }
         });
     }
 
     public void loadPhieuXuat() { masterData.setAll(daoPX.getAllPhieuXuat()); }
 
-    // ========================================================
-    // BỘ LỌC 3 TRONG 1: THEO TÊN + THEO LOẠI + THEO NGÀY
-    // ========================================================
     private void setupSearch() {
         cbLocLoaiPhieu.getItems().addAll("Tất cả", "Chuyển Kho", "Trả NCC", "Xuất Hủy");
         cbLocLoaiPhieu.getSelectionModel().selectFirst();
 
         FilteredList<PhieuXuat> filteredData = new FilteredList<>(masterData, p -> true);
 
-        // Lắng nghe sự thay đổi của cả 4 ô nhập liệu
         javafx.beans.value.ChangeListener<Object> filterListener = (obs, oldVal, newVal) -> {
             filteredData.setPredicate(px -> {
-                // 1. Kiểm tra Text (Từ khóa tìm kiếm)
                 String searchText = txtTimPhieu.getText() == null ? "" : txtTimPhieu.getText().toLowerCase();
-                boolean matchText = searchText.isEmpty() || 
-                                    px.getMaPhieuXuat().toLowerCase().contains(searchText) || 
+                boolean matchText = searchText.isEmpty() ||
+                                    px.getMaPhieuXuat().toLowerCase().contains(searchText) ||
                                     px.getMaNhanVien().toLowerCase().contains(searchText);
 
-                // 2. Kiểm tra Loại Phiếu
                 String loaiPhieu = cbLocLoaiPhieu.getValue();
                 boolean matchLoai = true;
                 if (loaiPhieu != null && !loaiPhieu.equals("Tất cả")) {
@@ -155,7 +167,6 @@ public class GUI_XuatKhoController implements Initializable {
                     if (loaiPhieu.equals("Xuất Hủy") && px.getLoaiPhieu() != 3) matchLoai = false;
                 }
 
-                // 3. Kiểm tra Ngày tháng
                 boolean matchNgay = true;
                 LocalDate tuNgay = dpTuNgay.getValue();
                 LocalDate denNgay = dpDenNgay.getValue();
@@ -165,14 +176,13 @@ public class GUI_XuatKhoController implements Initializable {
                     if (tuNgay != null && ngayLap.isBefore(tuNgay)) matchNgay = false;
                     if (denNgay != null && ngayLap.isAfter(denNgay)) matchNgay = false;
                 } else if (tuNgay != null || denNgay != null) {
-                    matchNgay = false; // Phiếu không có ngày thì rớt lọc
+                    matchNgay = false;
                 }
 
                 return matchText && matchLoai && matchNgay;
             });
         };
 
-        // Gắn listener vào các nút
         txtTimPhieu.textProperty().addListener(filterListener);
         cbLocLoaiPhieu.valueProperty().addListener(filterListener);
         dpTuNgay.valueProperty().addListener(filterListener);
@@ -185,9 +195,8 @@ public class GUI_XuatKhoController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ChiTietPhieuXuat.fxml"));
             Parent root = loader.load();
-            
             Dialog_ChiTietPhieuXuatController controller = loader.getController();
-            controller.setPhieuXuat(px); 
+            controller.setPhieuXuat(px);
 
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -209,7 +218,7 @@ public class GUI_XuatKhoController implements Initializable {
             s.initModality(Modality.APPLICATION_MODAL);
             s.setTitle(title); s.setScene(new Scene(r));
             s.showAndWait();
-            loadPhieuXuat(); // Load lại bảng sau khi tắt Dialog lập phiếu
+            loadPhieuXuat();
         } catch (IOException e) { e.printStackTrace(); }
     }
 }

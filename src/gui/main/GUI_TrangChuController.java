@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.ResourceBundle;
 
+import dao.DAO_NhatKyHoatDong;
 import dao.DAO_Thuoc;
 import entity.NhanVien;
 import entity.Thuoc;
@@ -48,7 +49,7 @@ public class GUI_TrangChuController {
     @FXML private TextField txtTimKiem;
     @FXML private BorderPane mainBorderPane;
 
-    // === SIDEBAR TitledPane (9 nhÃ³m) ===
+    // === SIDEBAR TitledPane (9 nhóm) ===
     @FXML private TitledPane tpQLBH, tpQLBG, tpQLDT, tpQLT, tpQLK, tpQLKH, tpQLNCC, tpQLND, tpBCTK;
 
     // === SIDEBAR Button con ===
@@ -62,7 +63,7 @@ public class GUI_TrangChuController {
     @FXML private Button btnDanhMucNguoiDung, btnPhanQuyen, btnNhatKy;
     @FXML private Button btnDoanhThu, btnHangHoa, btnTonKho;
 
-    // 3 card á»Ÿ Trang Chá»§
+    // 3 card ở Trang Chủ
     @FXML private javafx.scene.layout.HBox cardBanThuoc, cardDoiTra, cardBaoCao;
 
     private final DAO_Thuoc daoThuoc = new DAO_Thuoc();
@@ -93,7 +94,7 @@ public class GUI_TrangChuController {
         UserSession session = UserSession.getInstance();
         if (session.getUser() == null) return;
 
-        if ("Quáº£n LÃ½".equals(session.getUser().getChucVu())) return;
+        if ("Quản Lý".equals(session.getUser().getChucVu())) return;
 
         Object[][] tpMap = {
             {tpQLBH,  "QLBH"},  {tpQLBG,  "QLBG"},  {tpQLDT,  "QLDT"},
@@ -211,7 +212,7 @@ public class GUI_TrangChuController {
                 super.updateItem(item, empty);
                 getStyleClass().removeAll("text-do", "text-xanh-la");
                 if (empty || item == null) { setText(null); } 
-                else { setText(item ? "CÃ³" : "KhÃ´ng"); getStyleClass().add(item ? "text-do" : "text-xanh-la"); }
+                else { setText(item ? "Có" : "Không"); getStyleClass().add(item ? "text-do" : "text-xanh-la"); }
             }
         });
 
@@ -222,9 +223,9 @@ public class GUI_TrangChuController {
                 getStyleClass().removeAll("text-xanh-bien", "text-vang-cam", "text-do");
                 if (empty || item == null) { setText(null); } 
                 else {
-                    if ("DANG_BAN".equals(item)) { setText("Äang BÃ¡n"); getStyleClass().add("text-xanh-bien"); } 
-                    else if ("HET_HANG".equals(item)) { setText("Háº¿t HÃ ng"); getStyleClass().add("text-vang-cam"); } 
-                    else if ("NGUNG_BAN".equals(item)) { setText("Ngá»«ng BÃ¡n"); getStyleClass().add("text-do"); } 
+                    if ("DANG_BAN".equals(item)) { setText("Đang Bán"); getStyleClass().add("text-xanh-bien"); } 
+                    else if ("HET_HANG".equals(item)) { setText("Hết Hàng"); getStyleClass().add("text-vang-cam"); } 
+                    else if ("NGUNG_BAN".equals(item)) { setText("Ngừng Bán"); getStyleClass().add("text-do"); } 
                     else { setText(item); }
                 }
             }
@@ -268,7 +269,7 @@ public class GUI_TrangChuController {
             filteredData.setPredicate(thuoc -> {
                 if (newValue == null || newValue.isEmpty()) return true;
                 String filter = newValue.toLowerCase();
-                // ðŸ’¡ GIá»® Bá»˜ Lá»ŒC CHI TIáº¾T Tá»ª HEAD
+                // 💡 GIỮ BỘ LỌC CHI TIẾT TỪ HEAD
                 if (thuoc.getTrieuChung() != null && thuoc.getTrieuChung().toLowerCase().contains(filter)) return true;
                 if (thuoc.getMaThuoc().toLowerCase().contains(filter)) return true;
                 if (thuoc.getTenThuoc().toLowerCase().contains(filter)) return true;
@@ -308,6 +309,10 @@ public class GUI_TrangChuController {
 
     @FXML void handleDangXuat(ActionEvent event) {
         try {
+            // 💡 GHI LOG VÀ DỌN DẸP SESSION TỪ INCOMING
+            DAO_NhatKyHoatDong.ghiLog("DANG_XUAT", "Hệ thống", 
+                UserSession.getInstance().getUser().getMaNhanVien(),
+                UserSession.getInstance().getUser().getHoTen() + " đã đăng xuất hệ thống");
             
             nhanVienDangNhap = null;
             UserSession.getInstance().clear();
@@ -317,12 +322,12 @@ public class GUI_TrangChuController {
             
             Stage loginStage = new Stage();
             loginStage.setScene(new Scene(FXMLLoader.load(getClass().getResource("GUI_DangNhap.fxml"))));
-            loginStage.setTitle("ÄÄƒng nháº­p - Long NguyÃªn Pharma");
+            loginStage.setTitle("Đăng nhập - Long Nguyên Pharma");
             loginStage.show();
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    // CÃ¡c hÃ m má»Ÿ trang cÆ¡ báº£n
+    // Các hàm mở trang cơ bản
     @FXML void handleMoQuanLyDanhMucThuoc(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucThuoc.fxml"); }
     @FXML void handleMoQuanLyDonThuoc(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucDonThuoc.fxml"); }
     @FXML void handleMoQuanLyDonViQuyDoi(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_DonViQuyDoi.fxml"); }
@@ -349,23 +354,23 @@ public class GUI_TrangChuController {
     @FXML void handleMoPhanQuyen(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_PhanQuyen.fxml"); }
     @FXML void handleMoNhatKy(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_NhatKyHoatDong.fxml"); }
 
-    // Logic Card Dashboard cÃ³ kiá»ƒm tra quyá»n
+    // Logic Card Dashboard có kiểm tra quyền
     @FXML void handleMoBanThuoc(javafx.scene.input.MouseEvent event) { 
         if (!UserSession.getInstance().hasPermission("QLBH.LAP_HOA_DON")) {
-            new Alert(Alert.AlertType.WARNING, "Báº¡n khÃ´ng cÃ³ quyá»n truy cáº­p trang BÃ¡n HÃ ng.").show(); return;
+            new Alert(Alert.AlertType.WARNING, "Bạn không có quyền truy cập trang Bán Hàng.").show(); return;
         }
-        chuyenTrangVaHighlight("/gui/main/GUI_QuanLyBanHang.fxml", "Láº­p HÃ³a ÄÆ¡n"); 
+        chuyenTrangVaHighlight("/gui/main/GUI_QuanLyBanHang.fxml", "Lập Hóa Đơn"); 
     }
     @FXML void handleMoXuLyDoiTraCard(javafx.scene.input.MouseEvent event) { 
         if (!UserSession.getInstance().hasPermission("QLBH.XU_LY_DOI_TRA")) {
-            new Alert(Alert.AlertType.WARNING, "Báº¡n khÃ´ng cÃ³ quyá»n truy cáº­p trang Xá»­ LÃ½ Äá»•i Tráº£.").show(); return;
+            new Alert(Alert.AlertType.WARNING, "Bạn không có quyền truy cập trang Xử Lý Đổi Trả.").show(); return;
         }
-        chuyenTrangVaHighlight("/gui/main/GUI_XuLyDoiTra.fxml", "Äá»•i Tráº£"); 
+        chuyenTrangVaHighlight("/gui/main/GUI_XuLyDoiTra.fxml", "Đổi Trả"); 
     }
     @FXML void handleMoBaoCaoCard(javafx.scene.input.MouseEvent event) {
         UserSession session = UserSession.getInstance();
         if (!session.hasPermission("BCTK.DOANH_THU") && !session.hasPermission("BCTK.HANG_HOA") && !session.hasPermission("BCTK.TON_KHO")) {
-            new Alert(Alert.AlertType.WARNING, "Báº¡n khÃ´ng cÃ³ quyá»n truy cáº­p BÃ¡o CÃ¡o Thá»‘ng KÃª.").show(); return;
+            new Alert(Alert.AlertType.WARNING, "Bạn không có quyền truy cập Báo Cáo Thống Kê.").show(); return;
         }
         chuyenTrangVaHighlight("/gui/main/GUI_ThongKeDoanhThu.fxml", "Doanh Thu");
     }

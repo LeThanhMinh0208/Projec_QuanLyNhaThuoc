@@ -2,6 +2,7 @@ package gui.dialogs;
 
 import dao.DAO_DanhMucThuoc;
 import dao.DAO_Thuoc;
+import dao.DAO_NhatKyHoatDong;
 import entity.DanhMucThuoc;
 import entity.Thuoc;
 import javafx.collections.FXCollections;
@@ -264,6 +265,7 @@ public class Dialog_ThemThuocController {
         t.setTrangThai("DANG_BAN");
 
         if (daoThuoc.themThuoc(t)) {
+            DAO_NhatKyHoatDong.ghiLog("THEM", "Thuốc", t.getMaThuoc(), "Thêm thuốc mới: " + t.getTenThuoc());
             new Alert(Alert.AlertType.INFORMATION, "Thêm thuốc thành công!").showAndWait();
             handleHuy(); // Đóng form
         } else {
