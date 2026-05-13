@@ -17,4 +17,12 @@ public class UserSession {
 
     public void setUser(NhanVien user) { this.loggedInUser = user; }
     public NhanVien getUser() { return loggedInUser; }
+
+    public boolean hasPermission(String maQuyen) {
+        return true;
+    }
+
+    public void clear() {
+        loggedInUser = null;
+    }
 }
