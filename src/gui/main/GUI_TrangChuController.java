@@ -350,6 +350,7 @@ public class GUI_TrangChuController {
     @FXML void moTrangKiemKeKho(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_KiemKeKho.fxml"); }
     @FXML void moTrangGiaiQuyetKiemKe(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_GiaiQuyetKiemKe.fxml"); }
     @FXML void handleMoThongKeDoanhThu(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_ThongKeDoanhThu.fxml"); }
+    @FXML void handleMoThongKeTonKho(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_ThongKeTonKho.fxml"); }
     @FXML void handleMoPhanQuyen(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_PhanQuyen.fxml"); }
     @FXML void handleMoNhatKy(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_NhatKyHoatDong.fxml"); }
 
