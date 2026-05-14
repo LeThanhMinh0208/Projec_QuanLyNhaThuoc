@@ -193,16 +193,4 @@ public class DAO_NhanVien {
             return false;
         }
     }
-    public boolean doiMatKhau(String maNV, String matKhauMoi) {
-        String sql = "UPDATE NhanVien SET matKhau = ? WHERE maNhanVien = ?";
-        try (Connection con = ConnectDB.getInstance().getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, matKhauMoi);
-            ps.setString(2, maNV);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) { 
-            e.printStackTrace(); 
-            return false; 
-        }
-    }
 }
