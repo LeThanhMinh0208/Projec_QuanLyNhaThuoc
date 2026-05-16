@@ -89,7 +89,6 @@
                               <Button onAction="#moTrangXuatKho" styleClass="sub-btn" text="Xuất Kho" />
                               <Button onAction="#moTrangKiemKeKho"  styleClass="sub-btn" text="Kiểm Kê Kho" />
                                <Button onAction="#moTrangGiaiQuyetKiemKe"  styleClass="sub-btn" text="Giải Quyết Kiểm Kê" />
-                        
                            </VBox>
                         </content>
                      </TitledPane>
@@ -131,7 +130,9 @@
                         <content>
                            <VBox styleClass="dropdown-content">
                               <Button fx:id="btnDoanhThu" onAction="#handleMoThongKeDoanhThu" styleClass="sub-btn" text="Thống Kê Doanh Thu" />
-                              <Button fx:id="btnHangHoa" styleClass="sub-btn" text="Thống Kê Hàng Hóa" />
+                              
+                              <Button fx:id="btnHangHoa" onAction="#handleMoThongKeHangHoa" styleClass="sub-btn" text="Thống Kê Hàng Hóa" />
+                              
                               <Button fx:id="btnTonKho" onAction="#handleMoThongKeTonKho" styleClass="sub-btn" text="Thống Kê Tồn Kho" />
                            </VBox>
                         </content>

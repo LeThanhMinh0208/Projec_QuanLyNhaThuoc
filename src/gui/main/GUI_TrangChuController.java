@@ -269,7 +269,6 @@ public class GUI_TrangChuController {
             filteredData.setPredicate(thuoc -> {
                 if (newValue == null || newValue.isEmpty()) return true;
                 String filter = newValue.toLowerCase();
-                // 💡 GIỮ BỘ LỌC CHI TIẾT TỪ HEAD
                 if (thuoc.getTrieuChung() != null && thuoc.getTrieuChung().toLowerCase().contains(filter)) return true;
                 if (thuoc.getMaThuoc().toLowerCase().contains(filter)) return true;
                 if (thuoc.getTenThuoc().toLowerCase().contains(filter)) return true;
@@ -309,7 +308,6 @@ public class GUI_TrangChuController {
 
     @FXML void handleDangXuat(ActionEvent event) {
         try {
-            // 💡 GHI LOG VÀ DỌN DẸP SESSION TỪ INCOMING
             DAO_NhatKyHoatDong.ghiLog("DANG_XUAT", "Hệ thống", 
                 UserSession.getInstance().getUser().getMaNhanVien(),
                 UserSession.getInstance().getUser().getHoTen() + " đã đăng xuất hệ thống");
@@ -353,6 +351,12 @@ public class GUI_TrangChuController {
     @FXML void handleMoThongKeTonKho(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_ThongKeTonKho.fxml"); }
     @FXML void handleMoPhanQuyen(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_PhanQuyen.fxml"); }
     @FXML void handleMoNhatKy(ActionEvent event) { setMenuButtonActive(event); utils.SceneUtils.switchPage("/gui/main/GUI_NhatKyHoatDong.fxml"); }
+
+    // Bổ sung hàm mở trang thống kê hàng hóa kết nối đến file FXML mới viết lại
+    @FXML void handleMoThongKeHangHoa(ActionEvent event) { 
+        setMenuButtonActive(event); 
+        utils.SceneUtils.switchPage("/gui/main/GUI_ThongKeHangHoa.fxml"); 
+    }
 
     // Logic Card Dashboard có kiểm tra quyền
     @FXML void handleMoBanThuoc(javafx.scene.input.MouseEvent event) { 
