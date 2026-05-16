@@ -1,5 +1,10 @@
 package gui.dialogs;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+
 import dao.DAO_BangGia;
 import entity.BangGia;
 import entity.ChiTietBangGia;
@@ -12,15 +17,20 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import utils.AlertUtils;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 public class Dialog_ChiTietBangGiaController {
 
@@ -69,7 +79,7 @@ public class Dialog_ChiTietBangGiaController {
             @Override protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || bangGia == null) { setGraphic(null); return; }
-                
+
                 // Tính năng sửa/xóa được quyết định bởi bảng giá chưa active
                 btnSua.setVisible(chuaActive);
                 btnSua.setManaged(chuaActive);
@@ -78,13 +88,13 @@ public class Dialog_ChiTietBangGiaController {
                 btnXoa.setVisible(chuaActive);
                 btnXoa.setManaged(chuaActive);
                 btnXoa.setDisable(!chuaActive);
-                
+
                 // Ràng buộc riêng cho DEFAULT: KHÔNG xóa từng dòng thuốc
                 if ("DEFAULT".equals(bangGia.getLoaiBangGia())) {
                     btnXoa.setVisible(false);
                     btnXoa.setManaged(false);
                 }
-                
+
                 setGraphic(box);
             }
         });
@@ -94,7 +104,9 @@ public class Dialog_ChiTietBangGiaController {
         FilteredList<ChiTietBangGia> filteredList = new FilteredList<>(listCT, p -> true);
         txtTimKiem.textProperty().addListener((obs, oldVal, newVal) -> {
             filteredList.setPredicate(item -> {
-                if (newVal == null || newVal.isEmpty()) return true;
+                if (newVal == null || newVal.isEmpty()) {
+					return true;
+				}
                 String lower = newVal.toLowerCase().trim();
                 return item.getTenThuoc().toLowerCase().contains(lower);
             });
@@ -140,13 +152,13 @@ public class Dialog_ChiTietBangGiaController {
             btnThemThuoc.setVisible(!isPromo ? false : true);
             btnThemThuoc.setManaged(!isPromo ? false : true);
             btnThemThuoc.setDisable(false);
-            
+
             btnXoaBangGia.setVisible(true);
             btnXoaBangGia.setManaged(true);
-            
+
             lblCanhBaoDefault.setVisible(true);
             lblCanhBaoDefault.setManaged(true);
-            
+
             if (!isPromo) {
                 lblCanhBaoDefault.setText("ℹ Bảng giá mặc định - chỉ có thể sửa giá, không xóa thuốc");
             } else {
@@ -156,20 +168,20 @@ public class Dialog_ChiTietBangGiaController {
             // Đang hoạt động -> Tất cả Read Only + Cảnh báo active
             btnThemThuoc.setVisible(false);
             btnThemThuoc.setManaged(false);
-            
+
             btnXoaBangGia.setVisible(false);
             btnXoaBangGia.setManaged(false);
-            
+
             lblCanhBaoActive.setVisible(true);
             lblCanhBaoActive.setManaged(true);
         } else if (daKetThuc) {
             // Đã kết thúc -> Tất cả Read Only + Cảnh báo kết thúc
             btnThemThuoc.setVisible(false);
             btnThemThuoc.setManaged(false);
-            
+
             btnXoaBangGia.setVisible(false);
             btnXoaBangGia.setManaged(false);
-            
+
             if (lblCanhBaoKetThuc != null) {
                 lblCanhBaoKetThuc.setVisible(true);
                 lblCanhBaoKetThuc.setManaged(true);
@@ -189,13 +201,17 @@ public class Dialog_ChiTietBangGiaController {
     }
 
     private void loadChiTiet() {
-        if (bangGia == null) return;
+        if (bangGia == null) {
+			return;
+		}
         listCT.setAll(daoBG.getChiTietByMaBangGia(bangGia.getMaBangGia()));
     }
 
     @FXML
     private void handleLuu() {
-        if (bangGia == null) return;
+        if (bangGia == null) {
+			return;
+		}
         String ten = txtTen.getText().trim();
         if (ten.isEmpty()) {
             AlertUtils.showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Tên bảng giá không được để trống.");
@@ -232,7 +248,9 @@ public class Dialog_ChiTietBangGiaController {
 
     @FXML
     private void handleThemThuoc() {
-        if (bangGia == null) return;
+        if (bangGia == null) {
+			return;
+		}
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ThemThuocVaoBangGia.fxml"));
             Parent root = loader.load();
@@ -293,17 +311,19 @@ public class Dialog_ChiTietBangGiaController {
     private void handleDong() {
         ((Stage) tableChiTiet.getScene().getWindow()).close();
     }
-    
+
     @FXML
     private void handleXoaBangGia() {
-        if (bangGia == null) return;
-        
+        if (bangGia == null) {
+			return;
+		}
+
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Xác nhận xóa bảng giá");
         confirm.setHeaderText(null);
         confirm.setContentText("Bạn chắc chắn muốn xóa toàn bộ bảng giá " + bangGia.getTenBangGia() + "?\n"
                              + "Hành động này không thể hoàn tác.");
-        
+
         Optional<ButtonType> r = confirm.showAndWait();
         if (r.isPresent() && r.get() == ButtonType.OK) {
             if (daoBG.xoaBangGia(bangGia.getMaBangGia())) {

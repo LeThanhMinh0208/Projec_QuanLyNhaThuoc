@@ -9,7 +9,7 @@ public class DonDatHang {
     private Date ngayDat;
     private Date ngayGiaoDuKien;
     private double tongTienDuTinh;
-    private String trangThai; 
+    private String trangThai;
     private String ghiChu;
 
     public DonDatHang() {}
@@ -20,10 +20,12 @@ public class DonDatHang {
 
     // 1. Tình Trạng Hàng
     public String getTrangThaiHang() {
-        if (trangThai == null) return "Chờ Giao";
+        if (trangThai == null) {
+			return "Chờ Giao";
+		}
         switch (trangThai) {
             case "GIAO_DU": return "Giao Đủ";
-            case "GIAO_MOT_PHAN": 
+            case "GIAO_MOT_PHAN":
             case "DONG_DON_THIEU": return "Giao Một Phần";
             case "DA_HUY": return "Hủy Đơn";
             case "CHO_GIAO":
@@ -33,7 +35,9 @@ public class DonDatHang {
 
     // 2. Trạng Thái Nhập Kho
     public String getTrangThaiNhap() {
-        if (trangThai == null) return "Chưa Nhập Kho";
+        if (trangThai == null) {
+			return "Chưa Nhập Kho";
+		}
         switch (trangThai) {
             case "GIAO_DU":
             case "GIAO_MOT_PHAN":
@@ -46,10 +50,12 @@ public class DonDatHang {
 
     // 3. Tiến Độ Đơn
     public String getTrangThaiHoanThanh() {
-        if (trangThai == null) return "Đang Xử Lý";
+        if (trangThai == null) {
+			return "Đang Xử Lý";
+		}
         switch (trangThai) {
             case "GIAO_DU":
-            case "DONG_DON_THIEU": 
+            case "DONG_DON_THIEU":
             case "DA_HUY": return "Hoàn Thành";
             case "CHO_GIAO":
             case "GIAO_MOT_PHAN":

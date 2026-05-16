@@ -1,9 +1,14 @@
 package dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+
 import connectDB.ConnectDB;
 import entity.KhachHang;
-import java.sql.*;
-import java.util.ArrayList;
 
 public class DAO_KhachHang {
 
@@ -14,7 +19,7 @@ public class DAO_KhachHang {
     public ArrayList<KhachHang> getAllKhachHang() {
         ArrayList<KhachHang> ds = new ArrayList<>();
         String sql = "SELECT * FROM KhachHang WHERE trangThai = 1";
-        try (Connection con = ConnectDB.getConnection(); 
+        try (Connection con = ConnectDB.getConnection();
              Statement statement = con.createStatement();
              ResultSet rs = statement.executeQuery(sql)) {
             while (rs.next()) {
@@ -27,8 +32,8 @@ public class DAO_KhachHang {
                     rs.getBoolean("trangThai")
                 ));
             }
-        } catch (SQLException e) { 
-            e.printStackTrace(); 
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return ds;
     }
@@ -158,7 +163,9 @@ public class DAO_KhachHang {
              PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setString(1, maKhachHang);
             ResultSet rs = pst.executeQuery();
-            if (rs.next()) return rs.getInt(1);
+            if (rs.next()) {
+				return rs.getInt(1);
+			}
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 
-import gui.dialogs.Dialog_ChonSoLuongDonViController;
-import gui.dialogs.Dialog_ChonThuocController;
 import dao.DAO_PhieuDoiTra;
 import entity.ChiTietDoiTra;
 import entity.ChiTietDoiTraView;
@@ -19,12 +17,15 @@ import entity.HoaDonView;
 import entity.NhanVien;
 import entity.PhieuDoiTra;
 import entity.Thuoc;
+import gui.dialogs.Dialog_ChonSoLuongDonViController;
+import gui.dialogs.Dialog_ChonThuocController;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import dao.DAO_NhatKyHoatDong;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -37,7 +38,6 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.stage.Modality;
@@ -422,7 +422,9 @@ public class GUI_ChiTietDoiTraController {
         String lyDo = isDoi ? txtLyDo.getText().trim() : (cbLyDo.getValue() != null ? cbLyDo.getValue().trim() : "");
         if (lyDo.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Vui lòng nhập lý do đổi trả.");
-            if (isDoi) txtLyDo.requestFocus();
+            if (isDoi) {
+				txtLyDo.requestFocus();
+			}
             return;
         }
 
@@ -459,7 +461,9 @@ public class GUI_ChiTietDoiTraController {
         } else {
             if ("Khách hàng muốn hoàn".equals(lyDo)) {
                  double tongTienHoan = 0;
-                 for (ChiTietDoiTraTam t : dsTam) tongTienHoan += t.thanhTienHoan;
+                 for (ChiTietDoiTraTam t : dsTam) {
+					tongTienHoan += t.thanhTienHoan;
+				 }
                  pdt.setPhiPhat(tongTienHoan * 0.3); // Phạt 30% nếu khách tự ý trả
             } else {
                  pdt.setPhiPhat(0);
@@ -494,6 +498,7 @@ public class GUI_ChiTietDoiTraController {
         boolean okPhieuTra = daoPhieuDoiTra.lapPhieuDoiTra(pdt, chiTiet, dsThuocDoiParam);
 
         if (okPhieuTra) {
+            DAO_NhatKyHoatDong.ghiLog("TAO_PHIEU_DOI_TRA", "Phiếu Đổi Trả", pdt.getMaPhieuDoiTra(), "Lập phiếu đổi trả từ hóa đơn: " + hoaDon.getMaHoaDon());
             // =====================================================================
             // GIAO DỊCH 2: TẠO HÓA ĐƠN CHO THUỐC ĐỔI (KHÁCH LẤY ĐI)
             // Mục đích: Ép trừ kho FEFO và tăng Số Lượng Bán trong thống kê
@@ -502,15 +507,15 @@ public class GUI_ChiTietDoiTraController {
                 try {
                     dao.DAO_HoaDon daoHoaDon = new dao.DAO_HoaDon();
                     String maHDMoi = daoHoaDon.generateMaHoaDon();
-                    
+
                     HoaDon hdMoi = new HoaDon();
                     hdMoi.setMaHoaDon(maHDMoi);
                     hdMoi.setNgayLap(new java.sql.Timestamp(System.currentTimeMillis()));
                     hdMoi.setThueVAT(8.0); // Mặc định VAT
-                    hdMoi.setHinhThucThanhToan("TIEN_MAT"); 
+                    hdMoi.setHinhThucThanhToan("TIEN_MAT");
                     hdMoi.setLoaiBan("BAN_LE"); // Từ khóa để sau này phân biệt
                     hdMoi.setNhanVien(nhanVien);
-                    
+
                     // Lấy Khách Hàng từ hóa đơn gốc (Cần tạo đối tượng hoặc truy vấn DAO)
                     entity.KhachHang kh = new dao.DAO_KhachHang().getBySdt(hoaDon.getSdt());
                     hdMoi.setKhachHang(kh);
@@ -524,10 +529,10 @@ public class GUI_ChiTietDoiTraController {
                         ct.setMaQuyDoi(item.getMaQuyDoi());
                         ct.setSoLuong(item.getSoLuong());
                         ct.setDonGia(item.getDonGia() / (1 + hdMoi.getThueVAT() / 100.0));
-                        
+
                         // Phải tìm một bảng giá mặc định để chèn vào (hoặc null nếu DB cho phép)
                         ct.setMaBangGia("BG0001"); // Sếp tự điều chỉnh lại mã bảng giá cho đúng logic nhà thuốc nhé
-                        
+
                         dsCTHD.add(ct);
                     }
 
@@ -717,16 +722,16 @@ public class GUI_ChiTietDoiTraController {
         // HOAN_TIEN
         double tong = tinhTongGiaTriHienThi();
         double phiPhat = 0;
-        
+
         if ("Khách hàng muốn hoàn".equals(cbLyDo.getValue())) {
             phiPhat = tong * 0.3;
         }
-        
+
         double tongTienHoan = tong - phiPhat;
-        
+
         lblTongTienHoan.setText("Nhà thuốc hoàn: " + String.format("%,.0f VND", tongTienHoan));
         lblTongTienHoan.setStyle("-fx-text-fill:#16a34a; -fx-font-size:18px; -fx-font-weight:bold;");
-        
+
         if (phiPhat > 0 && lblPhiPhat != null) {
             lblPhiPhat.setText("Phí phạt (30%): " + String.format("-%,.0f VND", phiPhat));
             lblPhiPhat.setVisible(true);

@@ -55,7 +55,7 @@ public class Dialog_ChiTietPhieuDoiTraController {
     private final DAO_HoaDon daoHoaDon = new DAO_HoaDon();
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final DateTimeFormatter DFMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    
+
     private PhieuDoiTraView currentPdt;
     private List<Object[]> listChiTiet;
     private List<Object[]> listThuocDoi;
@@ -63,7 +63,7 @@ public class Dialog_ChiTietPhieuDoiTraController {
 
     public void setPhieuDoiTra(PhieuDoiTraView pdt) {
         this.currentPdt = pdt;
-        
+
         // Truy vấn lấy thueVAT từ HoaDon gốc (Xử lý null-safe)
         HoaDonView hd = daoHoaDon.getHoaDonViewByMa(pdt.getMaHoaDon());
         this.thueVAT = (hd != null) ? hd.getThueVAT() : 0;
@@ -98,21 +98,21 @@ public class Dialog_ChiTietPhieuDoiTraController {
             return new SimpleStringProperty(hsd != null ? hsd.toLocalDate().format(DFMT) : "--");
         });
         colSoLuong.setCellValueFactory(d -> new SimpleStringProperty(String.valueOf((int) d.getValue()[4])));
-        
+
         // Bảng 1 - Cột Đơn giá: Hiển thị giá đã bao gồm VAT
         colDonGia.setCellValueFactory(d -> {
             double donGiaGoc = (double) d.getValue()[5];
             double donGiaVAT = donGiaGoc * (1 + thueVAT / 100.0);
             return new SimpleStringProperty(String.format("%,.0f VND", donGiaVAT));
         });
-        
+
         // Bảng 1 - Cột Thành tiền: Hiển thị giá trị đã bao gồm VAT
         colThanhTien.setCellValueFactory(d -> {
             double thanhTienGoc = (double) d.getValue()[6];
             double thanhTienVAT = thanhTienGoc * (1 + thueVAT / 100.0);
             return new SimpleStringProperty(String.format("%,.0f VND", thanhTienVAT));
         });
-        
+
         colDoiSTT.setCellFactory(col -> new javafx.scene.control.TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -134,10 +134,10 @@ public class Dialog_ChiTietPhieuDoiTraController {
     private void loadChiTiet(PhieuDoiTraView pdt) {
         listChiTiet = dao.getChiTietByMaPhieuDoiTra(pdt.getMaPhieuDoiTra());
         tableChiTiet.setItems(FXCollections.observableArrayList(listChiTiet));
-        
+
         // Tính tổng tiền bảng 1 (đã bao gồm VAT) để hiển thị ở summary nếu cần
         double tongTienB1 = listChiTiet.stream().mapToDouble(r -> (double) r[6]).sum() * (1 + thueVAT / 100.0);
-        
+
         String dsThuocDoi = pdt.getDanhSachThuocDoi();
         listThuocDoi = new java.util.ArrayList<>();
         if (dsThuocDoi != null && !dsThuocDoi.isEmpty()) {
@@ -150,7 +150,7 @@ public class Dialog_ChiTietPhieuDoiTraController {
                 }
             }
         }
-        
+
         if (!listThuocDoi.isEmpty()) {
             boxKhachNhan.setManaged(true);
             boxKhachNhan.setVisible(true);

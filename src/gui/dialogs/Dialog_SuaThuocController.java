@@ -2,6 +2,7 @@ package gui.dialogs;
 
 import dao.DAO_DanhMucThuoc;
 import dao.DAO_Thuoc;
+import dao.DAO_NhatKyHoatDong;
 import entity.DanhMucThuoc;
 import entity.Thuoc;
 import javafx.collections.FXCollections;
@@ -292,6 +293,7 @@ public class Dialog_SuaThuocController {
         }
 
         if (daoThuoc.capNhatThuoc(t)) {
+            DAO_NhatKyHoatDong.ghiLog("SUA", "Thuốc", t.getMaThuoc(), "Cập nhật thông tin thuốc: " + t.getTenThuoc());
             new Alert(Alert.AlertType.INFORMATION, "Cập nhật thành công!").show();
             handleHuy();
         } else {

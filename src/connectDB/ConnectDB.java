@@ -6,11 +6,11 @@ import java.sql.SQLException;
 public class ConnectDB {
     private static ConnectDB instance = new ConnectDB();
     private static Connection con;
-    
+
     public static ConnectDB getInstance() {
         return instance;
     }
-    
+
     public void connect() {
     	 try {
              if (con == null || con.isClosed()) {
@@ -29,10 +29,10 @@ public class ConnectDB {
             System.out.println("Không tìm thấy driver: " + e.getMessage());
         }
     }
-    
+
     public void disconnect() {
         if (con != null) {
-            try { con.close(); } 
+            try { con.close(); }
             catch (SQLException e) { e.printStackTrace(); }
         }
     }

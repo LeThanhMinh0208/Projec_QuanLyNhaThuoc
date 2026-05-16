@@ -1,122 +1,79 @@
-/* ================================================
-   DANH MỤC ĐƠN THUỐC - CSS
-   Giống y hệt DanhMucThuoc
-   ================================================ */
-
-/* --- NÚT HÀNH ĐỘNG --- */
-.btn-action {
+/* ========================================================
+   1. Ô LỌC & THANH TÌM KIẾM DÁNG VIÊN THUỐC
+   ======================================================== */
+.xk-input, .search-box {
+    -fx-background-color: #f0f9ff;
+    -fx-border-color: #7dd3fc;
+    -fx-border-width: 1.5px;
+    -fx-background-radius: 25px; /* Bo tròn tuyệt đối */
+    -fx-border-radius: 25px;
+    -fx-padding: 0 15;
     -fx-font-weight: bold;
-    -fx-font-size: 18px;
-    -fx-padding: 10 0;
-    -fx-cursor: hand;
-    -fx-background-radius: 20px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 8, 0, 0, 3);
-}
-.btn-action:hover {
-    -fx-scale-x: 1.03;
-    -fx-scale-y: 1.03;
 }
 
-.card-green {
-    -fx-background-color: linear-gradient(to bottom right, #10b981, #34d399);
-}
-.card-green:hover {
-    -fx-background-color: linear-gradient(to bottom right, #34d399, #10b981);
-}
-
-.card-blue {
-    -fx-background-color: linear-gradient(to bottom right, #0ea5e9, #38bdf8);
-}
-.card-blue:hover {
-    -fx-background-color: linear-gradient(to bottom right, #38bdf8, #0ea5e9);
-}
-
-.card-orange {
-    -fx-background-color: linear-gradient(to bottom right, #f59e0b, #fbbf24);
-}
-.card-orange:hover {
-    -fx-background-color: linear-gradient(to bottom right, #fbbf24, #f59e0b);
-}
-
-/* --- THANH TÌM KIẾM --- */
-.search-box {
+.xk-input:focused, .search-box:focused-within {
     -fx-background-color: white;
-    -fx-border-color: #bae6fd;
-    -fx-border-radius: 10;
-    -fx-background-radius: 10;
-    -fx-padding: 0 12;
-    -fx-effect: dropshadow(three-pass-box, rgba(14,165,233,0.1), 8, 0, 0, 2);
-}
-
-.search-icon {
-    -fx-font-size: 20px;
-    -fx-text-fill: #0ea5e9;
-    -fx-padding: 0 8 0 0;
+    -fx-border-color: #0ea5e9;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.2), 10, 0, 0, 0);
 }
 
 .search-input {
     -fx-background-color: transparent;
-    -fx-border-color: transparent;
     -fx-font-size: 14px;
-    -fx-text-fill: #0c4a6e;
-    -fx-prompt-text-fill: #7dd3fc;
 }
 
-/* --- COMBOBOX --- */
-.combo-box {
-    -fx-background-color: white;
-    -fx-border-color: #cbd5e1;
-    -fx-border-radius: 8;
-    -fx-background-radius: 8;
-    -fx-cursor: hand;
-    -fx-font-size: 14px;
-    -fx-padding: 4 8;
-}
-.combo-box:hover {
-    -fx-border-color: #0ea5e9;
-}
-.combo-box .list-cell {
-    -fx-text-fill: #0369a1;
-}
 /* ========================================================
-   CÁC NÚT THAO TÁC TRONG BẢNG (STYLE Y TẾ - PASTEL)
+   2. HỆ THỐNG NÚT THAO TÁC TRONG BẢNG (PILL-BUTTONS)
    ======================================================== */
+/* Class chung cho nút trong bảng */
 .btn-action-table {
-    -fx-font-weight: bold;
+    -fx-background-radius: 20px; /* Bo tròn viên thuốc */
+    -fx-border-radius: 20px;
+    -fx-font-weight: 900;
     -fx-font-size: 12px;
-    -fx-padding: 6px 14px;
-    -fx-background-radius: 6px;
     -fx-cursor: hand;
-    -fx-transition: all 0.2s ease;
+    -fx-padding: 5 15;
 }
 
-.btn-action-table:hover {
-    -fx-translate-y: -1px;
-}
-
-/* 1. Nút Chi Tiết (Màu xanh dương nhạt - An toàn, thông tin) */
+/* Màu Xanh Dương - Chi Tiết */
 .btn-soft-blue {
     -fx-background-color: #e0f2fe;
-    -fx-text-fill: #0369a1;
+    -fx-text-fill: #0284c7;
 }
 .btn-soft-blue:hover { -fx-background-color: #bae6fd; }
 
-/* 2. Nút Xem Ảnh (Màu xanh ngọc / Mint - Mát mắt, y tế) */
+/* Màu Xanh Lá - Xem Ảnh */
 .btn-soft-teal {
-    -fx-background-color: #ccfbf1;
-    -fx-text-fill: #0f766e;
+    -fx-background-color: #f0fdf4;
+    -fx-text-fill: #16a34a;
 }
-.btn-soft-teal:hover { -fx-background-color: #99f6e4; }
+.btn-soft-teal:hover { -fx-background-color: #dcfce7; }
 
-/* 3. Nút Xóa Mềm (Màu đỏ cam nhạt - Cảnh báo nhẹ nhàng) */
-.btn-soft-red {
-    -fx-background-color: #fee2e2;
-    -fx-text-fill: #b91c1c;
-}
-.btn-soft-red:hover { -fx-background-color: #fecaca; }
-/* 4. Nút Tái Lập (Màu vàng cam nhạt - Chuyển tiếp, tạo mới) */
+/* Màu Vàng Cam - Tái Lập */
 .btn-soft-amber {
-    -fx-background-color: #fef3c7;
+    -fx-background-color: #fffbeb;
     -fx-text-fill: #d97706;
 }
-.btn-soft-amber:hover { -fx-background-color: #fde68a; }
+.btn-soft-amber:hover { -fx-background-color: #fef3c7; }
+
+/* Màu Đỏ - Xóa */
+.btn-soft-red {
+    -fx-background-color: #fef2f2;
+    -fx-text-fill: #dc2626;
+}
+.btn-soft-red:hover { -fx-background-color: #fee2e2; }
+
+/* ========================================================
+   3. TÙY CHỈNH BẢNG
+   ======================================================== */
+.panel-white {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 15px;
+    -fx-padding: 15;
+}
+
+.table-view {
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-color: #e2e8f0;
+}

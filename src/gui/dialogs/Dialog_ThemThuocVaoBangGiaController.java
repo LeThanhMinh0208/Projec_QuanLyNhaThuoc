@@ -1,5 +1,9 @@
 package gui.dialogs;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
 import dao.DAO_BangGia;
 import entity.BangGia;
 import entity.ChiTietBangGia;
@@ -8,13 +12,13 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import utils.AlertUtils;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Dialog_ThemThuocVaoBangGiaController {
 
@@ -42,7 +46,9 @@ public class Dialog_ThemThuocVaoBangGiaController {
                 tf.getStyleClass().add("bg-price-input");
                 tf.setPromptText("0");
                 tf.textProperty().addListener((o, ov, nv) -> {
-                    if (!nv.matches("\\d*\\.?\\d*")) tf.setText(ov);
+                    if (!nv.matches("\\d*\\.?\\d*")) {
+						tf.setText(ov);
+					}
                     if (getIndex() >= 0 && getIndex() < getTableView().getItems().size()) {
                         ChiTietBangGia ct = getTableView().getItems().get(getIndex());
                         try {
@@ -87,7 +93,9 @@ public class Dialog_ThemThuocVaoBangGiaController {
     }
 
     @FXML void handleLuu() {
-        if (bangGia == null) return;
+        if (bangGia == null) {
+			return;
+		}
 
         List<ChiTietBangGia> toAdd = new ArrayList<>();
         for (ChiTietBangGia ct : masterList) {
@@ -105,7 +113,9 @@ public class Dialog_ThemThuocVaoBangGiaController {
 
         int success = 0;
         for (ChiTietBangGia ct : toAdd) {
-            if (daoBG.themChiTietBangGia(ct)) success++;
+            if (daoBG.themChiTietBangGia(ct)) {
+				success++;
+			}
         }
 
         if (success > 0) {

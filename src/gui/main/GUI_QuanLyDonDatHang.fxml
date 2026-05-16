@@ -17,7 +17,7 @@
           </children>
       </VBox>
       
-      <HBox alignment="CENTER_LEFT" spacing="20.0">
+   <HBox alignment="CENTER_LEFT" spacing="20.0">
          <children>
             <Button mnemonicParsing="false" onAction="#handleLamMoi" prefHeight="45.0" prefWidth="120.0" styleClass="btn-refresh" text="↻ Làm Mới" />
             <Button mnemonicParsing="false" onAction="#handleTaoDonMoi" prefHeight="45.0" prefWidth="220.0" styleClass="btn-primary" text="+ Tạo Đơn Đặt Hàng Mới" />

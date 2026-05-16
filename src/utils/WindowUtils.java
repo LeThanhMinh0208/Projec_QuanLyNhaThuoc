@@ -40,10 +40,10 @@ public class WindowUtils {
             Stage stage = new Stage();
             stage.setTitle(title);
             stage.setScene(new Scene(root));
-            
+
             // Dòng này cực kỳ quan trọng: Ngăn không cho tương tác với trang chính khi đang mở Pop-up
-            stage.initModality(Modality.APPLICATION_MODAL); 
-            
+            stage.initModality(Modality.APPLICATION_MODAL);
+
             return loader;
         } catch (Exception e) {
             e.printStackTrace();

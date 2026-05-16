@@ -1,5 +1,7 @@
 package gui.dialogs;
 
+import java.text.DecimalFormat;
+
 import dao.DAO_NhaCungCap;
 // import dao.DAO_PhieuThu; // Sếp mở comment dòng này nếu đã tạo DAO_PhieuThu
 import entity.NhaCungCap;
@@ -18,9 +20,6 @@ import utils.AlertUtils;
 import utils.UserSession;
 import utils.WindowUtils;
 
-import java.text.DecimalFormat;
-import java.sql.Timestamp;
-
 public class Dialog_NCCThanhToanController {
 
     @FXML private Label lblTenNCC;
@@ -32,10 +31,10 @@ public class Dialog_NCCThanhToanController {
 
     private NhaCungCap nhaCungCap;
     private double soTienNCCDangNo = 0; // Số tiền thực tế NCC nợ mình
-    
+
     private DAO_NhaCungCap daoNhaCungCap = new DAO_NhaCungCap();
     // private DAO_PhieuThu daoPhieuThu = new DAO_PhieuThu(); // Nếu sếp có bảng PhieuThu trong CSDL
-    
+
     private DecimalFormat df = new DecimalFormat("#,###");
 
     @FXML
@@ -70,10 +69,10 @@ public class Dialog_NCCThanhToanController {
     public void setNhaCungCap(NhaCungCap ncc) {
         this.nhaCungCap = ncc;
         lblTenNCC.setText(ncc.getTenNhaCungCap());
-        
+
         // Công nợ bị Âm nghĩa là NCC đang nợ mình. Ta lấy giá trị tuyệt đối để hiển thị cho đẹp
-        this.soTienNCCDangNo = Math.abs(ncc.getCongNo()); 
-        
+        this.soTienNCCDangNo = Math.abs(ncc.getCongNo());
+
         lblCongNoNCCNo.setText(df.format(soTienNCCDangNo) + " VNĐ");
     }
 
@@ -105,20 +104,20 @@ public class Dialog_NCCThanhToanController {
 
         // 3. Tiến hành cập nhật Database
         NhanVien nhanVienLap = UserSession.getInstance().getUser();
-        
-        // Thu tiền vào thì cộng (+) thêm vào Công Nợ. 
+
+        // Thu tiền vào thì cộng (+) thêm vào Công Nợ.
         // Ví dụ: Đang nợ -500k, thu vào 200k -> (-500k) + 200k = -300k (Còn nợ 300k)
-        double congNoMoi = nhaCungCap.getCongNo() + soTienThu; 
+        double congNoMoi = nhaCungCap.getCongNo() + soTienThu;
 
         // Sếp gọi hàm update bên DAO (Giả sử sếp có hàm capNhatCongNo)
         boolean updateSuccess = daoNhaCungCap.capNhatCongNo(nhaCungCap.getMaNhaCungCap(), congNoMoi);
 
         if (updateSuccess) {
-            
-            // 💡 LƯU Ý CHO SẾP: 
+
+            // 💡 LƯU Ý CHO SẾP:
             // Nếu hệ thống của sếp CÓ bảng `PhieuThu` trong SQL Server để lưu lịch sử dòng tiền vào,
             // Sếp mở comment đoạn code dưới đây và chỉnh sửa lại tên hàm cho khớp với DAO của sếp nhé!
-            
+
             /*
             String maPhieuThu = daoPhieuThu.taoMaPhieuThuTuDong();
             PhieuThu pt = new PhieuThu(maPhieuThu, nhaCungCap, nhanVienLap, new Timestamp(System.currentTimeMillis()), soTienThu, hinhThuc, ghiChu);

@@ -1,0 +1,196 @@
+/* ========================================================
+   1. TIÊU ĐỀ & ĐƯỜNG KẺ GẠCH CHÂN (FIX HIỂN THỊ)
+   ======================================================== */
+.main-title {
+    -fx-font-size: 32px;
+    -fx-font-weight: 900;
+    -fx-text-fill: linear-gradient(to bottom, #0ea5e9, #0369a1);
+    -fx-padding: 10 0 5 0; /* Thu nhỏ khoảng cách với gạch chân */
+}
+
+.xk-title-line {
+    -fx-background-color: #0ea5e9;
+    -fx-min-height: 4px;
+    -fx-max-height: 4px;
+    -fx-background-radius: 5px;
+    -fx-pref-width: 350px; /* Ép độ dài thanh gạch chân hiện ra */
+}
+
+/* ========================================================
+   2. BỘ LỌC VIÊN THUỐC (ÉP RUỘT DATEPICKER TRÒN VO)
+   ======================================================== */
+.invoice-input {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-border-width: 1.5px;
+    -fx-background-radius: 25px;
+    -fx-border-radius: 25px;
+    -fx-padding: 0; /* Reset để ruột tự do */
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s ease;
+}
+
+/* 🚨 FIX TRỰC TIẾP RUỘT DATEPICKER & COMBOBOX */
+.invoice-input > .text-field, 
+.invoice-input .label,
+.invoice-input .list-cell {
+    -fx-background-color: transparent !important;
+    -fx-background-radius: 25px;
+    -fx-padding: 8 15;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #334155;
+}
+
+/* Ép nút mũi tên/lịch bo theo vỏ */
+.invoice-input > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0 25px 25px 0;
+    -fx-padding: 0 15 0 5;
+}
+
+.invoice-input:focused, .invoice-input:showing {
+    -fx-border-color: #0ea5e9;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.3), 10, 0, 0, 0);
+}
+
+/* ========================================================
+   3. THANH TÌM KIẾM (CLONE TỪ XUẤT KHO)
+   ======================================================== */
+.invoice-search-wrapper {
+    -fx-background-color: #f0f9ff;
+    -fx-background-radius: 25px; 
+    -fx-border-color: #bae6fd; 
+    -fx-border-radius: 25px; 
+    -fx-padding: 0 15 0 15;
+}
+.invoice-search-wrapper:focused-within {
+    -fx-background-color: white;
+    -fx-border-color: #0ea5e9;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.5), 12, 0, 0, 0);
+}
+.search-input {
+    -fx-background-color: transparent; 
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* ========================================================
+   4. NÚT BẤM DÁNG VIÊN THUỐC (PILL BUTTONS)
+   ======================================================== */
+.btn-pill-action {
+    -fx-background-radius: 30px;
+    -fx-border-radius: 30px;
+    -fx-cursor: hand;
+    -fx-font-weight: 900;
+    -fx-font-size: 14px;
+    -fx-transition: all 0.3s ease;
+}
+.btn-pill-action:hover { -fx-translate-y: -2px; }
+
+.btn-search-blue {
+    -fx-background-color: linear-gradient(to bottom, #3b82f6, #1d4ed8);
+    -fx-text-fill: white;
+}
+.btn-search-blue:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(29, 78, 216, 0.4), 15, 0, 0, 4);
+}
+
+.btn-clear-white {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-text-fill: #64748b;
+    -fx-border-width: 1.5px;
+}
+.btn-clear-white:hover {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #94a3b8;
+}
+
+/* ========================================================
+   5. NÚT "XEM" TRONG BẢNG (DÁNG VIÊN THUỐC NHỎ)
+   ======================================================== */
+.btn-view-pill {
+    -fx-background-color: #e0f2fe; /* Xanh lơ nhạt */
+    -fx-text-fill: #0284c7;        /* Chữ xanh đậm */
+    -fx-font-weight: 900;
+    -fx-font-size: 12px;
+    -fx-background-radius: 20px;
+    -fx-cursor: hand;
+    -fx-padding: 5px 18px;
+    -fx-border-width: 0;
+}
+.btn-view-pill:hover { 
+    -fx-background-color: #bae6fd; 
+    -fx-text-fill: #0369a1;
+}
+
+/* ========================================================
+   6. TÙY CHỈNH BẢNG (TABLE VIEW)
+   ======================================================== */
+.panel-white {
+    -fx-background-color: white;
+    -fx-background-radius: 15px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);
+}
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-background-radius: 12px;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #0ea5e9;
+    -fx-background-radius: 12px 12px 0 0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: 900;
+    -fx-text-transform: uppercase;
+}
+
+/* Style cho dòng được chọn */
+.table-row-cell:selected {
+    -fx-background-color: #0ea5e9 !important;
+}
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: white !important;
+    -fx-font-weight: bold;
+}
+
+/* Màu chữ cho trạng thái hóa đơn */
+.text-theo-don { -fx-text-fill: #1d4ed8; -fx-font-weight: 900; }
+.text-ban-le { -fx-text-fill: #059669; }
+/* ========================================================
+   FIX LỖI HOVER CHO DANH SÁCH XỔ XUỐNG (COMBOBOX POPUP)
+   ======================================================== */
+
+/* 1. Định dạng cái khung chứa danh sách xổ xuống */
+.invoice-input .list-view {
+    -fx-background-color: white;
+    -fx-border-color: #bae6fd;
+    -fx-border-width: 1px;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-padding: 5px; /* Tạo khoảng trống xung quanh các item */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
+}
+
+/* 2. Định dạng từng dòng (Item) bên trong */
+.invoice-input .list-view .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #334155;
+    -fx-padding: 10px 15px;
+    -fx-background-radius: 8px; /* Bo góc nhẹ cho dòng được chọn */
+    -fx-cursor: hand;
+}
+
+/* 3. HIỆU ỨNG HOVER & SELECTED: Chỗ sếp cần đây! */
+.invoice-input .list-view .list-cell:hover, 
+.invoice-input .list-view .list-cell:selected {
+    -fx-background-color: #e0f2fe; /* Màu xanh lơ nhạt chuẩn style sếp */
+    -fx-text-fill: #0284c7;        /* Chữ chuyển sang xanh đậm */
+    -fx-font-weight: bold;         /* In đậm cho nổi bật */
+}

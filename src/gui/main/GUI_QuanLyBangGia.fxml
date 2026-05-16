@@ -39,7 +39,7 @@
 
             <!-- Action bar -->
             <HBox alignment="CENTER_LEFT" spacing="15.0">
-                <Button onAction="#handleThemBangGiaMoi" prefHeight="50.0"
+                <Button fx:id="btnThemBangGiaMoi" onAction="#handleThemBangGiaMoi" prefHeight="50.0"
                         styleClass="top-card, card-green, btn-action"
                         text="  + Thêm Bảng Giá Mới  " textFill="WHITE" />
                 <HBox HBox.hgrow="ALWAYS" />
@@ -82,7 +82,7 @@
 
             <!-- Sub-header with back button -->
             <HBox alignment="CENTER_LEFT" spacing="15.0" VBox.vgrow="NEVER">
-                <Button text="← Quay Lại" onAction="#handleQuayLaiDanhSach" styleClass="bh-btn-secondary"
+                <Button fx:id="btnQuayLai1" text="← Quay Lại" onAction="#handleQuayLaiDanhSach" styleClass="bh-btn-secondary"
                         prefHeight="40.0" />
                 <Label text="TẠO BẢNG GIÁ MỚI" styleClass="bh-section-title"
                        style="-fx-font-size:18px;" />
@@ -169,7 +169,7 @@
 
                     <!-- Nút lưu -->
                     <HBox alignment="CENTER_RIGHT" spacing="12.0">
-                        <Button text="Hủy" onAction="#handleQuayLaiDanhSach" styleClass="bh-btn-secondary"
+                        <Button fx:id="btnQuayLai2" text="Hủy" onAction="#handleQuayLaiDanhSach" styleClass="bh-btn-secondary"
                                 prefHeight="44.0" prefWidth="120.0" />
                         <Button text="💾  Lưu Bảng Giá" onAction="#handleLuuBangGia"
                                 styleClass="bh-btn-success" prefHeight="44.0" prefWidth="180.0" />

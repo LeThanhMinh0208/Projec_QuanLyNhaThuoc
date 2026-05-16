@@ -1,6 +1,6 @@
 /* Nền màu xanh xám cực nhạt giống ảnh */
 .dmk-main-bg {
-    -fx-background-color: #f4f8fb;
+    -fx-background-color: #f0f9ff;
 }
 
 /* Tiêu đề góc trái */
@@ -167,3 +167,7 @@
 .dmk-table .table-cell:focused {
     -fx-background-color: transparent;
 }
+/* --- MÀU TRẠNG THÁI TỒN KHO --- */
+.status-con-hang { -fx-text-fill: #16a34a; -fx-font-weight: bold; } /* Xanh lá */
+.status-sap-het  { -fx-text-fill: #ea580c; -fx-font-weight: bold; } /* Cam */
+.status-het-hang { -fx-text-fill: #dc2626; -fx-font-weight: bold; } /* Đỏ */

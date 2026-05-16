@@ -21,6 +21,7 @@ import java.util.ResourceBundle;
 
 import utils.AlertUtils;
 import utils.SceneUtils;
+import utils.UserSession;
 
 public class GUI_DanhMucKhoController implements Initializable {
 
@@ -94,11 +95,26 @@ public class GUI_DanhMucKhoController implements Initializable {
             @Override protected void updateItem(Integer soLuong, boolean empty) {
                 super.updateItem(soLuong, empty);
                 setAlignment(Pos.CENTER);
+                
+                getStyleClass().removeAll("status-con-hang", "status-sap-het", "status-het-hang");
+                setStyle(""); 
+                
                 if (empty || soLuong == null) {
-                    setText(null); setStyle("");
+                    setText(null); 
                 } else {
-                    setText(soLuong < 100 ? "Tồn Thấp" : "Tồn Cao");
-                    setStyle(soLuong < 100 ? "-fx-text-fill: #dc2626; -fx-font-weight: bold;" : "-fx-text-fill: #16a34a; -fx-font-weight: bold;");
+                    if (soLuong == 0) {
+                        setText("Cạn Kho");
+                        setStyle("-fx-text-fill: #dc2626; -fx-font-weight: bold;"); 
+                        getStyleClass().add("status-het-hang"); 
+                    } else if (soLuong <= 100) {
+                        setText("Sắp Hết Hàng");
+                        setStyle("-fx-text-fill: #ea580c; -fx-font-weight: bold;");
+                        getStyleClass().add("status-sap-het");  
+                    } else {
+                        setText("Còn Hàng");
+                        setStyle("-fx-text-fill: #16a34a; -fx-font-weight: bold;");
+                        getStyleClass().add("status-con-hang"); 
+                    }
                 }
             }
         });
@@ -128,7 +144,15 @@ public class GUI_DanhMucKhoController implements Initializable {
                               (viTriSelection.equals("Kho Bán Hàng") && "KHO_BAN_HANG".equals(lo.getViTriKho())) ||
                               (viTriSelection.equals("Kho Dự Trữ") && "KHO_DU_TRU".equals(lo.getViTriKho()));
 
-            String trangThai = lo.getSoLuongTon() < 100 ? "tồn thấp" : "tồn cao";
+            String trangThai;
+            if (lo.getSoLuongTon() == 0) {
+                trangThai = "cạn kho";
+            } else if (lo.getSoLuongTon() <= 100) {
+                trangThai = "sắp hết hàng";
+            } else {
+                trangThai = "còn hàng";
+            }
+
             boolean matchSearch = tuKhoa.isEmpty() || 
                                  lo.getMaLoThuoc().toLowerCase().contains(tuKhoa) ||
                                  lo.getThuoc().getMaThuoc().toLowerCase().contains(tuKhoa) ||
@@ -139,8 +163,35 @@ public class GUI_DanhMucKhoController implements Initializable {
         });
     }
 
-    @FXML void moTrangNhapKho(ActionEvent event) { SceneUtils.switchPage("/gui/main/GUI_NhapKho.fxml"); }
-    @FXML void handleChuyenTrangXuatKho(ActionEvent event) { SceneUtils.switchPage("/gui/main/GUI_XuatKho.fxml"); }
+    // =========================================================================
+    // HÀM CHUYỂN TRANG: ĐÃ GỠ CONFLICT (KẾT HỢP PHÂN QUYỀN VÀ HIGHLIGHT SIDEBAR)
+    // =========================================================================
+    @FXML 
+    void moTrangNhapKho(ActionEvent event) { 
+        // 1. Kiểm tra quyền hạn từ Incoming
+        if (!UserSession.getInstance().hasPermission("QLK.NHAP_KHO")) {
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Không có quyền", "Bạn không có quyền truy cập trang Nhập Kho.");
+            return;
+        }
+        // 2. Chuyển trang và Highlight từ HEAD
+        if (GUI_TrangChuController.getInstance() != null) {
+            GUI_TrangChuController.getInstance().chuyenTrangVaHighlight("/gui/main/GUI_NhapKho.fxml", "Nhập Kho");
+        }
+    }
+
+    @FXML 
+    void handleChuyenTrangXuatKho(ActionEvent event) { 
+        // 1. Kiểm tra quyền hạn từ Incoming
+        if (!UserSession.getInstance().hasPermission("QLK.XUAT_KHO")) {
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Không có quyền", "Bạn không có quyền truy cập trang Xuất Kho.");
+            return;
+        }
+        // 2. Chuyển trang và Highlight từ HEAD
+        if (GUI_TrangChuController.getInstance() != null) {
+            GUI_TrangChuController.getInstance().chuyenTrangVaHighlight("/gui/main/GUI_XuatKho.fxml", "Xuất Kho");
+        }
+    }
+
     @FXML void handleChuyenTrangKiemKe(ActionEvent event) { 
         AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Tính năng đang phát triển", "Tính năng kiểm kê kho sẽ được cập nhật trong phiên bản tiếp theo.");
     }

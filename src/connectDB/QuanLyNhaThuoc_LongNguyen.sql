@@ -1,5 +1,6 @@
 -- ========================================================
--- TẠO DATABASE (TỰ ĐỘNG XÓA BẢN CŨ NẾU BỊ TRÙNG)
+-- TẠO DATABASE QUẢN LÝ NHÀ THUỐC LONG NGUYÊN (FULL VER 2.0)
+-- TỰ ĐỘNG XÓA BẢN CŨ NẾU BỊ TRÙNG ĐỂ LÀM SẠCH HOÀN TOÀN
 -- ========================================================
 USE master;
 GO
@@ -48,6 +49,28 @@ CREATE TABLE NhanVien (
     sdt VARCHAR(15),
     trangThai INT DEFAULT 1
 );
+
+-- ========================================================
+-- 1.1. BẢNG PHÂN QUYỀN & NHẬT KÝ HOẠT ĐỘNG
+-- ========================================================
+CREATE TABLE PhanQuyen (
+    maNhanVien VARCHAR(20) NOT NULL,
+    maQuyen VARCHAR(50) NOT NULL,
+    PRIMARY KEY (maNhanVien, maQuyen),
+    FOREIGN KEY (maNhanVien) REFERENCES NhanVien(maNhanVien) ON DELETE CASCADE
+);
+GO
+
+CREATE TABLE NhatKyHoatDong (
+    maLog INT IDENTITY(1,1) PRIMARY KEY,
+    maNhanVien VARCHAR(20) NOT NULL,
+    hanhDong NVARCHAR(50) NOT NULL,
+    doiTuong NVARCHAR(100),
+    maDoiTuong VARCHAR(50),
+    moTa NVARCHAR(500),
+    thoiGian DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (maNhanVien) REFERENCES NhanVien(maNhanVien)
+);
 GO
 
 CREATE TABLE DanhMucThuoc (
@@ -55,6 +78,7 @@ CREATE TABLE DanhMucThuoc (
     tenDanhMuc NVARCHAR(100) NOT NULL,
     moTa NVARCHAR(255)
 );
+GO
 
 -- ========================================================
 -- 2. TẠO BẢNG THUỐC, TỒN KHO & BẢNG GIÁ
@@ -87,6 +111,7 @@ CREATE TABLE DonViQuyDoi (
     FOREIGN KEY (maThuoc) REFERENCES Thuoc(maThuoc) ON DELETE CASCADE
 );
 
+-- 🚨 ĐÃ TÍCH HỢP CỜ KHÓA (isLockedForAudit) TRỰC TIẾP VÀO BẢNG LÔ THUỐC 🚨
 CREATE TABLE LoThuoc (
     maLoThuoc VARCHAR(20) PRIMARY KEY,
     maThuoc VARCHAR(20) NOT NULL,
@@ -96,9 +121,10 @@ CREATE TABLE LoThuoc (
     giaNhap DECIMAL(18,2),
     viTriKho VARCHAR(50) DEFAULT 'KHO_BAN_HANG',
     trangThai INT DEFAULT 1,
-
     ngayNhapKho DATE,
     maNhaCungCap VARCHAR(20),
+    
+    isLockedForAudit BIT DEFAULT 0, -- Cờ chống đụng độ khi kiểm kê
 
     FOREIGN KEY (maThuoc) REFERENCES Thuoc(maThuoc) ON DELETE CASCADE,
     FOREIGN KEY (maNhaCungCap) REFERENCES NhaCungCap(maNhaCungCap),
@@ -126,6 +152,7 @@ CREATE TABLE ChiTietBangGia (
     FOREIGN KEY (maQuyDoi) REFERENCES DonViQuyDoi(maQuyDoi),
     CONSTRAINT CHK_DonGiaBan CHECK (donGiaBan > 0)
 );
+GO
 
 -- ========================================================
 -- 3. TẠO BẢNG NGHIỆP VỤ: ĐẶT HÀNG
@@ -159,6 +186,7 @@ CREATE TABLE ChiTietDonDatHang (
     FOREIGN KEY (maDonDatHang) REFERENCES DonDatHang(maDonDatHang) ON DELETE CASCADE,
     FOREIGN KEY (maQuyDoi) REFERENCES DonViQuyDoi(maQuyDoi)
 );
+GO
 
 -- ========================================================
 -- 4. TẠO BẢNG NGHIỆP VỤ: NHẬP HÀNG
@@ -188,6 +216,7 @@ CREATE TABLE ChiTietPhieuNhap (
     FOREIGN KEY (maLoThuoc) REFERENCES LoThuoc(maLoThuoc),
     CONSTRAINT CHK_ChiTietNhap_SL_Gia CHECK (soLuong > 0 AND donGiaNhap > 0)
 );
+GO
 
 -- ========================================================
 -- 5. TẠO BẢNG NGHIỆP VỤ: BÁN HÀNG & ĐỔI TRẢ
@@ -264,6 +293,7 @@ CREATE TABLE ChiTietDoiTra (
     FOREIGN KEY (maLoThuoc) REFERENCES LoThuoc(maLoThuoc),
     CONSTRAINT CHK_ChiTietDoiTra_SL CHECK (soLuong > 0)
 );
+GO
 
 -- ========================================================
 -- 6. TẠO BẢNG NGHIỆP VỤ: QUẢN LÝ CÔNG NỢ & XUẤT HỦY
@@ -319,19 +349,52 @@ CREATE TABLE ChiTietPhieuXuat (
     FOREIGN KEY (maPhieuXuat) REFERENCES PhieuXuat(maPhieuXuat),
     FOREIGN KEY (maLoThuoc) REFERENCES LoThuoc(maLoThuoc)
 );
-
 GO
-PRINT N'Đã tạo xong Database cấu trúc mới!';
+
+-- ========================================================
+-- 7. TẠO BẢNG NGHIỆP VỤ: KIỂM KÊ (CHUẨN TÊN 100%)
+-- ========================================================
+CREATE TABLE PhieuKiemKe (
+    maPhieuKiemKe VARCHAR(20) PRIMARY KEY,
+    ngayTao DATETIME DEFAULT GETDATE(),
+    maNhanVienTao VARCHAR(20) NOT NULL,
+    maNhanVienDuyet VARCHAR(20) NULL,
+    ngayDuyet DATETIME NULL,
+    trangThai VARCHAR(50) DEFAULT 'DANG_KIEM_KE', 
+    ghiChu NVARCHAR(255),
+    
+    FOREIGN KEY (maNhanVienTao) REFERENCES NhanVien(maNhanVien),
+    FOREIGN KEY (maNhanVienDuyet) REFERENCES NhanVien(maNhanVien),
+    CONSTRAINT CHK_TrangThaiKiemKe CHECK (trangThai IN ('DANG_KIEM_KE', 'CHO_DUYET', 'DA_HOAN_THANH', 'DA_HUY'))
+);
+
+CREATE TABLE ChiTietPhieuKiemKe (
+    maPhieuKiemKe VARCHAR(20) NOT NULL,
+    maLoThuoc VARCHAR(20) NOT NULL,
+    tonKhoSnapshot INT NOT NULL,     
+    soLuongKiemTra INT NULL,         
+    chenhLech INT NULL,              
+    lyDoLech NVARCHAR(255) NULL,     
+    trangThaiChiTiet VARCHAR(20) DEFAULT 'CHUA_KIEM', 
+
+    PRIMARY KEY (maPhieuKiemKe, maLoThuoc),
+    FOREIGN KEY (maPhieuKiemKe) REFERENCES PhieuKiemKe(maPhieuKiemKe) ON DELETE CASCADE,
+    FOREIGN KEY (maLoThuoc) REFERENCES LoThuoc(maLoThuoc)
+);
+ALTER TABLE ChiTietPhieuKiemKe ADD thoiDiemDem DATETIME NULL;
+ALTER TABLE ChiTietPhieuKiemKe ADD ghiChu NVARCHAR(255) NULL;
+GO
+
+PRINT N'Đã tạo xong Database cấu trúc mới! Sẵn sàng nạp dữ liệu...';
 GO
 
 
 -- ==========================================
 -- DỮ LIỆU KHỞI TẠO (DATA FULL GỐC 100%)
 -- ==========================================
--- 🚨 ĐÃ BƠM ĐỦ 11 NHÂN VIÊN 🚨
 INSERT INTO NhanVien (maNhanVien, tenDangNhap, matKhau, hoTen, chucVu, caLamViec, sdt) VALUES
 ('NV001', 'admin', '123456', N'Lê Trọng Nghĩa', N'Quản Lý', N'Hành Chính', '0987654321'),
-('NV002', 'lethanhminh', '123456', N'Lê Thanh Minh', N'Nhân Viên', N'Ca Sáng', '0912345678'),
+('NV002', 'lethanhminh', '123456', N'Lê Thanh Minh', N'Nhân Viên', N'Ca Sáng', '0378123395'),
 ('NV003', 'nguyenhoanglong', '123456', N'Nguyễn Hoàng Long', N'Nhân Viên', N'Ca Chiều', '0398757483'),
 ('NV004', 'tatuankiet', '123456', N'Tạ Tuấn Kiệt', N'Nhân Viên', N'Ca Sáng', '0944556677'),
 ('NV005', 'nguyenminhkhoi', '123456', N'Nguyễn Minh Khôi', N'Nhân Viên', N'Ca Tối', '0901889900'),
@@ -600,7 +663,7 @@ INSERT INTO ChiTietBangGia (maBangGia, maQuyDoi, donGiaBan) VALUES
 ('BG0001', 'QD02413', 11000), ('BG0001', 'QD00121', 104500), ('BG0001', 'QD00122', 1012000),
 ('BG0001', 'QD02541', 9800), ('BG0001', 'QD00123', 93100), ('BG0001', 'QD00124', 901600),
 ('BG0001', 'QD02594', 2500), ('BG0001', 'QD00125', 23800), ('BG0001', 'QD00126', 230000),
-('BG0001', 'QD02671', 2200), ('BG0001', 'QD00127', 20900), ('BG0001', 'QD00128', 202400),
+('BG0001', 'QD02671', 2200), ('BG0001', 'QD00127', 20900), ('BG0001', 'QD00128', 216600),
 ('BG0001', 'QD02729', 7200), ('BG0001', 'QD00129', 68400), ('BG0001', 'QD00130', 662400),
 ('BG0001', 'QD02811', 7400), ('BG0001', 'QD00131', 70300), ('BG0001', 'QD00132', 680800),
 ('BG0001', 'QD02883', 30000), ('BG0001', 'QD00133', 144000),
@@ -844,6 +907,21 @@ GO
 INSERT INTO ChiTietDoiTra (maPhieuDoiTra, maQuyDoi, maLoThuoc, soLuong, tinhTrang) VALUES
 ('PDT0001', 'QD00094', 'LO01538', 1, N'Thuốc còn nguyên seal'),
 ('PDT0002', 'QD01435', 'LO01435', 1, N'Thuốc còn nguyên seal');
+GO
+
+-- ==========================================
+-- DỮ LIỆU PHÂN QUYỀN: GÁN TOÀN QUYỀN CHO NV001 (ADMIN)
+-- ==========================================
+INSERT INTO PhanQuyen (maNhanVien, maQuyen) VALUES
+('NV001', 'QLBH'), ('NV001', 'QLBH.LAP_HOA_DON'), ('NV001', 'QLBH.DANH_SACH_HOA_DON'), ('NV001', 'QLBH.XU_LY_DOI_TRA'),
+('NV001', 'QLBG'), ('NV001', 'QLBG.DANH_SACH_BANG_GIA'), ('NV001', 'QLBG.TAO_BANG_GIA_MOI'),
+('NV001', 'QLDT'), ('NV001', 'QLDT.DANH_MUC_DON_THUOC'),
+('NV001', 'QLT'), ('NV001', 'QLT.DANH_MUC_THUOC'), ('NV001', 'QLT.DON_VI_QUY_DOI'), ('NV001', 'QLT.LO_THUOC'),
+('NV001', 'QLK'), ('NV001', 'QLK.DANH_MUC_KHO'), ('NV001', 'QLK.DON_DAT_HANG'), ('NV001', 'QLK.NHAP_KHO'), ('NV001', 'QLK.XUAT_KHO'),
+('NV001', 'QLKH'), ('NV001', 'QLKH.DANH_MUC_KHACH_HANG'), ('NV001', 'QLKH.LICH_SU_GIAO_DICH'),
+('NV001', 'QLNCC'), ('NV001', 'QLNCC.DANH_MUC_NHA_CUNG_CAP'), ('NV001', 'QLNCC.CONG_NO'),
+('NV001', 'QLND'), ('NV001', 'QLND.DANH_MUC_NGUOI_DUNG'), ('NV001', 'QLND.PHAN_QUYEN'), ('NV001', 'QLND.NHAT_KY'),
+('NV001', 'BCTK'), ('NV001', 'BCTK.DOANH_THU'), ('NV001', 'BCTK.HANG_HOA'), ('NV001', 'BCTK.TON_KHO');
 GO
 
 PRINT N'✅ Khởi tạo Thành Công 100% Cấu trúc & Dữ liệu Long Nguyên Pharmacy!';

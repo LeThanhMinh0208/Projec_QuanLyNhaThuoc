@@ -1,12 +1,5 @@
 package dao;
 
-import connectDB.ConnectDB;
-import entity.ChiTietDoiTra;
-import entity.ChiTietDoiTraView;
-import entity.PhieuDoiTra;
-import entity.PhieuDoiTraView;
-import utils.DoiTraSession;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,6 +9,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import connectDB.ConnectDB;
+import entity.ChiTietDoiTra;
+import entity.ChiTietDoiTraView;
+import entity.PhieuDoiTra;
+import entity.PhieuDoiTraView;
+import utils.DoiTraSession;
 
 public class DAO_PhieuDoiTra {
     public String generateMaPhieuDoiTra() {
@@ -178,7 +178,9 @@ public class DAO_PhieuDoiTra {
             if (dsThuocDoi != null && !dsThuocDoi.isEmpty()) {
                 StringBuilder sb = new StringBuilder();
                 for (DoiTraSession.DonViDoiData td : dsThuocDoi) {
-                    if (sb.length() > 0) sb.append(";");
+                    if (sb.length() > 0) {
+						sb.append(";");
+					}
                     sb.append(td.getMaQuyDoi()).append("|")
                       .append(td.getTenThuoc()).append("|")
                       .append(td.getTenDonVi()).append("|")
@@ -218,35 +220,43 @@ public class DAO_PhieuDoiTra {
                 }
             }
 
-            // --- INSERT ChiTietDoiTra + cộng tồn thuốc trả ---
+         // --- INSERT ChiTietDoiTra + cộng tồn thuốc trả ---
             String sqlChiTiet = "INSERT INTO ChiTietDoiTra(maPhieuDoiTra, maQuyDoi, maLoThuoc, soLuong, tinhTrang) VALUES(?,?,?,?,?)";
+            // 🚨 CHỈ CỘNG VÀO TỒN KHO. (VÌ DB SẾP KHÔNG CÓ CỘT soLuongKhachTra NÊN KHÔNG ĐƯỢC THÊM VÀO)
             String sqlCongTon = "UPDATE LoThuoc SET soLuongTon = soLuongTon + ? WHERE maLoThuoc = ?";
 
             for (ChiTietDoiTra ct : chiTietHopLe) {
                 int soLuongConLai = getSoLuongConLaiCoTheDoi(con, pdt.getHoaDon().getMaHoaDon(), ct.getMaQuyDoi(), ct.getMaLoThuoc());
+                
                 if (ct.getSoLuong() <= 0 || ct.getSoLuong() > soLuongConLai) {
                     con.rollback();
                     con.setAutoCommit(true);
                     return false;
                 }
 
+                // 💡 BƯỚC QUAN TRỌNG NHẤT: Lấy tỷ lệ quy đổi và nhân lên để ra SỐ VIÊN (VD: 1 Hộp * 100 = 100 Viên)
+                int tyLeQuyDoi = getTyLeQuyDoi(con, ct.getMaQuyDoi());
+                int soLuongCoBan = ct.getSoLuong() * tyLeQuyDoi;
+
                 try (PreparedStatement pst = con.prepareStatement(sqlChiTiet)) {
                     pst.setString(1, ct.getMaPhieuDoiTra());
                     pst.setString(2, ct.getMaQuyDoi());
                     pst.setString(3, ct.getMaLoThuoc());
-                    pst.setInt(4, ct.getSoLuong());
+                    
+                    // 💡 LƯU SỐ LƯỢNG CƠ BẢN (100 Viên) VÀO BẢNG CHI TIẾT
+                    pst.setInt(4, soLuongCoBan); 
+                    
                     pst.setString(5, ct.getTinhTrang());
                     pst.executeUpdate();
                 }
 
-                int tyLeQuyDoi = getTyLeQuyDoi(con, ct.getMaQuyDoi());
                 try (PreparedStatement pst = con.prepareStatement(sqlCongTon)) {
-                    pst.setInt(1, ct.getSoLuong() * tyLeQuyDoi);
+                    // 💡 CỘNG SỐ LƯỢNG CƠ BẢN (100 Viên) VÀO TỒN KHO
+                    pst.setInt(1, soLuongCoBan); 
                     pst.setString(2, ct.getMaLoThuoc());
                     pst.executeUpdate();
                 }
             }
-
             // --- Trừ tồn kho thuốc đổi cho khách (DOI_SAN_PHAM - Hỗ trợ trừ nhiều lô FEFO) ---
             if (dsThuocDoi != null && !dsThuocDoi.isEmpty()) {
                 for (DoiTraSession.DonViDoiData thuocDoi : dsThuocDoi) {
@@ -266,10 +276,10 @@ public class DAO_PhieuDoiTra {
                                      "AND soLuongTon > 0 AND trangThai = 1 " +
                                      "AND hanSuDung >= CAST(GETDATE() AS DATE) " +
                                      "ORDER BY hanSuDung ASC";
-                    
+
                     List<String> listMaLo = new ArrayList<>();
                     List<Integer> listTonLo = new ArrayList<>();
-                    
+
                     try (PreparedStatement pstLo = con.prepareStatement(sqlLayLo)) {
                         pstLo.setString(1, maThuoc);
                         try (ResultSet rsLo = pstLo.executeQuery()) {
@@ -285,7 +295,7 @@ public class DAO_PhieuDoiTra {
                         String maLo = listMaLo.get(i);
                         int tonLo = listTonLo.get(i);
                         int canTru = Math.min(tonLo, soLuongPhaiTruCoBan - soLuongDaTru);
-                        
+
                         // Trừ tồn kho tại lô này
                         String sqlTruTon = "UPDATE LoThuoc SET soLuongTon = soLuongTon - ? WHERE maLoThuoc = ?";
                         try (PreparedStatement pstTru = con.prepareStatement(sqlTruTon)) {

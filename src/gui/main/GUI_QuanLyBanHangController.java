@@ -1,11 +1,5 @@
 package gui.main;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,6 +10,7 @@ import dao.DAO_DonThuoc;
 import dao.DAO_HoaDon;
 import dao.DAO_KhachHang;
 import dao.DAO_LoThuoc;
+import dao.DAO_NhatKyHoatDong;
 import dao.DAO_Thuoc;
 import entity.ChiTietHoaDon;
 import entity.DonThuoc;
@@ -23,17 +18,16 @@ import entity.DonViQuyDoi;
 import entity.HoaDon;
 import entity.HoaDonView;
 import entity.KhachHang;
-import entity.LoThuoc;
 import entity.NhanVien;
 import entity.Thuoc;
 import gui.dialogs.Dialog_ChonSoLuongDonViController;
-import utils.HoaDonPdfExporter;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -46,17 +40,15 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
+import utils.HoaDonPdfExporter;
 
 public class GUI_QuanLyBanHangController {
 
@@ -68,14 +60,18 @@ public class GUI_QuanLyBanHangController {
     private void onTabBanLe() {
         btnBanLe.setSelected(true);
         btnDonThuoc.setSelected(false);
-        if (tabPaneBanHang != null) tabPaneBanHang.getSelectionModel().select(0);
+        if (tabPaneBanHang != null) {
+			tabPaneBanHang.getSelectionModel().select(0);
+		}
     }
-    
+
     @FXML
     private void onTabDonThuoc() {
         btnDonThuoc.setSelected(true);
         btnBanLe.setSelected(false);
-        if (tabPaneBanHang != null) tabPaneBanHang.getSelectionModel().select(1);
+        if (tabPaneBanHang != null) {
+			tabPaneBanHang.getSelectionModel().select(1);
+		}
     }
 
     // --- TAB 1: BÁN LẺ ---
@@ -115,15 +111,15 @@ public class GUI_QuanLyBanHangController {
 
     private ObservableList<Thuoc> masterDataLe = FXCollections.observableArrayList();
     private ObservableList<CartItem> cartDataLe = FXCollections.observableArrayList();
-    
+
     private KhachHang currentKhachHang = null;
     private double tongTienLe = 0;
     private double thueVatLe = 0;
-    
+
  // 🚨 BIẾN STATIC ĐỂ NHẬN DỮ LIỆU TÁI LẬP TỪ MÀN HÌNH KHÁC
     private static GUI_QuanLyBanHangController instance;
     private static DonThuoc donThuocTaiLapPending = null;
-    private static Image hinhAnhTaiLapPending = null; 
+    private static Image hinhAnhTaiLapPending = null;
     public static void setHinhAnhTaiLap(Image img) { hinhAnhTaiLapPending = img; }
 
     public static GUI_QuanLyBanHangController getInstance() { return instance; }
@@ -159,7 +155,7 @@ public class GUI_QuanLyBanHangController {
 
         cbHinhThucThanhToanLe.getItems().addAll("Tiền mặt", "Chuyển khoản", "Thẻ tín dụng");
         cbHinhThucThanhToanLe.getSelectionModel().selectFirst();
-        
+
         // TAB 2: Bán theo đơn
         setupTableThuocDon();
         setupTableCartDon();
@@ -167,12 +163,14 @@ public class GUI_QuanLyBanHangController {
         setupSearchLogicDon();
         cbHinhThucThanhToanDon.getItems().addAll("Tiền mặt", "Chuyển khoản", "Thẻ tín dụng");
         cbHinhThucThanhToanDon.getSelectionModel().selectFirst();
-        
+
         // VĐ1: Disable nút "Thêm vào giỏ" tab đơn khi chưa có đơn thuốc
-        if (btnThemVaoGioDon != null) btnThemVaoGioDon.setDisable(true);
+        if (btnThemVaoGioDon != null) {
+			btnThemVaoGioDon.setDisable(true);
+		}
         // VĐ1-card: Ẩn paneThongTinDon khi khởi tạo
         if (paneThongTinDon != null) { paneThongTinDon.setVisible(false); paneThongTinDon.setManaged(false); }
-        
+
         // Keyboard navigation
         setupKeyboardNavigation();
         javafx.application.Platform.runLater(() -> {
@@ -205,7 +203,7 @@ public class GUI_QuanLyBanHangController {
             cell.setAlignment(javafx.geometry.Pos.CENTER);
             return cell;
         });
-        
+
         colThuocAnh.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("hinhAnh"));
         colThuocAnh.setCellFactory(column -> new TableCell<Thuoc, String>() {
             private final javafx.scene.image.ImageView imageView = new javafx.scene.image.ImageView();
@@ -239,7 +237,7 @@ public class GUI_QuanLyBanHangController {
                 }
             }
         });
-        
+
         colThuocTen.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("tenThuoc"));
         colThuocTen.setCellFactory(col -> {
             TableCell<Thuoc, String> cell = new TableCell<>() {
@@ -253,7 +251,7 @@ public class GUI_QuanLyBanHangController {
             return cell;
         });
         colThuocTrieuChung.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("trieuChung"));
-        
+
         colThuocKeDon.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("canKeDon"));
         colThuocKeDon.setCellFactory(column -> new TableCell<Thuoc, Boolean>() {
             {
@@ -287,7 +285,7 @@ public class GUI_QuanLyBanHangController {
         colCartSoLuong.setCellValueFactory(cd -> new SimpleIntegerProperty(cd.getValue().soLuong).asObject());
         colCartDonGia.setCellValueFactory(cd -> new SimpleStringProperty(String.format("%,.0f ₫", cd.getValue().donGia)));
         colCartThanhTien.setCellValueFactory(cd -> new SimpleStringProperty(String.format("%,.0f ₫", cd.getValue().thanhTien)));
-        
+
         colCartXoa.setCellFactory(column -> new TableCell<CartItem, Void>() {
             private final Button btn = new Button("✕");
             {
@@ -324,12 +322,16 @@ public class GUI_QuanLyBanHangController {
         FilteredList<Thuoc> filteredData = new FilteredList<>(masterDataLe, p -> true);
         txtTimKiemThuocLe.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(thuoc -> {
-                if (newValue == null || newValue.isEmpty()) return true;
+                if (newValue == null || newValue.isEmpty()) {
+					return true;
+				}
                 String lowerCaseFilter = newValue.toLowerCase();
-                if (thuoc.getTenThuoc().toLowerCase().contains(lowerCaseFilter)) return true;
-                if (thuoc.getMaThuoc().toLowerCase().contains(lowerCaseFilter)) return true;
-                if (thuoc.getCongDung() != null && thuoc.getCongDung().toLowerCase().contains(lowerCaseFilter)) return true;
-                if (thuoc.getTrieuChung() != null && thuoc.getTrieuChung().toLowerCase().contains(lowerCaseFilter)) return true;
+                if (thuoc.getTenThuoc().toLowerCase().contains(lowerCaseFilter) || thuoc.getMaThuoc().toLowerCase().contains(lowerCaseFilter) || (thuoc.getCongDung() != null && thuoc.getCongDung().toLowerCase().contains(lowerCaseFilter))) {
+					return true;
+				}
+                if (thuoc.getTrieuChung() != null && thuoc.getTrieuChung().toLowerCase().contains(lowerCaseFilter)) {
+					return true;
+				}
                 return false;
             });
         });
@@ -361,7 +363,7 @@ public class GUI_QuanLyBanHangController {
             Parent root = loader.load();
             Dialog_ChonSoLuongDonViController controller = loader.getController();
             controller.setThuoc(selectedThuoc);
-            
+
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
@@ -411,14 +413,18 @@ public class GUI_QuanLyBanHangController {
         if (sdt.isEmpty()) {
             currentKhachHang = null;
             lblTenKhachLe.setText("Khách lẻ (vãng lai)");
-            if (btnXoaKH != null) btnXoaKH.setVisible(false);
+            if (btnXoaKH != null) {
+				btnXoaKH.setVisible(false);
+			}
             return;
         }
         KhachHang kh = daoKhachHang.getBySdt(sdt);
         if (kh != null) {
             currentKhachHang = kh;
             lblTenKhachLe.setText("👤 " + kh.getHoTen() + " (Điểm: " + kh.getDiemTichLuy() + ")");
-            if (btnXoaKH != null) btnXoaKH.setVisible(true);
+            if (btnXoaKH != null) {
+				btnXoaKH.setVisible(true);
+			}
         } else {
             Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Không tìm thấy khách hàng với SĐT: " + sdt + ".\nBạn có muốn thêm khách hàng mới không?", ButtonType.YES, ButtonType.NO);
             confirm.showAndWait();
@@ -427,7 +433,7 @@ public class GUI_QuanLyBanHangController {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ThemKhachHang.fxml"));
                     Scene scene = new Scene(loader.load());
                     gui.dialogs.Dialog_ThemKhachHangController controller = loader.getController();
-                    
+
                     // Sinh mã khách hàng tiếp theo
                     int max = 0;
                     for (KhachHang khach : daoKhachHang.getAllKhachHang()) {
@@ -435,14 +441,16 @@ public class GUI_QuanLyBanHangController {
                         if (ma != null && ma.startsWith("KH")) {
                             try {
                                 int num = Integer.parseInt(ma.substring(2));
-                                if (num > max) max = num;
+                                if (num > max) {
+									max = num;
+								}
                             } catch (Exception e) {}
                         }
                     }
                     String nextIdSeq = String.format("KH%03d", max + 1);
                     controller.setMaKhachHang(nextIdSeq);
                     controller.setSdt(sdt);
-                    
+
                     Stage dialogStage = new Stage();
                     dialogStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
                     dialogStage.initStyle(javafx.stage.StageStyle.UTILITY);
@@ -455,10 +463,13 @@ public class GUI_QuanLyBanHangController {
                         // User đã nhấp Lưu trong dialog → thêm vào DB
                         boolean saved = daoKhachHang.themKhachHang(result);
                         if (saved) {
-                            currentKhachHang = result;
+                            DAO_NhatKyHoatDong.ghiLog("THEM", "Khách Hàng", result.getMaKhachHang(), "Thêm khách hàng mới từ màn hình bán hàng: " + result.getHoTen());
+                            new Alert(Alert.AlertType.INFORMATION, "Thêm khách hàng thành công!").show();
                             lblTenKhachLe.setText("👤 " + result.getHoTen() + " (Điểm: 0)");
                             txtSdtKhachLe.setText(result.getSdt());
-                            if (btnXoaKH != null) btnXoaKH.setVisible(true);
+                            if (btnXoaKH != null) {
+								btnXoaKH.setVisible(true);
+							}
                             showAlert(Alert.AlertType.INFORMATION, "Thành công", "Thêm khách hàng thành công! Mã: " + result.getMaKhachHang());
                         } else {
                             showAlert(Alert.AlertType.ERROR, "Thất bại", "Lỗi cơ sở dữ liệu khi lưu khách hàng. Vui lòng thử lại.");
@@ -486,7 +497,9 @@ public class GUI_QuanLyBanHangController {
         currentKhachHang = null;
         txtSdtKhachLe.clear();
         lblTenKhachLe.setText("Khách lẻ (vãng lai)");
-        if (btnXoaKH != null) btnXoaKH.setVisible(false);
+        if (btnXoaKH != null) {
+			btnXoaKH.setVisible(false);
+		}
     }
 
     @FXML void handleHuyGioLe(ActionEvent event) {
@@ -503,8 +516,10 @@ public class GUI_QuanLyBanHangController {
 
         Alert confirm = new Alert(AlertType.CONFIRMATION, "Xác nhận thanh toán hóa đơn với tổng số tiền: " + String.format("%,.0f ₫", tongTienLe + thueVatLe) + " ?", ButtonType.YES, ButtonType.NO);
         confirm.showAndWait();
-        if (confirm.getResult() != ButtonType.YES) return;
-        
+        if (confirm.getResult() != ButtonType.YES) {
+			return;
+		}
+
         // Kiem tra thuoc ke don
         for (CartItem item : cartDataLe) {
             if (item.thuoc.isCanKeDon()) {
@@ -512,23 +527,23 @@ public class GUI_QuanLyBanHangController {
                 return;
             }
         }
-        
+
         NhanVien user = GUI_TrangChuController.getNhanVienDangNhap();
         if (user == null) {
-            user = new NhanVien("NV001", "testuser", "123", "Nhân Viên Test", "Nhân viên", "Ca 1", "0123",1); 
+            user = new NhanVien("NV001", "testuser", "123", "Nhân Viên Test", "Nhân viên", "Ca 1", "0123",1);
         }
-        
+
         // Tao Hoa don
         String maHD = daoHoaDon.generateMaHoaDon();
         String pMethod = cbHinhThucThanhToanLe.getValue() != null ? cbHinhThucThanhToanLe.getValue().toString() : "";
-        String dbHinhThuc = pMethod.equals("Chuyển khoản") ? "CHUYEN_KHOAN" : 
+        String dbHinhThuc = pMethod.equals("Chuyển khoản") ? "CHUYEN_KHOAN" :
                             pMethod.equals("Thẻ tín dụng") ? "THE" : "TIEN_MAT";
 
         // --- FIX thueVAT: DB lưu 8.0 = 8%, KHÔNG phải 0.08 ---
-        HoaDon hd = new HoaDon(maHD, Timestamp.valueOf(LocalDateTime.now()), 8.0, 
+        HoaDon hd = new HoaDon(maHD, Timestamp.valueOf(LocalDateTime.now()), 8.0,
                 dbHinhThuc, "", user, currentKhachHang);
         hd.setLoaiBan("BAN_LE"); // Tường minh set BAN_LE
-        
+
         // Tạo danh sách ChiTietHoaDon – mỗi sản phẩm 1 lô FEFO (strict)
         List<ChiTietHoaDon> dsCT = new ArrayList<>();
         for (CartItem item : cartDataLe) {
@@ -549,9 +564,10 @@ public class GUI_QuanLyBanHangController {
             ct.setSoLuongTruKho(soLuongCoBan);
             dsCT.add(ct);
         }
-        
+
         boolean ok = daoHoaDon.thanhToan(hd, dsCT);
         if (ok) {
+            DAO_NhatKyHoatDong.ghiLog("TAO_HOA_DON", "Hóa Đơn", hd.getMaHoaDon(), "Tạo hóa đơn bán lẻ: " + hd.getMaHoaDon());
             // Tích điểm
             if (currentKhachHang != null) {
                 int diemCong = (int) ((tongTienLe + thueVatLe) / 1000);
@@ -744,7 +760,7 @@ public class GUI_QuanLyBanHangController {
         // VĐ2: Row factory — highlight dòng thuốc kê đơn bằng nền #E3F2FD nhưng tôn trọng style khi selected
         tblThuocDon.setRowFactory(tv -> {
             javafx.scene.control.TableRow<Thuoc> row = new javafx.scene.control.TableRow<>();
-            
+
             row.itemProperty().addListener((obs, oldItem, newItem) -> {
                 if (newItem == null) {
                     row.setStyle("");
@@ -754,7 +770,7 @@ public class GUI_QuanLyBanHangController {
                     row.setStyle("");
                 }
             });
-            
+
             row.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
                 if (isNowSelected) {
                     row.setStyle("");
@@ -796,13 +812,19 @@ public class GUI_QuanLyBanHangController {
         FilteredList<Thuoc> filteredData = new FilteredList<>(masterDataDon, p -> true);
         txtTimKiemThuocDon.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(thuoc -> {
-                if (newValue == null || newValue.isEmpty()) return true;
+                if (newValue == null || newValue.isEmpty()) {
+					return true;
+				}
                 String lowerCaseFilter = newValue.toLowerCase();
-                if (thuoc.getTenThuoc().toLowerCase().contains(lowerCaseFilter)) return true;
-                if (thuoc.getMaThuoc().toLowerCase().contains(lowerCaseFilter)) return true;
-                if (thuoc.getHoatChat() != null && thuoc.getHoatChat().toLowerCase().contains(lowerCaseFilter)) return true;
-                if (thuoc.getCongDung() != null && thuoc.getCongDung().toLowerCase().contains(lowerCaseFilter)) return true;
-                if (thuoc.getTrieuChung() != null && thuoc.getTrieuChung().toLowerCase().contains(lowerCaseFilter)) return true;
+                if (thuoc.getTenThuoc().toLowerCase().contains(lowerCaseFilter) || thuoc.getMaThuoc().toLowerCase().contains(lowerCaseFilter) || (thuoc.getHoatChat() != null && thuoc.getHoatChat().toLowerCase().contains(lowerCaseFilter))) {
+					return true;
+				}
+                if (thuoc.getCongDung() != null && thuoc.getCongDung().toLowerCase().contains(lowerCaseFilter)) {
+					return true;
+				}
+                if (thuoc.getTrieuChung() != null && thuoc.getTrieuChung().toLowerCase().contains(lowerCaseFilter)) {
+					return true;
+				}
                 return false;
             });
         });
@@ -836,7 +858,7 @@ public class GUI_QuanLyBanHangController {
             Parent root = loader.load();
             Dialog_ChonSoLuongDonViController controller = loader.getController();
             controller.setThuoc(selectedThuoc);
-            
+
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
@@ -909,7 +931,9 @@ public class GUI_QuanLyBanHangController {
     }
 
     @FXML void onXemSuaDonThuoc(ActionEvent event) {
-        if (donThuocTemp == null) return;
+        if (donThuocTemp == null) {
+			return;
+		}
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/dialogs/Dialog_ThemDonThuoc.fxml"));
             Scene scene = new Scene(loader.load());
@@ -937,8 +961,8 @@ public class GUI_QuanLyBanHangController {
 
     @FXML void onDatLaiDonThuoc(ActionEvent event) {
         if (cartDataDon != null && !cartDataDon.isEmpty()) {
-            Alert confirm = new Alert(AlertType.CONFIRMATION, 
-                "Đặt lại thông tin đơn thuốc sẽ xóa toàn bộ thuốc trong giỏ hàng. Bạn có đồng ý không?", 
+            Alert confirm = new Alert(AlertType.CONFIRMATION,
+                "Đặt lại thông tin đơn thuốc sẽ xóa toàn bộ thuốc trong giỏ hàng. Bạn có đồng ý không?",
                 ButtonType.YES, ButtonType.NO);
             confirm.setTitle("Xác nhận");
             if (confirm.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
@@ -964,9 +988,15 @@ public class GUI_QuanLyBanHangController {
         String chanDoan = donThuocTemp.getChanDoan();
 
         List<String> list = new ArrayList<>();
-        if (bacSi != null && !bacSi.isBlank()) list.add("BS: " + bacSi);
-        if (benhNhan != null && !benhNhan.isBlank()) list.add("BN: " + benhNhan);
-        if (chanDoan != null && !chanDoan.isBlank()) list.add("Chẩn đoán: " + chanDoan);
+        if (bacSi != null && !bacSi.isBlank()) {
+			list.add("BS: " + bacSi);
+		}
+        if (benhNhan != null && !benhNhan.isBlank()) {
+			list.add("BN: " + benhNhan);
+		}
+        if (chanDoan != null && !chanDoan.isBlank()) {
+			list.add("Chẩn đoán: " + chanDoan);
+		}
 
         lblTrangThaiDon.setText(String.join(" | ", list));
         // Hiện paneThongTinDon và cho nó chiếm không gian
@@ -979,7 +1009,9 @@ public class GUI_QuanLyBanHangController {
         btnXemSuaDon.setVisible(true);
         btnDatLaiDon.setVisible(true);
         // VĐ1: Enable nút "Thêm vào giỏ" khi đã có đơn
-        if (btnThemVaoGioDon != null) btnThemVaoGioDon.setDisable(false);
+        if (btnThemVaoGioDon != null) {
+			btnThemVaoGioDon.setDisable(false);
+		}
     }
 
     /** Reset card đơn thuốc về trạng thái "Chưa có đơn" */
@@ -995,7 +1027,9 @@ public class GUI_QuanLyBanHangController {
         btnXemSuaDon.setVisible(false);
         btnDatLaiDon.setVisible(false);
         // VĐ1: Disable nút "Thêm vào giỏ" khi không có đơn
-        if (btnThemVaoGioDon != null) btnThemVaoGioDon.setDisable(true);
+        if (btnThemVaoGioDon != null) {
+			btnThemVaoGioDon.setDisable(true);
+		}
     }
 
     // --- GIỎ HÀNG + THANH TOÁN TAB ĐƠN ---
@@ -1006,9 +1040,9 @@ public class GUI_QuanLyBanHangController {
         colCartDonSoLuong.setCellValueFactory(cd -> new SimpleIntegerProperty(cd.getValue().soLuong).asObject());
         colCartDonDonGia.setCellValueFactory(cellData -> new SimpleStringProperty(String.format("%,.0f", cellData.getValue().donGia)));
         colCartDonThanhTien.setCellValueFactory(cellData -> new SimpleStringProperty(String.format("%,.0f", cellData.getValue().thanhTien)));
-        
+
         tblGioHangDon.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        
+
         colCartDonXoa.setCellFactory(param -> new TableCell<>() {
             private final Button btnXoa = new Button("✕");
             {
@@ -1057,22 +1091,24 @@ public class GUI_QuanLyBanHangController {
 
         Alert confirm = new Alert(AlertType.CONFIRMATION, "Xác nhận thanh toán hóa đơn với tổng số tiền: " + String.format("%,.0f ₫", tongTienDon + thueVatDon) + " ?", ButtonType.YES, ButtonType.NO);
         confirm.showAndWait();
-        if (confirm.getResult() != ButtonType.YES) return;
-        
+        if (confirm.getResult() != ButtonType.YES) {
+			return;
+		}
+
         NhanVien user = GUI_TrangChuController.getNhanVienDangNhap();
         if (user == null) {
             user = new NhanVien("NV001", "testuser", "123", "Nhân Viên Test", "Nhân viên", "Ca 1", "0123",1);
         }
-        
+
         String maHD = daoHoaDon.generateMaHoaDon();
         String pMethod = cbHinhThucThanhToanDon.getValue() != null ? cbHinhThucThanhToanDon.getValue().toString() : "";
-        String dbHinhThuc = pMethod.equals("Chuyển khoản") ? "CHUYEN_KHOAN" : 
+        String dbHinhThuc = pMethod.equals("Chuyển khoản") ? "CHUYEN_KHOAN" :
                             pMethod.equals("Thẻ tín dụng") ? "THE" : "TIEN_MAT";
 
         // --- FIX thueVAT: DB lưu 8.0 = 8%, KHÔNG phải 0.08 ---
         HoaDon hd = new HoaDon(maHD, Timestamp.valueOf(LocalDateTime.now()), 8.0, dbHinhThuc, "Bán hóa đơn theo đơn thuốc", user, currentKhachHang);
         hd.setLoaiBan("BAN_THEO_DON"); // Tường minh set BAN_THEO_DON
-        
+
         List<ChiTietHoaDon> dsCT = new ArrayList<>();
         for (CartItem item : cartDataDon) {
             String maLo = item.maLoThuoc != null ? item.maLoThuoc
@@ -1092,15 +1128,16 @@ public class GUI_QuanLyBanHangController {
             ct.setSoLuongTruKho(soLuongCoBan);
             dsCT.add(ct);
         }
-        
+
         boolean ok = daoHoaDon.thanhToan(hd, dsCT);
         if (ok) {
+            DAO_NhatKyHoatDong.ghiLog("TAO_HOA_DON", "Hóa Đơn", hd.getMaHoaDon(), "Tạo hóa đơn bán theo đơn: " + hd.getMaHoaDon());
             // INSERT DonThuoc nếu donThuocTemp != null
             if (donThuocTemp != null) {
                 donThuocTemp.setMaHoaDon(maHD);
                 daoDonThuoc.themDonThuoc(donThuocTemp);
             }
-            
+
             if (currentKhachHang != null) {
                 int diemCong = (int) ((tongTienDon + thueVatDon) / 1000);
                 daoKhachHang.capNhatDiemTichLuy(currentKhachHang.getMaKhachHang(), currentKhachHang.getDiemTichLuy() + diemCong);
@@ -1219,13 +1256,13 @@ public class GUI_QuanLyBanHangController {
             this.donThuocTemp.setThongTinBenhNhan(dtCu.getThongTinBenhNhan());
             this.donThuocTemp.setChanDoan(dtCu.getChanDoan());
             this.donThuocTemp.setHinhAnhDon(dtCu.getHinhAnhDon());
-            
-     
+
+
             if (hinhAnhTaiLapPending != null) {
-              
-                this.donThuocTemp.setHinhAnhDon(dtCu.getHinhAnhDon()); 
-               
-          
+
+                this.donThuocTemp.setHinhAnhDon(dtCu.getHinhAnhDon());
+
+
             }
 
             try {
@@ -1256,9 +1293,9 @@ public class GUI_QuanLyBanHangController {
                         dv.setMaQuyDoi(maQuyDoi);
                         dv.setMaThuoc(maThuoc);
                         dv.setTenDonVi(tenDonVi);
-                        
+
                         CartItem item = new CartItem(thuoc, dv, soLuong, donGia, maBangGia);
-                        
+
                         // Cực quan trọng: Chọn lại lô FEFO hiện tại, bỏ qua lô của đơn cũ
                         String maLo = daoLoThuoc.getLoFEFO(maThuoc);
                         if (maLo != null) {

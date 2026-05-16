@@ -1,5 +1,8 @@
 package gui.main;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import dao.DAO_Thuoc;
 import entity.Thuoc;
 import gui.dialogs.Dialog_SuaThuocController;
@@ -30,9 +33,6 @@ import utils.AlertUtils;
 import utils.DoiTraSession;
 import utils.SceneUtils;
 import utils.WindowUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 public class GUI_DanhMucThuocController {
     @FXML private TableView<Thuoc> tableThuoc;
@@ -169,10 +169,7 @@ public class GUI_DanhMucThuocController {
         String keyword = txtTimKiem.getText() == null ? "" : txtTimKiem.getText().toLowerCase();
 
         filteredData.setPredicate(t -> {
-            if (keyword.isEmpty()) {
-                return true;
-            }
-            if (t.getMaThuoc() != null && t.getMaThuoc().toLowerCase().contains(keyword)) {
+            if (keyword.isEmpty() || (t.getMaThuoc() != null && t.getMaThuoc().toLowerCase().contains(keyword))) {
                 return true;
             }
             if (t.getTenThuoc() != null && t.getTenThuoc().toLowerCase().contains(keyword)) {

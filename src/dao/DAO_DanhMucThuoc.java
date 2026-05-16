@@ -9,20 +9,20 @@ import connectDB.ConnectDB;
 import entity.DanhMucThuoc;
 
 public class DAO_DanhMucThuoc {
-    
+
     // Hàm lấy toàn bộ danh mục thuốc từ CSDL
     public ArrayList<DanhMucThuoc> getAllDanhMuc() {
         ArrayList<DanhMucThuoc> list = new ArrayList<>();
         String sql = "SELECT * FROM DanhMucThuoc";
-        
+
         // ĐƯA CONNECTION RA NGOÀI TRY
         Connection con = ConnectDB.getConnection();
-        
+
         try {
             // CHỈ ĐỂ PreparedStatement VÀ ResultSet VÀO TRONG
             try (PreparedStatement pst = con.prepareStatement(sql);
                  ResultSet rs = pst.executeQuery()) {
-                 
+
                 while (rs.next()) {
                     DanhMucThuoc dm = new DanhMucThuoc(
                         rs.getString("maDanhMuc"),

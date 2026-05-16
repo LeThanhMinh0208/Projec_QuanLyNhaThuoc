@@ -10,9 +10,9 @@ public class PhieuDoiTra {
     private double phiPhat;
     private String ketQuaDoiSanPham;
     private String danhSachThuocDoi;
-    
+
     // Sử dụng Object thay vì String để đúng quan hệ trong sơ đồ lớp
-    private HoaDon hoaDon; 
+    private HoaDon hoaDon;
     private NhanVien nhanVien;
     private KhachHang khachHang;
 

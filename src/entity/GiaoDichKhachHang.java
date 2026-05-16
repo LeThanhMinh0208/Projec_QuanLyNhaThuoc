@@ -49,7 +49,9 @@ public class GiaoDichKhachHang {
         this.sdtKhachHang = sdtKhachHang;
     }
     public String getHinhThucLabel() {
-        if (hinhThucThanhToan == null) return "Tiền mặt";
+        if (hinhThucThanhToan == null) {
+			return "Tiền mặt";
+		}
         switch (hinhThucThanhToan) {
             case "CHUYEN_KHOAN": return "Chuyển khoản";
             case "THE": return "Thẻ tín dụng";
