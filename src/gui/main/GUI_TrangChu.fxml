@@ -132,7 +132,7 @@
                            <VBox styleClass="dropdown-content">
                               <Button fx:id="btnDoanhThu" onAction="#handleMoThongKeDoanhThu" styleClass="sub-btn" text="Thống Kê Doanh Thu" />
                               <Button fx:id="btnHangHoa" styleClass="sub-btn" text="Thống Kê Hàng Hóa" />
-                              <Button fx:id="btnTonKho" styleClass="sub-btn" text="Thống Kê Tồn Kho" />
+                              <Button fx:id="btnTonKho" onAction="#handleMoThongKeTonKho" styleClass="sub-btn" text="Thống Kê Tồn Kho" />
                            </VBox>
                         </content>
                      </TitledPane>
