@@ -229,12 +229,12 @@
 }
 .btn-save:hover { -fx-background-color: linear-gradient(to right, #60a5fa, #3b82f6); }
 .btn-cancel {
-    -fx-background-color: white;
-    -fx-border-color: #cbd5e1;
+    -fx-background-color: linear-gradient(to bottom, #ef4444, #dc2626);
+    -fx-border-color: transparent;
     -fx-border-radius: 8;
-    -fx-text-fill: #475569;
+    -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
     -fx-cursor: hand;
 }
-.btn-cancel:hover { -fx-background-color: #f1f5f9; }
+.btn-cancel:hover { -fx-background-color: linear-gradient(to bottom, #dc2626, #b91c1c); }

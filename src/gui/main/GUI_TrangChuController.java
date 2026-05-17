@@ -287,6 +287,10 @@ public class GUI_TrangChuController {
 
     public void chuyenTrangVaHighlight(String fxmlPath, String buttonTextToMatch) {
         switchPage(fxmlPath);
+        highlightSidebar(buttonTextToMatch);
+    }
+
+    public void highlightSidebar(String buttonTextToMatch) {
         javafx.application.Platform.runLater(() -> {
             if (mainBorderPane.getScene() != null) {
                 Parent root = mainBorderPane.getScene().getRoot();

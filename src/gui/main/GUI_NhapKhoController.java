@@ -122,6 +122,10 @@ public class GUI_NhapKhoController {
 
         listChiTietHienTai = daoDon.getChiTietByMaDon(don.getMaDonDatHang());
         
+        for (ChiTietDonDatHang ct : listChiTietHienTai) {
+            ct.setSoLuongDaNhan(ct.getSoLuongDat());
+        }
+        
         tableNhapKho.setItems(FXCollections.observableArrayList(listChiTietHienTai));
         tinhToanTongTienHienThi();
     }
@@ -490,6 +494,16 @@ public class GUI_NhapKhoController {
 
     private void setupTableDanhSachPhieuNhap() {
         if (tablePhieuNhap == null) return;
+
+        tablePhieuNhap.setRowFactory(tv -> {
+            javafx.scene.control.TableRow<PhieuNhap> row = new javafx.scene.control.TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    moDialogChiTietPhieuNhap(row.getItem());
+                }
+            });
+            return row;
+        });
 
         colMaPhieuNhap.setCellValueFactory(new PropertyValueFactory<>("maPhieuNhap"));
         colMaPhieuNhap.setStyle("-fx-alignment: CENTER; -fx-font-weight: bold;");

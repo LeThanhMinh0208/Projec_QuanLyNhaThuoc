@@ -50,6 +50,16 @@ public class GUI_QuanLyDonDatHangController {
     }
 
     private void setupTable() {
+        tableDonDat.setRowFactory(tv -> {
+            javafx.scene.control.TableRow<DonDatHang> row = new javafx.scene.control.TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    moDialogChiTiet(row.getItem());
+                }
+            });
+            return row;
+        });
+
         colMaDon.setCellValueFactory(new PropertyValueFactory<>("maDonDatHang"));
         colMaDon.setStyle("-fx-alignment: CENTER; -fx-font-weight: bold;");
 
@@ -234,11 +244,13 @@ public class GUI_QuanLyDonDatHangController {
             if (scene.getRoot() instanceof javafx.scene.layout.BorderPane) {
                 javafx.scene.layout.BorderPane mainLayout = (javafx.scene.layout.BorderPane) scene.getRoot();
                 mainLayout.setCenter(rootNhapKho);
+                gui.main.GUI_TrangChuController.getInstance().highlightSidebar("Nhập Kho");
             }
             else if (scene.getRoot() instanceof javafx.scene.layout.StackPane) {
                 javafx.scene.layout.StackPane mainLayout = (javafx.scene.layout.StackPane) scene.getRoot();
                 mainLayout.getChildren().clear();
                 mainLayout.getChildren().add(rootNhapKho);
+                gui.main.GUI_TrangChuController.getInstance().highlightSidebar("Nhập Kho");
             } else {
                 System.out.println("❌ Không tương thích: Root không phải BorderPane hay StackPane!");
             }

@@ -277,19 +277,19 @@
 
 /* Nút Đóng / Hủy Bỏ */
 .btn-close {
-    -fx-background-color: #ffffff;
-    -fx-text-fill: #64748b;
+    -fx-background-color: linear-gradient(to bottom, #ef4444, #dc2626);
+    -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-background-radius: 30; /* Viên thuốc */
-    -fx-border-color: #cbd5e1;
+    -fx-border-color: transparent;
     -fx-border-radius: 30;     /* Bo luôn viền */
     -fx-cursor: hand;
     -fx-font-size: 15px;
 }
 .btn-close:hover { 
-    -fx-background-color: #f8fafc; 
-    -fx-border-color: #94a3b8;
-    -fx-text-fill: #0f172a;
+    -fx-background-color: linear-gradient(to bottom, #dc2626, #b91c1c); 
+    -fx-border-color: transparent;
+    -fx-text-fill: white;
 }
 
 /* Nút Hủy Đơn (Đỏ nguy hiểm) */

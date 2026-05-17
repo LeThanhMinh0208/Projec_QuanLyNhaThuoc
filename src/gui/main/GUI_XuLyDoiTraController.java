@@ -169,6 +169,16 @@ public class GUI_XuLyDoiTraController {
     }
 
     private void setupTablePhieuDoiTra() {
+        tablePhieuDoiTra.setRowFactory(tv -> {
+            javafx.scene.control.TableRow<PhieuDoiTraView> row = new javafx.scene.control.TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    moChiTietPhieuDoiTra(row.getItem());
+                }
+            });
+            return row;
+        });
+
         colChiTietPDT.setCellFactory(col -> new TableCell<>() {
             private final Button btnChiTiet = new Button("Xem");
             {

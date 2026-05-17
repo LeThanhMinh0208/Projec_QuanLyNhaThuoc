@@ -115,6 +115,16 @@ public class GUI_QuanLyBangGiaController {
     // SETUP
     // ============================================================
     private void setupTableDanhSach() {
+        tableBangGia.setRowFactory(tv -> {
+            javafx.scene.control.TableRow<entity.BangGia> row = new javafx.scene.control.TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    moDialogChiTiet(row.getItem());
+                }
+            });
+            return row;
+        });
+
         colMaBangGia .setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getMaBangGia()));
         colTenBangGia.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTenBangGia()));
         colLoai      .setCellValueFactory(d -> new SimpleStringProperty(

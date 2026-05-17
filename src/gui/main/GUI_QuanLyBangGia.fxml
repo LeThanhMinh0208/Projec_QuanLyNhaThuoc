@@ -169,8 +169,8 @@
 
                     <!-- Nút lưu -->
                     <HBox alignment="CENTER_RIGHT" spacing="12.0">
-                        <Button fx:id="btnQuayLai2" text="Hủy" onAction="#handleQuayLaiDanhSach" styleClass="bh-btn-secondary"
-                                prefHeight="44.0" prefWidth="120.0" />
+                        <Button fx:id="btnQuayLai2" text="Hủy" onAction="#handleQuayLaiDanhSach" styleClass="dialog-btn-cancel"
+                                prefHeight="35" prefWidth="100"/>
                         <Button text="💾  Lưu Bảng Giá" onAction="#handleLuuBangGia"
                                 styleClass="bh-btn-success" prefHeight="44.0" prefWidth="180.0" />
                     </HBox>

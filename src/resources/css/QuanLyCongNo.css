@@ -179,14 +179,18 @@
 
 /* Nút hủy/Đóng */
 .btn-dialog-cancel, .cn-btn-secondary {
-    -fx-background-color: #f1f5f9;
-    -fx-text-fill: #475569;
+    -fx-background-color: linear-gradient(to bottom, #ef4444, #dc2626);
+    -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-background-radius: 25px;
-    -fx-border-color: #cbd5e1;
+    -fx-border-color: transparent;
     -fx-border-radius: 25px;
     -fx-cursor: hand;
     -fx-padding: 10 25;
+}
+
+.btn-dialog-cancel:hover, .cn-btn-secondary:hover {
+    -fx-background-color: linear-gradient(to bottom, #dc2626, #b91c1c);
 }
 
 /* --- 6. TABS CHUYỂN TRANG --- */

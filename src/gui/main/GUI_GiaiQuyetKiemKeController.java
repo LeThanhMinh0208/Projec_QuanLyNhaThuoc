@@ -55,6 +55,16 @@ public class GUI_GiaiQuyetKiemKeController {
     }
 
     private void setupTableDS() {
+        tableDanhSach.setRowFactory(tv -> {
+            javafx.scene.control.TableRow<PhieuKiemKe> row = new javafx.scene.control.TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    handleAction(row.getItem());
+                }
+            });
+            return row;
+        });
+
         colMaPhieu.setCellValueFactory(new PropertyValueFactory<>("maPhieuKiemKe"));
         colNguoiLap.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getNhanVienTao().getHoTen()));
         colNgayTao.setCellValueFactory(c -> new SimpleStringProperty(sdf.format(c.getValue().getNgayTao())));
@@ -88,9 +98,11 @@ public class GUI_GiaiQuyetKiemKeController {
                 if ("CHO_DUYET".equals(pk.getTrangThai())) {
                     btn.setText("Giải Quyết");
                     btn.getStyleClass().add("btn-giai-quyet");
+                    btn.setStyle("-fx-background-color: #ffedd5; -fx-text-fill: #ea580c;");
                 } else {
                     btn.setText("Xem Chi Tiết");
                     btn.getStyleClass().add("btn-xem-chi-tiet");
+                    btn.setStyle("-fx-background-color: #e0f2fe; -fx-text-fill: #0284c7;");
                 }
                 setGraphic(btn);
                 setAlignment(Pos.CENTER);

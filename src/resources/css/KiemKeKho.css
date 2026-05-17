@@ -338,8 +338,19 @@
     -fx-text-fill: #0284c7;
 }
 /* Chống đổi màu chữ nút bấm khi dòng bị bôi xanh */
-.table-row-cell:selected .btn-giai-quyet { -fx-text-fill: #ea580c !important; }
-.table-row-cell:selected .btn-xem-chi-tiet { -fx-text-fill: #0284c7 !important; }
+.table-row-cell:selected .btn-giai-quyet,
+.table-row-cell:selected .btn-giai-quyet .label,
+.table-row-cell:selected .btn-giai-quyet .text { 
+    -fx-text-fill: #ea580c !important; 
+    -fx-fill: #ea580c !important;
+}
+
+.table-row-cell:selected .btn-xem-chi-tiet,
+.table-row-cell:selected .btn-xem-chi-tiet .label,
+.table-row-cell:selected .btn-xem-chi-tiet .text { 
+    -fx-text-fill: #0284c7 !important; 
+    -fx-fill: #0284c7 !important;
+}
 
 /* CHUYỂN MÀU CỘT CHÊNH LỆCH SANG CSS */
 .text-lech-am { -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-alignment: CENTER; }
