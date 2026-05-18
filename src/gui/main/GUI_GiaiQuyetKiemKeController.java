@@ -98,12 +98,11 @@ public class GUI_GiaiQuyetKiemKeController {
                 if ("CHO_DUYET".equals(pk.getTrangThai())) {
                     btn.setText("Giải Quyết");
                     btn.getStyleClass().add("btn-giai-quyet");
-                    btn.setStyle("-fx-background-color: #ffedd5; -fx-text-fill: #ea580c;");
                 } else {
                     btn.setText("Xem Chi Tiết");
                     btn.getStyleClass().add("btn-xem-chi-tiet");
-                    btn.setStyle("-fx-background-color: #e0f2fe; -fx-text-fill: #0284c7;");
                 }
+                btn.setStyle("");
                 setGraphic(btn);
                 setAlignment(Pos.CENTER);
             }

@@ -48,23 +48,35 @@
 }
 
 /* --- NÚT BẤM DÁNG VIÊN THUỐC (ĐÃ GỘP CLASS) --- */
-.btn-green-pill { 
-    -fx-background-color: linear-gradient(to bottom, #10b981, #059669); 
+.btn-green-pill {
+    -fx-background-color: linear-gradient(to bottom, #34d399, #059669);
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-font-size: 14px;
     -fx-background-radius: 30;
     -fx-cursor: hand;
-    -fx-font-weight: 900;
-    -fx-text-fill: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(5, 150, 105, 0.3), 10, 0, 0, 4);
 }
-.btn-green-pill:hover { -fx-translate-y: -2px; }
+.btn-green-pill:hover {
+    -fx-background-color: linear-gradient(to bottom, #10b981, #047857);
+}
 
-.btn-refresh-pill { 
-    -fx-background-color: linear-gradient(to bottom, #3b82f6, #1d4ed8); 
+.btn-refresh-pill {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #475569;
+    -fx-font-weight: 800;
+    -fx-font-size: 13px;
     -fx-background-radius: 30;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 30;
+    -fx-border-width: 1.5;
     -fx-cursor: hand;
-    -fx-font-weight: 900;
-    -fx-text-fill: white;
 }
-.btn-refresh-pill:hover { -fx-translate-y: -2px; }
+.btn-refresh-pill:hover {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #94a3b8;
+    -fx-text-fill: #0f172a;
+}
 
 .btn-clear-red {
     -fx-background-color: #fee2e2;

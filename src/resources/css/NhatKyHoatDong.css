@@ -7,6 +7,13 @@
 
 .main-bg { -fx-background-color: #f0f9ff; }
 
+.xk-title-line {
+    -fx-background-color: #38bdf8;
+    -fx-min-height: 4px;
+    -fx-max-height: 4px;
+    -fx-background-radius: 2px;
+}
+
 .main-title {
     -fx-font-size: 32px;
     -fx-font-weight: 900;
@@ -60,18 +67,18 @@
 }
 
 .bh-btn-secondary {
-    -fx-background-color: #f1f5f9;
+    -fx-background-color: #ffffff;
     -fx-text-fill: #475569;
     -fx-font-weight: bold;
     -fx-font-size: 13px;
-    -fx-background-radius: 20;
+    -fx-background-radius: 30;
     -fx-cursor: hand;
     -fx-padding: 6 15;
-    -fx-border-color: #e2e8f0;
-    -fx-border-radius: 20;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 30;
     -fx-border-width: 1.5;
 }
-.bh-btn-secondary:hover { -fx-background-color: #e2e8f0; }
+.bh-btn-secondary:hover { -fx-background-color: #f8fafc; -fx-border-color: #94a3b8; }
 
 .bh-btn-primary {
     -fx-background-color: linear-gradient(to bottom, #0ea5e9, #0284c7);

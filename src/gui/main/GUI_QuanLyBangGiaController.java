@@ -169,13 +169,20 @@ public class GUI_QuanLyBangGiaController {
             private final HBox box = new HBox(8, btnXem, btnVHH);
             {
                 box.setAlignment(javafx.geometry.Pos.CENTER);
-                
-                // Style nút Xem: Nền xanh pastel nhạt, chữ xanh đậm (Giống hệt Ảnh 2)
-                btnXem.setStyle("-fx-background-color: #e0f2fe; -fx-text-fill: #0284c7; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20; -fx-cursor: hand;");
-                
-                // Style nút Vô hiệu: Nền đỏ pastel nhạt, chữ đỏ đậm (Đồng bộ form với nút Xem)
-                btnVHH.setStyle("-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20; -fx-cursor: hand;");
-                
+
+                final String styleXemNormal = "-fx-background-color: #e0f2fe; -fx-text-fill: #0284c7; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20; -fx-cursor: hand;";
+                final String styleXemHover  = "-fx-background-color: #0ea5e9; -fx-text-fill: white;   -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20; -fx-cursor: hand;";
+                final String styleVhhNormal = "-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20; -fx-cursor: hand;";
+                final String styleVhhHover  = "-fx-background-color: #ef4444; -fx-text-fill: white;   -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20; -fx-cursor: hand;";
+
+                btnXem.setStyle(styleXemNormal);
+                btnXem.setOnMouseEntered(e -> btnXem.setStyle(styleXemHover));
+                btnXem.setOnMouseExited(e  -> btnXem.setStyle(styleXemNormal));
+
+                btnVHH.setStyle(styleVhhNormal);
+                btnVHH.setOnMouseEntered(e -> { if (!btnVHH.isDisabled()) btnVHH.setStyle(styleVhhHover); });
+                btnVHH.setOnMouseExited(e  -> { if (!btnVHH.isDisabled()) btnVHH.setStyle(styleVhhNormal); });
+
                 btnXem.setOnAction(e -> moDialogChiTiet(getTableView().getItems().get(getIndex())));
                 btnVHH.setOnAction(e -> handleVoHieuHoa(getTableView().getItems().get(getIndex())));
             }

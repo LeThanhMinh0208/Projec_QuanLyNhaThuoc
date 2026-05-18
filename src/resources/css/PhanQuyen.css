@@ -7,6 +7,13 @@
 
 .main-bg { -fx-background-color: #f0f9ff; }
 
+.xk-title-line {
+    -fx-background-color: #38bdf8;
+    -fx-min-height: 4px;
+    -fx-max-height: 4px;
+    -fx-background-radius: 2px;
+}
+
 .main-title {
     -fx-font-size: 32px;
     -fx-font-weight: 900;

@@ -27,7 +27,7 @@
                   <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
                      <image><Image url="@../../resources/icons/icon_thuoc.png" /></image>
                   </ImageView>
-                  <Label prefWidth="180.0" styleClass="sidebar-logo" text="LONG NGUYÊN" />
+                  <Label styleClass="sidebar-logo" text="LONG NGUYÊN" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
                </children>
             </HBox>
 

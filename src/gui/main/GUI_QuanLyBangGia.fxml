@@ -23,7 +23,7 @@
         <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity">
             <children>
                 <Label styleClass="main-title" text="QUẢN LÝ BẢNG GIÁ" />
-                <Region prefHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+                <Region maxWidth="Infinity" styleClass="xk-title-line" />
             </children>
         </VBox>
     </HBox>
@@ -84,8 +84,8 @@
             <HBox alignment="CENTER_LEFT" spacing="15.0" VBox.vgrow="NEVER">
                 <Button fx:id="btnQuayLai1" text="← Quay Lại" onAction="#handleQuayLaiDanhSach" styleClass="bh-btn-secondary"
                         prefHeight="40.0" />
-                <Label text="TẠO BẢNG GIÁ MỚI" styleClass="bh-section-title"
-                       style="-fx-font-size:18px;" />
+                <Label text="TẠO BẢNG GIÁ MỚI" styleClass="main-title"
+                       style="-fx-font-size:28px; -fx-padding: 2 0 2 0;" />
             </HBox>
 
             <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"

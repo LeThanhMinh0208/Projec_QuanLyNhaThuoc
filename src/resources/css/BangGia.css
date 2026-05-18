@@ -3,6 +3,13 @@
    Tái dùng TrangChu.css + BanHang.css làm base
    ============================================================ */
 
+.xk-title-line {
+    -fx-background-color: #38bdf8;
+    -fx-min-height: 4px;
+    -fx-max-height: 4px;
+    -fx-background-radius: 2px;
+}
+
 /* --- BADGE TRẠNG THÁI BẢNG GIÁ --- */
 .bg-badge-active {
     -fx-background-color: #dcfce7;
