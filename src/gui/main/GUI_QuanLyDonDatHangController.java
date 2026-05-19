@@ -81,6 +81,8 @@ public class GUI_QuanLyDonDatHangController {
             {
                 btnXem.setStyle("-fx-background-color: #e0f2fe; -fx-text-fill: #0284c7; -fx-background-radius: 20; -fx-font-weight: bold; -fx-cursor: hand;");
                 btnXem.setPrefWidth(70);
+                btnXem.setOnMouseEntered(e -> btnXem.setStyle("-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-background-radius: 20; -fx-font-weight: bold; -fx-cursor: hand;"));
+                btnXem.setOnMouseExited(e -> btnXem.setStyle("-fx-background-color: #e0f2fe; -fx-text-fill: #0284c7; -fx-background-radius: 20; -fx-font-weight: bold; -fx-cursor: hand;"));
             }
             @Override
             protected void updateItem(Void item, boolean empty) {

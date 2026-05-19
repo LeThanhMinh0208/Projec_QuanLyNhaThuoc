@@ -94,7 +94,6 @@ public class DAO_KiemKeKho {
     }
 
     public List<PhieuKiemKe> getAllPhieuGiaiQuyet(String tuKhoa) {
-        xuLyPhieuNgamQua48h(); 
         List<PhieuKiemKe> list = new ArrayList<>();
         String sql = "SELECT p.*, nv.hoTen FROM PhieuKiemKe p JOIN NhanVien nv ON p.maNhanVienTao = nv.maNhanVien WHERE p.trangThai != 'DANG_KIEM_KE' AND (p.maPhieuKiemKe LIKE ? OR nv.hoTen LIKE ?) ORDER BY p.ngayTao DESC";
         try (Connection con = ConnectDB.getInstance().getConnection(); PreparedStatement pst = con.prepareStatement(sql)) {

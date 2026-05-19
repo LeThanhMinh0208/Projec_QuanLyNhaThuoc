@@ -216,15 +216,16 @@
 /* === SEARCH === */
 .search-box {
     -fx-background-color: white;
-    -fx-background-radius: 40px;
-    -fx-border-color: #cbd5e1;
+    -fx-background-radius: 25px;
+    -fx-border-color: #bae6fd;
     -fx-border-width: 1.5px;
-    -fx-border-radius: 40px;
-    -fx-padding: 4 20;
+    -fx-border-radius: 25px;
+    -fx-padding: 0 15 0 15;
 }
 .search-box:focused-within {
     -fx-border-color: #0ea5e9;
-    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.2), 10, 0, 0, 3);
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.3), 12, 0, 0, 0);
 }
 .search-input {
     -fx-background-color: transparent;

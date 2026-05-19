@@ -43,14 +43,16 @@ public class GUI_GiaiQuyetKiemKeController {
     private ObservableList<ChiTietDuyetUI> dsChiTiet = FXCollections.observableArrayList();
     private String currentMaPhieu;
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    private boolean daThinhToan = false;
 
     private final List<String> lyDoThieu = List.of("Thuốc hư hỏng", "Thất thoát", "Nhân viên quên lập hóa đơn", "Khác");
     private final List<String> lyDoThua = List.of("Quên lập phiếu nhập", "NCC giao dư", "Thuốc còn sót lại", "Nhân viên nhầm lẫn", "Khác");
 
     @FXML
     public void initialize() {
+        dao.xuLyPhieuNgamQua48h();
         setupTableDS();
-        setupTableDuyet(); 
+        setupTableDuyet();
         loadDanhSach();
     }
 
@@ -234,6 +236,7 @@ public class GUI_GiaiQuyetKiemKeController {
     private void handleAction(PhieuKiemKe pk) {
         if ("CHO_DUYET".equals(pk.getTrangThai())) {
             currentMaPhieu = pk.getMaPhieuKiemKe();
+            daThinhToan = false;
             viewDanhSach.setVisible(false); viewDanhSach.setManaged(false);
             viewDuyet.setVisible(true); viewDuyet.setManaged(true);
             loadDuLieuDuyet(pk);
@@ -297,12 +300,14 @@ public class GUI_GiaiQuyetKiemKeController {
                 ui.chenhLech = ui.soLuongKiemTra - ui.tonKyVongDong;
             }
             tableChiTiet.refresh();
+            daThinhToan = true;
             kiemTraNutXacNhan();
             AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã chốt Số lượng Kỳ vọng thời gian thực!");
         } catch (Exception e) { e.printStackTrace(); }
     }
 
     private void kiemTraNutXacNhan() {
+        if (!daThinhToan) { btnXacNhan.setDisable(true); return; }
         boolean allValid = true;
         for (ChiTietDuyetUI ui : dsChiTiet) {
             if (ui.chenhLech != 0 && (ui.lyDoLech == null || ui.lyDoLech.trim().isEmpty() || "Khớp số".equals(ui.lyDoLech))) {
@@ -344,17 +349,19 @@ public class GUI_GiaiQuyetKiemKeController {
         
         Optional<ButtonType> rs = confirm.showAndWait();
         if (rs.isPresent() && rs.get() == ButtonType.YES) {
-            String sql = "UPDATE PhieuKiemKe SET trangThai = 'DA_HUY' WHERE maPhieuKiemKe = ?";
+            String sqlUnlock = "UPDATE LoThuoc SET isLockedForAudit = 0 WHERE maLoThuoc IN (SELECT maLoThuoc FROM ChiTietPhieuKiemKe WHERE maPhieuKiemKe = ?)";
+            String sqlHuy    = "UPDATE PhieuKiemKe SET trangThai = 'DA_HUY' WHERE maPhieuKiemKe = ?";
             try (Connection con = ConnectDB.getInstance().getConnection();
-                 PreparedStatement pst = con.prepareStatement(sql)) {
-                 
-                pst.setString(1, currentMaPhieu);
-                if (pst.executeUpdate() > 0) {
-                    AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã hủy phiếu kiểm kê!");
-                    handleQuayLai(null); // Quay lại trang danh sách
-                } else {
-                    AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể hủy phiếu kiểm kê!");
-                }
+                 PreparedStatement pstUnlock = con.prepareStatement(sqlUnlock);
+                 PreparedStatement pstHuy    = con.prepareStatement(sqlHuy)) {
+                con.setAutoCommit(false);
+                pstUnlock.setString(1, currentMaPhieu);
+                pstUnlock.executeUpdate();
+                pstHuy.setString(1, currentMaPhieu);
+                pstHuy.executeUpdate();
+                con.commit();
+                AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã hủy phiếu kiểm kê!");
+                handleQuayLai(null);
             } catch (Exception e) {
                 e.printStackTrace();
                 AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi Database", "Lỗi trong quá trình hủy phiếu!");

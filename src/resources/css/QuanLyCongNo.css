@@ -33,15 +33,17 @@
 .cn-search-box, .cn-search-container {
     -fx-background-color: white;
     -fx-background-radius: 25px;
-    -fx-border-color: #cbd5e1;
+    -fx-border-color: #bae6fd;
+    -fx-border-width: 1.5px;
     -fx-border-radius: 25px;
     -fx-padding: 0 15 0 15;
-    -fx-alignment: CENTER_LEFT; /* Căn giữa kính lúp và chữ */
+    -fx-alignment: CENTER_LEFT;
 }
 
 .cn-search-box:focused-within, .cn-search-container:focused-within {
     -fx-border-color: #0ea5e9;
     -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.3), 12, 0, 0, 0);
 }
 
 .cn-search-input {
