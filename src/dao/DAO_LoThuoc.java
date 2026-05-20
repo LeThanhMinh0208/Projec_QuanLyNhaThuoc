@@ -275,6 +275,42 @@ public class DAO_LoThuoc {
         return result;
     }
     
+    public List<LoThuoc> getTatCaLoThuocChoXuatHuy(String maThuoc) {
+        List<LoThuoc> list = new ArrayList<>();
+        // Bao gồm cả lô hết hạn (trangThai = 0) để cho phép xuất hủy
+        String sql = "SELECT * FROM LoThuoc WHERE maThuoc = ? AND soLuongTon > 0 ORDER BY hanSuDung ASC";
+
+        connectDB.ConnectDB.getInstance();
+        try (Connection con = ConnectDB.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+
+            pst.setString(1, maThuoc);
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
+                LoThuoc lo = new LoThuoc();
+                lo.setMaLoThuoc(rs.getString("maLoThuoc"));
+                lo.setSoLuongTon(rs.getInt("soLuongTon"));
+                lo.setHanSuDung(rs.getDate("hanSuDung"));
+                lo.setNgaySanXuat(rs.getDate("ngaySanXuat"));
+                lo.setViTriKho(rs.getString("viTriKho"));
+                lo.setGiaNhap(rs.getDouble("giaNhap"));
+                lo.setTrangThai(rs.getInt("trangThai"));
+
+                String maNCC = rs.getString("maNhaCungCap");
+                if (maNCC != null) {
+                    NhaCungCap ncc = new NhaCungCap();
+                    ncc.setMaNhaCungCap(maNCC);
+                    lo.setNhaCungCap(ncc);
+                }
+                list.add(lo);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     public List<LoThuoc> getTatCaLoThuocTraNCC(String maThuoc) {
         List<LoThuoc> list = new ArrayList<>();
         String sql = "SELECT * FROM LoThuoc WHERE maThuoc = ? AND soLuongTon > 0 AND trangThai = 1 ORDER BY hanSuDung ASC";
