@@ -8,6 +8,9 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 
 import dao.DAO_ThongKeTonKho;
 import javafx.application.Platform;
@@ -62,6 +65,12 @@ public class GUI_ThongKeTonKhoController {
     private final DAO_ThongKeTonKho dao = new DAO_ThongKeTonKho();
     private final DecimalFormat df = new DecimalFormat("#,##0");
     private boolean suppressAutoReload = false;
+    
+    // Thread management để tránh race condition
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private AtomicLong lastRequestId = new AtomicLong(0);
+    private long currentExecutingRequestId = -1;
+    private boolean isActive = true; // Flag để ngăn update UI khi controller bị replace
 
     private LocalDate currentTuNgay;
     private LocalDate currentDenNgay;
@@ -89,6 +98,17 @@ public class GUI_ThongKeTonKhoController {
         setupTables();
         setupAutoReload();
         loadDataThongKe();
+    }
+
+    /**
+     * Dừng tất cả background tasks khi controller bị thay thế
+     * (Gọi này từ SceneUtils trước khi load trang mới)
+     */
+    public void stopBackgroundTasks() {
+        isActive = false;
+        if (executorService != null && !executorService.isShutdown()) {
+            executorService.shutdownNow();
+        }
     }
 
     private void setupAutoReload() {
@@ -229,8 +249,11 @@ public class GUI_ThongKeTonKhoController {
         currentDenNgay = reportDenNgay;
         currentDanhMuc = reportDanhMuc;
         currentTrangThaiTon = reportTrangThaiTon;
+        
+        // Tạo ID request độc nhất để tracking
+        final long requestId = lastRequestId.incrementAndGet();
 
-        new Thread(() -> {
+        executorService.submit(() -> {
             try {
                 Map<String, Object> tongQuan = dao.getTongQuan(reportDanhMuc, nguongTonThap, soNgayHetHan);
                 List<Map<String, Object>> tonKhoTheoDanhMuc = dao.getTonKhoTheoDanhMuc(reportDanhMuc);
@@ -243,8 +266,20 @@ public class GUI_ThongKeTonKhoController {
                 currentBienDongTonKho = bienDong;
                 currentTopTonKho = topTonKho;
                 currentLoSapHetHan = loSapHetHan;
+                
+                // Kiểm tra xem request này có phải là request mới nhất không
+                if (requestId != lastRequestId.get() || !isActive) {
+                    return;
+                }
+                
+                currentExecutingRequestId = requestId;
 
                 Platform.runLater(() -> {
+                    // Kiểm tra lại trước khi update UI
+                    if (currentExecutingRequestId != requestId || !isActive) {
+                        return;
+                    }
+                    
                     updateKpis(tongQuan);
                     loadCharts(reportTuNgay, reportDenNgay, tonKhoTheoDanhMuc, bienDong, topTonKho);
                     tableTopTonKho.setItems(FXCollections.observableArrayList(topTonKho));
@@ -254,7 +289,7 @@ public class GUI_ThongKeTonKhoController {
                 e.printStackTrace();
                 Platform.runLater(() -> showError("Không thể tải dữ liệu", "Đã xảy ra lỗi khi tải thống kê tồn kho."));
             }
-        }).start();
+        });
     }
 
     private void updateKpis(Map<String, Object> tongQuan) {
