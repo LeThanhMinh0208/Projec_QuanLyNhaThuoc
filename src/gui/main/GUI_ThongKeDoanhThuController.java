@@ -8,9 +8,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicLong;
 
 import dao.DAO_ThongKeDoanhThu;
 import javafx.application.Platform;
@@ -80,12 +77,6 @@ public class GUI_ThongKeDoanhThuController {
     private boolean suppressAutoReload = false;
     private LocalDate lastChangedDateValue;
     private boolean lastChangedWasTuNgay = true;
-    
-    // Thread management để tránh race condition
-    private ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private AtomicLong lastRequestId = new AtomicLong(0);
-    private long currentExecutingRequestId = -1;
-    private boolean isActive = true; // Flag để ngăn update UI khi controller bị replace
 
     // Lưu trữ dữ liệu hiện tại để xuất báo cáo
     private LocalDate currentTuNgay;
@@ -127,17 +118,6 @@ public class GUI_ThongKeDoanhThuController {
 
         // Tải dữ liệu lần đầu
         loadDataThongKe();
-    }
-
-    /**
-     * Dừng tất cả background tasks khi controller bị thay thế
-     * (Gọi này từ SceneUtils trước khi load trang mới)
-     */
-    public void stopBackgroundTasks() {
-        isActive = false;
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdownNow();
-        }
     }
 
     private void setupAutoReload() {
@@ -359,25 +339,21 @@ public class GUI_ThongKeDoanhThuController {
         currentDenNgay = reportDenNgay;
         currentLoaiBan = cbLoaiBan.getValue();
         currentHinhThuc = cbHinhThuc.getValue();
-        
-        // Tạo ID request độc nhất để tracking
-        final long requestId = lastRequestId.incrementAndGet();
-        
-        // Gửi task đến ExecutorService (single thread - đảm bảo sequential execution)
-        executorService.submit(() -> {
+
+        new Thread(() -> {
             try {
                 // Lấy dữ liệu từ DAO
-                double tongDoanhThu = daoThongKe.getTongDoanhThu(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc);
-                int tongDon = daoThongKe.getTongDonHang(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc);
-                double giaTrungBinh = daoThongKe.getGiaTrungBinh(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc);
-                int soKH = daoThongKe.getSoKhachHang(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc);
+            double tongDoanhThu = daoThongKe.getTongDoanhThu(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc);
+            int tongDon = daoThongKe.getTongDonHang(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc);
+            double giaTrungBinh = daoThongKe.getGiaTrungBinh(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc);
+            int soKH = daoThongKe.getSoKhachHang(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc);
 
-                List<Map<String, Object>> dataTheoNgay = daoThongKe.getDoanhThuTheoNgay(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc);
-                List<Map<String, Object>> dataCoCau = daoThongKe.getCoCAuDoanhThu(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc);
-                List<Map<String, Object>> dataTopSanPham = daoThongKe.getTopSanPham(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc, 10);
-                List<Map<String, Object>> topKH = daoThongKe.getTopKhachHang(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc, 5);
+            List<Map<String, Object>> dataTheoNgay = daoThongKe.getDoanhThuTheoNgay(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc);
+            List<Map<String, Object>> dataCoCau = daoThongKe.getCoCAuDoanhThu(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc);
+            List<Map<String, Object>> dataTopSanPham = daoThongKe.getTopSanPham(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc, 10);
+            List<Map<String, Object>> topKH = daoThongKe.getTopKhachHang(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc, 5);
                 List<Map<String, Object>> productDead = daoThongKe.getProductDead(90);
-                List<Map<String, Object>> thongKeHinhThuc = daoThongKe.getThongKeHinhThuc(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc);
+            List<Map<String, Object>> thongKeHinhThuc = daoThongKe.getThongKeHinhThuc(reportTuNgay, reportDenNgay, reportLoaiBan, reportHinhThuc);
 
                 // Lưu trữ dữ liệu cho export
                 currentTongDoanhThu = tongDoanhThu;
@@ -406,21 +382,8 @@ public class GUI_ThongKeDoanhThuController {
                 double percGia = calculatePercent(giaTrungBinh, prevGiaTrungBinh);
                 double percKH = calculatePercent(soKH, prevSoKH);
 
-                // Kiểm tra xem request này có phải là request mới nhất không
-                // Nếu có request mới hơn, hãy bỏ qua update UI này
-                if (requestId != lastRequestId.get() || !isActive) {
-                    return; // Bỏ qua cập nhật UI vì có request mới hơn hoặc controller đã bị replace
-                }
-                
-                currentExecutingRequestId = requestId;
-
-                // Update UI - chỉ cập nhật nếu đây là request mới nhất
+                // Update UI
                 Platform.runLater(() -> {
-                    // Kiểm tra lại trước khi update UI
-                    if (currentExecutingRequestId != requestId || !isActive) {
-                        return;
-                    }
-                    
                     lblTongDoanhThu.setText(dfCurrency.format(tongDoanhThu) + " ₫");
                     lblTongDoanhThuPercent.setText(formatPercent(percDoanhThu));
                     updatePercentStyle(lblTongDoanhThuPercent, percDoanhThu);
@@ -446,7 +409,7 @@ public class GUI_ThongKeDoanhThuController {
                 e.printStackTrace();
                 Platform.runLater(() -> showError("Không thể tải dữ liệu", "Đã xảy ra lỗi khi tải trang thống kê doanh thu."));
             }
-        });
+        }).start();
     }
 
     private void loadCharts(LocalDate tuNgay,

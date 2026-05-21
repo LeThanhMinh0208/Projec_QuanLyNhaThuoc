@@ -8,7 +8,6 @@ import javafx.scene.layout.BorderPane;
 
 public class SceneUtils {
     private static BorderPane mainControl;
-    private static Object currentController;
 
     public static void init(BorderPane borderPane) {
         mainControl = borderPane;
@@ -21,23 +20,11 @@ public class SceneUtils {
                 return;
             }
 
-            // Dừng background tasks của controller cũ
-            if (currentController != null) {
-                try {
-                    java.lang.reflect.Method stopMethod = currentController.getClass().getMethod("stopBackgroundTasks");
-                    stopMethod.invoke(currentController);
-                } catch (Exception e) {
-                    // Controller cũ không có method này - không sao
-                }
-            }
-
             FXMLLoader loader = new FXMLLoader(SceneUtils.class.getResource(fxmlPath));
             Parent root = loader.load();
 
             // Xử lý tự động load lại dữ liệu nếu trang đích là Trang Chủ
             Object controller = loader.getController();
-            currentController = controller; // Lưu reference controller mới
-            
             if (controller instanceof GUI_TrangChuController) {
                 ((GUI_TrangChuController) controller).loadDataTrangChu();
             }
