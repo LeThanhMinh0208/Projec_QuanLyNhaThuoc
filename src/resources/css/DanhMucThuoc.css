@@ -51,3 +51,18 @@
 .ds-btn-save { -fx-background-color: linear-gradient(to bottom, #3b82f6, #1d4ed8); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(29, 78, 216, 0.4), 10, 0, 0, 4); -fx-cursor: hand; }
 .ds-header-danger-area { -fx-background-color: linear-gradient(to right, #b91c1c, #ef4444, #f87171); -fx-padding: 20; -fx-background-radius: 12 12 0 0; -fx-effect: dropshadow(three-pass-box, rgba(239, 68, 68, 0.3), 15, 0, 0, 5); }
 .ds-btn-danger { -fx-background-color: linear-gradient(to bottom, #ef4444, #b91c1c); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(185, 28, 28, 0.4), 10, 0, 0, 4); }
+
+.ds-btn-cancel {
+    -fx-background-color: linear-gradient(to bottom, #ef4444, #dc2626);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-border-color: transparent;
+    -fx-border-radius: 8px;
+    -fx-cursor: hand;
+    -fx-font-size: 15px;
+}
+.ds-btn-cancel:hover {
+    -fx-background-color: linear-gradient(to bottom, #dc2626, #b91c1c);
+}
+

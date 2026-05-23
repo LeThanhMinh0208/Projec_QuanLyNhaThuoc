@@ -19,22 +19,22 @@
 
 <BorderPane fx:id="mainBorderPane" prefHeight="900.0" prefWidth="1500.0" stylesheets="@../../resources/css/TrangChu.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.GUI_TrangChuController">
    <left>
-      <VBox prefWidth="250.0" styleClass="sidebar" BorderPane.alignment="CENTER">
+      <VBox prefWidth="220.0" styleClass="sidebar" BorderPane.alignment="CENTER">
          <children>
-            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="250.0" spacing="10.0">
+            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="220.0" spacing="10.0">
                <padding><Insets left="15.0" /></padding>
                <children>
                   <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
                      <image><Image url="@../../resources/icons/icon_thuoc.png" /></image>
                   </ImageView>
-                  <Label prefWidth="180.0" styleClass="sidebar-logo" text="LONG NGUYÊN" />
+                  <Label styleClass="sidebar-logo" text="LONG NGUYÊN" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
                </children>
             </HBox>
 
             <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent; -fx-padding: 0;" VBox.vgrow="ALWAYS">
                <content>
                   <VBox>
-                     <Button onAction="#handleVeTrangChu" alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="55.0" prefWidth="250.0" styleClass="btn-home-special" text="Trang Chủ">
+                     <Button onAction="#handleVeTrangChu" alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="55.0" prefWidth="220.0" styleClass="btn-home-special" text="Trang Chủ">
                         <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/ic_home.png" /></ImageView></graphic>
                      </Button>
 
@@ -143,7 +143,7 @@
             
             <Region VBox.vgrow="ALWAYS" />
             
-            <Button fx:id="btnDangXuat" onAction="#handleDangXuat" alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="50.0" prefWidth="250.0" styleClass="sidebar-btn-logout" text="Đăng Xuất">
+            <Button fx:id="btnDangXuat" onAction="#handleDangXuat" alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="50.0" prefWidth="220.0" styleClass="sidebar-btn-logout" text="Đăng Xuất">
                <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/ic_logout.png" /></ImageView></graphic>
                <VBox.margin><Insets bottom="20.0" /></VBox.margin>
             </Button>
@@ -151,65 +151,130 @@
       </VBox>
    </left>
    <center>
-      <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
-         <content>
-            <VBox spacing="20.0" styleClass="main-bg">
-               <padding><Insets bottom="30.0" left="40.0" right="40.0" top="30.0" /></padding>
+      <VBox spacing="15.0" styleClass="main-bg" BorderPane.alignment="CENTER">
+         <padding><Insets bottom="15.0" left="20.0" right="20.0" top="15.0" /></padding>
+         <children>
+            <!-- TOP HEADER & 3 CARDS -->
+            <VBox spacing="15.0">
                <children>
-                  <Label maxWidth="Infinity" alignment="CENTER" styleClass="main-title" text="HỆ THỐNG QUẢN LÝ NHÀ THUỐC LONG NGUYÊN" />
-
-                  <HBox spacing="30.0" alignment="CENTER">
+                  <Label alignment="BASELINE_LEFT" maxWidth="Infinity" styleClass="main-title" text="HỆ THỐNG QUẢN LÝ NHÀ THUỐC LONG NGUYỄN" />
+                  <HBox alignment="CENTER" spacing="30.0">
                      <children>
-                        <HBox fx:id="cardBanThuoc" alignment="CENTER" spacing="15.0" prefHeight="75.0" prefWidth="200.0" styleClass="top-card, card-blue" HBox.hgrow="ALWAYS" onMouseClicked="#handleMoBanThuoc">
+                        <HBox fx:id="cardBanThuoc" alignment="CENTER" onMouseClicked="#handleMoBanThuoc" prefHeight="85.0" HBox.hgrow="ALWAYS" styleClass="top-card, card-blue">
                            <children>
-                              <Label styleClass="card-icon" text="🛒" />
-                              <Label styleClass="card-title" text="BÁN THUỐC" />
+                              <Label styleClass="card-icon" text="🛒">
+                                 <HBox.margin>
+                                    <Insets right="10.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <VBox alignment="CENTER_LEFT" spacing="2.0">
+                                 <children>
+                                    <Label styleClass="card-title" text="BÁN THUỐC" />
+                                 </children>
+                              </VBox>
                            </children>
                         </HBox>
-                        
-                        <HBox fx:id="cardDoiTra" alignment="CENTER" spacing="15.0" onMouseClicked="#handleMoXuLyDoiTraCard" prefHeight="75.0" prefWidth="200.0" styleClass="top-card, card-orange" HBox.hgrow="ALWAYS">
+                        <HBox fx:id="cardDoiTra" alignment="CENTER" onMouseClicked="#handleMoXuLyDoiTraCard" prefHeight="85.0" HBox.hgrow="ALWAYS" styleClass="top-card, card-orange">
                            <children>
-                              <Label styleClass="card-icon" text="🔄" />
-                              <Label styleClass="card-title" text="ĐỔI / TRẢ" />
+                              <Label styleClass="card-icon" text="🔄">
+                                 <HBox.margin>
+                                    <Insets right="10.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <VBox alignment="CENTER_LEFT" spacing="2.0">
+                                 <children>
+                                    <Label styleClass="card-title" text="ĐỔI / TRẢ" />
+                                 </children>
+                              </VBox>
                            </children>
                         </HBox>
-                        
-                        <HBox fx:id="cardBaoCao" alignment="CENTER" spacing="15.0" onMouseClicked="#handleMoBaoCaoCard" prefHeight="75.0" prefWidth="200.0" styleClass="top-card, card-green" HBox.hgrow="ALWAYS">
+                        <HBox fx:id="cardBaoCao" alignment="CENTER" onMouseClicked="#handleMoBaoCaoCard" prefHeight="85.0" HBox.hgrow="ALWAYS" styleClass="top-card, card-green">
                            <children>
-                              <Label styleClass="card-icon" text="📊" />
-                              <Label styleClass="card-title" text="BÁO CÁO" />
+                              <Label styleClass="card-icon" text="📊">
+                                 <HBox.margin>
+                                    <Insets right="10.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <VBox alignment="CENTER_LEFT" spacing="2.0">
+                                 <children>
+                                    <Label styleClass="card-title" text="BÁO CÁO" />
+                                 </children>
+                              </VBox>
                            </children>
                         </HBox>
                      </children>
                   </HBox>
-                  
-                  <HBox alignment="CENTER_LEFT" prefHeight="60.0" prefWidth="200.0" styleClass="search-box">
+                  <HBox alignment="CENTER" spacing="10.0">
                      <children>
-                        <TextField fx:id="txtTimKiem" prefHeight="40.0" prefWidth="1000.0" promptText="Tìm theo mã, tên, triệu chứng, hoạt chất, hãng, nước SX..." styleClass="search-input" HBox.hgrow="ALWAYS" />
+                        <HBox alignment="CENTER_LEFT" prefHeight="45.0" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="search-box">
+                           <padding><Insets left="20.0" right="20.0" /></padding>
+                           <children>
+                              <Label styleClass="search-icon" text="🔍"><HBox.margin><Insets right="10.0" /></HBox.margin></Label>
+                              <TextField fx:id="txtTimKiem" prefHeight="40.0" promptText="Tìm tên thuốc, mã hoặc triệu chứng..." styleClass="search-input" HBox.hgrow="ALWAYS" />
+                           </children>
+                        </HBox>
                      </children>
-                     <padding><Insets left="20.0" right="20.0" /></padding>
                   </HBox>
-                  
-                  <VBox styleClass="panel-white" VBox.vgrow="ALWAYS">
+               </children>
+            </VBox>
+            
+            <!-- BOTTOM SPLIT PANELS (LEFT: DIRECTORY | RIGHT: WARNINGS) -->
+            <HBox spacing="20.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <!-- LEFT PANEL: PRODUCT DIRECTORY -->
+                  <VBox styleClass="panel-white" HBox.hgrow="ALWAYS">
                      <children>
                         <Label styleClass="section-title" text="DANH MỤC THUỐC" />
-                        <TableView fx:id="tableThuoc" fixedCellSize="85.0" prefHeight="600.0" styleClass="no-scroll-table" VBox.vgrow="ALWAYS" maxHeight="Infinity">
+                        <TableView fx:id="tableThuoc" fixedCellSize="55.0" styleClass="table-view" VBox.vgrow="ALWAYS">
                            <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
                            <columns>
                               <TableColumn fx:id="colMaThuoc" prefWidth="90.0" text="Mã Thuốc" />
-                              <TableColumn fx:id="colHinhAnh" prefWidth="110.0" text="Hình Ảnh" />
-                              <TableColumn fx:id="colTenThuoc" prefWidth="220.0" text="Tên Thuốc" />
-                              <TableColumn fx:id="colTrieuChung" prefWidth="300.0" text="Triệu Chứng" />
-                              <TableColumn fx:id="colDVT" prefWidth="70.0" text="ĐVT" />
-                              <TableColumn fx:id="colKeDon" prefWidth="80.0" text="Kê Đơn" />
-                              <TableColumn fx:id="colTrangThai" prefWidth="110.0" text="Trạng Thái" />
+                              <TableColumn fx:id="colHinhAnh" prefWidth="80.0" text="Hình Ảnh" />
+                              <TableColumn fx:id="colTenThuoc" prefWidth="200.0" text="Tên Thuốc" />
+                              <TableColumn fx:id="colTrieuChung" prefWidth="220.0" text="Triệu Chứng" />
+                              <TableColumn fx:id="colTrangThai" prefWidth="100.0" text="Số Lượng Tồn" />
                            </columns>
                         </TableView>
                      </children>
                   </VBox>
+                  
+                  <!-- RIGHT PANEL: WARNINGS -->
+                  <VBox minWidth="500.0" prefWidth="500.0" spacing="15.0">
+                     <children>
+                        <!-- EXPIRY WARNING PANEL -->
+                        <VBox spacing="10.0" styleClass="panel-white" VBox.vgrow="ALWAYS">
+                           <children>
+                              <Label styleClass="warning-title-red" text="SẮP HẾT HẠN" />
+                              <TableView fx:id="tableSapHetHan" fixedCellSize="45.0" styleClass="warning-table" VBox.vgrow="ALWAYS">
+                                 <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+                                 <columns>
+                                    <TableColumn fx:id="colHsdTen" prefWidth="160.0" text="Tên Thuốc" />
+                                    <TableColumn fx:id="colHsdLo" prefWidth="120.0" text="Lô Thuốc" />
+                                    <TableColumn fx:id="colHsdNgay" prefWidth="140.0" text="Ngày Còn Lại" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </VBox>
+                        
+                        <!-- LOW STOCK WARNING PANEL -->
+                        <VBox spacing="10.0" styleClass="panel-white" VBox.vgrow="ALWAYS">
+                           <children>
+                              <Label styleClass="warning-title-orange" text="SẮP HẾT HÀNG" />
+                              <TableView fx:id="tableSapHetTon" fixedCellSize="45.0" styleClass="warning-table" VBox.vgrow="ALWAYS">
+                                 <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+                                 <columns>
+                                    <TableColumn fx:id="colTonTen" prefWidth="160.0" text="Tên Thuốc" />
+                                    <TableColumn fx:id="colTonLo" prefWidth="120.0" text="Lô Thuốc" />
+                                    <TableColumn fx:id="colTonSoLuong" prefWidth="140.0" text="Tồn Kho" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </children>
+                  </VBox>
                </children>
-            </VBox>
-         </content>
-      </ScrollPane>
+            </HBox>
+         </children>
+      </VBox>
    </center>
 </BorderPane>

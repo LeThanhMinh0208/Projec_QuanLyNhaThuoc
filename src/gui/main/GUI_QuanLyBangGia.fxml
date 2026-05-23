@@ -23,7 +23,7 @@
         <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity">
             <children>
                 <Label styleClass="main-title" text="QUẢN LÝ BẢNG GIÁ" />
-                <Region prefHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+                <Region maxWidth="Infinity" styleClass="xk-title-line" />
             </children>
         </VBox>
     </HBox>
@@ -39,9 +39,9 @@
 
             <!-- Action bar -->
             <HBox alignment="CENTER_LEFT" spacing="15.0">
-                <Button fx:id="btnThemBangGiaMoi" onAction="#handleThemBangGiaMoi" prefHeight="50.0"
-                        styleClass="top-card, card-green, btn-action"
-                        text="  + Thêm Bảng Giá Mới  " textFill="WHITE" />
+              <Button fx:id="btnThemBangGiaMoi" onAction="#handleThemBangGiaMoi" prefHeight="40.0"
+        styleClass="bg-btn-add-new"
+        text="➕ Thêm Bảng Giá Mới" />
                 <HBox HBox.hgrow="ALWAYS" />
                 <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="350.0" styleClass="search-box">
                     <Label styleClass="search-icon" text="🔍" />
@@ -84,8 +84,8 @@
             <HBox alignment="CENTER_LEFT" spacing="15.0" VBox.vgrow="NEVER">
                 <Button fx:id="btnQuayLai1" text="← Quay Lại" onAction="#handleQuayLaiDanhSach" styleClass="bh-btn-secondary"
                         prefHeight="40.0" />
-                <Label text="TẠO BẢNG GIÁ MỚI" styleClass="bh-section-title"
-                       style="-fx-font-size:18px;" />
+                <Label text="TẠO BẢNG GIÁ MỚI" styleClass="main-title"
+                       style="-fx-font-size:28px; -fx-padding: 2 0 2 0;" />
             </HBox>
 
             <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
@@ -137,8 +137,8 @@
                         <HBox alignment="CENTER_LEFT" spacing="15.0">
                             <Label text="DANH SÁCH THUỐC VÀ GIÁ BÁN" styleClass="bh-section-title"
                                    VBox.vgrow="NEVER" HBox.hgrow="ALWAYS" />
-                            <Button text="Lấy giá từ bảng mặc định hiện tại" onAction="#handleLayGiaTuDefault"
-                                    style="-fx-background-color:#7c3aed; -fx-text-fill:white; -fx-font-size:12px; -fx-padding:6 12; -fx-cursor:hand; -fx-background-radius:6;">
+                            <Button text="Lấy giá từ bảng mặc định" onAction="#handleLayGiaTuDefault"
+                                    style="-fx-background-color: linear-gradient(to right, #38bdf8, #0ea5e9); -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 8 15; -fx-cursor: hand; -fx-background-radius: 8;">
                                 <tooltip>
                                     <Tooltip text="Lấy giá từ bảng giá mặc định đang hiệu lực cho các thuốc chưa có giá" />
                                 </tooltip>
@@ -169,8 +169,8 @@
 
                     <!-- Nút lưu -->
                     <HBox alignment="CENTER_RIGHT" spacing="12.0">
-                        <Button fx:id="btnQuayLai2" text="Hủy" onAction="#handleQuayLaiDanhSach" styleClass="bh-btn-secondary"
-                                prefHeight="44.0" prefWidth="120.0" />
+                        <Button fx:id="btnQuayLai2" text="Hủy" onAction="#handleQuayLaiDanhSach" styleClass="dialog-btn-cancel"
+                                prefHeight="35" prefWidth="100"/>
                         <Button text="💾  Lưu Bảng Giá" onAction="#handleLuuBangGia"
                                 styleClass="bh-btn-success" prefHeight="44.0" prefWidth="180.0" />
                     </HBox>

@@ -1,13 +1,17 @@
 /* Nền màu xanh xám cực nhạt giống ảnh */
+
 .dmk-main-bg {
     -fx-background-color: #f0f9ff;
 }
 
+
 /* Tiêu đề góc trái */
+
 .dmk-page-title {
     -fx-font-size: 28px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1b84c4; /* Màu xanh đậm */
+    -fx-text-fill: #1b84c4;
+    /* Màu xanh đậm */
 }
 
 .main-title {
@@ -19,47 +23,64 @@
     -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.4), 5, 0, 0, 2);
 }
 
+
 /* ========================================
    CARDS 3 NÚT CHỨC NĂNG (STYLE TỪ TRANG CHỦ)
    ======================================== */
+
 .top-card {
-    -fx-background-radius: 35px; /* 💡 Tăng từ 12px lên 35px để bo tròn sâu như viên thuốc */
+    -fx-background-radius: 35px;
+    /* 💡 Tăng từ 12px lên 35px để bo tròn sâu như viên thuốc */
     -fx-cursor: hand;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.15), 10, 0, 0, 4);
     -fx-transition: all 0.3s ease;
-    -fx-alignment: center; /* Ép mọi thứ vào giữa thẻ */
+    -fx-alignment: center;
+    /* Ép mọi thứ vào giữa thẻ */
 }
+
 
 /* Hiệu ứng nảy lên khi lia chuột */
+
 .top-card:hover {
-    -fx-translate-y: -3px; 
+    -fx-translate-y: -3px;
 }
 
+
 /* NÚT NHẬP KHO - Xanh Lá */
-.card-green { 
-    -fx-background-color: linear-gradient(to bottom right, #10b981, #34d399); 
+
+.card-green {
+    -fx-background-color: linear-gradient(to bottom right, #10b981, #34d399);
 }
+
 .card-green:hover {
     -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.6), 20, 0, 0, 8);
 }
 
+
 /* NÚT XUẤT KHO - Xanh Dương */
-.card-blue { 
-    -fx-background-color: linear-gradient(to bottom right, #0ea5e9, #38bdf8); 
+
+.card-blue {
+    -fx-background-color: linear-gradient(to bottom right, #0ea5e9, #38bdf8);
 }
+
 .card-blue:hover {
     -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.6), 20, 0, 0, 8);
 }
 
+
 /* NÚT KIỂM KÊ - Cam Vàng */
-.card-orange { 
-    -fx-background-color: linear-gradient(to bottom right, #f59e0b, #fbbf24); 
+
+.card-orange {
+    -fx-background-color: linear-gradient(to bottom right, #f59e0b, #fbbf24);
 }
+
 .card-orange:hover {
     -fx-effect: dropshadow(three-pass-box, rgba(245, 158, 11, 0.6), 20, 0, 0, 8);
 }
 
+
 /* --- BỘ LỌC VÀ TÌM KIẾM --- */
+
 .dmk-combo {
     -fx-background-color: white;
     -fx-border-color: #cbd5e1;
@@ -68,106 +89,187 @@
     -fx-font-size: 14px;
 }
 
+
 /* Khung tìm kiếm dài, viền xanh nhạt bo tròn giống viên thuốc */
+
 .dmk-search-wrapper {
     -fx-background-color: white;
-    -fx-border-color: #2fb9f6; /* Viền xanh y hệt ảnh */
+    -fx-border-color: #bae6fd;
     -fx-border-width: 1.5px;
-    -fx-border-radius: 30px;
-    -fx-background-radius: 30px;
+    -fx-border-radius: 25px;
+    -fx-background-radius: 25px;
+    -fx-padding: 0 15 0 15;
+}
+.dmk-search-wrapper:focused-within {
+    -fx-border-color: #0ea5e9;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.3), 12, 0, 0, 0);
 }
 
-.dmk-search-field, .dmk-search-field:focused {
+.dmk-search-field,
+.dmk-search-field:focused {
     -fx-background-color: transparent;
     -fx-font-size: 15px;
     -fx-text-fill: #475569;
 }
 
+
 /* --- KHUNG BẢNG MÀU TRẮNG BO GÓC (CARD) --- */
+
 .dmk-table-card {
     -fx-background-color: white;
     -fx-background-radius: 15px;
     -fx-border-radius: 15px;
     -fx-border-color: #e5e7eb;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 10, 0, 0, 5);
 }
 
+
 /* --- TABLEVIEW STYLE (Sao chép nguyên bản từ ảnh) --- */
+
 .dmk-table {
     -fx-background-color: transparent;
     -fx-font-size: 14px;
 }
 
+
 /* Ẩn cái viền table xấu xí */
-.dmk-table .box { -fx-background-color: transparent; }
+
+.dmk-table .box {
+    -fx-background-color: transparent;
+}
+
 
 /* Header của bảng màu xanh sáng */
+
 .dmk-table .column-header-background {
-    -fx-background-color: #1ea0eb; /* Xanh dương chuẩn ảnh */
+    -fx-background-color: #1ea0eb;
+    /* Xanh dương chuẩn ảnh */
     -fx-background-radius: 8px 8px 0 0;
 }
+
 .dmk-table .column-header {
     -fx-background-color: transparent;
 }
+
 .dmk-table .column-header .label {
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-alignment: center;
 }
 
+
 /* Hàng chẵn/lẻ */
-.dmk-table .table-row-cell:odd { -fx-background-color: white; }
-.dmk-table .table-row-cell:even { -fx-background-color: #fafafa; }
-.dmk-table .table-row-cell:hover { -fx-background-color: #e0f2fe; }
+
+.dmk-table .table-row-cell:odd {
+    -fx-background-color: white;
+}
+
+.dmk-table .table-row-cell:even {
+    -fx-background-color: #fafafa;
+}
+
+.dmk-table .table-row-cell:hover {
+    -fx-background-color: #e0f2fe;
+}
+
 
 /* Kẻ sọc dọc mờ giữa các cột */
+
 .dmk-table .table-cell {
     -fx-border-color: transparent #f0f0f0 transparent transparent;
     -fx-alignment: center-left;
     -fx-padding: 5px 10px;
 }
 
+
 /* --- MÀU NHÃN CẢNH BÁO (Gọn gàng) --- */
+
 .status-label {
     -fx-font-weight: bold;
     -fx-padding: 3px 8px;
     -fx-background-radius: 5px;
 }
-.status-safe { -fx-text-fill: #16a34a; }
-.status-priority { -fx-text-fill: #ca8a04; }
-.status-promo { -fx-text-fill: #ea580c; }
-.status-stop { -fx-text-fill: #dc2626; }
+
+.status-safe {
+    -fx-text-fill: #16a34a;
+}
+
+.status-priority {
+    -fx-text-fill: #ca8a04;
+}
+
+.status-promo {
+    -fx-text-fill: #ea580c;
+}
+
+.status-stop {
+    -fx-text-fill: #dc2626;
+}
+
+
 /* --- ÉP MÀU XANH SKY RỰC RỠ CHO DÒNG ĐƯỢC CHỌN (ĐỒNG BỘ TRANG CHỦ) --- */
 
 .dmk-table .table-row-cell:selected {
-    -fx-background-color: #0ea5e9 !important; 
+    -fx-background-color: #0ea5e9 !important;
     -fx-background-insets: 0;
 }
 
+
 /* Ép tất cả chữ thành màu trắng tinh để nổi bật trên nền xanh */
+
 .dmk-table .table-row-cell:selected .table-cell {
     -fx-text-fill: white !important;
     -fx-font-weight: bold !important;
 }
 
+
 /* Ép luôn các thẻ Label (Trạng thái hạn) và số lượng màu xanh lá thành Trắng hết */
+
 .dmk-table .table-row-cell:selected .label,
 .dmk-table .table-row-cell:selected .text {
     -fx-text-fill: white !important;
     -fx-fill: white !important;
 }
 
+
 /* --- TẮT BÓNG MA MÀU XÁM KHI CLICK BỎ CHỌN (FOCUS) --- */
+
 .dmk-table:focused {
     -fx-background-color: transparent;
 }
+
 .dmk-table .table-row-cell:focused {
     -fx-background-insets: 0;
 }
+
 .dmk-table .table-cell:focused {
     -fx-background-color: transparent;
 }
+
+
 /* --- MÀU TRẠNG THÁI TỒN KHO --- */
-.status-con-hang { -fx-text-fill: #16a34a; -fx-font-weight: bold; } /* Xanh lá */
-.status-sap-het  { -fx-text-fill: #ea580c; -fx-font-weight: bold; } /* Cam */
-.status-het-hang { -fx-text-fill: #dc2626; -fx-font-weight: bold; } /* Đỏ */
+
+.status-con-hang {
+    -fx-text-fill: #16a34a;
+    -fx-font-weight: bold;
+}
+
+
+/* Xanh lá */
+
+.status-sap-het {
+    -fx-text-fill: #ea580c;
+    -fx-font-weight: bold;
+}
+
+
+/* Cam */
+
+.status-het-hang {
+    -fx-text-fill: #dc2626;
+    -fx-font-weight: bold;
+}
+
+
+/* Đỏ */

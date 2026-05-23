@@ -71,6 +71,16 @@ public class Dialog_LichSuGiaoDichController {
     }
 
     private void setupTable() {
+        tableGiaoDich.setRowFactory(tv -> {
+            javafx.scene.control.TableRow<entity.GiaoDichKhachHang> row = new javafx.scene.control.TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    moDialogChiTiet(row.getItem());
+                }
+            });
+            return row;
+        });
+
         colMaHD.setCellValueFactory(new PropertyValueFactory<>("maHoaDon"));
         colNhanVien.setCellValueFactory(new PropertyValueFactory<>("tenNhanVien"));
 

@@ -90,6 +90,16 @@ public class GUI_DanhSachHoaDonController {
     }
 
     private void setupTable() {
+        tableHoaDon.setRowFactory(tv -> {
+            javafx.scene.control.TableRow<entity.HoaDonView> row = new javafx.scene.control.TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    moDialogChiTiet(row.getItem());
+                }
+            });
+            return row;
+        });
+
         colMaHD      .setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getMaHoaDon()));
         colNgayLap   .setCellValueFactory(d -> new SimpleStringProperty(
                 d.getValue().getNgayLap() != null

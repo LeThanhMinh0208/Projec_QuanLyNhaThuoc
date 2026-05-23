@@ -298,16 +298,16 @@
 .btn-danger:hover { -fx-background-color: linear-gradient(to bottom, #f87171, #dc2626); }
 
 .btn-cancel {
-    -fx-background-color: #ffffff;
-    -fx-text-fill: #475569;
+    -fx-background-color: linear-gradient(to bottom, #ef4444, #dc2626);
+    -fx-text-fill: white;
     -fx-font-weight: 900;
     -fx-background-radius: 10px;
-    -fx-border-color: #cbd5e1;
+    -fx-border-color: transparent;
     -fx-border-radius: 10px;
     -fx-cursor: hand;
     -fx-font-size: 15px;
 }
-.btn-cancel:hover { -fx-background-color: #f8fafc; -fx-border-color: #94a3b8; }
+.btn-cancel:hover { -fx-background-color: linear-gradient(to bottom, #dc2626, #b91c1c); }
 
 /* Nút Xem Chi Tiết dạng viên thuốc (Pill-shape) */
 .btn-view-detail {

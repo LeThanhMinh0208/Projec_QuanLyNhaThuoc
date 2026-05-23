@@ -55,22 +55,23 @@ public class Dialog_XuatHuyController implements Initializable {
 
         cbChonThuoc.valueProperty().addListener((o, old, t) -> {
             if (t != null) {
-                cbChonLo.setItems(FXCollections.observableArrayList(daoLo.getTatCaLoThuocTraNCC(t.getMaThuoc())));
+                cbChonLo.setItems(FXCollections.observableArrayList(daoLo.getTatCaLoThuocChoXuatHuy(t.getMaThuoc())));
             }
         });
 
         cbChonLo.setConverter(new StringConverter<LoThuoc>() {
-            @Override public String toString(LoThuoc l) { 
+            @Override public String toString(LoThuoc l) {
                 if (l == null) return "";
                 String k = "KHO_BAN_HANG".equals(l.getViTriKho()) ? "Bán hàng" : "Dự trữ";
-                return "Lô: " + l.getMaLoThuoc() + " (Tồn: " + l.getSoLuongTon() + " | Kho: " + k + ")";
+                String hetHan = l.getTrangThai() == 0 ? " [Hết hạn]" : "";
+                return "Lô: " + l.getMaLoThuoc() + " (Tồn: " + l.getSoLuongTon() + " | Kho: " + k + ")" + hetHan;
             }
             @Override public LoThuoc fromString(String s) { return null; }
         });
     }
 
     private void loadTatCaThuocCoHang() {
-        String sql = "SELECT DISTINCT t.* FROM Thuoc t JOIN LoThuoc l ON t.maThuoc = l.maThuoc WHERE l.soLuongTon > 0 AND l.trangThai = 1";
+        String sql = "SELECT DISTINCT t.* FROM Thuoc t JOIN LoThuoc l ON t.maThuoc = l.maThuoc WHERE l.soLuongTon > 0";
         try (Connection con = connectDB.ConnectDB.getInstance().getConnection();
              Statement st = con.createStatement(); ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {

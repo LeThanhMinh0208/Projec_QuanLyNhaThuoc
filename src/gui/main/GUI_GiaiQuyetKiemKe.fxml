@@ -25,7 +25,7 @@
                     <Label style="-fx-text-fill:#0ea5e9;" text="🔍" />
                     <TextField fx:id="txtTimKiem" promptText="Tìm mã phiếu..." styleClass="search-input" HBox.hgrow="ALWAYS" />
                 </HBox>
-                <Button text="Làm mới" onAction="#loadDanhSach" styleClass="btn-blue" prefHeight="40" prefWidth="120" />
+                <Button text="Làm mới" onAction="#loadDanhSach" styleClass="btn-lam-moi" prefHeight="40" prefWidth="120" />
             </HBox>
             <VBox styleClass="panel-white" VBox.vgrow="ALWAYS">
                 <TableView fx:id="tableDanhSach" VBox.vgrow="ALWAYS">

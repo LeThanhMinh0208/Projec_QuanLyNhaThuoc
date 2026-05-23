@@ -26,13 +26,18 @@
     -fx-translate-y: -10px; 
 }
 
-.kk-search-wrapper { 
-    -fx-background-color: white; 
-    -fx-background-radius: 25; 
-    -fx-border-color: #cbd5e1; 
-    -fx-border-radius: 25; 
-    -fx-padding: 0 15 0 15; 
-    -fx-border-width: 1.5px; 
+.kk-search-wrapper {
+    -fx-background-color: white;
+    -fx-background-radius: 25px;
+    -fx-border-color: #bae6fd;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 25px;
+    -fx-padding: 0 15 0 15;
+}
+.kk-search-wrapper:focused-within {
+    -fx-border-color: #0ea5e9;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.3), 12, 0, 0, 0);
 }
 
 .search-input { 
@@ -44,12 +49,47 @@
    CÁC CLASS DÙNG CHUNG (ĐÃ KHÔI PHỤC .BTN-PILL CHO TRONG JAVA)
    ======================================================== */
 .btn-pill {
-    -fx-background-radius: 30 !important; 
+    -fx-background-radius: 30 !important;
     -fx-border-radius: 30 !important;
-    -fx-cursor: hand !important; 
-    -fx-font-weight: 900 !important; 
+    -fx-cursor: hand !important;
+    -fx-font-weight: 900 !important;
     -fx-font-size: 14px !important;
     -fx-alignment: CENTER !important;
+}
+
+.btn-xem-chi-tiet {
+    -fx-background-color: #e0f2fe;
+    -fx-text-fill: #0284c7;
+}
+.btn-xem-chi-tiet:hover {
+    -fx-background-color: #0ea5e9;
+    -fx-text-fill: white;
+}
+
+.btn-giai-quyet {
+    -fx-background-color: #ffedd5;
+    -fx-text-fill: #ea580c;
+}
+.btn-giai-quyet:hover {
+    -fx-background-color: #f97316;
+    -fx-text-fill: white;
+}
+
+.btn-lam-moi {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #475569;
+    -fx-font-weight: 800;
+    -fx-font-size: 13px;
+    -fx-background-radius: 30;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 30;
+    -fx-border-width: 1.5;
+    -fx-cursor: hand;
+}
+.btn-lam-moi:hover {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #94a3b8;
+    -fx-text-fill: #0f172a;
 }
 
 /* ========================================================
@@ -338,8 +378,19 @@
     -fx-text-fill: #0284c7;
 }
 /* Chống đổi màu chữ nút bấm khi dòng bị bôi xanh */
-.table-row-cell:selected .btn-giai-quyet { -fx-text-fill: #ea580c !important; }
-.table-row-cell:selected .btn-xem-chi-tiet { -fx-text-fill: #0284c7 !important; }
+.table-row-cell:selected .btn-giai-quyet,
+.table-row-cell:selected .btn-giai-quyet .label,
+.table-row-cell:selected .btn-giai-quyet .text { 
+    -fx-text-fill: #ea580c !important; 
+    -fx-fill: #ea580c !important;
+}
+
+.table-row-cell:selected .btn-xem-chi-tiet,
+.table-row-cell:selected .btn-xem-chi-tiet .label,
+.table-row-cell:selected .btn-xem-chi-tiet .text { 
+    -fx-text-fill: #0284c7 !important; 
+    -fx-fill: #0284c7 !important;
+}
 
 /* CHUYỂN MÀU CỘT CHÊNH LỆCH SANG CSS */
 .text-lech-am { -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-alignment: CENTER; }
@@ -400,4 +451,32 @@
     -fx-background-color: #e0f2fe !important; 
     -fx-text-fill: #0ea5e9 !important;        
     -fx-font-weight: bold !important;
+}
+/* =======================================================
+   NÚT TIỆN ÍCH MÀU TÍM VIOLET (Sắp xếp / Lọc)
+   ======================================================= */
+.btn-purple {
+    -fx-background-color: #f3e8ff; 
+    -fx-text-fill: #7e22ce;        
+    -fx-border-color: #d8b4fe;     
+    
+    /* 💡 ĐÃ SỬA Ở 2 DÒNG NÀY: Tăng từ 6 lên 20 để bo góc tròn vo như nút chính */
+    -fx-border-radius: 20;     
+    -fx-background-radius: 20; 
+    
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 0 15px;           
+    -fx-transition: all 0.2s;      
+}
+
+.btn-purple:hover {
+    -fx-background-color: #d8b4fe; 
+    -fx-text-fill: #581c87;        
+    -fx-border-color: #c084fc;
+}
+
+.btn-purple:pressed {
+    -fx-background-color: #c084fc;
+    -fx-text-fill: white;          
 }

@@ -74,3 +74,17 @@
     -fx-text-fill: white !important;
     -fx-font-weight: bold !important;
 }
+
+.dvqd-btn-cancel {
+    -fx-background-color: linear-gradient(to bottom, #ef4444, #dc2626);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-border-color: transparent;
+    -fx-border-radius: 8px;
+    -fx-cursor: hand;
+    -fx-font-size: 15px;
+}
+.dvqd-btn-cancel:hover {
+    -fx-background-color: linear-gradient(to bottom, #dc2626, #b91c1c);
+}

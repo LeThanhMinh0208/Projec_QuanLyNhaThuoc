@@ -54,6 +54,16 @@ public class GUI_XuatKhoController implements Initializable {
     }
 
     private void setupTable() {
+        tableDanhMucPhieuXuat.setRowFactory(tv -> {
+            javafx.scene.control.TableRow<PhieuXuat> row = new javafx.scene.control.TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    handleXemChiTiet(row.getItem());
+                }
+            });
+            return row;
+        });
+
         colSTT.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(tableDanhMucPhieuXuat.getItems().indexOf(p.getValue()) + 1));
         colMaPhieu.setCellValueFactory(new PropertyValueFactory<>("maPhieuXuat"));
         colNguoiLap.setCellValueFactory(new PropertyValueFactory<>("maNhanVien"));

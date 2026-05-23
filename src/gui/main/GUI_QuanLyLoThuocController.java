@@ -300,10 +300,25 @@ public class GUI_QuanLyLoThuocController implements Initializable {
                         long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), lo.getHanSuDung().toLocalDate());
                         btnAction.setDisable(lo.getSoLuongTon() == 0 || daysBetween < 0);
                     } else {
-                        btnAction.setText("Mở Khóa");
-                        btnAction.getStyleClass().add("btn-unlock-pill"); 
-                        btnAction.setOnAction(e -> xuLyKhoaLo(lo.getMaLoThuoc(), 1));
-                        btnAction.setDisable(false);
+                        boolean isExpired = lo.getHanSuDung() != null &&
+                            java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), lo.getHanSuDung().toLocalDate()) < 0;
+                        boolean noStock = lo.getSoLuongTon() <= 0;
+                        if (isExpired) {
+                            btnAction.setText("Hết hạn");
+                            btnAction.getStyleClass().add("btn-disabled-pill");
+                            btnAction.setOnAction(e -> AlertUtils.showAlert(Alert.AlertType.WARNING, "Không thể mở khóa",
+                                "Lô thuốc đã hết hạn sử dụng!\nKhông thể mở khóa. Vui lòng lập phiếu xuất hủy."));
+                        } else if (noStock) {
+                            btnAction.setText("Hết hàng");
+                            btnAction.getStyleClass().add("btn-disabled-pill");
+                            btnAction.setOnAction(e -> AlertUtils.showAlert(Alert.AlertType.WARNING, "Không thể mở khóa",
+                                "Lô thuốc đã hết hàng (tồn kho = 0)!\nKhông thể mở khóa."));
+                        } else {
+                            btnAction.setText("Mở Khóa");
+                            btnAction.getStyleClass().add("btn-unlock-pill");
+                            btnAction.setOnAction(e -> xuLyKhoaLo(lo.getMaLoThuoc(), 1));
+                            btnAction.setDisable(false);
+                        }
                     }
                     setGraphic(btnAction); setAlignment(Pos.CENTER);
                 }

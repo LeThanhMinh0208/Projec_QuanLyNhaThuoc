@@ -102,16 +102,17 @@
 /* SEARCH */
 .bh-search-box {
     -fx-background-color: white;
-    -fx-background-radius: 12;
-    -fx-border-color: #e2e8f0;
-    -fx-border-width: 1.5;
-    -fx-border-radius: 12;
-    -fx-padding: 4 16;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 3);
+    -fx-background-radius: 25px;
+    -fx-border-color: #bae6fd;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 25px;
+    -fx-padding: 0 15 0 15;
 }
 
 .bh-search-box:focused-within {
-    -fx-border-color: #38bdf8;
+    -fx-border-color: #0ea5e9;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.3), 12, 0, 0, 0);
 }
 
 .bh-search-icon {
@@ -354,15 +355,15 @@
 }
 
 .bh-btn-secondary {
-    -fx-background-color: #f1f5f9;
+    -fx-background-color: #ffffff;
     -fx-text-fill: #475569;
     -fx-font-weight: bold;
     -fx-font-size: 13px;
-    -fx-background-radius: 10;
+    -fx-background-radius: 30;
     -fx-cursor: hand;
     -fx-padding: 8 16;
-    -fx-border-color: #e2e8f0;
-    -fx-border-radius: 10;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 30;
     -fx-border-width: 1.5;
 }
 
@@ -554,20 +555,20 @@
 }
 
 .dialog-btn-cancel {
-    -fx-background-color: white;
-    -fx-text-fill: #64748b;
+    -fx-background-color: linear-gradient(to bottom, #ef4444, #dc2626);
+    -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
     -fx-background-radius: 10;
     -fx-cursor: hand;
     -fx-padding: 12 20;
-    -fx-border-color: #e2e8f0;
+    -fx-border-color: transparent;
     -fx-border-radius: 10;
     -fx-border-width: 1.5;
 }
 
 .dialog-btn-cancel:hover {
-    -fx-background-color: #f1f5f9;
+    -fx-background-color: linear-gradient(to bottom, #dc2626, #b91c1c);
 }
 
 /* ─── SPINNER ─────────────────────────────────────────────── */

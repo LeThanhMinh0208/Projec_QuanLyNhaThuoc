@@ -50,6 +50,16 @@ public class GUI_QuanLyDonDatHangController {
     }
 
     private void setupTable() {
+        tableDonDat.setRowFactory(tv -> {
+            javafx.scene.control.TableRow<DonDatHang> row = new javafx.scene.control.TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    moDialogChiTiet(row.getItem());
+                }
+            });
+            return row;
+        });
+
         colMaDon.setCellValueFactory(new PropertyValueFactory<>("maDonDatHang"));
         colMaDon.setStyle("-fx-alignment: CENTER; -fx-font-weight: bold;");
 
@@ -71,6 +81,8 @@ public class GUI_QuanLyDonDatHangController {
             {
                 btnXem.setStyle("-fx-background-color: #e0f2fe; -fx-text-fill: #0284c7; -fx-background-radius: 20; -fx-font-weight: bold; -fx-cursor: hand;");
                 btnXem.setPrefWidth(70);
+                btnXem.setOnMouseEntered(e -> btnXem.setStyle("-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-background-radius: 20; -fx-font-weight: bold; -fx-cursor: hand;"));
+                btnXem.setOnMouseExited(e -> btnXem.setStyle("-fx-background-color: #e0f2fe; -fx-text-fill: #0284c7; -fx-background-radius: 20; -fx-font-weight: bold; -fx-cursor: hand;"));
             }
             @Override
             protected void updateItem(Void item, boolean empty) {
@@ -234,11 +246,13 @@ public class GUI_QuanLyDonDatHangController {
             if (scene.getRoot() instanceof javafx.scene.layout.BorderPane) {
                 javafx.scene.layout.BorderPane mainLayout = (javafx.scene.layout.BorderPane) scene.getRoot();
                 mainLayout.setCenter(rootNhapKho);
+                gui.main.GUI_TrangChuController.getInstance().highlightSidebar("Nhập Kho");
             }
             else if (scene.getRoot() instanceof javafx.scene.layout.StackPane) {
                 javafx.scene.layout.StackPane mainLayout = (javafx.scene.layout.StackPane) scene.getRoot();
                 mainLayout.getChildren().clear();
                 mainLayout.getChildren().add(rootNhapKho);
+                gui.main.GUI_TrangChuController.getInstance().highlightSidebar("Nhập Kho");
             } else {
                 System.out.println("❌ Không tương thích: Root không phải BorderPane hay StackPane!");
             }

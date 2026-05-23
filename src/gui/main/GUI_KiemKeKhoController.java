@@ -503,4 +503,27 @@ public class GUI_KiemKeKhoController {
         public int getSoLuongKiemTra() { return soLuongKiemTra.get(); }
         public void setSoLuongKiemTra(int val) { soLuongKiemTra.set(val); }
     }
+
+    @FXML
+    void handleDuaChonLenDau(ActionEvent event) {
+        List<LoThuocUI> listDaChon = new ArrayList<>();
+        List<LoThuocUI> listChuaChon = new ArrayList<>();
+
+        for (LoThuocUI lo : dsLoThuoc) {
+            if (lo.isSelected()) {
+                listDaChon.add(lo);
+            } else {
+                listChuaChon.add(lo);
+            }
+        }
+
+
+        dsLoThuoc.clear();
+        dsLoThuoc.addAll(listDaChon);
+        dsLoThuoc.addAll(listChuaChon);
+
+
+        tableChonThuoc.getSortOrder().clear();
+        tableChonThuoc.refresh();
+    }
 }

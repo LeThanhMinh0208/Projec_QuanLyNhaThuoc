@@ -115,6 +115,16 @@ public class GUI_QuanLyBangGiaController {
     // SETUP
     // ============================================================
     private void setupTableDanhSach() {
+        tableBangGia.setRowFactory(tv -> {
+            javafx.scene.control.TableRow<entity.BangGia> row = new javafx.scene.control.TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    moDialogChiTiet(row.getItem());
+                }
+            });
+            return row;
+        });
+
         colMaBangGia .setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getMaBangGia()));
         colTenBangGia.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTenBangGia()));
         colLoai      .setCellValueFactory(d -> new SimpleStringProperty(
@@ -153,12 +163,26 @@ public class GUI_QuanLyBangGiaController {
         });
 
         colHanhDong.setCellFactory(col -> new TableCell<>() {
-            private final Button btnXem = new Button("👁 Xem chi tiết");
-            private final Button btnVHH = new Button("🚫 Vô Hiệu");
-            private final HBox box = new HBox(6, btnXem, btnVHH);
+            // Sửa text thành ngắn gọn giống ảnh
+            private final Button btnXem = new Button("Xem chi tiết");
+            private final Button btnVHH = new Button("Vô Hiệu");
+            private final HBox box = new HBox(8, btnXem, btnVHH);
             {
-                btnXem.setStyle("-fx-background-color:#2563eb;-fx-text-fill:white;-fx-font-size:11px;-fx-padding:4 8;-fx-cursor:hand;");
-                btnVHH.setStyle("-fx-background-color:#dc3545;-fx-text-fill:white;-fx-font-size:11px;-fx-padding:4 8;-fx-cursor:hand;");
+                box.setAlignment(javafx.geometry.Pos.CENTER);
+
+                final String styleXemNormal = "-fx-background-color: #e0f2fe; -fx-text-fill: #0284c7; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20; -fx-cursor: hand;";
+                final String styleXemHover  = "-fx-background-color: #0ea5e9; -fx-text-fill: white;   -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20; -fx-cursor: hand;";
+                final String styleVhhNormal = "-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20; -fx-cursor: hand;";
+                final String styleVhhHover  = "-fx-background-color: #ef4444; -fx-text-fill: white;   -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20; -fx-cursor: hand;";
+
+                btnXem.setStyle(styleXemNormal);
+                btnXem.setOnMouseEntered(e -> btnXem.setStyle(styleXemHover));
+                btnXem.setOnMouseExited(e  -> btnXem.setStyle(styleXemNormal));
+
+                btnVHH.setStyle(styleVhhNormal);
+                btnVHH.setOnMouseEntered(e -> { if (!btnVHH.isDisabled()) btnVHH.setStyle(styleVhhHover); });
+                btnVHH.setOnMouseExited(e  -> { if (!btnVHH.isDisabled()) btnVHH.setStyle(styleVhhNormal); });
+
                 btnXem.setOnAction(e -> moDialogChiTiet(getTableView().getItems().get(getIndex())));
                 btnVHH.setOnAction(e -> handleVoHieuHoa(getTableView().getItems().get(getIndex())));
             }
@@ -167,7 +191,16 @@ public class GUI_QuanLyBangGiaController {
                 if (empty) { setGraphic(null); return; }
                 BangGia bg = getTableView().getItems().get(getIndex());
                 String tt = tinhTrangThai(bg);
-                btnVHH.setDisable(!tt.contains("hiệu lực") || tt.contains("Chưa"));
+                
+                // Chuyển nút Vô Hiệu thành màu xám nếu bị disable
+                if (!tt.contains("hiệu lực") || tt.contains("Chưa")) {
+                    btnVHH.setDisable(true);
+                    btnVHH.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #94a3b8; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20;");
+                } else {
+                    btnVHH.setDisable(false);
+                    btnVHH.setStyle("-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20; -fx-cursor: hand;");
+                }
+                
                 setGraphic(box);
             }
         });

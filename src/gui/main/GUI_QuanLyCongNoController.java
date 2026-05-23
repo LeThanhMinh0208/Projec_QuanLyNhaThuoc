@@ -181,6 +181,16 @@ public class GUI_QuanLyCongNoController {
     // XỬ LÝ TAB 2: DANH MỤC PHIẾU CHI LỊCH SỬ
     // =======================================================
     private void setupTablePhieuChi() {
+        tablePhieuChi.setRowFactory(tv -> {
+            javafx.scene.control.TableRow<PhieuChi> row = new javafx.scene.control.TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    moDialogChiTietPhieuChi(row.getItem());
+                }
+            });
+            return row;
+        });
+
         colMaPhieuChi.setCellValueFactory(new PropertyValueFactory<>("maPhieuChi"));
 
 

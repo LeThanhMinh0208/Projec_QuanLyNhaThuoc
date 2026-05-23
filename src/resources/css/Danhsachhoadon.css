@@ -59,16 +59,17 @@
    ======================================================== */
 .invoice-search-wrapper {
     -fx-background-color: #f0f9ff;
-    -fx-background-radius: 25px; 
-    -fx-border-color: #bae6fd; 
-    -fx-border-radius: 25px; 
+    -fx-background-radius: 25px;
+    -fx-border-color: #bae6fd;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 25px;
     -fx-padding: 0 15 0 15;
 }
 .invoice-search-wrapper:focused-within {
     -fx-background-color: white;
     -fx-border-color: #0ea5e9;
     -fx-border-width: 2px;
-    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.5), 12, 0, 0, 0);
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.3), 12, 0, 0, 0);
 }
 .search-input {
     -fx-background-color: transparent; 
@@ -90,11 +91,12 @@
 .btn-pill-action:hover { -fx-translate-y: -2px; }
 
 .btn-search-blue {
-    -fx-background-color: linear-gradient(to bottom, #3b82f6, #1d4ed8);
+    -fx-background-color: linear-gradient(to bottom, #0ea5e9, #0284c7);
     -fx-text-fill: white;
 }
 .btn-search-blue:hover {
-    -fx-effect: dropshadow(three-pass-box, rgba(29, 78, 216, 0.4), 15, 0, 0, 4);
+    -fx-background-color: linear-gradient(to bottom, #38bdf8, #0ea5e9);
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 165, 233, 0.4), 15, 0, 0, 4);
 }
 
 .btn-clear-white {
