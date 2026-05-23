@@ -455,6 +455,18 @@ public class GUI_TrangChuController {
         });
     }
 
+    @FXML
+    void handleMoThongKeHangHoa(ActionEvent event) {
+        // Kiểm tra phân quyền tương tự như các chức năng thống kê khác của bạn
+        if (utils.UserSession.getInstance().getUser() != null && 
+            !"Quản lý".equalsIgnoreCase(utils.UserSession.getInstance().getUser().getChucVu())) {
+            new Alert(Alert.AlertType.WARNING, "Bạn không có quyền truy cập Báo Cáo Thống Kê Hàng Hóa.").show();
+            return;
+        }
+        setMenuButtonActive(event);
+        chuyenTrangVaHighlight("/gui/main/GUI_ThongKeHangHoa.fxml", "Hàng Hóa");
+    }
+
     private void loadDataFromServer() {
         masterData.setAll(daoThuoc.getAllThuoc());
     }
@@ -488,7 +500,6 @@ public class GUI_TrangChuController {
                 if (thuoc.getNuocSanXuat() != null && thuoc.getNuocSanXuat().toLowerCase().contains(filter)) {
                     return true;
                 }
-
                 String keDonString = thuoc.isCanKeDon() ? "co ke don" : "khong ke don";
                 return keDonString.contains(filter);
             });
@@ -529,7 +540,6 @@ public class GUI_TrangChuController {
             DAO_NhatKyHoatDong.ghiLog("DANG_XUAT", "Hệ thống",
                     UserSession.getInstance().getUser().getMaNhanVien(),
                     UserSession.getInstance().getUser().getHoTen() + " đã đăng xuất hệ thống");
-
             nhanVienDangNhap = null;
             UserSession.getInstance().clear();
 
@@ -694,13 +704,6 @@ public class GUI_TrangChuController {
     void handleMoNhatKy(ActionEvent event) {
         setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_NhatKyHoatDong.fxml");
-    }
-
-    // Bổ sung hàm mở trang thống kê hàng hóa kết nối đến file FXML mới viết lại
-    @FXML
-    void handleMoThongKeHangHoa(ActionEvent event) {
-        setMenuButtonActive(event);
-        utils.SceneUtils.switchPage("/gui/main/GUI_ThongKeHangHoa.fxml");
     }
 
     // Logic Card Dashboard có kiểm tra quyền
