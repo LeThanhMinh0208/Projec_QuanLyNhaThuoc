@@ -95,6 +95,9 @@ public class GUI_ThongKeDoanhThuController {
 
     @FXML
     public void initialize() {
+        // Ngăn các listener được kích hoạt khi setup ban đầu
+        suppressAutoReload = true;
+        
         LocalDate today = LocalDate.now();
         dpTuNgay.setValue(today);
         dpDenNgay.setValue(today);
@@ -110,13 +113,15 @@ public class GUI_ThongKeDoanhThuController {
         cbHinhThuc.setValue("Tất cả");
         cbKhoangNhanh.setValue("Tùy chọn");
 
-        setupAutoReload();
-
         // Cấu hình TableView
         setupTableTopKhachHang();
         setupTableProductDead();
 
-        // Tải dữ liệu lần đầu
+        // Setup listeners sau khi tất cả setup xong
+        setupAutoReload();
+
+        // Bật lại auto reload và tải dữ liệu lần đầu
+        suppressAutoReload = false;
         loadDataThongKe();
     }
 

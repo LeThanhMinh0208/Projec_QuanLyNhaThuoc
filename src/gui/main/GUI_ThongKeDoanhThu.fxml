@@ -64,8 +64,8 @@
         <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
             <Label text="Tổng Doanh Thu (VNĐ)" styleClass="kpi-label" />
             <HBox spacing="10" alignment="BOTTOM_LEFT">
-                <Label fx:id="lblTongDoanhThu" text="₫245,678,000" styleClass="kpi-value" />
-                <Label fx:id="lblTongDoanhThuPercent" text="+8.5%" styleClass="kpi-percent kpi-percent-up" />
+                <Label fx:id="lblTongDoanhThu" text="0 ₫" styleClass="kpi-value" />
+                <Label fx:id="lblTongDoanhThuPercent" text="--" styleClass="kpi-percent kpi-percent-up" />
             </HBox>
         </VBox>
 
@@ -73,8 +73,8 @@
         <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
             <Label text="Tổng Đơn Hàng" styleClass="kpi-label" />
             <HBox spacing="10" alignment="BOTTOM_LEFT">
-                <Label fx:id="lblTongDonHang" text="164Đ" styleClass="kpi-value" />
-                <Label fx:id="lblTongDonHangPercent" text="+5.2%" styleClass="kpi-percent kpi-percent-up" />
+                <Label fx:id="lblTongDonHang" text="0 đơn" styleClass="kpi-value" />
+                <Label fx:id="lblTongDonHangPercent" text="--" styleClass="kpi-percent kpi-percent-up" />
             </HBox>
         </VBox>
 
@@ -82,8 +82,8 @@
         <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
             <Label text="Giá Trị Trung Bình/Đơn" styleClass="kpi-label" />
             <HBox spacing="10" alignment="BOTTOM_LEFT">
-                <Label fx:id="lblGiaTrungBinh" text="d1,498,000" styleClass="kpi-value" />
-                <Label fx:id="lblGiaTrungBinhPercent" text="-1.1%" styleClass="kpi-percent kpi-percent-down" />
+                <Label fx:id="lblGiaTrungBinh" text="0 ₫" styleClass="kpi-value" />
+                <Label fx:id="lblGiaTrungBinhPercent" text="--" styleClass="kpi-percent kpi-percent-down" />
             </HBox>
         </VBox>
 
@@ -91,8 +91,8 @@
         <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
             <Label text="Số Khách Hàng" styleClass="kpi-label" />
             <HBox spacing="10" alignment="BOTTOM_LEFT">
-                <Label fx:id="lblSoKhachHang" text="85N" styleClass="kpi-value" />
-                <Label fx:id="lblSoKhachHangPercent" text="+0.7%" styleClass="kpi-percent kpi-percent-up" />
+                <Label fx:id="lblSoKhachHang" text="0 khách" styleClass="kpi-value" />
+                <Label fx:id="lblSoKhachHangPercent" text="--" styleClass="kpi-percent kpi-percent-up" />
             </HBox>
         </VBox>
     </HBox>
@@ -149,7 +149,7 @@
                 </placeholder>
                 <columns>
                     <TableColumn fx:id="colSTT1" text="STT" prefWidth="50" />
-                    <TableColumn fx:id="colTenKhachHang" text="Tên Khách Hàng" prefWidth="120" />
+                    <TableColumn fx:id="colTenKhachHang" text="Tên Khách Hàng" prefWidth="160" />
                     <TableColumn fx:id="colSoDon" text="Số Đơn" prefWidth="80" />
                     <TableColumn fx:id="colTongDoanhThuKH" text="Tổng Doanh Thu" prefWidth="150" />
                 </columns>
