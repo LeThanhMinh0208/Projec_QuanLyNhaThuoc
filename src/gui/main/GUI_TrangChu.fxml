@@ -83,13 +83,12 @@
                         <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/warehouse.png" /></ImageView></graphic>
                         <content>
                            <VBox styleClass="dropdown-content">
-                              <Button onAction="#moTrangDanhMucKho" styleClass="sub-btn" text="Danh Mục Kho" />
-                              <Button onAction="#moQuanLyDonDatHang" styleClass="sub-btn" text="Quản Lý Đơn Đặt Hàng" />
-                              <Button onAction="#moTrangNhapKho" styleClass="sub-btn" text="Nhập Kho" />
-                              <Button onAction="#moTrangXuatKho" styleClass="sub-btn" text="Xuất Kho" />
+                              <Button fx:id="btnDanhMucKho" onAction="#moTrangDanhMucKho" styleClass="sub-btn" text="Danh Mục Kho" />
+                              <Button fx:id="btnDonDatHang" onAction="#moQuanLyDonDatHang" styleClass="sub-btn" text="Quản Lý Đơn Đặt Hàng" />
+                              <Button fx:id="btnNhapKho" onAction="#moTrangNhapKho" styleClass="sub-btn" text="Nhập Kho" />
+                              <Button fx:id="btnXuatKho" onAction="#moTrangXuatKho" styleClass="sub-btn" text="Xuất Kho" />
                               <Button onAction="#moTrangKiemKeKho"  styleClass="sub-btn" text="Kiểm Kê Kho" />
-                               <Button onAction="#moTrangGiaiQuyetKiemKe"  styleClass="sub-btn" text="Giải Quyết Kiểm Kê" />
-                        
+                              <Button onAction="#moTrangGiaiQuyetKiemKe"  styleClass="sub-btn" text="Giải Quyết Kiểm Kê" />
                            </VBox>
                         </content>
                      </TitledPane>
@@ -131,7 +130,7 @@
                         <content>
                            <VBox styleClass="dropdown-content">
                               <Button fx:id="btnDoanhThu" onAction="#handleMoThongKeDoanhThu" styleClass="sub-btn" text="Thống Kê Doanh Thu" />
-                              <Button fx:id="btnHangHoa" styleClass="sub-btn" text="Thống Kê Hàng Hóa" />
+                              <Button fx:id="btnHangHoa" onAction="#handleMoThongKeHangHoa" styleClass="sub-btn" text="Thống Kê Hàng Hóa" />
                               <Button fx:id="btnTonKho" onAction="#handleMoThongKeTonKho" styleClass="sub-btn" text="Thống Kê Tồn Kho" />
                            </VBox>
                         </content>
@@ -161,7 +160,7 @@
                      <children>
                         <HBox fx:id="cardBanThuoc" alignment="CENTER" spacing="15.0" prefHeight="75.0" prefWidth="200.0" styleClass="top-card, card-blue" HBox.hgrow="ALWAYS" onMouseClicked="#handleMoBanThuoc">
                            <children>
-                              <Label styleClass="card-icon" text="🛒" />
+                              <Label styleClass="card-icon" text="💊" />
                               <Label styleClass="card-title" text="BÁN THUỐC" />
                            </children>
                         </HBox>

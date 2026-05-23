@@ -261,6 +261,18 @@ public class GUI_TrangChuController {
         });
     }
 
+    @FXML
+    void handleMoThongKeHangHoa(ActionEvent event) {
+        // Kiểm tra phân quyền tương tự như các chức năng thống kê khác của bạn
+        if (utils.UserSession.getInstance().getUser() != null && 
+            !"Quản lý".equalsIgnoreCase(utils.UserSession.getInstance().getUser().getChucVu())) {
+            new Alert(Alert.AlertType.WARNING, "Bạn không có quyền truy cập Báo Cáo Thống Kê Hàng Hóa.").show();
+            return;
+        }
+        setMenuButtonActive(event);
+        chuyenTrangVaHighlight("/gui/main/GUI_ThongKeHangHoa.fxml", "Hàng Hóa");
+    }
+
     private void loadDataFromServer() { masterData.setAll(daoThuoc.getAllThuoc()); }
 
     private void setupSearchLogic() {
@@ -269,7 +281,6 @@ public class GUI_TrangChuController {
             filteredData.setPredicate(thuoc -> {
                 if (newValue == null || newValue.isEmpty()) return true;
                 String filter = newValue.toLowerCase();
-                // 💡 GIỮ BỘ LỌC CHI TIẾT TỪ HEAD
                 if (thuoc.getTrieuChung() != null && thuoc.getTrieuChung().toLowerCase().contains(filter)) return true;
                 if (thuoc.getMaThuoc().toLowerCase().contains(filter)) return true;
                 if (thuoc.getTenThuoc().toLowerCase().contains(filter)) return true;
@@ -309,7 +320,6 @@ public class GUI_TrangChuController {
 
     @FXML void handleDangXuat(ActionEvent event) {
         try {
-            // 💡 GHI LOG VÀ DỌN DẸP SESSION TỪ INCOMING
             DAO_NhatKyHoatDong.ghiLog("DANG_XUAT", "Hệ thống", 
                 UserSession.getInstance().getUser().getMaNhanVien(),
                 UserSession.getInstance().getUser().getHoTen() + " đã đăng xuất hệ thống");

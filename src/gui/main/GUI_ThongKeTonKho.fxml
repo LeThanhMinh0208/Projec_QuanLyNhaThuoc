@@ -122,6 +122,20 @@
 
             <VBox spacing="20" style="-fx-padding: 36 0 0 0; -fx-min-height: 300; -fx-pref-height: 300;" VBox.vgrow="ALWAYS">
                 <VBox style="-fx-min-height: 300; -fx-pref-height: 300;" styleClass="chart-panel" VBox.vgrow="ALWAYS">
+                    <Label styleClass="chart-title" text="Cơ Cấu Giá Trị Tồn - Biểu Đồ Cột" />
+                    <BarChart fx:id="chartCoCauTonCot" minHeight="250.0" prefHeight="250.0" style="-fx-font-size: 12px; -fx-padding: 10;" VBox.vgrow="ALWAYS">
+                        <xAxis>
+                            <CategoryAxis fx:id="xAxisCoCauTonCot" label="Nhóm Thuốc" styleClass="axis-label" />
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis fx:id="yAxisCoCauTonCot" label="Giá Trị Tồn (đ)" styleClass="axis-label" />
+                        </yAxis>
+                    </BarChart>
+                </VBox>
+            </VBox>
+
+            <VBox spacing="20" style="-fx-padding: 36 0 0 0; -fx-min-height: 300; -fx-pref-height: 300;" VBox.vgrow="ALWAYS">
+                <VBox style="-fx-min-height: 300; -fx-pref-height: 300;" styleClass="chart-panel" VBox.vgrow="ALWAYS">
                     <Label styleClass="chart-title" text="Top 10 Sản Phẩm Tồn Kho Cao Nhất" />
                     <BarChart fx:id="chartTopTonKho" minHeight="250.0" prefHeight="250.0" style="-fx-font-size: 12px; -fx-padding: 10;" VBox.vgrow="ALWAYS">
                         <xAxis>

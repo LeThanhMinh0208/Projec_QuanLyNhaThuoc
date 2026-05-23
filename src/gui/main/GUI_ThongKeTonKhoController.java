@@ -47,6 +47,10 @@ public class GUI_ThongKeTonKhoController {
     @FXML private NumberAxis yAxisBienDong;
     @FXML private PieChart chartCoCauTon;
     @FXML private BarChart<String, Number> chartTopTonKho;
+    
+    @FXML private BarChart<String, Number> chartCoCauTonCot;
+    @FXML private CategoryAxis xAxisCoCauTonCot;
+    @FXML private NumberAxis yAxisCoCauTonCot;
 
     @FXML private TableView<Map<String, Object>> tableTopTonKho;
     @FXML private TableColumn<Map<String, Object>, Integer> colSTTTop;
@@ -279,15 +283,32 @@ public class GUI_ThongKeTonKhoController {
                             List<Map<String, Object>> bienDong,
                             List<Map<String, Object>> topTonKho) {
         loadChartCoCau(tonKhoTheoDanhMuc);
+        loadChartCoCauCot(tonKhoTheoDanhMuc);
         loadChartBienDong(tuNgay, denNgay, bienDong);
         loadChartTopTonKho(topTonKho);
     }
 
     private void loadChartCoCau(List<Map<String, Object>> data) {
         chartCoCauTon.getData().clear();
-        for (Map<String, Object> row : data) {
-            chartCoCauTon.getData().add(new PieChart.Data(String.valueOf(row.get("tenDanhMuc")), toDouble(row.get("giaTriTon"))));
+        if (data != null && !data.isEmpty()) {
+            chartCoCauTon.setVisible(true);
+            for (Map<String, Object> row : data) {
+                chartCoCauTon.getData().add(new PieChart.Data(String.valueOf(row.get("tenDanhMuc")), toDouble(row.get("giaTriTon"))));
+            }
+        } else {
+            // Nếu không có dữ liệu thì ẩn PieChart (không hiển thị gì)
+            chartCoCauTon.setVisible(false);
         }
+    }
+
+    private void loadChartCoCauCot(List<Map<String, Object>> data) {
+        chartCoCauTonCot.getData().clear();
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Giá Trị Tồn (đ)");
+        for (Map<String, Object> row : data) {
+            series.getData().add(new XYChart.Data<>(String.valueOf(row.get("tenDanhMuc")), toDouble(row.get("giaTriTon"))));
+        }
+        chartCoCauTonCot.getData().add(series);
     }
 
     private void loadChartBienDong(LocalDate tuNgay, LocalDate denNgay, List<Map<String, Object>> data) {
