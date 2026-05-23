@@ -31,7 +31,7 @@ public class DAO_ThongKeDoanhThu {
                 "FROM HoaDon hd " +
                 "LEFT JOIN ChiTietHoaDon ct ON hd.maHoaDon = ct.maHoaDon " +
                 "WHERE CAST(hd.ngayLap AS DATE) >= ? AND CAST(hd.ngayLap AS DATE) <= ? " +
-                "AND (hd.ghiChu IS NULL OR hd.ghiChu NOT LIKE N'HĐ xuất bù cho PDT:%') ";
+                "AND (hd.ghiChu IS NULL OR hd.ghiChu NOT LIKE '%HĐ xuất bù%') ";
 
         if (hasFilter(loaiBan)) {
             sql += "AND hd.loaiBan = ? ";
@@ -70,7 +70,7 @@ public class DAO_ThongKeDoanhThu {
     public int getTongDonHang(LocalDate tuNgay, LocalDate denNgay, String loaiBan, String hinhThuc) {
         String sql = "SELECT COUNT(*) as tongDon FROM HoaDon " +
                 "WHERE CAST(ngayLap AS DATE) >= ? AND CAST(ngayLap AS DATE) <= ? " +
-                "AND (ghiChu IS NULL OR ghiChu NOT LIKE N'HĐ xuất bù cho PDT:%') ";
+                "AND (ghiChu IS NULL OR ghiChu NOT LIKE '%HĐ xuất bù%') ";
 
         if (hasFilter(loaiBan)) {
             sql += "AND loaiBan = ? ";
@@ -126,7 +126,7 @@ public class DAO_ThongKeDoanhThu {
     public int getSoKhachHang(LocalDate tuNgay, LocalDate denNgay, String loaiBan, String hinhThuc) {
         String sql = "SELECT COUNT(DISTINCT maKhachHang) as soKH FROM HoaDon " +
                 "WHERE CAST(ngayLap AS DATE) >= ? AND CAST(ngayLap AS DATE) <= ? " +
-                "AND (ghiChu IS NULL OR ghiChu NOT LIKE N'HĐ xuất bù cho PDT:%') ";
+                "AND (ghiChu IS NULL OR ghiChu NOT LIKE '%HĐ xuất bù%') ";
 
         if (hasFilter(loaiBan)) {
             sql += "AND loaiBan = ? ";
@@ -175,7 +175,7 @@ public class DAO_ThongKeDoanhThu {
                 "FROM HoaDon hd " +
                 "LEFT JOIN ChiTietSum cts ON hd.maHoaDon = cts.maHoaDon " +
                 "WHERE CAST(hd.ngayLap AS DATE) >= ? AND CAST(hd.ngayLap AS DATE) <= ? " +
-                "AND (hd.ghiChu IS NULL OR hd.ghiChu NOT LIKE N'HĐ xuất bù cho PDT:%') ";
+                "AND (hd.ghiChu IS NULL OR hd.ghiChu NOT LIKE '%HĐ xuất bù%') ";
 
         if (hasFilter(loaiBan)) {
             sql += "AND hd.loaiBan = ? ";
@@ -234,7 +234,7 @@ public class DAO_ThongKeDoanhThu {
                 "LEFT JOIN Thuoc t ON cts.maThuoc = t.maThuoc " +
                 "LEFT JOIN DanhMucThuoc dm ON t.maDanhMuc = dm.maDanhMuc " +
                 "WHERE CAST(hd.ngayLap AS DATE) >= ? AND CAST(hd.ngayLap AS DATE) <= ? " +
-                "AND (hd.ghiChu IS NULL OR hd.ghiChu NOT LIKE N'HĐ xuất bù cho PDT:%') ";
+                "AND (hd.ghiChu IS NULL OR hd.ghiChu NOT LIKE '%HĐ xuất bù%') ";
 
         if (hasFilter(loaiBan)) {
             sql += "AND hd.loaiBan = ? ";
@@ -291,7 +291,7 @@ public class DAO_ThongKeDoanhThu {
                 "INNER JOIN DonViQuyDoi ON ChiTietHoaDon.maQuyDoi = DonViQuyDoi.maQuyDoi " +
                 "INNER JOIN Thuoc ON DonViQuyDoi.maThuoc = Thuoc.maThuoc " +
                 "WHERE CAST(HoaDon.ngayLap AS DATE) >= ? AND CAST(HoaDon.ngayLap AS DATE) <= ? " +
-                "AND (HoaDon.ghiChu IS NULL OR HoaDon.ghiChu NOT LIKE N'HĐ xuất bù cho PDT:%') ";
+                "AND (HoaDon.ghiChu IS NULL OR HoaDon.ghiChu NOT LIKE '%HĐ xuất bù%') ";
 
         if (hasFilter(loaiBan)) {
             sql += "AND HoaDon.loaiBan = ? ";
@@ -346,14 +346,14 @@ public class DAO_ThongKeDoanhThu {
                 "    SELECT maHoaDon, SUM(soLuong * donGia) as tongTien FROM ChiTietHoaDon GROUP BY maHoaDon" +
                 ")" +
                 "SELECT TOP " + top + " " +
-                "ISNULL(kh.hoTen, N'Khách lẻ') as tenKhachHang, " +
+                "ISNULL(kh.hoTen, 'Khách lẻ') as tenKhachHang, " +
                 "COUNT(hd.maHoaDon) as soDon, " +
                 "ISNULL(SUM(CASE WHEN hd.thueVAT > 0 THEN cts.tongTien * (1 + hd.thueVAT/100) ELSE cts.tongTien END), 0) as doanhThu " +
                 "FROM HoaDon hd " +
                 "LEFT JOIN KhachHang kh ON hd.maKhachHang = kh.maKhachHang " +
                 "LEFT JOIN ChiTietSum cts ON hd.maHoaDon = cts.maHoaDon " +
                 "WHERE CAST(hd.ngayLap AS DATE) >= ? AND CAST(hd.ngayLap AS DATE) <= ? " +
-                "AND (hd.ghiChu IS NULL OR hd.ghiChu NOT LIKE N'HĐ xuất bù cho PDT:%') ";
+                "AND (hd.ghiChu IS NULL OR hd.ghiChu NOT LIKE '%HĐ xuất bù%') ";
 
         if (hasFilter(loaiBan)) {
             sql += "AND hd.loaiBan = ? ";
@@ -403,7 +403,7 @@ public class DAO_ThongKeDoanhThu {
         String sql = "SELECT ISNULL(hd.hinhThucThanhToan, 'KHAC') as hinhThuc, COUNT(*) as soDon " +
                 "FROM HoaDon hd " +
                 "WHERE CAST(hd.ngayLap AS DATE) >= ? AND CAST(hd.ngayLap AS DATE) <= ? " +
-                "AND (hd.ghiChu IS NULL OR hd.ghiChu NOT LIKE N'HĐ xuất bù cho PDT:%') ";
+                "AND (hd.ghiChu IS NULL OR hd.ghiChu NOT LIKE '%HĐ xuất bù%') ";
 
         if (hasFilter(loaiBan)) {
             sql += "AND hd.loaiBan = ? ";
@@ -451,7 +451,7 @@ public class DAO_ThongKeDoanhThu {
                 "t.tenThuoc, " +
                 "ISNULL(CONVERT(VARCHAR, t.maThuoc), 'N/A') as nhomThuoc, " +
                 "ISNULL(SUM(lt.soLuongTon), 0) as tonKho, " +
-                "ISNULL(DATEDIFF(DAY, MAX(hd.ngayLap), CAST(GETDATE() AS DATE)), ?) as soNgayKhongBan " +
+                "ISNULL(DATEDIFF(DAY, MAX(hd.ngayLap), CAST(GETDATE() AS DATE)), " + ngayKhongBan + ") as soNgayKhongBan " +
                 "FROM Thuoc t " +
                 "LEFT JOIN LoThuoc lt ON t.maThuoc = lt.maThuoc AND lt.trangThai = 1 " +
                 "LEFT JOIN (SELECT DISTINCT dv.maThuoc, MAX(hd.ngayLap) as ngayLap " +
@@ -461,7 +461,7 @@ public class DAO_ThongKeDoanhThu {
                 "    GROUP BY dv.maThuoc) hd ON t.maThuoc = hd.maThuoc " +
                 "GROUP BY t.maThuoc, t.tenThuoc " +
                 "HAVING ISNULL(SUM(lt.soLuongTon), 0) > 0 AND " +
-                "ISNULL(DATEDIFF(DAY, MAX(hd.ngayLap), CAST(GETDATE() AS DATE)), ?) >= ? " +
+                "ISNULL(DATEDIFF(DAY, MAX(hd.ngayLap), CAST(GETDATE() AS DATE)), " + ngayKhongBan + ") >= ? " +
                 "ORDER BY soNgayKhongBan DESC";
 
         List<Map<String, Object>> result = new ArrayList<>();
@@ -469,8 +469,6 @@ public class DAO_ThongKeDoanhThu {
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, ngayKhongBan);
-            ps.setInt(2, ngayKhongBan);
-            ps.setInt(3, ngayKhongBan);
 
             ResultSet rs = ps.executeQuery();
             int stt = 1;

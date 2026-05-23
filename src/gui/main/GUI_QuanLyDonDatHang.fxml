@@ -17,17 +17,17 @@
           </children>
       </VBox>
       
-      <HBox alignment="CENTER_LEFT" spacing="20.0">
+   <HBox alignment="CENTER_LEFT" spacing="20.0">
          <children>
             <Button mnemonicParsing="false" onAction="#handleLamMoi" prefHeight="45.0" prefWidth="120.0" styleClass="btn-refresh" text="↻ Làm Mới" />
             <Button mnemonicParsing="false" onAction="#handleTaoDonMoi" prefHeight="45.0" prefWidth="220.0" styleClass="btn-primary" text="+ Tạo Đơn Đặt Hàng Mới" />
             
             <Region prefWidth="20.0" />
             
-            <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-background-radius: 25px; -fx-border-color: #e2e8f0; -fx-border-radius: 25px; -fx-padding: 0 15 0 15;" HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER_LEFT" styleClass="dmk-search-wrapper" HBox.hgrow="ALWAYS">
                <children>
                   <Label style="-fx-font-size: 16px; -fx-text-fill: #0ea5e9;" text="🔍" />
-                  <TextField fx:id="txtTimKiem" prefHeight="45.0" promptText="Tìm mã đơn, nhà cung cấp..." style="-fx-background-color: transparent; -fx-font-size: 14px;" HBox.hgrow="ALWAYS" />
+                  <TextField fx:id="txtTimKiem" prefHeight="45.0" promptText="Tìm mã đơn, nhà cung cấp..." styleClass="dmk-search-field" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
          </children>

@@ -1,6 +1,7 @@
 package gui.dialogs;
 
 import dao.DAO_NhanVien;
+import dao.DAO_NhatKyHoatDong;
 import entity.NhanVien;
 import gui.main.GUI_QuanLyNguoiDungController;
 import javafx.event.ActionEvent;
@@ -69,7 +70,8 @@ public class Dialog_SuaNhanVienController {
         nvDangSua.setSdt(sdt);
 
         if (dao.capNhatThongTin(nvDangSua, isResetPassword)) {
-            new Alert(Alert.AlertType.INFORMATION, "Cập nhật thành công!").show();
+            DAO_NhatKyHoatDong.ghiLog("SUA", "Nhân Viên", nvDangSua.getMaNhanVien(), "Cập nhật thông tin nhân viên: " + nvDangSua.getHoTen());
+            new Alert(Alert.AlertType.INFORMATION, "Cập nhật thành công!").showAndWait();
             parentController.loadData();
             handleHuy(null);
         } else {

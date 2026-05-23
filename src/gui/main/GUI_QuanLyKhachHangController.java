@@ -1,6 +1,7 @@
 package gui.main;
 
 import dao.DAO_KhachHang;
+import dao.DAO_NhatKyHoatDong;
 import entity.KhachHang;
 import gui.dialogs.Dialog_LichSuGiaoDichController;
 import javafx.collections.FXCollections;
@@ -181,7 +182,8 @@ public class GUI_QuanLyKhachHangController {
                 if (newKh != null) {
                     boolean saved = daoKhachHang.themKhachHang(newKh);
                     if (saved) {
-                        showAlert(Alert.AlertType.INFORMATION, "Thành công", "Thêm khách hàng thành công!");
+                        DAO_NhatKyHoatDong.ghiLog("THEM", "Khách Hàng", newKh.getMaKhachHang(), "Thêm khách hàng mới: " + newKh.getHoTen());
+                        new Alert(Alert.AlertType.INFORMATION, "Thêm khách hàng thành công!").show();
                     } else {
                         showAlert(Alert.AlertType.ERROR, "Thất bại", "Lỗi khi thêm khách hàng vào cơ sở dữ liệu!");
                     }

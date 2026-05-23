@@ -38,7 +38,7 @@
       <children>
          <Button fx:id="btnNhapKho" maxWidth="Infinity" minHeight="50" prefHeight="50" style="-fx-font-size: 16px; -fx-font-weight: bold;" onAction="#moTrangNhapKho" styleClass="top-card, card-green, btn-action" text="Nhập Kho" textFill="WHITE" GridPane.columnIndex="0">
             <graphic>
-               <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+               <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                   <image>
                      <Image url="@../../resources/icons/into_warehouse.png" />
                   </image>
@@ -48,7 +48,7 @@
 
          <Button fx:id="btnXuatKho" maxWidth="Infinity" minHeight="50" prefHeight="50" style="-fx-font-size: 16px; -fx-font-weight: bold;" onAction="#handleChuyenTrangXuatKho" styleClass="top-card, card-blue, btn-action" text="Xuất Kho" textFill="WHITE" GridPane.columnIndex="1">
             <graphic>
-               <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+               <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                   <image>
                      <Image url="@../../resources/icons/export_icon.png" />
                   </image>
@@ -58,7 +58,7 @@
 
          <Button fx:id="btnKiemKe" maxWidth="Infinity" minHeight="50" prefHeight="50" style="-fx-font-size: 16px; -fx-font-weight: bold;" onAction="#handleChuyenTrangKiemKe" styleClass="top-card, card-orange, btn-action" text="Kiểm Kê Kho" textFill="WHITE" GridPane.columnIndex="2">
             <graphic>
-               <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+               <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                   <image>
                      <Image url="@../../resources/icons/inventory_icon.png" />
                   </image>

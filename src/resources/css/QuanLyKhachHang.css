@@ -1,0 +1,55 @@
+/* --- NỀN VÀ TIÊU ĐỀ --- */
+.khachhang-main-bg {
+    -fx-background-color: #f0f9ff; 
+}
+
+.xk-title-line {
+    -fx-background-color: #38bdf8;
+    -fx-min-height: 4px;
+    -fx-max-height: 4px;
+    -fx-background-radius: 2px;
+}
+
+/* --- CARDS 3 NÚT CHỨC NĂNG (DÁNG VIÊN THUỐC) --- */
+.top-card {
+    -fx-background-radius: 35px; /* Bo tròn hoàn toàn */
+    -fx-cursor: hand;
+    -fx-font-size: 16px;
+    -fx-font-weight: 900;
+    -fx-text-fill: white;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.15), 10, 0, 0, 4);
+    -fx-transition: all 0.3s ease;
+}
+.top-card:hover { 
+    -fx-translate-y: -3px; 
+}
+
+/* Màu sắc cho các Card */
+.card-green { -fx-background-color: linear-gradient(to bottom right, #34d399, #10b981); }
+.card-blue { -fx-background-color: linear-gradient(to bottom right, #38bdf8, #0ea5e9); }
+.card-orange { -fx-background-color: linear-gradient(to bottom right, #fbbf24, #f59e0b); }
+
+/* --- TÙY CHỈNH BẢNG --- */
+.panel-white {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12px;
+    -fx-padding: 15;
+}
+
+.table-view {
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+}
+
+/* Nút Xem Lịch Sử trong bảng (Nếu sếp muốn thêm sau này) */
+.btn-view-detail {
+    -fx-background-color: #e0f2fe;
+    -fx-text-fill: #0284c7;
+    -fx-font-weight: 900;
+    -fx-font-size: 14px;
+    -fx-background-radius: 20px;
+    -fx-cursor: hand;
+    -fx-padding: 4px 15px;
+    -fx-border-width: 0;
+}

@@ -10,6 +10,7 @@ import dao.DAO_DonThuoc;
 import dao.DAO_HoaDon;
 import dao.DAO_KhachHang;
 import dao.DAO_LoThuoc;
+import dao.DAO_NhatKyHoatDong;
 import dao.DAO_Thuoc;
 import entity.ChiTietHoaDon;
 import entity.DonThuoc;
@@ -462,7 +463,8 @@ public class GUI_QuanLyBanHangController {
                         // User đã nhấp Lưu trong dialog → thêm vào DB
                         boolean saved = daoKhachHang.themKhachHang(result);
                         if (saved) {
-                            currentKhachHang = result;
+                            DAO_NhatKyHoatDong.ghiLog("THEM", "Khách Hàng", result.getMaKhachHang(), "Thêm khách hàng mới từ màn hình bán hàng: " + result.getHoTen());
+                            new Alert(Alert.AlertType.INFORMATION, "Thêm khách hàng thành công!").show();
                             lblTenKhachLe.setText("👤 " + result.getHoTen() + " (Điểm: 0)");
                             txtSdtKhachLe.setText(result.getSdt());
                             if (btnXoaKH != null) {
@@ -565,6 +567,7 @@ public class GUI_QuanLyBanHangController {
 
         boolean ok = daoHoaDon.thanhToan(hd, dsCT);
         if (ok) {
+            DAO_NhatKyHoatDong.ghiLog("TAO_HOA_DON", "Hóa Đơn", hd.getMaHoaDon(), "Tạo hóa đơn bán lẻ: " + hd.getMaHoaDon());
             // Tích điểm
             if (currentKhachHang != null) {
                 int diemCong = (int) ((tongTienLe + thueVatLe) / 1000);
@@ -1128,6 +1131,7 @@ public class GUI_QuanLyBanHangController {
 
         boolean ok = daoHoaDon.thanhToan(hd, dsCT);
         if (ok) {
+            DAO_NhatKyHoatDong.ghiLog("TAO_HOA_DON", "Hóa Đơn", hd.getMaHoaDon(), "Tạo hóa đơn bán theo đơn: " + hd.getMaHoaDon());
             // INSERT DonThuoc nếu donThuocTemp != null
             if (donThuocTemp != null) {
                 donThuocTemp.setMaHoaDon(maHD);

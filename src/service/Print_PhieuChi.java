@@ -1,146 +1,190 @@
 package service;
 
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+import com.itextpdf.text.pdf.draw.DottedLineSeparator;
+import entity.PhieuChi;
+
 import java.awt.Desktop;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.BaseFont;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.pdf.draw.LineSeparator;
-
-import entity.PhieuChi;
-
 public class Print_PhieuChi {
-    private static DecimalFormat df = new DecimalFormat("#,###");
-    private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
-    public static void inPhieu(PhieuChi pc) {
-        // Đường dẫn lưu file PDF tạm
-        String path = "reports/PhieuChi_" + pc.getMaPhieuChi() + ".pdf";
-
+    public static boolean inPhieu(PhieuChi pc, String path) {
+        // Dùng kích thước A5 (nửa tờ A4) cho phiếu chi
+        Document document = new Document(PageSize.A5, 30, 30, 40, 40); 
         try {
-            // Tạo thư mục nếu chưa có
-            File directory = new File("reports");
-            if (!directory.exists()) {
-				directory.mkdirs();
-			}
-
-            Document document = new Document(PageSize.A5.rotate()); // In khổ A5 ngang cho tiết kiệm giấy
             PdfWriter.getInstance(document, new FileOutputStream(path));
             document.open();
 
-            // Cấu hình Font tiếng Việt (Sếp kiểm tra đường dẫn font này trong project nhé)
-            BaseFont bf = BaseFont.createFont("src/resources/fonts/vuArial.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-            Font fontHeader = new Font(bf, 16, Font.BOLD);
-            Font fontTitle = new Font(bf, 13, Font.BOLD);
-            Font fontNormal = new Font(bf, 11, Font.NORMAL);
-            Font fontItalic = new Font(bf, 10, Font.ITALIC);
+            // =======================================================
+            // 1. CÀI ĐẶT FONT TIẾNG VIỆT
+            // =======================================================
+            BaseFont bf = BaseFont.createFont("C:\\Windows\\Fonts\\arial.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            Font fontShopName = new Font(bf, 16, Font.BOLD, BaseColor.BLACK);
+            Font fontTitle = new Font(bf, 14, Font.BOLD, BaseColor.BLACK);
+            Font fontNormal = new Font(bf, 11, Font.NORMAL, BaseColor.BLACK);
+            Font fontBold = new Font(bf, 11, Font.BOLD, BaseColor.BLACK);
+            Font fontItalic = new Font(bf, 10, Font.ITALIC, BaseColor.DARK_GRAY);
+            Font fontTotalRed = new Font(bf, 14, Font.BOLD, new BaseColor(220, 38, 38)); 
 
-            // 1. Thông tin nhà thuốc
-            Paragraph nhaThuoc = new Paragraph("NHÀ THUỐC LONG NGUYÊN", fontHeader);
-            nhaThuoc.setAlignment(Element.ALIGN_LEFT);
-            document.add(nhaThuoc);
+            // =======================================================
+            // 2. HEADER THƯƠNG HIỆU
+            // =======================================================
+            Paragraph shopName = new Paragraph("NHÀ THUỐC LONG NGUYÊN", fontShopName);
+            shopName.setAlignment(Element.ALIGN_CENTER);
+            document.add(shopName);
 
-            document.add(new Paragraph("Địa chỉ: Quận Gò Vấp, TP. Hồ Chí Minh", fontItalic));
-            document.add(new Paragraph("Điện thoại: 0987.xxx.xxx", fontItalic));
-            document.add(new Chunk(new LineSeparator()));
+            Paragraph address = new Paragraph("Đ/c: 12 Nguyễn Văn Bảo, P.Hạnh Thông, TP.HCM\nHotline: 0123.456.789", fontItalic);
+            address.setAlignment(Element.ALIGN_CENTER);
+            document.add(address);
+            
+            document.add(new Paragraph(" "));
 
-            // 2. Tiêu đề phiếu
-            Paragraph title = new Paragraph("\nPHIẾU CHI TIỀN", fontTitle);
+            DottedLineSeparator separator = new DottedLineSeparator();
+            separator.setPercentage(100);
+            separator.setLineColor(BaseColor.GRAY);
+            document.add(new Chunk(separator));
+
+            // =======================================================
+            // 3. TIÊU ĐỀ PHIẾU
+            // =======================================================
+            Paragraph title = new Paragraph("PHIẾU CHI TIỀN", fontTitle);
             title.setAlignment(Element.ALIGN_CENTER);
+            title.setSpacingBefore(15f);
+            title.setSpacingAfter(10f);
             document.add(title);
 
             Paragraph maPhieu = new Paragraph("Mã phiếu: " + pc.getMaPhieuChi(), fontItalic);
             maPhieu.setAlignment(Element.ALIGN_CENTER);
+            maPhieu.setSpacingAfter(20f);
             document.add(maPhieu);
-            document.add(new Paragraph("\n"));
 
-            // 3. Nội dung chi tiết
-            PdfPTable table = new PdfPTable(2);
-            table.setWidthPercentage(100);
-            table.setWidths(new float[]{1.2f, 3f});
+            // =======================================================
+            // 4. THÔNG TIN PHIẾU CHI
+            // =======================================================
+            PdfPTable infoTable = new PdfPTable(2);
+            infoTable.setWidthPercentage(100);
+            infoTable.setWidths(new float[]{2.5f, 5f});
+            infoTable.setSpacingAfter(15f);
 
-            addRow(table, "Nhà cung cấp:", pc.getNhaCungCap().getTenNhaCungCap(), fontNormal);
-            addRow(table, "Lý do chi:", (pc.getGhiChu() == null || pc.getGhiChu().isEmpty()) ? "Thanh toán công nợ" : pc.getGhiChu(), fontNormal);
-            addRow(table, "Hình thức:", dichHinhThuc(pc.getHinhThucChi()), fontNormal);
-            addRow(table, "Số tiền chi:", df.format(pc.getTongTienChi()) + " VNĐ", fontTitle);
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm - dd/MM/yyyy");
+            DecimalFormat df = new DecimalFormat("#,### VNĐ");
 
-            // Dòng quan trọng: Đọc tiền bằng chữ
-            addRow(table, "Bằng chữ:", docSoThanhChu((long) pc.getTongTienChi()), fontItalic);
+            addInfoRow(infoTable, "Ngày chi:", pc.getNgayChi() != null ? sdf.format(pc.getNgayChi()) : "---", fontNormal);
+            addInfoRow(infoTable, "Người nhận (NCC):", pc.getNhaCungCap() != null ? pc.getNhaCungCap().getTenNhaCungCap() : "---", fontBold);
+            addInfoRow(infoTable, "Người lập (NV):", pc.getNhanVien() != null ? pc.getNhanVien().getHoTen() : "---", fontNormal);
+            addInfoRow(infoTable, "Hình thức chi:", dichHinhThuc(pc.getHinhThucChi()), fontNormal);
+            addInfoRow(infoTable, "Lý do / Ghi chú:", pc.getGhiChu() != null ? pc.getGhiChu() : "Thanh toán công nợ", fontNormal);
+            
+            // Dòng đọc số tiền bằng chữ (Tích hợp từ Incoming)
+            addInfoRow(infoTable, "Bằng chữ:", docSoThanhChu((long) pc.getTongTienChi()), fontItalic);
 
-            document.add(table);
+            document.add(infoTable);
 
-            // 4. Chữ ký
-            document.add(new Paragraph("\n"));
-            PdfPTable tableKy = new PdfPTable(2);
-            tableKy.setWidthPercentage(100);
+            // =======================================================
+            // 5. TỔNG CỘNG
+            // =======================================================
+            PdfPTable totalTable = new PdfPTable(2);
+            totalTable.setWidthPercentage(100);
+            totalTable.setSpacingBefore(10f);
+            totalTable.setWidths(new float[]{6f, 4f});
 
-            PdfPCell cell1 = new PdfPCell(new Paragraph("Người lập phiếu\n(Ký và ghi rõ họ tên)", fontNormal));
-            PdfPCell cell2 = new PdfPCell(new Paragraph("Người nhận tiền\n(Ký và ghi rõ họ tên)", fontNormal));
+            PdfPCell cellLabel = new PdfPCell(new Phrase("SỐ TIỀN CHI:", fontTotalRed));
+            cellLabel.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            cellLabel.setBorder(Rectangle.TOP);
+            cellLabel.setBorderColor(BaseColor.LIGHT_GRAY);
+            cellLabel.setPaddingTop(10f);
 
-            cell1.setBorder(Rectangle.NO_BORDER); cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
-            cell2.setBorder(Rectangle.NO_BORDER); cell2.setHorizontalAlignment(Element.ALIGN_CENTER);
+            PdfPCell cellValue = new PdfPCell(new Phrase(df.format(pc.getTongTienChi()), fontTotalRed));
+            cellValue.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            cellValue.setBorder(Rectangle.TOP);
+            cellValue.setBorderColor(BaseColor.LIGHT_GRAY);
+            cellValue.setPaddingTop(10f);
 
-            tableKy.addCell(cell1);
-            tableKy.addCell(cell2);
-            document.add(tableKy);
+            totalTable.addCell(cellLabel);
+            totalTable.addCell(cellValue);
+            document.add(totalTable);
 
-            document.add(new Paragraph("\n\n\n"));
-            Paragraph ngayKy = new Paragraph("Ngày in phiếu: " + sdf.format(new java.util.Date()), fontItalic);
-            ngayKy.setAlignment(Element.ALIGN_RIGHT);
-            document.add(ngayKy);
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph(" "));
+
+            // =======================================================
+            // 6. CHỮ KÝ
+            // =======================================================
+            PdfPTable tableChuKy = new PdfPTable(2);
+            tableChuKy.setWidthPercentage(100);
+            
+            PdfPCell cellNguoiLap = new PdfPCell(new Phrase("Người lập phiếu", fontBold));
+            cellNguoiLap.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cellNguoiLap.setBorder(Rectangle.NO_BORDER);
+            
+            PdfPCell cellNguoiNhan = new PdfPCell(new Phrase("Người nhận tiền", fontBold));
+            cellNguoiNhan.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cellNguoiNhan.setBorder(Rectangle.NO_BORDER);
+            
+            tableChuKy.addCell(cellNguoiLap);
+            tableChuKy.addCell(cellNguoiNhan);
+
+            PdfPCell cellGhiChu1 = new PdfPCell(new Phrase("(Ký và ghi rõ họ tên)", fontItalic));
+            cellGhiChu1.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cellGhiChu1.setBorder(Rectangle.NO_BORDER);
+
+            PdfPCell cellGhiChu2 = new PdfPCell(new Phrase("(Ký và ghi rõ họ tên)", fontItalic));
+            cellGhiChu2.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cellGhiChu2.setBorder(Rectangle.NO_BORDER);
+
+            tableChuKy.addCell(cellGhiChu1);
+            tableChuKy.addCell(cellGhiChu2);
+
+            document.add(tableChuKy);
 
             document.close();
 
-            // Mở file PDF sau khi in xong
-            Desktop.getDesktop().open(new File(path));
+            // =======================================================
+            // 7. TỰ ĐỘNG MỞ FILE PDF SAU KHI XUẤT
+            // =======================================================
+            File pdfFile = new File(path);
+            if (pdfFile.exists() && Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(pdfFile);
+            }
+
+            return true;
 
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 
-    private static void addRow(PdfPTable table, String label, String value, Font font) {
-        PdfPCell cellLabel = new PdfPCell(new Paragraph(label, font));
-        cellLabel.setBorder(Rectangle.NO_BORDER);
-        cellLabel.setPaddingBottom(8);
-
-        PdfPCell cellValue = new PdfPCell(new Paragraph(value, font));
-        cellValue.setBorder(Rectangle.NO_BORDER);
-        cellValue.setPaddingBottom(8);
-
-        table.addCell(cellLabel);
-        table.addCell(cellValue);
+    private static void addInfoRow(PdfPTable table, String label, String value, Font font) {
+        PdfPCell c1 = new PdfPCell(new Phrase(label, font));
+        c1.setBorder(Rectangle.NO_BORDER);
+        c1.setPaddingBottom(8f);
+        
+        PdfPCell c2 = new PdfPCell(new Phrase(value, font));
+        c2.setBorder(Rectangle.NO_BORDER);
+        c2.setPaddingBottom(8f);
+        
+        table.addCell(c1);
+        table.addCell(c2);
     }
 
     private static String dichHinhThuc(String ht) {
-        if ("CHUYEN_KHOAN".equals(ht)) {
-			return "Chuyển Khoản";
-		}
-        if ("THE".equals(ht)) {
-			return "Thẻ";
-		}
+        if ("CHUYEN_KHOAN".equals(ht)) return "Chuyển Khoản";
+        if ("THE".equals(ht)) return "Thẻ";
         return "Tiền Mặt";
     }
 
-    // Hàm phụ trợ đọc số thành chữ (Sếp có thể dùng thư viện hoặc hàm tự viết)
+    /**
+     * Hàm phụ trợ đọc số thành chữ (Demo placeholder từ bản Incoming)
+     */
     public static String docSoThanhChu(long amount) {
-        if (amount == 0) {
-			return "Không đồng";
-		}
-        // Phần này sếp có thể copy hàm đọc số tiền Việt Nam trên mạng vào nhé
-        // Để demo em ghi tạm là:
-        return "(Một số tiền bằng chữ tương ứng) đồng chẵn.";
+        if (amount == 0) return "Không đồng";
+        // Sếp có thể thay logic đọc số chuẩn tiếng Việt vào đây nhé
+        return "(Viết bằng chữ tương ứng số tiền trên) đồng chẵn.";
     }
 }

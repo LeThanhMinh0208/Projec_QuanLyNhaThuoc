@@ -1,14 +1,14 @@
 package gui.main;
 
 import dao.DAO_NhanVien;
+import dao.DAO_NhatKyHoatDong;
 import entity.NhanVien;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-// 🚨 NHỚ PHẢI IMPORT USERSESSION NÀY VÀO 🚨
-import utils.UserSession;
+import utils.UserSession; 
 
 public class GUI_DoiMatKhauController {
 
@@ -20,10 +20,26 @@ public class GUI_DoiMatKhauController {
 
     @FXML
     public void initialize() {
-        // 🚨 LẤY TRỰC TIẾP TỪ USERSESSION, KHÔNG ĐỤNG TỚI TRANG CHỦ 🚨
-        currentUser = UserSession.getInstance().getUser();
+        // 1. Lấy thông tin user tạm thời từ Session
+        NhanVien sessionUser = UserSession.getInstance().getUser(); 
+        
+        if (sessionUser != null) {
+            // 🚨 ĐỒNG BỘ DỮ LIỆU: Lôi dữ liệu MỚI NHẤT từ Database để lấy SĐT/Tên mới nhất
+            for (NhanVien nv : dao.getChiNhanVien()) {
+                if (nv.getMaNhanVien().equals(sessionUser.getMaNhanVien())) {
+                    currentUser = nv; 
+                    // Cập nhật lại Session để các trang khác dùng chung dữ liệu mới
+                    UserSession.getInstance().setUser(nv); 
+                    break;
+                }
+            }
+            
+            // Backup an toàn nếu DB gặp sự cố
+            if (currentUser == null) {
+                currentUser = sessionUser;
+            }
 
-        if (currentUser != null) {
+            // Gán dữ liệu lên giao diện
             txtHoTen.setText(currentUser.getHoTen());
             txtTaiKhoan.setText(currentUser.getTenDangNhap());
         } else {
@@ -34,8 +50,8 @@ public class GUI_DoiMatKhauController {
     @FXML
     void handleLuuThayDoi(ActionEvent event) {
         if (currentUser == null) {
-			return;
-		}
+            return;
+        }
 
         String sdtXacThuc = txtSdt.getText().trim();
         String mkCu = txtMatKhauCu.getText();
@@ -48,7 +64,7 @@ public class GUI_DoiMatKhauController {
             return;
         }
 
-        // 2. XÁC THỰC SỐ ĐIỆN THOẠI
+        // 2. XÁC THỰC SỐ ĐIỆN THOẠI (Dữ liệu đã đồng bộ từ DB ở trên)
         if (!sdtXacThuc.equals(currentUser.getSdt())) {
             new Alert(Alert.AlertType.ERROR, "Số điện thoại xác thực không khớp với hồ sơ của bạn!").show();
             return;
@@ -78,9 +94,12 @@ public class GUI_DoiMatKhauController {
 
         // 5. GỌI DAO ĐỂ LƯU
         if (dao.doiMatKhau(currentUser.getMaNhanVien(), mkMoi)) {
-            // Cập nhật luôn pass trong cái Session hiện tại để đồng bộ
-            currentUser.setMatKhau(mkMoi);
-
+            DAO_NhatKyHoatDong.ghiLog("DOI_MAT_KHAU", "Hệ thống", currentUser.getMaNhanVien(), "Đổi mật khẩu tài khoản");
+            
+            // Cập nhật Session ngay lập tức để đồng bộ toàn hệ thống
+            currentUser.setMatKhau(mkMoi); 
+            UserSession.getInstance().setUser(currentUser); 
+            
             Alert success = new Alert(Alert.AlertType.INFORMATION);
             success.setTitle("Thành Công");
             success.setHeaderText("Đổi mật khẩu thành công!");

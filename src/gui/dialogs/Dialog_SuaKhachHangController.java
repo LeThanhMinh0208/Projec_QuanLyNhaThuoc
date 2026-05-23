@@ -1,6 +1,7 @@
 package gui.dialogs;
 
 import dao.DAO_KhachHang;
+import dao.DAO_NhatKyHoatDong;
 import entity.KhachHang;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -92,7 +93,8 @@ public class Dialog_SuaKhachHangController {
         khachHang.setDiaChi(diaChi);
 
         if (daoKhachHang.capNhatKhachHang(khachHang)) {
-            new Alert(Alert.AlertType.INFORMATION, "Cập nhật thông tin khách hàng thành công!").show();
+            DAO_NhatKyHoatDong.ghiLog("SUA", "Khách Hàng", khachHang.getMaKhachHang(), "Cập nhật thông tin khách hàng: " + khachHang.getHoTen());
+            new Alert(Alert.AlertType.INFORMATION, "Cập nhật khách hàng thành công!").showAndWait();
             handleHuy();
         } else {
             new Alert(Alert.AlertType.ERROR, "Cập nhật thất bại! Vui lòng kiểm tra dữ liệu.").show();

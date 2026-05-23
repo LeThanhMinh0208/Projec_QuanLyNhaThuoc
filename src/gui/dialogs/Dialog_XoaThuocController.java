@@ -1,6 +1,7 @@
 package gui.dialogs;
 
 import dao.DAO_Thuoc;
+import dao.DAO_NhatKyHoatDong;
 import entity.Thuoc;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -31,7 +32,8 @@ public class Dialog_XoaThuocController {
         boolean thanhCong = daoThuoc.xoaThuoc(thuocCanXoa.getMaThuoc());
 
         if (thanhCong) {
-            new Alert(Alert.AlertType.INFORMATION, "Đã xóa thành công.").showAndWait();
+            DAO_NhatKyHoatDong.ghiLog("XOA", "Thuốc", thuocCanXoa.getMaThuoc(), "Xóa mềm thuốc: " + thuocCanXoa.getTenThuoc());
+            new Alert(Alert.AlertType.INFORMATION, "Xóa thuốc thành công!").showAndWait();
         } else {
             new Alert(Alert.AlertType.ERROR, "Có lỗi xảy ra! Vui lòng thử lại.").showAndWait();
         }

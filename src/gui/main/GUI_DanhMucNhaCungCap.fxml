@@ -22,33 +22,55 @@
    <stylesheets>
       <URL value="@../../resources/css/TrangChu.css" />
       <URL value="@../../resources/css/BanHang.css" />
+      <URL value="@../../resources/css/DanhMucNCC.css" />
    </stylesheets>
 
    <padding><Insets bottom="30.0" left="40.0" right="40.0" top="30.0" /></padding>
    
    <children>
-      <!-- Header -->
-      <HBox alignment="CENTER_LEFT" spacing="20">
-          <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity">
-              <children>
-                  <Label styleClass="main-title" text="QUẢN LÝ DANH MỤC NHÀ CUNG CẤP" />
-                  <Region prefHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
-              </children>
-          </VBox>
-      </HBox>
+      <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="-Infinity">
+          <children>
+              <Label styleClass="main-title" text="QUẢN LÝ DANH MỤC NHÀ CUNG CẤP" />
+              <Region prefHeight="4.0" maxWidth="Infinity" style="-fx-background-color: #0ea5e9; -fx-background-radius: 5px;" />
+          </children>
+      </VBox>
 
-      <GridPane hgap="8" maxWidth="Infinity">
+      <GridPane hgap="20" maxWidth="Infinity">
          <columnConstraints>
             <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS" />
             <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS" />
             <ColumnConstraints percentWidth="33.34" hgrow="ALWAYS" />
          </columnConstraints>
          <children>
-            <Button fx:id="btnThem" maxWidth="Infinity" minHeight="40" prefHeight="40" style="-fx-font-size: 13px;" onAction="#handleThem" styleClass="top-card, card-green, btn-action" text="＋ Thêm mới" textFill="WHITE" GridPane.columnIndex="0" />
-
-            <Button fx:id="btnSua" maxWidth="Infinity" minHeight="40" prefHeight="40" style="-fx-font-size: 13px;" onAction="#handleSua" styleClass="top-card, card-blue, btn-action" text="✎ Cập nhật" textFill="WHITE" GridPane.columnIndex="1" />
-
-            <Button fx:id="btnXoa" maxWidth="Infinity" minHeight="40" prefHeight="40" style="-fx-font-size: 13px;" onAction="#handleXoa" styleClass="top-card, card-orange, btn-action" text="✖ Xóa" textFill="WHITE" GridPane.columnIndex="2" />
+            <Button maxWidth="Infinity" minHeight="50" graphicTextGap="10" onAction="#handleThem" styleClass="top-card, card-green" text="Thêm mới" GridPane.columnIndex="0">
+               <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../resources/icons/plus.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            
+            <Button maxWidth="Infinity" minHeight="50" graphicTextGap="10" onAction="#handleSua" styleClass="top-card, card-blue" text="Cập nhật" GridPane.columnIndex="1">
+               <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../resources/icons/fix.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            
+            <Button maxWidth="Infinity" minHeight="50" graphicTextGap="10" onAction="#handleXoa" styleClass="top-card, card-orange" text="Xóa" GridPane.columnIndex="2">
+               <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../resources/icons/minus.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
          </children>
       </GridPane>
 
@@ -57,7 +79,7 @@
             <HBox alignment="CENTER_LEFT" prefHeight="45.0" styleClass="search-box" HBox.hgrow="ALWAYS">
                <children>
                   <Label styleClass="search-icon" text="🔍" />
-                  <TextField fx:id="txtTimKiem" prefHeight="45.0" promptText="Tìm theo tên, SĐT, địa chỉ..." styleClass="search-input" HBox.hgrow="ALWAYS" />
+                  <TextField fx:id="txtTimKiem" promptText="Tìm theo tên, SĐT, địa chỉ..." styleClass="search-input" HBox.hgrow="ALWAYS" />
                   <Button text="Làm mới" onAction="#handleRefresh" styleClass="bh-btn-secondary" prefHeight="32"/>
                </children>
             </HBox>
@@ -66,7 +88,7 @@
 
       <VBox styleClass="panel-white" VBox.vgrow="ALWAYS">
          <children>
-            <TableView fx:id="tableNhaCungCap" prefHeight="500.0" styleClass="table-view" style="-fx-fixed-cell-size: 36;" VBox.vgrow="ALWAYS">
+            <TableView fx:id="tableNhaCungCap" prefHeight="500.0" styleClass="table-view" style="-fx-fixed-cell-size: 50;" VBox.vgrow="ALWAYS">
                <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
                <columns>
                   <TableColumn fx:id="colMa" prefWidth="120.0" text="Mã NCC" />

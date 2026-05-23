@@ -3,6 +3,7 @@ package gui.main;
 import java.util.Optional;
 
 import dao.DAO_NhanVien;
+import dao.DAO_NhatKyHoatDong;
 import entity.NhanVien;
 import gui.dialogs.Dialog_SuaNhanVienController;
 import gui.dialogs.Dialog_ThemNhanVienController;
@@ -62,6 +63,9 @@ public class GUI_QuanLyNguoiDungController {
                     NhanVien nv = getTableView().getItems().get(getIndex());
                     int trangThaiMoi = nv.getTrangThai() == 1 ? 2 : 1; // 1: Mở, 2: Khóa
                     if (daoNhanVien.capNhatTrangThai(nv.getMaNhanVien(), trangThaiMoi)) {
+                        String hd = (trangThaiMoi == 1) ? "MO_KHOA_TAI_KHOAN" : "KHOA_TAI_KHOAN";
+                        String moTa = (trangThaiMoi == 1) ? "Mở khóa tài khoản: " : "Khóa tài khoản: ";
+                        DAO_NhatKyHoatDong.ghiLog(hd, "Nhân Viên", nv.getMaNhanVien(), moTa + nv.getHoTen());
                         nv.setTrangThai(trangThaiMoi);
                         updateItem(nv, false); // Cập nhật lại UI nút ngay lập tức
                     }
@@ -177,7 +181,8 @@ public class GUI_QuanLyNguoiDungController {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             if (daoNhanVien.xoaMemNhanVien(selected.getMaNhanVien())) {
-                new Alert(Alert.AlertType.INFORMATION, "Đã đưa nhân viên vào danh sách Xóa!").show();
+                DAO_NhatKyHoatDong.ghiLog("XOA", "Nhân Viên", selected.getMaNhanVien(), "Xóa mềm nhân viên: " + selected.getHoTen());
+                new Alert(Alert.AlertType.INFORMATION, "Xóa thành công!").show();
                 loadData();
             } else {
                 new Alert(Alert.AlertType.ERROR, "Xóa thất bại!").show();

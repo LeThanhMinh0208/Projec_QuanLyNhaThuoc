@@ -1,16 +1,15 @@
 package dao;
 
+import connectDB.ConnectDB;
+import entity.LoThuoc;
+import entity.NhaCungCap;
+import entity.Thuoc;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import connectDB.ConnectDB;
-import entity.LoThuoc;
-import entity.NhaCungCap;
-import entity.Thuoc;
 
 public class DAO_LoThuoc {
 
@@ -49,7 +48,6 @@ public class DAO_LoThuoc {
                     rs.getInt("trangThai")
                 );
 
-                // Ánh xạ 2 trường mới từ DB lên Object
                 lo.setNgayNhapKho(rs.getDate("ngayNhapKho"));
 
                 if (rs.getString("maNhaCungCap") != null) {
@@ -68,7 +66,6 @@ public class DAO_LoThuoc {
     }
 
     public boolean themLoThuoc(LoThuoc lo) {
-        // Đã cập nhật câu INSERT có thêm ngayNhapKho và maNhaCungCap
         String sql = "INSERT INTO LoThuoc (MaLoThuoc, MaThuoc, NgaySanXuat, HanSuDung, SoLuongTon, GiaNhap, ViTriKho, trangThai, ngayNhapKho, maNhaCungCap) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?)";
 
@@ -103,7 +100,7 @@ public class DAO_LoThuoc {
     public List<LoThuoc> getLoThuocTheoFEFO(String maThuoc, String viTriKho) {
         List<LoThuoc> list = new ArrayList<>();
         String sql = "SELECT * FROM LoThuoc WHERE maThuoc = ? AND viTriKho = ? AND soLuongTon > 0 AND trangThai = 1 ORDER BY hanSuDung ASC";
-        try (Connection con = ConnectDB.getConnection();
+        try (Connection con = ConnectDB.getInstance().getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setString(1, maThuoc);
             pst.setString(2, viTriKho);
@@ -133,7 +130,7 @@ public class DAO_LoThuoc {
                 "  AND viTriKho = 'KHO_BAN_HANG' " +
                 "  AND hanSuDung >= CAST(GETDATE() AS DATE) " +
                 "ORDER BY hanSuDung ASC";
-        try (Connection con = ConnectDB.getConnection();
+        try (Connection con = ConnectDB.getInstance().getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setString(1, maThuoc);
             ResultSet rs = pst.executeQuery();
@@ -167,7 +164,7 @@ public class DAO_LoThuoc {
                      "  AND viTriKho = 'KHO_BAN_HANG' " +
                      "  AND hanSuDung > CAST(GETDATE() AS DATE) " +
                      "ORDER BY hanSuDung ASC";
-        try (Connection con = ConnectDB.getConnection();
+        try (Connection con = ConnectDB.getInstance().getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setString(1, maThuoc);
             ResultSet rs = pst.executeQuery();
@@ -217,9 +214,10 @@ public class DAO_LoThuoc {
         }
         return list;
     }
+    
     public boolean capNhatTrangThaiLo(String maLoThuoc, int trangThaiMoi) {
         String sql = "UPDATE LoThuoc SET trangThai = ? WHERE maLoThuoc = ?";
-        try (Connection con = ConnectDB.getConnection();
+        try (Connection con = ConnectDB.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, trangThaiMoi);
@@ -235,7 +233,7 @@ public class DAO_LoThuoc {
     public int getSoLuongTon(String maLoThuoc) {
         int soLuong = 0;
         String sql = "SELECT soLuongTon FROM LoThuoc WHERE maLoThuoc = ?";
-        try (Connection con = ConnectDB.getConnection();
+        try (Connection con = ConnectDB.getInstance().getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setString(1, maLoThuoc);
             ResultSet rs = pst.executeQuery();
@@ -256,9 +254,9 @@ public class DAO_LoThuoc {
         String sql = "SELECT " +
             "(SELECT ISNULL(SUM(ctpn.soLuong * dq.tyLeQuyDoi), 0) FROM ChiTietPhieuNhap ctpn JOIN DonViQuyDoi dq ON ctpn.maQuyDoi = dq.maQuyDoi WHERE ctpn.maLoThuoc = ?) AS slNhapBanDau, " +
             "(SELECT ISNULL(SUM(cthd.soLuong * dq.tyLeQuyDoi), 0) FROM ChiTietHoaDon cthd JOIN DonViQuyDoi dq ON cthd.maQuyDoi = dq.maQuyDoi WHERE cthd.maLoThuoc = ?) AS slDaBan, " +
-            "(SELECT ISNULL(SUM(soLuong), 0) FROM ChiTietPhieuXuat WHERE maLoThuoc = ? AND loaiPhieu IN (2, 3)) AS slXuatTra";
+            "(SELECT ISNULL(SUM(ctpx.soLuong), 0) FROM ChiTietPhieuXuat ctpx JOIN PhieuXuat px ON ctpx.maPhieuXuat = px.maPhieuXuat WHERE ctpx.maLoThuoc = ? AND px.loaiPhieu IN (2, 3)) AS slXuatTra";
 
-        try (Connection con = ConnectDB.getConnection();
+        try (Connection con = ConnectDB.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, maLoThuoc);
@@ -276,9 +274,45 @@ public class DAO_LoThuoc {
         }
         return result;
     }
+    
+    public List<LoThuoc> getTatCaLoThuocChoXuatHuy(String maThuoc) {
+        List<LoThuoc> list = new ArrayList<>();
+        // Bao gồm cả lô hết hạn (trangThai = 0) để cho phép xuất hủy
+        String sql = "SELECT * FROM LoThuoc WHERE maThuoc = ? AND soLuongTon > 0 ORDER BY hanSuDung ASC";
+
+        connectDB.ConnectDB.getInstance();
+        try (Connection con = ConnectDB.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+
+            pst.setString(1, maThuoc);
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
+                LoThuoc lo = new LoThuoc();
+                lo.setMaLoThuoc(rs.getString("maLoThuoc"));
+                lo.setSoLuongTon(rs.getInt("soLuongTon"));
+                lo.setHanSuDung(rs.getDate("hanSuDung"));
+                lo.setNgaySanXuat(rs.getDate("ngaySanXuat"));
+                lo.setViTriKho(rs.getString("viTriKho"));
+                lo.setGiaNhap(rs.getDouble("giaNhap"));
+                lo.setTrangThai(rs.getInt("trangThai"));
+
+                String maNCC = rs.getString("maNhaCungCap");
+                if (maNCC != null) {
+                    NhaCungCap ncc = new NhaCungCap();
+                    ncc.setMaNhaCungCap(maNCC);
+                    lo.setNhaCungCap(ncc);
+                }
+                list.add(lo);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     public List<LoThuoc> getTatCaLoThuocTraNCC(String maThuoc) {
         List<LoThuoc> list = new ArrayList<>();
-        // Đã bỏ điều kiện viTriKho = ?
         String sql = "SELECT * FROM LoThuoc WHERE maThuoc = ? AND soLuongTon > 0 AND trangThai = 1 ORDER BY hanSuDung ASC";
 
         connectDB.ConnectDB.getInstance();

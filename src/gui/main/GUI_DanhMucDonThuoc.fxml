@@ -24,7 +24,7 @@
       
       <HBox alignment="CENTER_LEFT" spacing="20.0">
          <children>
-            <ComboBox fx:id="cbLocDanhMuc" prefHeight="45.0" prefWidth="250.0" promptText="Tất cả bác sĩ" />
+            <ComboBox fx:id="cbLocDanhMuc" prefHeight="40.0" prefWidth="250.0" promptText="Tất cả bác sĩ" styleClass="xk-input" />
 
             <HBox alignment="CENTER_LEFT" prefHeight="45.0" styleClass="search-box" HBox.hgrow="ALWAYS">
                <children>

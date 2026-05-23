@@ -1,6 +1,7 @@
 package gui.dialogs;
 
 import dao.DAO_NhaCungCap;
+import dao.DAO_NhatKyHoatDong;
 import entity.NhaCungCap;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -105,7 +106,8 @@ public class Dialog_SuaNhaCungCapController {
 
         // 3. Gọi DAO cập nhật (bạn cần implement hàm này trong DAO)
         if (daoNCC.capNhatNhaCungCap(nhaCungCap)) {
-            new Alert(Alert.AlertType.INFORMATION, "Cập nhật nhà cung cấp thành công!").show();
+            DAO_NhatKyHoatDong.ghiLog("SUA", "Nhà Cung Cấp", nhaCungCap.getMaNhaCungCap(), "Cập nhật thông tin nhà cung cấp: " + nhaCungCap.getTenNhaCungCap());
+            new Alert(Alert.AlertType.INFORMATION, "Cập nhật nhà cung cấp thành công!").showAndWait();
             handleHuy();
         } else {
             new Alert(Alert.AlertType.ERROR, "Cập nhật thất bại! Vui lòng kiểm tra dữ liệu.").show();

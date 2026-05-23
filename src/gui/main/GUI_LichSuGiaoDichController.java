@@ -13,9 +13,11 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -37,7 +39,6 @@ public class GUI_LichSuGiaoDichController {
     @FXML private DatePicker dpTuNgay, dpDenNgay;
 
     @FXML private TableView<GiaoDichKhachHang> tableGiaoDich;
-    // Khai báo cột mới
     @FXML private TableColumn<GiaoDichKhachHang, String> colMaHD, colNgayLap, colKhachHang, colSdt;
     @FXML private TableColumn<GiaoDichKhachHang, String> colTamTinh, colVAT, colTongTT, colHinhThuc;
     @FXML private TableColumn<GiaoDichKhachHang, Void> colHanhDong;
@@ -67,7 +68,19 @@ public class GUI_LichSuGiaoDichController {
     }
 
     private void setupTable() {
+        tableGiaoDich.setRowFactory(tv -> {
+            javafx.scene.control.TableRow<entity.GiaoDichKhachHang> row = new javafx.scene.control.TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    moDialogChiTiet(row.getItem());
+                }
+            });
+            return row;
+        });
+
         colMaHD.setCellValueFactory(new PropertyValueFactory<>("maHoaDon"));
+        
+        // ĐÃ GỘP: Gán dữ liệu cột Khách hàng & SĐT kèm chú thích
         colKhachHang.setCellValueFactory(new PropertyValueFactory<>("tenKhachHang")); // Cột Khách hàng
         colSdt.setCellValueFactory(new PropertyValueFactory<>("sdtKhachHang"));       // Cột SĐT
 
@@ -80,14 +93,19 @@ public class GUI_LichSuGiaoDichController {
         colHinhThuc.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getHinhThucLabel()));
 
         colHanhDong.setCellFactory(param -> new TableCell<>() {
-            private final Button btn = new Button("👁 Chi tiết");
+            private final Button btn = new Button("Xem");
             {
-                btn.setStyle("-fx-background-color:#2563eb;-fx-text-fill:white;-fx-font-size:12px;-fx-padding:4 10;-fx-cursor:hand;");
+                btn.getStyleClass().add("btn-view-pill");
                 btn.setOnAction(e -> moDialogChiTiet(getTableView().getItems().get(getIndex())));
             }
             @Override protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : btn);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(btn);
+                    setAlignment(Pos.CENTER);
+                }
             }
         });
     }
@@ -99,8 +117,13 @@ public class GUI_LichSuGiaoDichController {
 
     private void setupFilter() {
         filteredData = new FilteredList<>(masterData, p -> true);
-        tableGiaoDich.setItems(filteredData);
-        applyFilter();
+        
+        // 💡 GIỮ LOGIC TỪ HEAD: Bọc SortedList để người dùng có thể click sắp xếp các cột mượt mà
+        SortedList<GiaoDichKhachHang> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(tableGiaoDich.comparatorProperty());
+        
+        tableGiaoDich.setItems(sortedData);
+        applyFilter(); 
 
         txtTimKiem.textProperty().addListener((obs, oldVal, newVal) -> applyFilter());
     }
@@ -118,9 +141,9 @@ public class GUI_LichSuGiaoDichController {
     private void applyFilter() {
         filteredData.setPredicate(gd -> {
             String keyword = txtTimKiem.getText().toLowerCase().trim();
-
-            // Tìm theo Mã HĐ, Tên KH, hoặc SĐT KH
-            boolean matchText = keyword.isEmpty() ||
+            
+            // ĐÃ GỘP: Tìm theo Mã HĐ, Tên KH, hoặc SĐT KH kèm chú thích rành mạch
+            boolean matchText = keyword.isEmpty() || 
                                 (gd.getMaHoaDon() != null && gd.getMaHoaDon().toLowerCase().contains(keyword)) ||
                                 (gd.getTenKhachHang() != null && gd.getTenKhachHang().toLowerCase().contains(keyword)) ||
                                 (gd.getSdtKhachHang() != null && gd.getSdtKhachHang().contains(keyword));
@@ -132,11 +155,11 @@ public class GUI_LichSuGiaoDichController {
             if (gd.getNgayLap() != null) {
                 LocalDate date = gd.getNgayLap().toLocalDateTime().toLocalDate();
                 if (dpTuNgay.getValue() != null && date.isBefore(dpTuNgay.getValue())) {
-					matchDate = false;
-				}
+                    matchDate = false;
+                }
                 if (dpDenNgay.getValue() != null && date.isAfter(dpDenNgay.getValue())) {
-					matchDate = false;
-				}
+                    matchDate = false;
+                }
             }
             return matchText && matchHT && matchDate;
         });

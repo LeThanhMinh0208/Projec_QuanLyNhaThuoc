@@ -1,5 +1,18 @@
 package gui.dialogs;
 
+import dao.DAO_DanhMucThuoc;
+import dao.DAO_Thuoc;
+import dao.DAO_NhatKyHoatDong;
+import entity.DanhMucThuoc;
+import entity.Thuoc;
+import javafx.collections.FXCollections;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,29 +21,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
-import dao.DAO_DanhMucThuoc;
-import dao.DAO_Thuoc;
-import entity.DanhMucThuoc;
-import entity.Thuoc;
-import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Control;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-
 public class Dialog_ThemThuocController {
 
     @FXML private ImageView imgPreview;
     @FXML private TextField txtMa, txtTen, txtHoatChat, txtHangSX, txtHamLuong;
-    @FXML private ComboBox<String> cbDanhMuc, cbDonVi, cbNuocSX;
+    @FXML private ComboBox<String> cbDanhMuc, cbDonVi, cbNuocSX; 
     @FXML private CheckBox chkKeDon;
     @FXML private TextArea txtCongDung, txtTrieuChung;
 
@@ -47,7 +42,7 @@ public class Dialog_ThemThuocController {
     @FXML
     public void initialize() {
         txtMa.setText(daoThuoc.getMaThuocMoi());
-        txtMa.setEditable(false);
+        txtMa.setEditable(false); 
 
         // Nạp danh mục
         dsDanhMucToanBo = daoDM.getAllDanhMuc();
@@ -76,7 +71,7 @@ public class Dialog_ThemThuocController {
     private void setLoi(Control control, String thongBao) {
         // Đổi viền thành màu đỏ, nền hơi hồng để đập vào mắt
         control.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2px; -fx-border-radius: 8; -fx-background-color: #fef2f2; -fx-background-radius: 8;");
-
+        
         // Gắn Tooltip thông báo lỗi (Hiện ra khi rê chuột vào)
         Tooltip tooltip = new Tooltip("❌ " + thongBao);
         tooltip.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 5px 10px;");
@@ -93,9 +88,7 @@ public class Dialog_ThemThuocController {
         for (Control c : danhSachO) {
             // Lắng nghe sự kiện: Chỉ cần click chuột vào (Focus) là tự động xóa báo lỗi đỏ
             c.focusedProperty().addListener((obs, oldVal, newVal) -> {
-                if (newVal) {
-					xoaLoi(c);
-				}
+                if (newVal) xoaLoi(c);
             });
         }
     }
@@ -139,9 +132,7 @@ public class Dialog_ThemThuocController {
 
         // Xóa sạch các báo lỗi đỏ cũ trước khi kiểm tra lại
         Control[] danhSachO = {txtTen, txtHoatChat, txtHangSX, cbNuocSX, txtHamLuong, cbDonVi, cbDanhMuc, txtCongDung, txtTrieuChung};
-        for (Control c : danhSachO) {
-			xoaLoi(c);
-		}
+        for (Control c : danhSachO) xoaLoi(c);
 
         // --- KIỂM TRA TỪNG Ô (RỖNG VÀ ĐỘ DÀI) ---
 
@@ -205,7 +196,7 @@ public class Dialog_ThemThuocController {
         String congDung = txtCongDung.getText();
         congDung = utils.ValidationUtils.normalizeString(congDung);
         txtCongDung.setText(congDung);
-
+        
         if (!utils.ValidationUtils.isSoftValidText(congDung)) {
             setLoi(txtCongDung, "Công dụng phải từ 2-255 ký tự và chứa ít nhất 1 chữ/số!");
             hopLe = false;
@@ -223,21 +214,14 @@ public class Dialog_ThemThuocController {
         // Nếu có bất kỳ ô nào vi phạm -> Dừng lại và hiện Alert cảnh báo
         if (!hopLe) {
             StringBuilder errorMsg = new StringBuilder("Dữ liệu chưa hợp lệ:\n");
-
+            
             // Re-check for specific critical errors to put in the Alert
-            if (!utils.ValidationUtils.isValidTenThuoc(tenThuoc)) {
-				errorMsg.append("- Tên thuốc không hợp lệ.\n");
-			} else if (daoThuoc.existsByTenThuoc(tenThuoc)) {
-				errorMsg.append("- Tên thuốc này đã tồn tại trong hệ thống.\n");
-			}
-
-            if (tenDMSelected == null || tenDMSelected.trim().isEmpty()) {
-				errorMsg.append("- Chưa chọn danh mục.\n");
-			}
-            if (donViSelected == null || donViSelected.trim().isEmpty()) {
-				errorMsg.append("- Chưa chọn đơn vị tính.\n");
-			}
-
+            if (!utils.ValidationUtils.isValidTenThuoc(tenThuoc)) errorMsg.append("- Tên thuốc không hợp lệ.\n");
+            else if (daoThuoc.existsByTenThuoc(tenThuoc)) errorMsg.append("- Tên thuốc này đã tồn tại trong hệ thống.\n");
+            
+            if (tenDMSelected == null || tenDMSelected.trim().isEmpty()) errorMsg.append("- Chưa chọn danh mục.\n");
+            if (donViSelected == null || donViSelected.trim().isEmpty()) errorMsg.append("- Chưa chọn đơn vị tính.\n");
+            
             errorMsg.append("\nVui lòng kiểm tra lại các ô bị bôi đỏ!");
             new Alert(Alert.AlertType.ERROR, errorMsg.toString()).show();
             return;
@@ -253,14 +237,14 @@ public class Dialog_ThemThuocController {
         }
 
         Thuoc t = new Thuoc();
-        t.setMaThuoc(txtMa.getText());
-        t.setMaDanhMuc(maDM);
+        t.setMaThuoc(txtMa.getText()); 
+        t.setMaDanhMuc(maDM);         
         t.setTenThuoc(tenThuoc);
         t.setHoatChat(hoatChat);
         t.setHangSanXuat(hangSX);
         t.setNuocSanXuat(nuocSX);
         t.setHamLuong(hamLuong);
-        t.setDonViCoBan(donViSelected);
+        t.setDonViCoBan(donViSelected); 
         t.setCanKeDon(chkKeDon.isSelected());
         t.setCongDung(congDung);
         t.setTrieuChung(trieuChung);
@@ -281,6 +265,7 @@ public class Dialog_ThemThuocController {
         t.setTrangThai("DANG_BAN");
 
         if (daoThuoc.themThuoc(t)) {
+            DAO_NhatKyHoatDong.ghiLog("THEM", "Thuốc", t.getMaThuoc(), "Thêm thuốc mới: " + t.getTenThuoc());
             new Alert(Alert.AlertType.INFORMATION, "Thêm thuốc thành công!").showAndWait();
             handleHuy(); // Đóng form
         } else {

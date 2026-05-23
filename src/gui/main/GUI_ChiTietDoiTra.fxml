@@ -22,6 +22,7 @@
     <stylesheets>
         <URL value="@../../resources/css/TrangChu.css" />
         <URL value="@../../resources/css/BanHang.css" />
+         <URL value="@../../resources/css/XuLyDoiTra.css" />
     </stylesheets>
 
     <padding><Insets bottom="20.0" left="30.0" right="30.0" top="20.0" /></padding>

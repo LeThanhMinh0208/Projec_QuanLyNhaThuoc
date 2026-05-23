@@ -6,16 +6,6 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/javafx-sdk-25.0.2/lib/itext-asian-5.2.0.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="C:/javafx-sdk-25.0.2/lib/itextpdf-5.5.13.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="C:/javafx-sdk-25.0.2/lib/javafx.base.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
@@ -72,5 +62,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="P:/Projec_QuanLyNhaThuoc/mssql-jdbc-13.2.1.jre11.jar"/>
+	<classpathentry kind="lib" path="C:/javafx-sdk-25.0.2/lib/itext-asian-5.2.0.jar"/>
+	<classpathentry kind="lib" path="C:/javafx-sdk-25.0.2/lib/itextpdf-5.5.13.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

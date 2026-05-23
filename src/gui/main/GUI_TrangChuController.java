@@ -1,6 +1,16 @@
 package gui.main;
-import java.io.InputStream;
 
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.ResourceBundle;
+
+import dao.DAO_NhatKyHoatDong;
+import dao.DAO_LoThuoc;
+import dao.DAO_ThongKeDoanhThu;
 import dao.DAO_Thuoc;
 import entity.NhanVien;
 import entity.Thuoc;
@@ -11,39 +21,122 @@ import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import utils.UserSession;
 
 public class GUI_TrangChuController {
 
     @FXML
     private TableView<Thuoc> tableThuoc;
     @FXML
-    private TableColumn<Thuoc, String> colMaThuoc, colHinhAnh, colTenThuoc, colTrieuChung, colDVT, colTrangThai;
-    @FXML
-    private TableColumn<Thuoc, Boolean> colKeDon;
+    private TableColumn<Thuoc, String> colMaThuoc, colHinhAnh, colTenThuoc, colTrieuChung, colTrangThai;
     @FXML
     private TextField txtTimKiem;
     @FXML
     private BorderPane mainBorderPane;
 
+    // === SIDEBAR TitledPane (9 nhóm) ===
+    @FXML
+    private TitledPane tpQLBH, tpQLBG, tpQLDT, tpQLT, tpQLK, tpQLKH, tpQLNCC, tpQLND, tpBCTK;
+
+    // === SIDEBAR Button con ===
+    @FXML
+    private Button btnLapHoaDon, btnDanhSachHoaDon, btnXuLyDoiTra;
+    @FXML
+    private Button btnDanhSachBangGia, btnTaoBangGiaMoi;
+    @FXML
+    private Button btnDanhMucDonThuoc;
+    @FXML
+    private Button btnDanhMucThuoc, btnDonViQuyDoi, btnLoThuoc;
+    @FXML
+    private Button btnDanhMucKho, btnDonDatHang, btnNhapKho, btnXuatKho;
+    @FXML
+    private Button btnDanhMucKhachHang, btnLichSuGiaoDich;
+    @FXML
+    private Button btnDanhMucNCC, btnCongNo;
+    @FXML
+    private Button btnDanhMucNguoiDung, btnPhanQuyen, btnNhatKy;
+    @FXML
+    private Button btnDoanhThu, btnHangHoa, btnTonKho;
+
+    // 3 card ở Trang Chủ
+    @FXML
+    private javafx.scene.layout.HBox cardBanThuoc, cardDoiTra, cardBaoCao;
+
+    // === EXPANDED DASHBOARD TABLES ===
+    @FXML
+    private TableView<WarningItem> tableSapHetHan;
+    @FXML
+    private TableColumn<WarningItem, String> colHsdTen, colHsdLo, colHsdNgay;
+
+    @FXML
+    private TableView<WarningItem> tableSapHetTon;
+    @FXML
+    private TableColumn<WarningItem, String> colTonTen, colTonLo, colTonSoLuong;
+
+    @FXML
+    private Label lblMaHDGanNhat, lblLoaiHDGanNhat, lblTienHDGanNhat;
+
+    // Class dữ liệu để hiển thị cảnh báo
+    public static class WarningItem {
+
+        private String name, lo, detail;
+        private int urgency; // 0 = Green/Gray, 1 = Orange, 2 = Dark Red
+
+        public WarningItem(String name, String lo, String detail, int urgency) {
+            this.name = name;
+            this.lo = lo;
+            this.detail = detail;
+            this.urgency = urgency;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getLo() {
+            return lo;
+        }
+
+        public String getDetail() {
+            return detail;
+        }
+
+        public int getUrgency() {
+            return urgency;
+        }
+    }
+
     private final DAO_Thuoc daoThuoc = new DAO_Thuoc();
     private final ObservableList<Thuoc> masterData = FXCollections.observableArrayList();
+    private java.util.Map<String, Integer> stockMap = new java.util.HashMap<>();
     private static NhanVien nhanVienDangNhap;
     private Node noiDungTrangChuGoc;
+
+    private static GUI_TrangChuController instance;
+
+    public static GUI_TrangChuController getInstance() {
+        return instance;
+    }
 
     public static void setNhanVienDangNhap(NhanVien nv) {
         nhanVienDangNhap = nv;
@@ -55,56 +148,265 @@ public class GUI_TrangChuController {
 
     @FXML
     public void initialize() {
+        instance = this;
         setupTable();
+        setupWarningTables(); // Khởi tạo giao diện Dashboard mới
         loadDataFromServer();
+        loadDashboardStats();
         setupSearchLogic();
         utils.SceneUtils.init(mainBorderPane);
         if (mainBorderPane != null) {
             noiDungTrangChuGoc = mainBorderPane.getCenter();
         }
+        apDungPhanQuyen();
+    }
+
+    private void apDungPhanQuyen() {
+        UserSession session = UserSession.getInstance();
+        if (session.getUser() == null) {
+            return;
+        }
+
+        if ("Quản Lý".equals(session.getUser().getChucVu())) {
+            return;
+        }
+
+        Object[][] tpMap = {
+            {tpQLBH, "QLBH"}, {tpQLBG, "QLBG"}, {tpQLDT, "QLDT"},
+            {tpQLT, "QLT"}, {tpQLK, "QLK"}, {tpQLKH, "QLKH"},
+            {tpQLNCC, "QLNCC"}, {tpQLND, "QLND"}, {tpBCTK, "BCTK"}
+        };
+
+        Object[][] btnMap = {
+            {btnLapHoaDon, "QLBH.LAP_HOA_DON"},
+            {btnDanhSachHoaDon, "QLBH.DANH_SACH_HOA_DON"},
+            {btnXuLyDoiTra, "QLBH.XU_LY_DOI_TRA"},
+            {btnDanhSachBangGia, "QLBG.DANH_SACH_BANG_GIA"},
+            {btnTaoBangGiaMoi, "QLBG.TAO_BANG_GIA_MOI"},
+            {btnDanhMucDonThuoc, "QLDT.DANH_MUC_DON_THUOC"},
+            {btnDanhMucThuoc, "QLT.DANH_MUC_THUOC"},
+            {btnDonViQuyDoi, "QLT.DON_VI_QUY_DOI"},
+            {btnLoThuoc, "QLT.LO_THUOC"},
+            {btnDanhMucKho, "QLK.DANH_MUC_KHO"},
+            {btnDonDatHang, "QLK.DON_DAT_HANG"},
+            {btnNhapKho, "QLK.NHAP_KHO"},
+            {btnXuatKho, "QLK.XUAT_KHO"},
+            {btnDanhMucKhachHang, "QLKH.DANH_MUC_KHACH_HANG"},
+            {btnLichSuGiaoDich, "QLKH.LICH_SU_GIAO_DICH"},
+            {btnDanhMucNCC, "QLNCC.DANH_MUC_NHA_CUNG_CAP"},
+            {btnCongNo, "QLNCC.CONG_NO"},
+            {btnDanhMucNguoiDung, "QLND.DANH_MUC_NGUOI_DUNG"},
+            {btnPhanQuyen, "QLND.PHAN_QUYEN"},
+            {btnNhatKy, "QLND.NHAT_KY"},
+            {btnDoanhThu, "BCTK.DOANH_THU"},
+            {btnHangHoa, "BCTK.HANG_HOA"},
+            {btnTonKho, "BCTK.TON_KHO"}
+        };
+
+        for (Object[] pair : btnMap) {
+            Button btn = (Button) pair[0];
+            String maQuyen = (String) pair[1];
+            if (btn != null && !session.hasPermission(maQuyen)) {
+                btn.setVisible(false);
+                btn.setManaged(false);
+            }
+        }
+
+        for (Object[] pair : tpMap) {
+            TitledPane tp = (TitledPane) pair[0];
+            String maCha = (String) pair[1];
+            if (tp != null && !session.hasPermission(maCha)) {
+                boolean coQuyenCon = false;
+                for (Object[] btnPair : btnMap) {
+                    String maConQuyen = (String) btnPair[1];
+                    if (maConQuyen.startsWith(maCha + ".") && session.hasPermission(maConQuyen)) {
+                        coQuyenCon = true;
+                        break;
+                    }
+                }
+                if (!coQuyenCon) {
+                    tp.setVisible(false);
+                    tp.setManaged(false);
+                }
+            }
+        }
+
+        if (cardBanThuoc != null && !session.hasPermission("QLBH.LAP_HOA_DON")) {
+            cardBanThuoc.setVisible(false);
+            cardBanThuoc.setManaged(false);
+        }
+        if (cardDoiTra != null && !session.hasPermission("QLBH.XU_LY_DOI_TRA")) {
+            cardDoiTra.setVisible(false);
+            cardDoiTra.setManaged(false);
+        }
+        if (cardBaoCao != null) {
+            boolean coBCTK = session.hasPermission("BCTK.DOANH_THU")
+                    || session.hasPermission("BCTK.HANG_HOA")
+                    || session.hasPermission("BCTK.TON_KHO");
+            if (!coBCTK) {
+                cardBaoCao.setVisible(false);
+                cardBaoCao.setManaged(false);
+            }
+        }
+    }
+
+    // Nạp định dạng cột cho các bảng cảnh báo
+    private void setupWarningTables() {
+        // 1. SETUP SẮP HẾT HẠN
+        colHsdTen.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getName()));
+        colHsdLo.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getLo()));
+        colHsdNgay.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getDetail()));
+        colHsdNgay.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                getStyleClass().removeAll("text-dark-red", "text-orange", "text-green");
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item);
+                    getStyleClass().add("text-dark-red");
+                }
+            }
+        });
+
+        // 2. SETUP SẮP HẾT HÀNG
+        colTonTen.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getName()));
+        colTonLo.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getLo()));
+        colTonSoLuong.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getDetail()));
+        colTonSoLuong.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                getStyleClass().removeAll("text-dark-red", "text-orange", "text-green");
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item);
+                    getStyleClass().add("text-dark-red");
+                }
+            }
+        });
+    }
+
+    private void loadDashboardStats() {
+        new Thread(() -> {
+            try {
+                // 1. Lấy danh sách lô thuốc từ DB
+                DAO_LoThuoc daoLo = new DAO_LoThuoc();
+                List<entity.LoThuoc> dsLo = daoLo.getAllLoThuoc();
+                java.time.LocalDate today = java.time.LocalDate.now();
+
+                List<WarningItem> sapHetHanList = new ArrayList<>();
+                List<WarningItem> sapHetTonList = new ArrayList<>();
+                java.util.Map<String, Integer> newStockMap = new java.util.HashMap<>();
+
+                for (entity.LoThuoc lo : dsLo) {
+                    if (lo.getTrangThai() == 1) { // Chỉ tính lô đang hoạt động
+                        String maThuoc = lo.getThuoc() != null ? lo.getThuoc().getMaThuoc() : null;
+                        int ton = lo.getSoLuongTon();
+
+                        if (maThuoc != null) {
+                            newStockMap.put(maThuoc, newStockMap.getOrDefault(maThuoc, 0) + ton);
+                        }
+
+                        String tenThuoc = lo.getThuoc() != null ? lo.getThuoc().getTenThuoc() : "Không xác định";
+                        String maLo = lo.getMaLoThuoc() != null ? lo.getMaLoThuoc() : "N/A";
+                        String donVi = lo.getThuoc() != null && lo.getThuoc().getDonViCoBan() != null ? lo.getThuoc().getDonViCoBan() : "Đơn vị";
+
+                        // Xử lý tồn kho
+                        if (ton >= 0 && ton < 100) {
+                            int urgency = (ton <= 30) ? 2 : (ton <= 60 ? 1 : 0);
+                            sapHetTonList.add(new WarningItem(tenThuoc, maLo, ton + " " + donVi, urgency));
+                        }
+
+                        // Xử lý hạn sử dụng
+                        if (lo.getHanSuDung() != null && ton > 0) {
+                            long days = java.time.temporal.ChronoUnit.DAYS.between(today, lo.getHanSuDung().toLocalDate());
+                            if (days >= 0 && days <= 90) {
+                                int urgency = (days <= 30) ? 2 : (days <= 60 ? 1 : 0);
+                                sapHetHanList.add(new WarningItem("⏳ " + tenThuoc, maLo, days + " ngày", urgency));
+                            }
+                        }
+                    }
+                }
+
+                // Cập nhật giao diện trên JavaFX Application Thread
+                javafx.application.Platform.runLater(() -> {
+                    stockMap = newStockMap;
+                    // Cập nhật bảng dữ liệu
+                    tableSapHetHan.setItems(FXCollections.observableArrayList(sapHetHanList));
+                    tableSapHetTon.setItems(FXCollections.observableArrayList(sapHetTonList));
+                    tableThuoc.refresh(); // Cập nhật lại cột số lượng tồn
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    public void chuyenTrangVaHighlight(String fxmlPath, String buttonTextToMatch) {
+        switchPage(fxmlPath);
+        highlightSidebar(buttonTextToMatch);
+    }
+
+    public void highlightSidebar(String buttonTextToMatch) {
+        javafx.application.Platform.runLater(() -> {
+            if (mainBorderPane.getScene() != null) {
+                Parent root = mainBorderPane.getScene().getRoot();
+                root.lookupAll(".sub-btn").forEach(n -> n.getStyleClass().remove("sub-btn-active"));
+                root.lookupAll(".btn-home-special").forEach(n -> n.getStyleClass().remove("btn-home-special-active"));
+
+                for (Node node : root.lookupAll(".sub-btn")) {
+                    if (node instanceof Button) {
+                        Button btn = (Button) node;
+                        if (btn.getText() != null && btn.getText().toLowerCase().contains(buttonTextToMatch.toLowerCase())) {
+                            btn.getStyleClass().add("sub-btn-active");
+                            return;
+                        }
+                    }
+                }
+                for (Node node : root.lookupAll(".btn-home-special")) {
+                    if (node instanceof Button) {
+                        Button btn = (Button) node;
+                        if (btn.getText() != null && btn.getText().toLowerCase().contains(buttonTextToMatch.toLowerCase())) {
+                            btn.getStyleClass().add("btn-home-special-active");
+                            return;
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private void setupTable() {
         colMaThuoc.setCellValueFactory(new PropertyValueFactory<>("maThuoc"));
         colTenThuoc.setCellValueFactory(new PropertyValueFactory<>("tenThuoc"));
         colTrieuChung.setCellValueFactory(new PropertyValueFactory<>("trieuChung"));
-        colDVT.setCellValueFactory(new PropertyValueFactory<>("donViCoBan"));
 
-        colKeDon.setCellValueFactory(new PropertyValueFactory<>("canKeDon"));
-        colKeDon.setCellFactory(column -> new TableCell<>() {
-            @Override
-            protected void updateItem(Boolean item, boolean empty) {
-                super.updateItem(item, empty);
-                getStyleClass().removeAll("text-do", "text-xanh-la");
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item ? "Có" : "Không");
-                    getStyleClass().add(item ? "text-do" : "text-xanh-la");
-                }
-            }
-        });
-
+        // Hiển thị Trạng Thái Tồn Kho thay vì trạng thái bán (để đáp ứng Highlight Đỏ)
         colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
         colTrangThai.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                getStyleClass().removeAll("text-xanh-bien", "text-vang-cam", "text-do");
+                getStyleClass().removeAll("text-xanh-bien", "text-vang-cam", "text-do", "text-dark-red", "text-green");
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    if ("DANG_BAN".equals(item)) {
-                        setText("Đang Bán");
-                        getStyleClass().add("text-xanh-bien");
-                    } else if ("HET_HANG".equals(item)) {
-                        setText("Hết Hàng");
-                        getStyleClass().add("text-vang-cam");
-                    } else if ("NGUNG_BAN".equals(item)) {
-                        setText("Ngừng Bán");
-                        getStyleClass().add("text-do");
-                    } else {
-                        setText(item);
+                    Thuoc t = getTableRow().getItem();
+                    if (t != null) {
+                        int ton = stockMap.getOrDefault(t.getMaThuoc(), 0);
+                        setText(String.valueOf(ton));
+                        if (ton == 0) {
+                            getStyleClass().add("text-dark-red");
+                        } else if (ton <= 30) {
+                            getStyleClass().add("text-orange");
+                        } else {
+                            getStyleClass().add("text-green");
+                        }
+                        setStyle("-fx-font-weight: bold;");
                     }
                 }
             }
@@ -159,28 +461,33 @@ public class GUI_TrangChuController {
 
     private void setupSearchLogic() {
         FilteredList<Thuoc> filteredData = new FilteredList<>(masterData, p -> true);
-        txtTimKiem.textProperty().addListener((observable, oldValue, newValue) -> {
+        txtTimKiem.textProperty().addListener((obs, old, newValue) -> {
             filteredData.setPredicate(thuoc -> {
                 if (newValue == null || newValue.isEmpty()) {
                     return true;
                 }
                 String filter = newValue.toLowerCase();
-
-                if ((thuoc.getTrieuChung() != null && thuoc.getTrieuChung().toLowerCase().contains(filter)) || thuoc.getMaThuoc().toLowerCase().contains(filter) || thuoc.getTenThuoc().toLowerCase().contains(filter)) {
-					return true;
-				}
+                if (thuoc.getTrieuChung() != null && thuoc.getTrieuChung().toLowerCase().contains(filter)) {
+                    return true;
+                }
+                if (thuoc.getMaThuoc().toLowerCase().contains(filter)) {
+                    return true;
+                }
+                if (thuoc.getTenThuoc().toLowerCase().contains(filter)) {
+                    return true;
+                }
                 if (thuoc.getCongDung() != null && thuoc.getCongDung().toLowerCase().contains(filter)) {
-					return true;
-				}
+                    return true;
+                }
                 if (thuoc.getHoatChat() != null && thuoc.getHoatChat().toLowerCase().contains(filter)) {
-					return true;
-				}
+                    return true;
+                }
                 if (thuoc.getHangSanXuat() != null && thuoc.getHangSanXuat().toLowerCase().contains(filter)) {
-					return true;
-				}
+                    return true;
+                }
                 if (thuoc.getNuocSanXuat() != null && thuoc.getNuocSanXuat().toLowerCase().contains(filter)) {
-					return true;
-				}
+                    return true;
+                }
 
                 String keDonString = thuoc.isCanKeDon() ? "co ke don" : "khong ke don";
                 return keDonString.contains(filter);
@@ -191,137 +498,238 @@ public class GUI_TrangChuController {
         tableThuoc.setItems(sortedData);
     }
 
+    private void setMenuButtonActive(ActionEvent event) {
+        if (event == null || !(event.getSource() instanceof Button)) {
+            return;
+        }
+        Button clickedButton = (Button) event.getSource();
+        if (mainBorderPane.getScene() != null) {
+            mainBorderPane.getScene().getRoot().lookupAll(".sub-btn").forEach(n -> n.getStyleClass().remove("sub-btn-active"));
+            mainBorderPane.getScene().getRoot().lookupAll(".btn-home-special").forEach(n -> n.getStyleClass().remove("btn-home-special-active"));
+        }
+        if (clickedButton.getStyleClass().contains("btn-home-special")) {
+            clickedButton.getStyleClass().add("btn-home-special-active");
+        } else {
+            clickedButton.getStyleClass().add("sub-btn-active");
+        }
+    }
+
     @FXML
     void handleVeTrangChu(ActionEvent event) {
         loadDataTrangChu();
         if (noiDungTrangChuGoc != null) {
             mainBorderPane.setCenter(noiDungTrangChuGoc);
         }
+        setMenuButtonActive(event);
     }
 
     @FXML
     void handleDangXuat(ActionEvent event) {
         try {
+            DAO_NhatKyHoatDong.ghiLog("DANG_XUAT", "Hệ thống",
+                    UserSession.getInstance().getUser().getMaNhanVien(),
+                    UserSession.getInstance().getUser().getHoTen() + " đã đăng xuất hệ thống");
+
             nhanVienDangNhap = null;
+            UserSession.getInstance().clear();
+
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             currentStage.close();
-            Parent root = FXMLLoader.load(getClass().getResource("GUI_DangNhap.fxml"));
+
             Stage loginStage = new Stage();
-            loginStage.setScene(new Scene(root));
-            loginStage.setTitle("Dang nhap");
+            loginStage.setScene(new Scene(FXMLLoader.load(getClass().getResource("GUI_DangNhap.fxml"))));
+            loginStage.setTitle("Đăng nhập - Long Nguyên Pharma");
             loginStage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    // Các hàm mở trang cơ bản
     @FXML
     void handleMoQuanLyDanhMucThuoc(ActionEvent event) {
+        setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucThuoc.fxml");
     }
 
     @FXML
     void handleMoQuanLyDonThuoc(ActionEvent event) {
+        setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucDonThuoc.fxml");
     }
 
     @FXML
     void handleMoQuanLyDonViQuyDoi(ActionEvent event) {
+        setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_DonViQuyDoi.fxml");
     }
 
     @FXML
     void handleMoQuanLyBanHangLapHoaDon(ActionEvent event) {
-        switchPage("/gui/main/GUI_QuanLyBanHang.fxml");
-    }
-
-    @FXML
-    void handleMoBanThuoc(javafx.scene.input.MouseEvent event) {
+        setMenuButtonActive(event);
         switchPage("/gui/main/GUI_QuanLyBanHang.fxml");
     }
 
     @FXML
     void handleMoQuanLyKhachHang(ActionEvent event) {
+        setMenuButtonActive(event);
         switchPage("/gui/main/GUI_QuanLyKhachHang.fxml");
     }
 
     @FXML
     void moTrangDanhMucKho(ActionEvent event) {
+        setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucKho.fxml");
     }
 
     @FXML
     void moTrangNhapKho(ActionEvent event) {
+        setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_NhapKho.fxml");
     }
 
     @FXML
     void moTrangXuLyDoiTra(ActionEvent event) {
+        setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_XuLyDoiTra.fxml");
     }
 
     @FXML
     void handleMoXuLyDoiTra(ActionEvent event) {
-        switchPage("/gui/main/GUI_XuLyDoiTra.fxml");
-    }
-
-    @FXML
-    void handleMoXuLyDoiTraCard(javafx.scene.input.MouseEvent event) {
+        setMenuButtonActive(event);
         switchPage("/gui/main/GUI_XuLyDoiTra.fxml");
     }
 
     @FXML
     void moTrangXuatKho(ActionEvent event) {
+        setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_XuatKho.fxml");
     }
 
     @FXML
     void moQuanLyDonDatHang(ActionEvent event) {
+        setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyDonDatHang.fxml");
     }
 
     @FXML
     void handleMoQuanLyDanhMucNhaCungCap(ActionEvent event) {
+        setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_DanhMucNhaCungCap.fxml");
     }
 
     @FXML
     void handleMoQuanLyCongNo(ActionEvent event) {
+        setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyCongNo.fxml");
     }
 
     @FXML
     void handleMoQuanLyBangGia(ActionEvent event) {
+        setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyBangGia.fxml");
     }
 
     @FXML
     void handleMoDanhSachHoaDon(ActionEvent event) {
+        setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_DanhSachHoaDon.fxml");
     }
 
     @FXML
     void handleMoQuanLyLoThuoc(ActionEvent event) {
+        setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyLoThuoc.fxml");
     }
 
     @FXML
     void handleMoQuanLyNguoiDung(ActionEvent event) {
+        setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyNguoiDung.fxml");
     }
 
     @FXML
     void handleMoLichSuGiaoDich(ActionEvent event) {
+        setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_LichSuGiaoDich.fxml");
     }
+
     @FXML
     void handleMoDoiMatKhau(ActionEvent event) {
+        setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_DoiMatKhau.fxml");
     }
 
     @FXML
+    void moTrangKiemKeKho(ActionEvent event) {
+        setMenuButtonActive(event);
+        utils.SceneUtils.switchPage("/gui/main/GUI_KiemKeKho.fxml");
+    }
+
+    @FXML
+    void moTrangGiaiQuyetKiemKe(ActionEvent event) {
+        setMenuButtonActive(event);
+        utils.SceneUtils.switchPage("/gui/main/GUI_GiaiQuyetKiemKe.fxml");
+    }
+
+    @FXML
     void handleMoThongKeDoanhThu(ActionEvent event) {
+        setMenuButtonActive(event);
         utils.SceneUtils.switchPage("/gui/main/GUI_ThongKeDoanhThu.fxml");
+    }
+
+    @FXML
+    void handleMoThongKeTonKho(ActionEvent event) {
+        setMenuButtonActive(event);
+        utils.SceneUtils.switchPage("/gui/main/GUI_ThongKeTonKho.fxml");
+    }
+
+    @FXML
+    void handleMoPhanQuyen(ActionEvent event) {
+        setMenuButtonActive(event);
+        utils.SceneUtils.switchPage("/gui/main/GUI_PhanQuyen.fxml");
+    }
+
+    @FXML
+    void handleMoNhatKy(ActionEvent event) {
+        setMenuButtonActive(event);
+        utils.SceneUtils.switchPage("/gui/main/GUI_NhatKyHoatDong.fxml");
+    }
+
+    // Bổ sung hàm mở trang thống kê hàng hóa kết nối đến file FXML mới viết lại
+    @FXML
+    void handleMoThongKeHangHoa(ActionEvent event) {
+        setMenuButtonActive(event);
+        utils.SceneUtils.switchPage("/gui/main/GUI_ThongKeHangHoa.fxml");
+    }
+
+    // Logic Card Dashboard có kiểm tra quyền
+    @FXML
+    void handleMoBanThuoc(javafx.scene.input.MouseEvent event) {
+        if (!UserSession.getInstance().hasPermission("QLBH.LAP_HOA_DON")) {
+            new Alert(Alert.AlertType.WARNING, "Bạn không có quyền truy cập trang Bán Hàng.").show();
+            return;
+        }
+        chuyenTrangVaHighlight("/gui/main/GUI_QuanLyBanHang.fxml", "Lập Hóa Đơn");
+    }
+
+    @FXML
+    void handleMoXuLyDoiTraCard(javafx.scene.input.MouseEvent event) {
+        if (!UserSession.getInstance().hasPermission("QLBH.XU_LY_DOI_TRA")) {
+            new Alert(Alert.AlertType.WARNING, "Bạn không có quyền truy cập trang Xử Lý Đổi Trả.").show();
+            return;
+        }
+        chuyenTrangVaHighlight("/gui/main/GUI_XuLyDoiTra.fxml", "Đổi Trả");
+    }
+
+    @FXML
+    void handleMoBaoCaoCard(javafx.scene.input.MouseEvent event) {
+        UserSession session = UserSession.getInstance();
+        if (!session.hasPermission("BCTK.DOANH_THU") && !session.hasPermission("BCTK.HANG_HOA") && !session.hasPermission("BCTK.TON_KHO")) {
+            new Alert(Alert.AlertType.WARNING, "Bạn không có quyền truy cập Báo Cáo Thống Kê.").show();
+            return;
+        }
+        chuyenTrangVaHighlight("/gui/main/GUI_ThongKeDoanhThu.fxml", "Doanh Thu");
     }
 
     @FXML
@@ -334,8 +742,8 @@ public class GUI_TrangChuController {
                 ((GUI_QuanLyBangGiaController) controller).handleThemBangGiaMoi();
             }
             mainBorderPane.setCenter(root);
+            setMenuButtonActive(event);
         } catch (Exception e) {
-            System.err.println("Loi mo Tao Bang Gia: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -345,7 +753,6 @@ public class GUI_TrangChuController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
             Object controller = loader.getController();
-
             if (controller instanceof GUI_TrangChuController) {
                 ((GUI_TrangChuController) controller).loadDataTrangChu();
             } else if (controller instanceof GUI_QuanLyBanHangController) {
@@ -353,12 +760,12 @@ public class GUI_TrangChuController {
             }
             mainBorderPane.setCenter(root);
         } catch (Exception e) {
-            System.err.println("Loi nap file FXML: " + fxmlPath);
             e.printStackTrace();
         }
     }
 
     public void loadDataTrangChu() {
         masterData.setAll(daoThuoc.getAllThuoc());
+        loadDashboardStats(); // Load lại cả số liệu cảnh báo khi quay về
     }
 }

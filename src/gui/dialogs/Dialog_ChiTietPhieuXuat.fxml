@@ -62,10 +62,13 @@
          <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
       </TableView>
 
-      <HBox alignment="CENTER_RIGHT" spacing="20.0">
+    <HBox alignment="CENTER_RIGHT" spacing="20.0">
          <Label fx:id="lblTextTongTien" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Tổng giá trị:" />
          <Label fx:id="lblTongTien" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #ef4444;" text="0 VNĐ" />
          <Region HBox.hgrow="ALWAYS" />
+         
+         <Button onAction="#handleInPhieu" prefHeight="45.0" prefWidth="180.0" style="-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="🖨 IN PHIẾU PDF" />
+         
          <Button onAction="#handleDong" prefHeight="45.0" prefWidth="150.0" style="-fx-background-color: #64748b; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="ĐÓNG CỬA SỔ" />
       </HBox>
    </children>

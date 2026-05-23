@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import java.net.URL?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.Region?>
-<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 
 <VBox prefHeight="800.0" prefWidth="1200.0" spacing="25.0" styleClass="main-bg" 
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
@@ -24,18 +27,42 @@
         </VBox>
     </HBox>
 
-    <GridPane hgap="8" maxWidth="Infinity">
+    <GridPane hgap="20" maxWidth="Infinity">
          <columnConstraints>
             <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS" />
             <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS" />
             <ColumnConstraints percentWidth="33.34" hgrow="ALWAYS" />
          </columnConstraints>
-             <children>
-            <Button fx:id="btnThem" maxWidth="Infinity" minHeight="40" prefHeight="40" style="-fx-font-size: 13px;" onAction="#handleThem" styleClass="top-card, card-green, btn-action" text="＋ Thêm mới" textFill="WHITE" GridPane.columnIndex="0" />
-
-            <Button fx:id="btnSua" maxWidth="Infinity" minHeight="40" prefHeight="40" style="-fx-font-size: 13px;" onAction="#handleSua" styleClass="top-card, card-blue, btn-action" text="✎ Cập nhật" textFill="WHITE" GridPane.columnIndex="1" />
-
-            <Button fx:id="btnXoa" maxWidth="Infinity" minHeight="40" prefHeight="40" style="-fx-font-size: 13px;" onAction="#handleXoa" styleClass="top-card, card-orange, btn-action" text="✖ Xóa" textFill="WHITE" GridPane.columnIndex="2" />
+         <children>
+            <Button fx:id="btnThem" maxWidth="Infinity" minHeight="50" prefHeight="50" graphicTextGap="10" onAction="#handleThem" styleClass="top-card, card-green, btn-action" text="Thêm mới" textFill="WHITE" GridPane.columnIndex="0">
+                <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../resources/icons/plus.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            
+            <Button fx:id="btnSua" maxWidth="Infinity" minHeight="50" prefHeight="50" graphicTextGap="10" onAction="#handleSua" styleClass="top-card, card-blue, btn-action" text="Cập nhật" textFill="WHITE" GridPane.columnIndex="1">
+                <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../resources/icons/fix.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            
+            <Button fx:id="btnXoa" maxWidth="Infinity" minHeight="50" prefHeight="50" graphicTextGap="10" onAction="#handleXoa" styleClass="top-card, card-orange, btn-action" text="Xóa" textFill="WHITE" GridPane.columnIndex="2">
+                <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../resources/icons/minus.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
          </children>
     </GridPane>
 

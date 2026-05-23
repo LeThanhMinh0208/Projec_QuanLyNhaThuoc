@@ -37,9 +37,10 @@ public class DAO_PhieuDoiTra {
         String sql =
                 "SELECT ct.maQuyDoi, ct.maLoThuoc, t.tenThuoc, dv.tenDonVi, lo.hanSuDung, " +
                 "       SUM(ct.soLuong) AS soLuongDaMua, " +
-                "       ISNULL((SELECT SUM(dt.soLuong) " +
+                "       ISNULL((SELECT SUM(dt.soLuong / NULLIF(dv2.tyLeQuyDoi, 0)) " +
                 "               FROM ChiTietDoiTra dt " +
                 "               JOIN PhieuDoiTra pdt ON pdt.maPhieuDoiTra = dt.maPhieuDoiTra " +
+                "               JOIN DonViQuyDoi dv2 ON dv2.maQuyDoi = dt.maQuyDoi " +
                 "               WHERE pdt.maHoaDon = ct.maHoaDon " +
                 "                 AND dt.maQuyDoi = ct.maQuyDoi " +
                 "                 AND dt.maLoThuoc = ct.maLoThuoc), 0) AS soLuongDaTra, " +
@@ -220,13 +221,21 @@ public class DAO_PhieuDoiTra {
                 }
             }
 
-            // --- INSERT ChiTietDoiTra + cộng tồn thuốc trả ---
+         // --- INSERT ChiTietDoiTra + cộng tồn thuốc trả ---
             String sqlChiTiet = "INSERT INTO ChiTietDoiTra(maPhieuDoiTra, maQuyDoi, maLoThuoc, soLuong, tinhTrang) VALUES(?,?,?,?,?)";
+            // 🚨 CHỈ CỘNG VÀO TỒN KHO. (VÌ DB SẾP KHÔNG CÓ CỘT soLuongKhachTra NÊN KHÔNG ĐƯỢC THÊM VÀO)
             String sqlCongTon = "UPDATE LoThuoc SET soLuongTon = soLuongTon + ? WHERE maLoThuoc = ?";
 
             for (ChiTietDoiTra ct : chiTietHopLe) {
+                // soLuongConLai trả về đơn vị CƠ BẢN (Viên) sau khi fix
                 int soLuongConLai = getSoLuongConLaiCoTheDoi(con, pdt.getHoaDon().getMaHoaDon(), ct.getMaQuyDoi(), ct.getMaLoThuoc());
-                if (ct.getSoLuong() <= 0 || ct.getSoLuong() > soLuongConLai) {
+
+                // 💡 BƯỚC QUAN TRỌNG NHẤT: Lấy tỷ lệ quy đổi và nhân lên để ra SỐ VIÊN (VD: 1 Hộp * 100 = 100 Viên)
+                int tyLeQuyDoi = getTyLeQuyDoi(con, ct.getMaQuyDoi());
+                int soLuongCoBan = ct.getSoLuong() * tyLeQuyDoi;
+
+                // So sánh cùng đơn vị cơ bản với soLuongConLai
+                if (soLuongCoBan <= 0 || soLuongCoBan > soLuongConLai) {
                     con.rollback();
                     con.setAutoCommit(true);
                     return false;
@@ -236,19 +245,21 @@ public class DAO_PhieuDoiTra {
                     pst.setString(1, ct.getMaPhieuDoiTra());
                     pst.setString(2, ct.getMaQuyDoi());
                     pst.setString(3, ct.getMaLoThuoc());
-                    pst.setInt(4, ct.getSoLuong());
+                    
+                    // 💡 LƯU SỐ LƯỢNG CƠ BẢN (100 Viên) VÀO BẢNG CHI TIẾT
+                    pst.setInt(4, soLuongCoBan); 
+                    
                     pst.setString(5, ct.getTinhTrang());
                     pst.executeUpdate();
                 }
 
-                int tyLeQuyDoi = getTyLeQuyDoi(con, ct.getMaQuyDoi());
                 try (PreparedStatement pst = con.prepareStatement(sqlCongTon)) {
-                    pst.setInt(1, ct.getSoLuong() * tyLeQuyDoi);
+                    // 💡 CỘNG SỐ LƯỢNG CƠ BẢN (100 Viên) VÀO TỒN KHO
+                    pst.setInt(1, soLuongCoBan); 
                     pst.setString(2, ct.getMaLoThuoc());
                     pst.executeUpdate();
                 }
             }
-
             // --- Trừ tồn kho thuốc đổi cho khách (DOI_SAN_PHAM - Hỗ trợ trừ nhiều lô FEFO) ---
             if (dsThuocDoi != null && !dsThuocDoi.isEmpty()) {
                 for (DoiTraSession.DonViDoiData thuocDoi : dsThuocDoi) {
@@ -370,7 +381,10 @@ public class DAO_PhieuDoiTra {
     }
 
     private int getSoLuongConLaiCoTheDoi(Connection con, String maHoaDon, String maQuyDoi, String maLoThuoc) throws SQLException {
-        String sqlDaMua = "SELECT ISNULL(SUM(soLuong), 0) FROM ChiTietHoaDon WHERE maHoaDon = ? AND maQuyDoi = ? AND maLoThuoc = ?";
+        // daMua: quy về đơn vị cơ bản (x tyLeQuyDoi) để khớp với daTra (đã lưu dạng cơ bản)
+        String sqlDaMua = "SELECT ISNULL(SUM(ct.soLuong * dv.tyLeQuyDoi), 0) FROM ChiTietHoaDon ct " +
+                "JOIN DonViQuyDoi dv ON ct.maQuyDoi = dv.maQuyDoi " +
+                "WHERE ct.maHoaDon = ? AND ct.maQuyDoi = ? AND ct.maLoThuoc = ?";
         String sqlDaTra =
                 "SELECT ISNULL(SUM(dt.soLuong), 0) FROM ChiTietDoiTra dt " +
                 "JOIN PhieuDoiTra pdt ON pdt.maPhieuDoiTra = dt.maPhieuDoiTra " +
