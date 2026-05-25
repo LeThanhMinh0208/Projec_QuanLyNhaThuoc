@@ -37,8 +37,9 @@ public class GUI_KiemKeKhoController {
     @FXML private TextField txtTimKiemThuoc;
 
     @FXML private TableView<ChiTietKiemKeUI> tableChiTietDem;
-    @FXML private TableColumn<ChiTietKiemKeUI, String> colMaLoDem, colTenThuocDem;
+    @FXML private TableColumn<ChiTietKiemKeUI, String> colMaLoDem, colTenThuocDem, colTrangThaiDem;
     @FXML private TableColumn<ChiTietKiemKeUI, Integer> colTonSnapshotDem, colThucTeDem;
+    @FXML private TableColumn<ChiTietKiemKeUI, Void> colChotDem;
 
     private DAO_KiemKeKho dao = new DAO_KiemKeKho();
     private ObservableList<LoThuocUI> dsLoThuoc = FXCollections.observableArrayList();
@@ -46,6 +47,8 @@ public class GUI_KiemKeKhoController {
 
     private static String currentMaPhieu = null;
     private static boolean isDangKiemKe = false;
+
+    public static boolean isCoPhieuDangKiemKe() { return isDangKiemKe; }
 
     @FXML
     public void initialize() {
@@ -130,20 +133,104 @@ public class GUI_KiemKeKhoController {
         });
     }
 
+    private static final java.text.SimpleDateFormat TIME_FMT = new java.text.SimpleDateFormat("HH:mm:ss");
+
     private void setupTableDem() {
         colMaLoDem.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().maLoThuoc));
         colTenThuocDem.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().tenThuoc));
         colTonSnapshotDem.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().tonKhoSnapshot).asObject());
-
         colThucTeDem.setCellValueFactory(c -> c.getValue().soLuongKiemTraProperty().asObject());
+
+        // Dòng đã chốt → nền xanh lá nhạt
+        tableChiTietDem.setRowFactory(tv -> new TableRow<ChiTietKiemKeUI>() {
+            private ChiTietKiemKeUI boundItem = null;
+            private final javafx.beans.value.ChangeListener<Boolean> daChotListener = (obs, o, n) -> {
+                getStyleClass().remove("row-da-chot");
+                if (Boolean.TRUE.equals(n)) getStyleClass().add("row-da-chot");
+            };
+            @Override protected void updateItem(ChiTietKiemKeUI item, boolean empty) {
+                super.updateItem(item, empty);
+                if (boundItem != null) { boundItem.daChotProperty().removeListener(daChotListener); boundItem = null; }
+                getStyleClass().remove("row-da-chot");
+                if (item != null && !empty) {
+                    boundItem = item;
+                    boundItem.daChotProperty().addListener(daChotListener);
+                    if (item.isDaChot()) getStyleClass().add("row-da-chot");
+                }
+            }
+        });
+
+        // Cột Trạng Thái
+        colTrangThaiDem.setCellValueFactory(c -> {
+            ChiTietKiemKeUI row = c.getValue();
+            if (row.isDaChot() && row.thoiDiemDem != null)
+                return new SimpleStringProperty("✓ " + TIME_FMT.format(row.thoiDiemDem));
+            return new SimpleStringProperty("⏳ Chưa chốt");
+        });
+        colTrangThaiDem.setCellFactory(col -> new TableCell<ChiTietKiemKeUI, String>() {
+            @Override protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) { setText(null); setStyle(""); return; }
+                setText(item);
+                getStyleClass().removeAll("text-da-chot", "text-chua-chot");
+                getStyleClass().add(item.startsWith("✓") ? "text-da-chot" : "text-chua-chot");
+            }
+        });
+
+        // Cột Thao Tác (Chốt / Mở lại)
+        colChotDem.setCellFactory(col -> new TableCell<ChiTietKiemKeUI, Void>() {
+            private final Button btn = new Button();
+            private ChiTietKiemKeUI boundRow = null;
+            private final javafx.beans.value.ChangeListener<Boolean> daChotListener =
+                    (obs, o, n) -> refreshBtn();
+
+            {
+                btn.setOnAction(e -> {
+                    TableRow<?> tr = getTableRow();
+                    if (tr == null) return;
+                    ChiTietKiemKeUI row = (ChiTietKiemKeUI) tr.getItem();
+                    if (row == null) return;
+                    if (row.isDaChot()) handleMoLaiDem(row);
+                    else handleChotDem(row);
+                });
+            }
+
+            @Override protected void updateItem(Void v, boolean empty) {
+                super.updateItem(v, empty);
+                if (boundRow != null) {
+                    boundRow.daChotProperty().removeListener(daChotListener);
+                    boundRow = null;
+                }
+                if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
+                    setGraphic(null);
+                    return;
+                }
+                boundRow = getTableView().getItems().get(getIndex());
+                boundRow.daChotProperty().addListener(daChotListener);
+                refreshBtn();
+                setGraphic(btn);
+                setAlignment(javafx.geometry.Pos.CENTER);
+            }
+
+            private void refreshBtn() {
+                btn.getStyleClass().removeAll("btn-chot-dem", "btn-mo-lai-dem");
+                if (boundRow != null && boundRow.isDaChot()) {
+                    btn.setText("↩ Mở lại");
+                    btn.getStyleClass().add("btn-mo-lai-dem");
+                } else {
+                    btn.setText("✓ Chốt");
+                    btn.getStyleClass().add("btn-chot-dem");
+                }
+            }
+        });
 
         // CHỐNG NUỐT CLICK
         viewDangDem.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
             javafx.scene.Node target = (javafx.scene.Node) event.getTarget();
             while (target != null) {
-                if (target instanceof TextField) return; 
+                if (target instanceof TextField) return;
                 if (target instanceof Button) {
-                    tableChiTietDem.requestFocus(); 
+                    tableChiTietDem.requestFocus();
                     return;
                 }
                 target = target.getParent();
@@ -156,10 +243,12 @@ public class GUI_KiemKeKhoController {
 
             @Override
             public void startEdit() {
+                ChiTietKiemKeUI rowData = getTableRow() != null ? (ChiTietKiemKeUI) getTableRow().getItem() : null;
+                if (rowData != null && rowData.isDaChot()) return;
                 super.startEdit();
                 if (textField == null) {
                     textField = new TextField(getString());
-                    textField.setStyle("-fx-text-fill: black; -fx-background-color: white; -fx-border-color: #0ea5e9; -fx-alignment: center;");
+                    textField.setStyle("-fx-text-fill: black; -fx-background-color: white; -fx-border-color: #0ea5e9; -fx-alignment: center; -fx-pref-height: 32px; -fx-max-height: 32px;");
                     
                     textField.setOnAction(e -> xuLyNhapLieu(textField.getText()));
                     
@@ -184,21 +273,16 @@ public class GUI_KiemKeKhoController {
                     int slNhap = Integer.parseInt(text.trim());
                     if (slNhap < 0) slNhap = 0; // Chặn số âm
                     
-                    ChiTietKiemKeUI rowData = getTableRow().getItem();
-                    if (rowData != null) {
-                        int maxChoPhep = Math.max(rowData.tongNhapBanDau, rowData.tonKhoSnapshot);
-                        
-                        // Ép về Max nếu gõ lố và bật thông báo
-                        if (maxChoPhep > 0 && slNhap > maxChoPhep) {
-                            slNhap = maxChoPhep;
-                            final int slThuc = slNhap; // Biến hằng để ném vào thread
-                            
-                            // Bọc trong Platform.runLater để không bị lỗi giật bảng của JavaFX
-                            javafx.application.Platform.runLater(() -> {
-                                AlertUtils.showAlert(Alert.AlertType.WARNING, "Vượt quá giới hạn", 
-                                        "Số lượng đếm không được vượt quá số lượng đã nhập ban đầu (" + slThuc + ")!");
-                            });
-                        }
+                    int idx = getIndex();
+                    ChiTietKiemKeUI rowData = (idx >= 0 && idx < tableChiTietDem.getItems().size())
+                            ? tableChiTietDem.getItems().get(idx) : null;
+                    if (rowData != null && rowData.tongNhapBanDau > 0 && slNhap > rowData.tongNhapBanDau) {
+                        slNhap = rowData.tongNhapBanDau;
+                        final int slThuc = slNhap;
+                        javafx.application.Platform.runLater(() -> {
+                            AlertUtils.showAlert(Alert.AlertType.WARNING, "Vượt quá giới hạn",
+                                    "Số lượng đếm không được vượt quá tổng số lượng nhập ban đầu của lô (" + slThuc + " viên)!");
+                        });
                     }
                     commitEdit(slNhap);
                 } catch (NumberFormatException ex) { 
@@ -250,12 +334,36 @@ public class GUI_KiemKeKhoController {
         colThucTeDem.setOnEditCommit(e -> {
             ChiTietKiemKeUI row = e.getRowValue();
             row.setSoLuongKiemTra(e.getNewValue() == null ? 0 : e.getNewValue());
-            row.thoiDiemDem = new Timestamp(System.currentTimeMillis());
             tuDongLuuTungDong(row);
         });
 
         tableChiTietDem.setEditable(true);
         colThucTeDem.setEditable(true);
+        tableChiTietDem.setFixedCellSize(40);
+    }
+
+    private void handleChotDem(ChiTietKiemKeUI row) {
+        // Defer to let any pending text-field focusLoss commit run first
+        javafx.application.Platform.runLater(() -> {
+            int soLuong = row.getSoLuongKiemTra();
+            if (row.tongNhapBanDau > 0 && soLuong > row.tongNhapBanDau) {
+                AlertUtils.showAlert(Alert.AlertType.WARNING, "Vượt quá giới hạn",
+                        "Số lượng đếm (" + soLuong + " viên) vượt quá tổng nhập ban đầu của lô ("
+                        + row.tongNhapBanDau + " viên).\nVui lòng sửa lại trước khi chốt.");
+                return;
+            }
+            row.thoiDiemDem = new Timestamp(System.currentTimeMillis());
+            row.setDaChot(true);
+            tuDongLuuTungDong(row);
+            tableChiTietDem.refresh();
+        });
+    }
+
+    private void handleMoLaiDem(ChiTietKiemKeUI row) {
+        row.thoiDiemDem = null;
+        row.setDaChot(false);
+        tuDongLuuTungDong(row);
+        tableChiTietDem.refresh();
     }
 
     private void tuDongLuuTungDong(ChiTietKiemKeUI row) {
@@ -317,8 +425,14 @@ public class GUI_KiemKeKhoController {
 
     private void loadDuLieuDemKho() {
         dsChiTiet.clear();
-        String sql = "SELECT c.*, t.tenThuoc, " +
-                     "ISNULL((SELECT SUM(ctpn.soLuong * dq.tyLeQuyDoi) FROM ChiTietPhieuNhap ctpn JOIN DonViQuyDoi dq ON ctpn.maQuyDoi = dq.maQuyDoi WHERE ctpn.maLoThuoc = l.maLoThuoc), 0) as tongNhap " +
+        String sql = "SELECT c.*, t.tenThuoc, l.soLuongTon as soLuongTonHienTai, " +
+                     "ISNULL((SELECT SUM(ctpn.soLuong * dq.tyLeQuyDoi) FROM ChiTietPhieuNhap ctpn JOIN DonViQuyDoi dq ON ctpn.maQuyDoi = dq.maQuyDoi WHERE ctpn.maLoThuoc = l.maLoThuoc), 0) as tongNhap, " +
+                     "ISNULL((SELECT SUM(cthd.soLuong * dq.tyLeQuyDoi) FROM ChiTietHoaDon cthd JOIN DonViQuyDoi dq ON cthd.maQuyDoi = dq.maQuyDoi WHERE cthd.maLoThuoc = l.maLoThuoc), 0) as slBan, " +
+                     "ISNULL((SELECT SUM(ctpx.soLuong) FROM ChiTietPhieuXuat ctpx JOIN PhieuXuat px ON ctpx.maPhieuXuat = px.maPhieuXuat WHERE ctpx.maLoThuoc = l.maLoThuoc AND px.loaiPhieu = 2), 0) as slTraNcc, " +
+                     "ISNULL((SELECT SUM(ctpx.soLuong) FROM ChiTietPhieuXuat ctpx JOIN PhieuXuat px ON ctpx.maPhieuXuat = px.maPhieuXuat WHERE ctpx.maLoThuoc = l.maLoThuoc AND px.loaiPhieu = 3), 0) as slXuatHuy, " +
+                     "ISNULL((SELECT SUM(ctdt.soLuong) FROM ChiTietDoiTra ctdt WHERE ctdt.maLoThuoc = l.maLoThuoc), 0) as slDoiTra, " +
+                     "ISNULL((SELECT SUM(ctkk.chenhLech) FROM ChiTietPhieuKiemKe ctkk JOIN PhieuKiemKe pkk ON ctkk.maPhieuKiemKe = pkk.maPhieuKiemKe WHERE ctkk.maLoThuoc = l.maLoThuoc AND pkk.trangThai = 'DA_HOAN_THANH' AND ctkk.chenhLech > 0), 0) as kkDu, " +
+                     "ISNULL((SELECT SUM(ABS(ctkk.chenhLech)) FROM ChiTietPhieuKiemKe ctkk JOIN PhieuKiemKe pkk ON ctkk.maPhieuKiemKe = pkk.maPhieuKiemKe WHERE ctkk.maLoThuoc = l.maLoThuoc AND pkk.trangThai = 'DA_HOAN_THANH' AND ctkk.chenhLech < 0), 0) as kkThieu " +
                      "FROM ChiTietPhieuKiemKe c " +
                      "JOIN LoThuoc l ON c.maLoThuoc = l.maLoThuoc " +
                      "JOIN Thuoc t ON l.maThuoc = t.maThuoc " +
@@ -335,7 +449,20 @@ public class GUI_KiemKeKhoController {
                 ui.setSoLuongKiemTra(rs.getObject("soLuongKiemTra") != null
                         ? rs.getInt("soLuongKiemTra") : ui.tonKhoSnapshot);
                 ui.thoiDiemDem = rs.getTimestamp("thoiDiemDem");
-                ui.tongNhapBanDau = rs.getInt("tongNhap");
+                ui.setDaChot(ui.thoiDiemDem != null);
+                int tongNhap = rs.getInt("tongNhap");
+                if (tongNhap == 0) {
+                    // Lô seed (không có ChiTietPhieuNhap): tính ngược giống Quản Lý Lô Thuốc
+                    int tonKho = rs.getInt("soLuongTonHienTai");
+                    int slBan = rs.getInt("slBan");
+                    int slTraNcc = rs.getInt("slTraNcc");
+                    int slXuatHuy = rs.getInt("slXuatHuy");
+                    int slDoiTra = rs.getInt("slDoiTra");
+                    int netKK = rs.getInt("kkDu") - rs.getInt("kkThieu");
+                    tongNhap = tonKho + slBan + slTraNcc + slXuatHuy - slDoiTra - netKK;
+                    if (tongNhap < 0) tongNhap = 0;
+                }
+                ui.tongNhapBanDau = tongNhap;
                 dsChiTiet.add(ui);
             }
             tableChiTietDem.setItems(dsChiTiet);
@@ -368,14 +495,12 @@ public class GUI_KiemKeKhoController {
                             for (ChiTietKiemKeUI ui : dsChiTiet) {
                                 if (ui.maLoThuoc.toUpperCase().equals(maLo)) {
                                     
-                                    int maxChoPhep = Math.max(ui.tongNhapBanDau, ui.tonKhoSnapshot);
-                                    if(maxChoPhep > 0 && slNhap > maxChoPhep) {
-                                        slNhap = maxChoPhep;
-                                        canhBaoList.add(maLo); // Ghi nhận mã lô bị ép số
+                                    if (ui.tongNhapBanDau > 0 && slNhap > ui.tongNhapBanDau) {
+                                        slNhap = ui.tongNhapBanDau;
+                                        canhBaoList.add(maLo);
                                     }
                                     
                                     ui.setSoLuongKiemTra(slNhap);
-                                    ui.thoiDiemDem = new Timestamp(System.currentTimeMillis());
                                     tuDongLuuTungDong(ui);
                                     count++;
                                 }
@@ -414,10 +539,27 @@ public class GUI_KiemKeKhoController {
     }
 
     private boolean luuDataChiTietTruocKhiNop() {
-        for (ChiTietKiemKeUI ui : dsChiTiet) {
-            if (ui.thoiDiemDem == null) {
-                ui.thoiDiemDem = new Timestamp(System.currentTimeMillis());
+        long chuaChotCount = dsChiTiet.stream().filter(ui -> !ui.isDaChot()).count();
+        if (chuaChotCount > 0) {
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+            confirm.setTitle("Còn dòng chưa chốt");
+            confirm.setHeaderText("Có " + chuaChotCount + " lô thuốc chưa được chốt đếm.");
+            confirm.setContentText("Bấm \"Chốt & Nộp\" để tự động chốt tất cả dòng còn lại và nộp phiếu.\nBấm \"Huỷ\" để quay lại và chốt thủ công từng dòng.");
+            ButtonType btnCo = new ButtonType("Chốt & Nộp", ButtonBar.ButtonData.OK_DONE);
+            ButtonType btnKhong = new ButtonType("Huỷ", ButtonBar.ButtonData.CANCEL_CLOSE);
+            confirm.getButtonTypes().setAll(btnCo, btnKhong);
+            java.util.Optional<ButtonType> result = confirm.showAndWait();
+            if (result.isEmpty() || result.get() == btnKhong) return false;
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            for (ChiTietKiemKeUI ui : dsChiTiet) {
+                if (!ui.isDaChot()) {
+                    ui.thoiDiemDem = now;
+                    ui.setDaChot(true);
+                }
             }
+        }
+
+        for (ChiTietKiemKeUI ui : dsChiTiet) {
             tuDongLuuTungDong(ui);
         }
 
@@ -495,13 +637,18 @@ public class GUI_KiemKeKhoController {
     public class ChiTietKiemKeUI {
         public String maLoThuoc, tenThuoc;
         public int tonKhoSnapshot;
-        public int tongNhapBanDau; 
+        public int tongNhapBanDau;
         private SimpleIntegerProperty soLuongKiemTra = new SimpleIntegerProperty(0);
         public Timestamp thoiDiemDem;
+        private BooleanProperty daChot = new SimpleBooleanProperty(false);
 
         public IntegerProperty soLuongKiemTraProperty() { return soLuongKiemTra; }
         public int getSoLuongKiemTra() { return soLuongKiemTra.get(); }
         public void setSoLuongKiemTra(int val) { soLuongKiemTra.set(val); }
+
+        public BooleanProperty daChotProperty() { return daChot; }
+        public boolean isDaChot() { return daChot.get(); }
+        public void setDaChot(boolean val) { daChot.set(val); }
     }
 
     @FXML

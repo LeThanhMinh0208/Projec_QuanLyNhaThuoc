@@ -59,30 +59,37 @@ public class DAO_KiemKeKho {
     }
 
     public boolean chotSoKiemKeDuyet(String maPhieu, String maNVDuyet, List<entity.ChiTietPhieuKiemKe> listChiTietDaKiem) {
-        String sqlCheck = "SELECT soLuongTon FROM LoThuoc WHERE maLoThuoc = ?";
-        String sqlUpKho = "UPDATE LoThuoc SET soLuongTon = soLuongTon + ?, isLockedForAudit = 0 WHERE maLoThuoc = ?";
-        String sqlUpCT = "UPDATE ChiTietPhieuKiemKe SET soLuongKiemTra=?, chenhLech=?, lyDoLech=?, ghiChu=?, trangThaiChiTiet=? WHERE maPhieuKiemKe=? AND maLoThuoc=?";
+        // chenhLech is pre-computed by GUI_GiaiQuyetKiemKeController.handleTinhToanChenhLech
+        // using the transaction-range formula (snapshot ± transactions in [T0, Tchot])
+        String sqlCheck   = "SELECT soLuongTon FROM LoThuoc WHERE maLoThuoc = ?";
+        String sqlUpKho   = "UPDATE LoThuoc SET soLuongTon = soLuongTon + ?, isLockedForAudit = 0 WHERE maLoThuoc = ?";
+        String sqlUpCT    = "UPDATE ChiTietPhieuKiemKe SET soLuongKiemTra=?, chenhLech=?, lyDoLech=?, ghiChu=?, trangThaiChiTiet=? WHERE maPhieuKiemKe=? AND maLoThuoc=?";
         String sqlUpPhieu = "UPDATE PhieuKiemKe SET trangThai = 'DA_HOAN_THANH', maNhanVienDuyet = ?, ngayDuyet = GETDATE() WHERE maPhieuKiemKe = ?";
 
         try (Connection con = ConnectDB.getInstance().getConnection()) {
-            con.setAutoCommit(false); 
-            try (PreparedStatement pstCheck = con.prepareStatement(sqlCheck); PreparedStatement pstUpKho = con.prepareStatement(sqlUpKho);
-                 PreparedStatement pstUpCT = con.prepareStatement(sqlUpCT); PreparedStatement pstUpPhieu = con.prepareStatement(sqlUpPhieu)) {
+            con.setAutoCommit(false);
+            try (PreparedStatement pstCheck  = con.prepareStatement(sqlCheck);
+                 PreparedStatement pstUpKho  = con.prepareStatement(sqlUpKho);
+                 PreparedStatement pstUpCT   = con.prepareStatement(sqlUpCT);
+                 PreparedStatement pstUpPhieu = con.prepareStatement(sqlUpPhieu)) {
                 for (entity.ChiTietPhieuKiemKe ct : listChiTietDaKiem) {
-                    pstCheck.setString(1, ct.getMaLoThuoc()); ResultSet rs = pstCheck.executeQuery();
-                    if (rs.next() && (rs.getInt(1) + ct.getChenhLech() < 0)) { con.rollback(); throw new Exception("Tồn âm"); }
+                    pstCheck.setString(1, ct.getMaLoThuoc());
+                    ResultSet rs = pstCheck.executeQuery();
+                    if (rs.next() && (rs.getInt(1) + ct.getChenhLech() < 0)) {
+                        con.rollback();
+                        throw new Exception("Tồn âm cho lô " + ct.getMaLoThuoc());
+                    }
                     pstUpKho.setInt(1, ct.getChenhLech()); pstUpKho.setString(2, ct.getMaLoThuoc()); pstUpKho.addBatch();
-                    
-                    pstUpCT.setInt(1, ct.getSoLuongKiemTra()); pstUpCT.setInt(2, ct.getChenhLech()); 
-                    pstUpCT.setString(3, ct.getLyDoLech()); pstUpCT.setString(4, ct.getGhiChu()); 
+                    pstUpCT.setInt(1, ct.getSoLuongKiemTra()); pstUpCT.setInt(2, ct.getChenhLech());
+                    pstUpCT.setString(3, ct.getLyDoLech()); pstUpCT.setString(4, ct.getGhiChu());
                     pstUpCT.setString(5, ct.getChenhLech() == 0 ? "KHOP" : (ct.getChenhLech() > 0 ? "THUA" : "THIEU"));
                     pstUpCT.setString(6, maPhieu); pstUpCT.setString(7, ct.getMaLoThuoc()); pstUpCT.addBatch();
                 }
                 pstUpKho.executeBatch(); pstUpCT.executeBatch();
                 pstUpPhieu.setString(1, maNVDuyet); pstUpPhieu.setString(2, maPhieu); pstUpPhieu.executeUpdate();
                 con.commit(); return true;
-            } catch (Exception ex) { con.rollback(); return false; }
-        } catch (Exception e) { return false; }
+            } catch (Exception ex) { ex.printStackTrace(); con.rollback(); return false; }
+        } catch (Exception e) { e.printStackTrace(); return false; }
     }
 
     public void xuLyPhieuNgamQua48h() {

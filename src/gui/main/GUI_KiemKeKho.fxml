@@ -62,10 +62,12 @@
             <VBox styleClass="panel-white" VBox.vgrow="ALWAYS">
                 <TableView fx:id="tableChiTietDem" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colMaLoDem" prefWidth="100" text="Mã Lô" />
-                        <TableColumn fx:id="colTenThuocDem" prefWidth="300" text="Tên Thuốc" />
-                        <TableColumn fx:id="colTonSnapshotDem" prefWidth="150" style="-fx-alignment: CENTER;" text="Tồn Hiện Tại" />
-                        <TableColumn fx:id="colThucTeDem" prefWidth="150" text="Số lượng Thực Tế" />
+                        <TableColumn fx:id="colMaLoDem" prefWidth="90" text="Mã Lô" />
+                        <TableColumn fx:id="colTenThuocDem" prefWidth="250" text="Tên Thuốc" />
+                        <TableColumn fx:id="colTonSnapshotDem" prefWidth="110" style="-fx-alignment: CENTER;" text="Tồn Snapshot" />
+                        <TableColumn fx:id="colThucTeDem" prefWidth="120" text="Số Lượng Đếm" style="-fx-alignment: CENTER;" />
+                        <TableColumn fx:id="colTrangThaiDem" prefWidth="140" text="Trạng Thái" style="-fx-alignment: CENTER;" />
+                        <TableColumn fx:id="colChotDem" prefWidth="100" text="Thao Tác" style="-fx-alignment: CENTER;" />
                     </columns>
                     <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
                 </TableView>

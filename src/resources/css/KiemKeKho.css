@@ -453,6 +453,80 @@
     -fx-font-weight: bold !important;
 }
 /* =======================================================
+   NÚT CHỐT ĐẾM / MỞ LẠI (PER-ROW)
+   ======================================================= */
+.btn-chot-dem {
+    -fx-background-color: #dcfce7 !important;
+    -fx-text-fill: #16a34a !important;
+    -fx-font-weight: 900;
+    -fx-font-size: 11px;
+    -fx-background-radius: 15;
+    -fx-cursor: hand;
+    -fx-padding: 4 10;
+    -fx-border-width: 0;
+}
+.btn-chot-dem .text {
+    -fx-fill: #16a34a !important;
+}
+.btn-chot-dem:hover {
+    -fx-background-color: #10b981 !important;
+    -fx-text-fill: white !important;
+}
+.btn-chot-dem:hover .text {
+    -fx-fill: white !important;
+}
+
+.btn-mo-lai-dem {
+    -fx-background-color: #ffedd5 !important;
+    -fx-text-fill: #ea580c !important;
+    -fx-font-weight: 900;
+    -fx-font-size: 11px;
+    -fx-background-radius: 15;
+    -fx-cursor: hand;
+    -fx-padding: 4 10;
+    -fx-border-width: 0;
+}
+.btn-mo-lai-dem .text {
+    -fx-fill: #ea580c !important;
+}
+.btn-mo-lai-dem:hover {
+    -fx-background-color: #f97316 !important;
+    -fx-text-fill: white !important;
+}
+.btn-mo-lai-dem:hover .text {
+    -fx-fill: white !important;
+}
+
+/* Dòng đã chốt — nền xanh lá nhạt */
+.row-da-chot {
+    -fx-background-color: #f0fdf4 !important;
+}
+.row-da-chot .table-cell {
+    -fx-text-fill: #166534;
+}
+/* Giữ màu nút Chốt/Mở lại khi dòng được bôi chọn (xanh dương) */
+.table-row-cell:selected .btn-chot-dem {
+    -fx-background-color: #dcfce7 !important;
+    -fx-text-fill: #16a34a !important;
+}
+.table-row-cell:selected .btn-chot-dem .text {
+    -fx-fill: #16a34a !important;
+}
+.table-row-cell:selected .btn-mo-lai-dem {
+    -fx-background-color: #ffedd5 !important;
+    -fx-text-fill: #ea580c !important;
+}
+.table-row-cell:selected .btn-mo-lai-dem .text {
+    -fx-fill: #ea580c !important;
+}
+
+/* Trạng thái Đã Chốt (xanh lá) / Chưa Chốt (xám) */
+.text-da-chot  { -fx-text-fill: #16a34a; -fx-font-weight: bold; }
+.text-chua-chot { -fx-text-fill: #94a3b8; -fx-font-weight: bold; }
+.table-row-cell:selected .text-da-chot,
+.table-row-cell:selected .text-chua-chot { -fx-text-fill: white !important; }
+
+/* =======================================================
    NÚT TIỆN ÍCH MÀU TÍM VIOLET (Sắp xếp / Lọc)
    ======================================================= */
 .btn-purple {

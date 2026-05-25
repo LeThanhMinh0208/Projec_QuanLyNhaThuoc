@@ -319,9 +319,20 @@ public class GUI_DangNhapController {
                 mainStage.setTitle("Long Nguyên Pharma - " + nv.getHoTen());
 
                 mainStage.setScene(new javafx.scene.Scene(root));
-                
+
+                mainStage.setOnCloseRequest(closeEvent -> {
+                    if (GUI_KiemKeKhoController.isCoPhieuDangKiemKe()) {
+                        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+                        alert.setTitle("Không thể đóng ứng dụng");
+                        alert.setHeaderText("Đang có phiếu kiểm kê chưa hoàn tất!");
+                        alert.setContentText("Vui lòng nộp phiếu kiểm kê trước khi thoát ứng dụng.");
+                        alert.showAndWait();
+                        closeEvent.consume();
+                    }
+                });
+
                 // 🚨 BẬT FULL MÀN HÌNH HỆ THỐNG
-                mainStage.setMaximized(true); 
+                mainStage.setMaximized(true);
                 mainStage.show();
             } catch (Exception e) { e.printStackTrace(); }
         } else {

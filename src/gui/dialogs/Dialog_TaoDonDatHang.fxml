@@ -64,7 +64,7 @@
                      <TextField fx:id="txtGiaDuKien" prefHeight="35.0" prefWidth="120.0" styleClass="input-field" alignment="CENTER_RIGHT" promptText="0" />
                   </VBox>
                   <VBox alignment="BOTTOM_CENTER" prefHeight="55.0">
-                    <Button onAction="#handleThemThuoc" prefHeight="38.0" prefWidth="140.0" text="+ Thêm Thuốc" style="-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 5 10; -fx-font-size: 14px;" />
+                    <Button onAction="#handleThemThuoc" prefHeight="38.0" prefWidth="140.0" text="Thêm" style="-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 5 10; -fx-font-size: 14px;" />
                   </VBox>
                </children>
             </HBox>

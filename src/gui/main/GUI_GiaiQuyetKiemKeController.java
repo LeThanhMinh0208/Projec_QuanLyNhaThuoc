@@ -302,7 +302,9 @@ public class GUI_GiaiQuyetKiemKeController {
             tableChiTiet.refresh();
             daThinhToan = true;
             kiemTraNutXacNhan();
-            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã chốt Số lượng Kỳ vọng thời gian thực!");
+            if (event != null) {
+                AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã tính toán chênh lệch xong!");
+            }
         } catch (Exception e) { e.printStackTrace(); }
     }
 
@@ -334,8 +336,10 @@ public class GUI_GiaiQuyetKiemKeController {
         String maNV = UserSession.getInstance().getUser() != null
                 ? UserSession.getInstance().getUser().getMaNhanVien() : "NV001";
         if (dao.chotSoKiemKeDuyet(currentMaPhieu, maNV, listToSave)) {
-            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "THÀNH CÔNG", "Đã chốt sổ!");
+            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "THÀNH CÔNG", "Đã chốt sổ kiểm kê!");
             handleQuayLai(null);
+        } else {
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể chốt kho. Kiểm tra lại dữ liệu hoặc liên hệ quản trị viên.");
         }
     }
     
