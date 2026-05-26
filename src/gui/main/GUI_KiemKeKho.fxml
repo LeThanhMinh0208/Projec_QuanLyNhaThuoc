@@ -67,7 +67,6 @@
                         <TableColumn fx:id="colTonSnapshotDem" prefWidth="110" style="-fx-alignment: CENTER;" text="Tồn Snapshot" />
                         <TableColumn fx:id="colThucTeDem" prefWidth="120" text="Số Lượng Đếm" style="-fx-alignment: CENTER;" />
                         <TableColumn fx:id="colTrangThaiDem" prefWidth="140" text="Trạng Thái" style="-fx-alignment: CENTER;" />
-                        <TableColumn fx:id="colChotDem" prefWidth="100" text="Thao Tác" style="-fx-alignment: CENTER;" />
                     </columns>
                     <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
                 </TableView>

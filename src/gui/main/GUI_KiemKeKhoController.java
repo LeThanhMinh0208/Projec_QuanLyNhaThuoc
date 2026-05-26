@@ -39,7 +39,6 @@ public class GUI_KiemKeKhoController {
     @FXML private TableView<ChiTietKiemKeUI> tableChiTietDem;
     @FXML private TableColumn<ChiTietKiemKeUI, String> colMaLoDem, colTenThuocDem, colTrangThaiDem;
     @FXML private TableColumn<ChiTietKiemKeUI, Integer> colTonSnapshotDem, colThucTeDem;
-    @FXML private TableColumn<ChiTietKiemKeUI, Void> colChotDem;
 
     private DAO_KiemKeKho dao = new DAO_KiemKeKho();
     private ObservableList<LoThuocUI> dsLoThuoc = FXCollections.observableArrayList();
@@ -177,54 +176,9 @@ public class GUI_KiemKeKhoController {
             }
         });
 
-        // Cột Thao Tác (Chốt / Mở lại)
-        colChotDem.setCellFactory(col -> new TableCell<ChiTietKiemKeUI, Void>() {
-            private final Button btn = new Button();
-            private ChiTietKiemKeUI boundRow = null;
-            private final javafx.beans.value.ChangeListener<Boolean> daChotListener =
-                    (obs, o, n) -> refreshBtn();
+        // REMOVED Cột Thao Tác (Chốt / Mở lại)
 
-            {
-                btn.setOnAction(e -> {
-                    TableRow<?> tr = getTableRow();
-                    if (tr == null) return;
-                    ChiTietKiemKeUI row = (ChiTietKiemKeUI) tr.getItem();
-                    if (row == null) return;
-                    if (row.isDaChot()) handleMoLaiDem(row);
-                    else handleChotDem(row);
-                });
-            }
-
-            @Override protected void updateItem(Void v, boolean empty) {
-                super.updateItem(v, empty);
-                if (boundRow != null) {
-                    boundRow.daChotProperty().removeListener(daChotListener);
-                    boundRow = null;
-                }
-                if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
-                    setGraphic(null);
-                    return;
-                }
-                boundRow = getTableView().getItems().get(getIndex());
-                boundRow.daChotProperty().addListener(daChotListener);
-                refreshBtn();
-                setGraphic(btn);
-                setAlignment(javafx.geometry.Pos.CENTER);
-            }
-
-            private void refreshBtn() {
-                btn.getStyleClass().removeAll("btn-chot-dem", "btn-mo-lai-dem");
-                if (boundRow != null && boundRow.isDaChot()) {
-                    btn.setText("↩ Mở lại");
-                    btn.getStyleClass().add("btn-mo-lai-dem");
-                } else {
-                    btn.setText("✓ Chốt");
-                    btn.getStyleClass().add("btn-chot-dem");
-                }
-            }
-        });
-
-        // Chống nuốt click khi bấm nút trong bảng
+        // CHỐNG NUỐT CLICK
         viewDangDem.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
             javafx.scene.Node target = (javafx.scene.Node) event.getTarget();
             while (target != null) {
@@ -244,7 +198,7 @@ public class GUI_KiemKeKhoController {
             @Override
             public void startEdit() {
                 ChiTietKiemKeUI rowData = getTableRow() != null ? (ChiTietKiemKeUI) getTableRow().getItem() : null;
-                if (rowData != null && rowData.isDaChot()) return;
+                // REMOVED check for isDaChot so users can re-edit to fix mistakes
                 super.startEdit();
                 if (textField == null) {
                     textField = new TextField(getString());
@@ -271,24 +225,22 @@ public class GUI_KiemKeKhoController {
             private void xuLyNhapLieu(String text) {
                 try {
                     int slNhap = Integer.parseInt(text.trim());
-                    if (slNhap < 0) slNhap = 0;
-
+                    if (slNhap < 0) slNhap = 0; // Chặn số âm
+                    
                     int idx = getIndex();
                     ChiTietKiemKeUI rowData = (idx >= 0 && idx < tableChiTietDem.getItems().size())
                             ? tableChiTietDem.getItems().get(idx) : null;
                     if (rowData != null && rowData.tongNhapBanDau > 0 && slNhap > rowData.tongNhapBanDau) {
-                        final int giaiHan = rowData.tongNhapBanDau;
-                        final int slNhapFinal = slNhap;
-                        cancelEdit();
-                        javafx.application.Platform.runLater(() ->
+                        slNhap = rowData.tongNhapBanDau;
+                        final int slThuc = slNhap;
+                        javafx.application.Platform.runLater(() -> {
                             AlertUtils.showAlert(Alert.AlertType.WARNING, "Vượt quá giới hạn",
-                                    "Số lượng đếm (" + slNhapFinal + ") vượt quá tổng nhập ban đầu của lô (" + giaiHan + " viên).\nVui lòng nhập lại.")
-                        );
-                        return;
+                                    "Số lượng đếm không được vượt quá tổng số lượng nhập ban đầu của lô (" + slThuc + " viên)!");
+                        });
                     }
                     commitEdit(slNhap);
-                } catch (NumberFormatException ex) {
-                    commitEdit(getItem() != null ? getItem() : 0);
+                } catch (NumberFormatException ex) { 
+                    commitEdit(getItem() != null ? getItem() : 0); 
                 }
             }
 
@@ -335,8 +287,30 @@ public class GUI_KiemKeKhoController {
 
         colThucTeDem.setOnEditCommit(e -> {
             ChiTietKiemKeUI row = e.getRowValue();
-            row.setSoLuongKiemTra(e.getNewValue() == null ? 0 : e.getNewValue());
+            int soLuong = e.getNewValue() == null ? 0 : e.getNewValue();
+            
+            if (row.tongNhapBanDau > 0 && soLuong > row.tongNhapBanDau) {
+                // If exceeded, we don't save or chot. We just reset UI.
+                tableChiTietDem.refresh();
+                return;
+            }
+            
+            row.setSoLuongKiemTra(soLuong);
+            row.thoiDiemDem = new Timestamp(System.currentTimeMillis());
+            row.setDaChot(true);
             tuDongLuuTungDong(row);
+            tableChiTietDem.refresh();
+            
+            // Move next
+            int nextIndex = e.getTablePosition().getRow() + 1;
+            if (nextIndex < tableChiTietDem.getItems().size()) {
+                javafx.application.Platform.runLater(() -> {
+                    tableChiTietDem.getSelectionModel().select(nextIndex, colThucTeDem);
+                    tableChiTietDem.edit(nextIndex, colThucTeDem);
+                });
+            } else {
+                tableChiTietDem.edit(-1, null);
+            }
         });
 
         tableChiTietDem.setEditable(true);
@@ -344,28 +318,7 @@ public class GUI_KiemKeKhoController {
         tableChiTietDem.setFixedCellSize(40);
     }
 
-    private void handleChotDem(ChiTietKiemKeUI row) {
-        javafx.application.Platform.runLater(() -> {
-            int soLuong = row.getSoLuongKiemTra();
-            if (row.tongNhapBanDau > 0 && soLuong > row.tongNhapBanDau) {
-                AlertUtils.showAlert(Alert.AlertType.WARNING, "Vượt quá giới hạn",
-                        "Số lượng đếm (" + soLuong + " viên) vượt quá tổng nhập ban đầu của lô ("
-                        + row.tongNhapBanDau + " viên).\nVui lòng sửa lại trước khi chốt.");
-                return;
-            }
-            row.thoiDiemDem = new Timestamp(System.currentTimeMillis());
-            row.setDaChot(true);
-            tuDongLuuTungDong(row);
-            tableChiTietDem.refresh();
-        });
-    }
-
-    private void handleMoLaiDem(ChiTietKiemKeUI row) {
-        row.thoiDiemDem = null;
-        row.setDaChot(false);
-        tuDongLuuTungDong(row);
-        tableChiTietDem.refresh();
-    }
+    // REMOVED handleChotDem and handleMoLaiDem
 
     private void tuDongLuuTungDong(ChiTietKiemKeUI row) {
         String sql = "UPDATE ChiTietPhieuKiemKe SET soLuongKiemTra = ?, thoiDiemDem = ? WHERE maPhieuKiemKe = ? AND maLoThuoc = ?";
@@ -495,10 +448,12 @@ public class GUI_KiemKeKhoController {
                             if (slNhap < 0) slNhap = 0; 
                             for (ChiTietKiemKeUI ui : dsChiTiet) {
                                 if (ui.maLoThuoc.toUpperCase().equals(maLo)) {
+                                    
                                     if (ui.tongNhapBanDau > 0 && slNhap > ui.tongNhapBanDau) {
-                                        canhBaoList.add(maLo + " (đếm " + slNhap + ", tối đa " + ui.tongNhapBanDau + ")");
-                                        break;
+                                        slNhap = ui.tongNhapBanDau;
+                                        canhBaoList.add(maLo);
                                     }
+                                    
                                     ui.setSoLuongKiemTra(slNhap);
                                     tuDongLuuTungDong(ui);
                                     count++;
@@ -511,9 +466,8 @@ public class GUI_KiemKeKhoController {
                 
                 String tb = "Đã cập nhật thành công " + count + " lô thuốc từ file!";
                 if (!canhBaoList.isEmpty()) {
-                    tb += "\n\n⚠️ " + canhBaoList.size() + " lô bị bỏ qua (vượt số lượng nhập ban đầu), vui lòng nhập thủ công hoặc import lại:\n• "
-                            + String.join("\n• ", canhBaoList);
-                    AlertUtils.showAlert(Alert.AlertType.WARNING, "Import CSV Có Cảnh Báo", tb);
+                    tb += "\n⚠️ Có " + canhBaoList.size() + " lô thuốc vượt quá số lượng nhập ban đầu đã được tự động điều chỉnh về mức tối đa.";
+                    AlertUtils.showAlert(Alert.AlertType.WARNING, "Import CSV Thành Công (Có Cảnh Báo)", tb);
                 } else {
                     AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Import CSV Thành Công", tb);
                 }

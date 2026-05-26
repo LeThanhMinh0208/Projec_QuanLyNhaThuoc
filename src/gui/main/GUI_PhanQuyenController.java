@@ -58,7 +58,9 @@ public class GUI_PhanQuyenController {
             {"QLK.DANH_MUC_KHO", "Danh Mục Kho"},
             {"QLK.DON_DAT_HANG", "Quản Lý Đơn Đặt Hàng"},
             {"QLK.NHAP_KHO", "Nhập Kho"},
-            {"QLK.XUAT_KHO", "Xuất Kho"}
+            {"QLK.XUAT_KHO", "Xuất Kho"},
+            {"QLK.KIEM_KE", "Kiểm Kê Kho"},
+            {"QLK.GIAI_QUYET_KIEM_KE", "Giải Quyết Kiểm Kê"}
         }));
         CAY_QUYEN.put("QLKH", new QuyenNode("Quản Lý Khách Hàng", "👥", new String[][]{
             {"QLKH.DANH_MUC_KHACH_HANG", "Danh Mục Khách Hàng"},

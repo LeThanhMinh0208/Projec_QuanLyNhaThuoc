@@ -449,17 +449,18 @@ public class DAO_ThongKeDoanhThu {
     public List<Map<String, Object>> getProductDead(int ngayKhongBan) {
         String sql = "SELECT TOP 10 " +
                 "t.tenThuoc, " +
-                "ISNULL(CONVERT(VARCHAR, t.maThuoc), 'N/A') as nhomThuoc, " +
+                "ISNULL(dm.tenDanhMuc, N'Kh\u00f4ng x\u00e1c \u0111\u1ecbnh') as nhomThuoc, " +
                 "ISNULL(SUM(lt.soLuongTon), 0) as tonKho, " +
                 "ISNULL(DATEDIFF(DAY, MAX(hd.ngayLap), CAST(GETDATE() AS DATE)), " + ngayKhongBan + ") as soNgayKhongBan " +
                 "FROM Thuoc t " +
+                "LEFT JOIN DanhMucThuoc dm ON t.maDanhMuc = dm.maDanhMuc " +
                 "LEFT JOIN LoThuoc lt ON t.maThuoc = lt.maThuoc AND lt.trangThai = 1 " +
                 "LEFT JOIN (SELECT DISTINCT dv.maThuoc, MAX(hd.ngayLap) as ngayLap " +
                 "    FROM ChiTietHoaDon ct " +
                 "    INNER JOIN HoaDon hd ON ct.maHoaDon = hd.maHoaDon " +
                 "    INNER JOIN DonViQuyDoi dv ON ct.maQuyDoi = dv.maQuyDoi " +
                 "    GROUP BY dv.maThuoc) hd ON t.maThuoc = hd.maThuoc " +
-                "GROUP BY t.maThuoc, t.tenThuoc " +
+                "GROUP BY t.maThuoc, t.tenThuoc, dm.tenDanhMuc " +
                 "HAVING ISNULL(SUM(lt.soLuongTon), 0) > 0 AND " +
                 "ISNULL(DATEDIFF(DAY, MAX(hd.ngayLap), CAST(GETDATE() AS DATE)), " + ngayKhongBan + ") >= ? " +
                 "ORDER BY soNgayKhongBan DESC";

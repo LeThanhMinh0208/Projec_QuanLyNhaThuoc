@@ -177,8 +177,12 @@ public class GUI_DanhMucDonThuocController implements Initializable {
                                 gui.main.GUI_QuanLyBanHangController.setHinhAnhTaiLap(null);
                             }
 
-                            // 2. Chuyển trang
-                            utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyBanHang.fxml");
+                            // 2. Chuyển trang & cập nhật highlight menu
+                            if (GUI_TrangChuController.getInstance() != null) {
+                                GUI_TrangChuController.getInstance().chuyenTrangVaHighlight("/gui/main/GUI_QuanLyBanHang.fxml", "Lập Hóa Đơn");
+                            } else {
+                                utils.SceneUtils.switchPage("/gui/main/GUI_QuanLyBanHang.fxml");
+                            }
                         }
                     });
                 });

@@ -9,6 +9,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 
 import dao.DAO_ThongKeTonKho;
 import dao.DAO_ThongKeHangHoa;
@@ -67,6 +70,11 @@ public class GUI_ThongKeHangHoaController {
     private final DecimalFormat df = new DecimalFormat("#,##0");
     private boolean suppressAutoReload = false;
 
+    // Thread management để tránh race condition
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private AtomicLong lastRequestId = new AtomicLong(0);
+    private boolean isActive = true;
+
     // Cache dữ liệu cục bộ phục vụ việc xuất báo cáo file tuần tự
     private LocalDate currentTuNgay;
     private LocalDate currentDenNgay;
@@ -78,6 +86,7 @@ public class GUI_ThongKeHangHoaController {
     @FXML
     public void initialize() {
         LocalDate today = LocalDate.now();
+        suppressAutoReload = true;
         dpTuNgay.setValue(YearMonth.now().atDay(1));
         dpDenNgay.setValue(today);
 
@@ -90,7 +99,34 @@ public class GUI_ThongKeHangHoaController {
         
         setupTables();
         setupAutoReload();
+
+        suppressAutoReload = false;
+        // Đặt placeholder "---" để tránh nháy khi mới load trang
+        setLoadingPlaceholders();
         loadDataThongKe();
+    }
+
+    /**
+     * Dừng tất cả background tasks khi controller bị thay thế.
+     * Được gọi từ SceneUtils trước khi load trang mới.
+     */
+    public void stopBackgroundTasks() {
+        isActive = false;
+        if (executorService != null && !executorService.isShutdown()) {
+            executorService.shutdownNow();
+        }
+    }
+
+    /**
+     * Đặt placeholder "---" cho tất cả KPI labels trước khi dữ liệu được tải.
+     * Tránh hiện số 0 mặc định gây nháy giao diện.
+     */
+    private void setLoadingPlaceholders() {
+        if (lblTongMatHang != null)    lblTongMatHang.setText("---");
+        if (lblTongMatHangPercent != null) lblTongMatHangPercent.setText("");
+        if (lblTongSoLuongBan != null) lblTongSoLuongBan.setText("---");
+        if (lblDoanhThuGoc != null)    lblDoanhThuGoc.setText("---");
+        if (lblDoanhThuSauThue != null) lblDoanhThuSauThue.setText("---");
     }
 
     private void setupTables() {
@@ -173,21 +209,31 @@ public class GUI_ThongKeHangHoaController {
         final LocalDate reportDen = denNgay;
         final String reportDanhMuc = cbDanhMuc.getValue();
 
-        new Thread(() -> {
+        // Tạo ID request để tránh race condition (chỉ request mới nhất mới update UI)
+        final long requestId = lastRequestId.incrementAndGet();
+
+        executorService.submit(() -> {
             try {
                 Map<String, Object> tongQuan = daoHangHoa.getTongQuan(reportTu, reportDen, reportDanhMuc);
                 List<Map<String, Object>> coCau = daoHangHoa.getDoanhThuTheoDanhMuc(reportTu, reportDen, reportDanhMuc);
                 List<Map<String, Object>> topSanPham = daoHangHoa.getTopSanPhamBanChay(reportTu, reportDen, reportDanhMuc, 10);
                 List<Map<String, Object>> bienDong = daoHangHoa.getBienDongDoanhThuTheoNgay(reportTu, reportDen, reportDanhMuc);
 
+                // Kiểm tra còn là request mới nhất không
+                if (requestId != lastRequestId.get() || !isActive) {
+                    return;
+                }
+
                 currentTuNgay = reportTu;
                 currentDenNgay = reportDen;
                 currentDanhMuc = reportDanhMuc;
                 currentTongQuan = tongQuan;
                 currentCoCauDoanhThu = coCau;
-                currentTopSanPham = topSanPham; // Cập nhật lại dữ liệu xuất excel/pdf
+                currentTopSanPham = topSanPham;
 
                 Platform.runLater(() -> {
+                    if (requestId != lastRequestId.get() || !isActive) return;
+
                     // 1. Cập nhật khối thẻ số liệu tổng quan KPI
                     lblTongMatHang.setText(df.format(tongQuan.get("tongMatHangDaBan")));
                     lblTongSoLuongBan.setText(df.format(tongQuan.get("tongSoLuongBan")));
@@ -249,7 +295,7 @@ public class GUI_ThongKeHangHoaController {
                 e.printStackTrace();
                 Platform.runLater(() -> showError("Lỗi hiển thị", "Không thể hiển thị đầy đủ các khối biểu đồ thống kê hàng hóa."));
             }
-        }).start();
+        });
     }
 
     @FXML

@@ -85,6 +85,51 @@
     -fx-cursor: hand;
     -fx-font-size: 15px;
 }
-.dvqd-btn-cancel:hover {
-    -fx-background-color: linear-gradient(to bottom, #dc2626, #b91c1c);
+}
+
+/* ========================================================
+   4. TÙY CHỈNH DIALOG SỬA/THÊM ĐƠN VỊ QUY ĐỔI
+   ======================================================== */
+.dialog-root {
+    -fx-background-color: #f8fafc;
+}
+
+.dialog-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #0ea5e9;
+}
+
+.section-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 12px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 8, 0, 0, 3);
+}
+
+.section-title-strong {
+    -fx-font-size: 14px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #1e293b;
+}
+
+.hint-text {
+    -fx-text-fill: #64748b;
+    -fx-font-style: italic;
+    -fx-font-size: 12px;
+}
+
+.dvqd-btn-save {
+    -fx-background-color: linear-gradient(to right, #0ea5e9, #0284c7);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-font-size: 15px;
+}
+.dvqd-btn-save:hover {
+    -fx-background-color: linear-gradient(to right, #0284c7, #0369a1);
 }

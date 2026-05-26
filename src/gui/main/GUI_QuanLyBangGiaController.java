@@ -6,6 +6,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import java.io.File;
+import javafx.stage.FileChooser;
+import utils.BangGiaExcelExporter;
+import utils.BangGiaExcelImporter;
+
 import dao.DAO_BangGia;
 import dao.DAO_NhatKyHoatDong;
 import entity.BangGia;
@@ -164,16 +169,19 @@ public class GUI_QuanLyBangGiaController {
 
         colHanhDong.setCellFactory(col -> new TableCell<>() {
             // Sửa text thành ngắn gọn giống ảnh
-            private final Button btnXem = new Button("Xem chi tiết");
+            private final Button btnXem = new Button("Xem");
             private final Button btnVHH = new Button("Vô Hiệu");
-            private final HBox box = new HBox(8, btnXem, btnVHH);
+            private final Button btnXuatExcel = new Button("Xuất Excel");
+            private final HBox box = new HBox(8, btnXem, btnVHH, btnXuatExcel);
             {
                 box.setAlignment(javafx.geometry.Pos.CENTER);
 
-                final String styleXemNormal = "-fx-background-color: #e0f2fe; -fx-text-fill: #0284c7; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20; -fx-cursor: hand;";
-                final String styleXemHover  = "-fx-background-color: #0ea5e9; -fx-text-fill: white;   -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20; -fx-cursor: hand;";
-                final String styleVhhNormal = "-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20; -fx-cursor: hand;";
-                final String styleVhhHover  = "-fx-background-color: #ef4444; -fx-text-fill: white;   -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20; -fx-cursor: hand;";
+                final String styleXemNormal = "-fx-background-color: #e0f2fe; -fx-text-fill: #0284c7; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 12; -fx-background-radius: 20; -fx-cursor: hand;";
+                final String styleXemHover  = "-fx-background-color: #0ea5e9; -fx-text-fill: white;   -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 12; -fx-background-radius: 20; -fx-cursor: hand;";
+                final String styleVhhNormal = "-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 12; -fx-background-radius: 20; -fx-cursor: hand;";
+                final String styleVhhHover  = "-fx-background-color: #ef4444; -fx-text-fill: white;   -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 12; -fx-background-radius: 20; -fx-cursor: hand;";
+                final String styleExcelNormal = "-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 12; -fx-background-radius: 20; -fx-cursor: hand;";
+                final String styleExcelHover  = "-fx-background-color: #22c55e; -fx-text-fill: white;   -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 12; -fx-background-radius: 20; -fx-cursor: hand;";
 
                 btnXem.setStyle(styleXemNormal);
                 btnXem.setOnMouseEntered(e -> btnXem.setStyle(styleXemHover));
@@ -183,8 +191,13 @@ public class GUI_QuanLyBangGiaController {
                 btnVHH.setOnMouseEntered(e -> { if (!btnVHH.isDisabled()) btnVHH.setStyle(styleVhhHover); });
                 btnVHH.setOnMouseExited(e  -> { if (!btnVHH.isDisabled()) btnVHH.setStyle(styleVhhNormal); });
 
+                btnXuatExcel.setStyle(styleExcelNormal);
+                btnXuatExcel.setOnMouseEntered(e -> btnXuatExcel.setStyle(styleExcelHover));
+                btnXuatExcel.setOnMouseExited(e  -> btnXuatExcel.setStyle(styleExcelNormal));
+
                 btnXem.setOnAction(e -> moDialogChiTiet(getTableView().getItems().get(getIndex())));
                 btnVHH.setOnAction(e -> handleVoHieuHoa(getTableView().getItems().get(getIndex())));
+                btnXuatExcel.setOnAction(e -> handleXuatExcel(getTableView().getItems().get(getIndex())));
             }
             @Override protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
@@ -195,10 +208,10 @@ public class GUI_QuanLyBangGiaController {
                 // Chuyển nút Vô Hiệu thành màu xám nếu bị disable
                 if (!tt.contains("hiệu lực") || tt.contains("Chưa")) {
                     btnVHH.setDisable(true);
-                    btnVHH.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #94a3b8; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20;");
+                    btnVHH.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #94a3b8; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 12; -fx-background-radius: 20;");
                 } else {
                     btnVHH.setDisable(false);
-                    btnVHH.setStyle("-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 15; -fx-background-radius: 20; -fx-cursor: hand;");
+                    btnVHH.setStyle("-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 12; -fx-background-radius: 20; -fx-cursor: hand;");
                 }
                 
                 setGraphic(box);
@@ -633,4 +646,78 @@ public class GUI_QuanLyBangGiaController {
             }
         });
     }
+
+    // ============================================================
+    // FIX 2: XỬ LÝ NHẬP XUẤT EXCEL
+    // ============================================================
+    private void handleXuatExcel(BangGia bg) {
+        try {
+            List<ChiTietBangGia> chiTietList = dao.getChiTietByMaBangGia(bg.getMaBangGia());
+            String filePath = BangGiaExcelExporter.xuatExcel(bg, chiTietList);
+            showAlert(Alert.AlertType.INFORMATION, "Thành công", "Xuất Excel thành công!\nFile lưu tại: " + filePath);
+            File file = new File(filePath);
+            if (file.exists() && java.awt.Desktop.isDesktopSupported()) {
+                java.awt.Desktop.getDesktop().open(file);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể xuất file Excel: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void handleTaiFileMauExcel(ActionEvent event) {
+        try {
+            // Lấy danh sách thuốc hiện tại từ table
+            List<ChiTietBangGia> chiTietList = new java.util.ArrayList<>(masterThuocNhapGia);
+            String filePath = BangGiaExcelExporter.xuatFileMau(chiTietList);
+            showAlert(Alert.AlertType.INFORMATION, "Thành công", "Tạo file mẫu thành công!\nFile lưu tại: " + filePath);
+            File file = new File(filePath);
+            if (file.exists() && java.awt.Desktop.isDesktopSupported()) {
+                java.awt.Desktop.getDesktop().open(file);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể tạo file mẫu: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void handleNhapGiaTuExcel(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Chọn file Excel bảng giá");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+        File file = fileChooser.showOpenDialog(txtTenBangGia.getScene().getWindow());
+
+        if (file != null) {
+            try {
+                // Đọc file excel
+                List<ChiTietBangGia> imported = BangGiaExcelImporter.docFileExcel(file.getAbsolutePath(), masterThuocNhapGia);
+                
+                if (imported.isEmpty()) {
+                    showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Không tìm thấy giá hợp lệ nào trong file Excel.\nVui lòng kiểm tra lại định dạng file.");
+                    return;
+                }
+
+                // Cập nhật giá vào masterThuocNhapGia
+                int count = 0;
+                for (ChiTietBangGia importedCt : imported) {
+                    for (ChiTietBangGia ct : masterThuocNhapGia) {
+                        if (ct.getTenThuoc().equals(importedCt.getTenThuoc()) && 
+                            ct.getTenDonVi().equals(importedCt.getTenDonVi())) {
+                            ct.setDonGiaBan(importedCt.getDonGiaBan());
+                            count++;
+                            break;
+                        }
+                    }
+                }
+                tableThuocNhapGia.refresh();
+                showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã cập nhật giá cho " + count + " đơn vị thuốc từ file Excel.");
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể đọc file Excel: " + e.getMessage());
+            }
+        }
+    }
 }
+
