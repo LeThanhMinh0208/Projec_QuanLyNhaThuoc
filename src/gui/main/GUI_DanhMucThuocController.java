@@ -192,24 +192,24 @@ public class GUI_DanhMucThuocController {
 
     @FXML
     void handleThem() {
-        openDialog("/gui/dialogs/Dialog_ThemThuoc.fxml", "Them Thuoc Moi", null);
+        openDialog("/gui/dialogs/Dialog_ThemThuoc.fxml", "Thêm thuốc mới", null);
     }
 
     @FXML
     void handleSua() {
-        checkAndOpenDialog("/gui/dialogs/Dialog_SuaThuoc.fxml", "Sua Thuoc");
+        checkAndOpenDialog("/gui/dialogs/Dialog_SuaThuoc.fxml", "Cập nhật thông tin thuốc");
     }
 
     @FXML
     void handleXoa() {
-        checkAndOpenDialog("/gui/dialogs/Dialog_XoaThuoc.fxml", "Xoa Thuoc");
+        checkAndOpenDialog("/gui/dialogs/Dialog_XoaThuoc.fxml", "Ngưng kinh doanh thuốc");
     }
 
     @FXML
     void handleDoiThuoc() {
         Thuoc selected = tableThuoc.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thong bao", "Vui long chon mot thuoc de doi.");
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng chọn một thuốc để đổi.");
             return;
         }
         DoiTraSession.setThuocDoiDaChon(selected);
@@ -221,7 +221,7 @@ public class GUI_DanhMucThuocController {
     void handleMoQuyDoiDonVi() {
         Thuoc selected = tableThuoc.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thong bao", "Vui long chon mot loai thuoc trong bang!");
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng chọn một loại thuốc trong bảng!");
             return;
         }
         moCuaSoDonViQuyDoi(selected);
@@ -241,7 +241,7 @@ public class GUI_DanhMucThuocController {
 
         Thuoc selected = tableThuoc.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thong bao", "Vui long chon mot loai thuoc trong bang!");
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng chọn một loại thuốc trong bảng!");
             return;
         }
         openDialog(path, title, selected);
@@ -305,13 +305,13 @@ public class GUI_DanhMucThuocController {
             controller.setThuoc(thuoc);
 
             Stage stage = new Stage();
-            stage.setTitle("Quy doi don vi - " + thuoc.getTenThuoc());
+            stage.setTitle("Quy đổi đơn vị - " + thuoc.getTenThuoc());
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
             stage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
-            AlertUtils.showAlert(Alert.AlertType.ERROR, "Loi", "Khong the mo trang quy doi don vi.");
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể mở trang quy đổi đơn vị.");
         }
     }
 }

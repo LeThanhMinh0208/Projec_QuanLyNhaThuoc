@@ -39,7 +39,6 @@ public class GUI_KiemKeKhoController {
     @FXML private TableView<ChiTietKiemKeUI> tableChiTietDem;
     @FXML private TableColumn<ChiTietKiemKeUI, String> colMaLoDem, colTenThuocDem, colTrangThaiDem;
     @FXML private TableColumn<ChiTietKiemKeUI, Integer> colTonSnapshotDem, colThucTeDem;
-    @FXML private TableColumn<ChiTietKiemKeUI, Void> colChotDem;
 
     private DAO_KiemKeKho dao = new DAO_KiemKeKho();
     private ObservableList<LoThuocUI> dsLoThuoc = FXCollections.observableArrayList();
@@ -177,52 +176,7 @@ public class GUI_KiemKeKhoController {
             }
         });
 
-        // Cột Thao Tác (Chốt / Mở lại)
-        colChotDem.setCellFactory(col -> new TableCell<ChiTietKiemKeUI, Void>() {
-            private final Button btn = new Button();
-            private ChiTietKiemKeUI boundRow = null;
-            private final javafx.beans.value.ChangeListener<Boolean> daChotListener =
-                    (obs, o, n) -> refreshBtn();
-
-            {
-                btn.setOnAction(e -> {
-                    TableRow<?> tr = getTableRow();
-                    if (tr == null) return;
-                    ChiTietKiemKeUI row = (ChiTietKiemKeUI) tr.getItem();
-                    if (row == null) return;
-                    if (row.isDaChot()) handleMoLaiDem(row);
-                    else handleChotDem(row);
-                });
-            }
-
-            @Override protected void updateItem(Void v, boolean empty) {
-                super.updateItem(v, empty);
-                if (boundRow != null) {
-                    boundRow.daChotProperty().removeListener(daChotListener);
-                    boundRow = null;
-                }
-                if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
-                    setGraphic(null);
-                    return;
-                }
-                boundRow = getTableView().getItems().get(getIndex());
-                boundRow.daChotProperty().addListener(daChotListener);
-                refreshBtn();
-                setGraphic(btn);
-                setAlignment(javafx.geometry.Pos.CENTER);
-            }
-
-            private void refreshBtn() {
-                btn.getStyleClass().removeAll("btn-chot-dem", "btn-mo-lai-dem");
-                if (boundRow != null && boundRow.isDaChot()) {
-                    btn.setText("↩ Mở lại");
-                    btn.getStyleClass().add("btn-mo-lai-dem");
-                } else {
-                    btn.setText("✓ Chốt");
-                    btn.getStyleClass().add("btn-chot-dem");
-                }
-            }
-        });
+        // REMOVED Cột Thao Tác (Chốt / Mở lại)
 
         // CHỐNG NUỐT CLICK
         viewDangDem.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
@@ -244,7 +198,7 @@ public class GUI_KiemKeKhoController {
             @Override
             public void startEdit() {
                 ChiTietKiemKeUI rowData = getTableRow() != null ? (ChiTietKiemKeUI) getTableRow().getItem() : null;
-                if (rowData != null && rowData.isDaChot()) return;
+                // REMOVED check for isDaChot so users can re-edit to fix mistakes
                 super.startEdit();
                 if (textField == null) {
                     textField = new TextField(getString());
@@ -333,8 +287,30 @@ public class GUI_KiemKeKhoController {
 
         colThucTeDem.setOnEditCommit(e -> {
             ChiTietKiemKeUI row = e.getRowValue();
-            row.setSoLuongKiemTra(e.getNewValue() == null ? 0 : e.getNewValue());
+            int soLuong = e.getNewValue() == null ? 0 : e.getNewValue();
+            
+            if (row.tongNhapBanDau > 0 && soLuong > row.tongNhapBanDau) {
+                // If exceeded, we don't save or chot. We just reset UI.
+                tableChiTietDem.refresh();
+                return;
+            }
+            
+            row.setSoLuongKiemTra(soLuong);
+            row.thoiDiemDem = new Timestamp(System.currentTimeMillis());
+            row.setDaChot(true);
             tuDongLuuTungDong(row);
+            tableChiTietDem.refresh();
+            
+            // Move next
+            int nextIndex = e.getTablePosition().getRow() + 1;
+            if (nextIndex < tableChiTietDem.getItems().size()) {
+                javafx.application.Platform.runLater(() -> {
+                    tableChiTietDem.getSelectionModel().select(nextIndex, colThucTeDem);
+                    tableChiTietDem.edit(nextIndex, colThucTeDem);
+                });
+            } else {
+                tableChiTietDem.edit(-1, null);
+            }
         });
 
         tableChiTietDem.setEditable(true);
@@ -342,29 +318,7 @@ public class GUI_KiemKeKhoController {
         tableChiTietDem.setFixedCellSize(40);
     }
 
-    private void handleChotDem(ChiTietKiemKeUI row) {
-        // Defer to let any pending text-field focusLoss commit run first
-        javafx.application.Platform.runLater(() -> {
-            int soLuong = row.getSoLuongKiemTra();
-            if (row.tongNhapBanDau > 0 && soLuong > row.tongNhapBanDau) {
-                AlertUtils.showAlert(Alert.AlertType.WARNING, "Vượt quá giới hạn",
-                        "Số lượng đếm (" + soLuong + " viên) vượt quá tổng nhập ban đầu của lô ("
-                        + row.tongNhapBanDau + " viên).\nVui lòng sửa lại trước khi chốt.");
-                return;
-            }
-            row.thoiDiemDem = new Timestamp(System.currentTimeMillis());
-            row.setDaChot(true);
-            tuDongLuuTungDong(row);
-            tableChiTietDem.refresh();
-        });
-    }
-
-    private void handleMoLaiDem(ChiTietKiemKeUI row) {
-        row.thoiDiemDem = null;
-        row.setDaChot(false);
-        tuDongLuuTungDong(row);
-        tableChiTietDem.refresh();
-    }
+    // REMOVED handleChotDem and handleMoLaiDem
 
     private void tuDongLuuTungDong(ChiTietKiemKeUI row) {
         String sql = "UPDATE ChiTietPhieuKiemKe SET soLuongKiemTra = ?, thoiDiemDem = ? WHERE maPhieuKiemKe = ? AND maLoThuoc = ?";

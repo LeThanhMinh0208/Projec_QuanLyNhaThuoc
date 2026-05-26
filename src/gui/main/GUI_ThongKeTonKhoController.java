@@ -8,6 +8,9 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 
 import dao.DAO_ThongKeTonKho;
 import javafx.application.Platform;
@@ -67,6 +70,11 @@ public class GUI_ThongKeTonKhoController {
     private final DecimalFormat df = new DecimalFormat("#,##0");
     private boolean suppressAutoReload = false;
 
+    // Thread management để tránh race condition
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private AtomicLong lastRequestId = new AtomicLong(0);
+    private boolean isActive = true;
+
     private LocalDate currentTuNgay;
     private LocalDate currentDenNgay;
     private String currentDanhMuc;
@@ -80,6 +88,7 @@ public class GUI_ThongKeTonKhoController {
     @FXML
     public void initialize() {
         LocalDate today = LocalDate.now();
+        suppressAutoReload = true;
         dpTuNgay.setValue(YearMonth.now().atDay(1));
         dpDenNgay.setValue(today);
 
@@ -92,7 +101,36 @@ public class GUI_ThongKeTonKhoController {
 
         setupTables();
         setupAutoReload();
+        suppressAutoReload = false;
+        // Đặt placeholder "---" để tránh nháy khi mới load trang
+        setLoadingPlaceholders();
         loadDataThongKe();
+    }
+
+    /**
+     * Dừng tất cả background tasks khi controller bị thay thế.
+     * Được gọi từ SceneUtils trước khi load trang mới.
+     */
+    public void stopBackgroundTasks() {
+        isActive = false;
+        if (executorService != null && !executorService.isShutdown()) {
+            executorService.shutdownNow();
+        }
+    }
+
+    /**
+     * Đặt placeholder "---" cho tất cả KPI labels trước khi dữ liệu được tải.
+     * Tránh hiện số 0 mặc định gây nháy giao diện.
+     */
+    private void setLoadingPlaceholders() {
+        if (lblTongMatHang != null)     lblTongMatHang.setText("---");
+        if (lblTongMatHangPercent != null) lblTongMatHangPercent.setText("");
+        if (lblTongSoLuongTon != null)  lblTongSoLuongTon.setText("---");
+        if (lblTongSoLuongTonPercent != null) lblTongSoLuongTonPercent.setText("");
+        if (lblTongGiaTriTon != null)   lblTongGiaTriTon.setText("---");
+        if (lblTongGiaTriTonPercent != null) lblTongGiaTriTonPercent.setText("");
+        if (lblCanhBaoTon != null)      lblCanhBaoTon.setText("---");
+        if (lblCanhBaoTonPercent != null) lblCanhBaoTonPercent.setText("");
     }
 
     private void setupAutoReload() {
@@ -234,13 +272,21 @@ public class GUI_ThongKeTonKhoController {
         currentDanhMuc = reportDanhMuc;
         currentTrangThaiTon = reportTrangThaiTon;
 
-        new Thread(() -> {
+        // Tạo ID request để tránh race condition (chỉ request mới nhất mới update UI)
+        final long requestId = lastRequestId.incrementAndGet();
+
+        executorService.submit(() -> {
             try {
                 Map<String, Object> tongQuan = dao.getTongQuan(reportDanhMuc, nguongTonThap, soNgayHetHan);
                 List<Map<String, Object>> tonKhoTheoDanhMuc = dao.getTonKhoTheoDanhMuc(reportDanhMuc);
                 List<Map<String, Object>> bienDong = dao.getBienDongTonKho(reportTuNgay, reportDenNgay, reportDanhMuc);
                 List<Map<String, Object>> topTonKho = dao.getTopTonKho(reportDanhMuc, reportTrangThaiTon, 10, nguongTonThap);
                 List<Map<String, Object>> loSapHetHan = dao.getLoSapHetHan(reportDanhMuc, soNgayHetHan, 10);
+
+                // Kiểm tra còn là request mới nhất không
+                if (requestId != lastRequestId.get() || !isActive) {
+                    return;
+                }
 
                 currentTongQuan = tongQuan;
                 currentTonKhoTheoDanhMuc = tonKhoTheoDanhMuc;
@@ -249,6 +295,7 @@ public class GUI_ThongKeTonKhoController {
                 currentLoSapHetHan = loSapHetHan;
 
                 Platform.runLater(() -> {
+                    if (requestId != lastRequestId.get() || !isActive) return;
                     updateKpis(tongQuan);
                     loadCharts(reportTuNgay, reportDenNgay, tonKhoTheoDanhMuc, bienDong, topTonKho);
                     tableTopTonKho.setItems(FXCollections.observableArrayList(topTonKho));
@@ -258,7 +305,7 @@ public class GUI_ThongKeTonKhoController {
                 e.printStackTrace();
                 Platform.runLater(() -> showError("Không thể tải dữ liệu", "Đã xảy ra lỗi khi tải thống kê tồn kho."));
             }
-        }).start();
+        });
     }
 
     private void updateKpis(Map<String, Object> tongQuan) {

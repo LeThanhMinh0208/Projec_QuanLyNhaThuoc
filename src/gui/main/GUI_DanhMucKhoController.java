@@ -193,6 +193,14 @@ public class GUI_DanhMucKhoController implements Initializable {
     }
 
     @FXML void handleChuyenTrangKiemKe(ActionEvent event) { 
-        AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Tính năng đang phát triển", "Tính năng kiểm kê kho sẽ được cập nhật trong phiên bản tiếp theo.");
+        // 1. Kiểm tra quyền hạn từ Incoming
+        if (!UserSession.getInstance().hasPermission("QLK.KIEM_KE")) {
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Không có quyền", "Bạn không có quyền truy cập trang Kiểm Kê Kho.");
+            return;
+        }
+        // 2. Chuyển trang và Highlight từ HEAD
+        if (GUI_TrangChuController.getInstance() != null) {
+            GUI_TrangChuController.getInstance().chuyenTrangVaHighlight("/gui/main/GUI_KiemKeKho.fxml", "Kiểm Kê Kho");
+        }
     }
 }

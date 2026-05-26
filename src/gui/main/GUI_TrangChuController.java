@@ -68,7 +68,7 @@ public class GUI_TrangChuController {
     @FXML
     private Button btnDanhMucThuoc, btnDonViQuyDoi, btnLoThuoc;
     @FXML
-    private Button btnDanhMucKho, btnDonDatHang, btnNhapKho, btnXuatKho;
+    private Button btnDanhMucKho, btnDonDatHang, btnNhapKho, btnXuatKho, btnKiemKeKho, btnGiaiQuyetKiemKe;
     @FXML
     private Button btnDanhMucKhachHang, btnLichSuGiaoDich;
     @FXML
@@ -191,6 +191,8 @@ public class GUI_TrangChuController {
             {btnDonDatHang, "QLK.DON_DAT_HANG"},
             {btnNhapKho, "QLK.NHAP_KHO"},
             {btnXuatKho, "QLK.XUAT_KHO"},
+            {btnKiemKeKho, "QLK.KIEM_KE"},
+            {btnGiaiQuyetKiemKe, "QLK.GIAI_QUYET_KIEM_KE"},
             {btnDanhMucKhachHang, "QLKH.DANH_MUC_KHACH_HANG"},
             {btnLichSuGiaoDich, "QLKH.LICH_SU_GIAO_DICH"},
             {btnDanhMucNCC, "QLNCC.DANH_MUC_NHA_CUNG_CAP"},
@@ -363,6 +365,16 @@ public class GUI_TrangChuController {
                         Button btn = (Button) node;
                         if (btn.getText() != null && btn.getText().toLowerCase().contains(buttonTextToMatch.toLowerCase())) {
                             btn.getStyleClass().add("sub-btn-active");
+                            
+                            // Tự động mở rộng TitledPane cha chứa nút này
+                            Node parent = btn.getParent();
+                            while (parent != null) {
+                                if (parent instanceof TitledPane) {
+                                    ((TitledPane) parent).setExpanded(true);
+                                    break;
+                                }
+                                parent = parent.getParent();
+                            }
                             return;
                         }
                     }
@@ -457,14 +469,8 @@ public class GUI_TrangChuController {
 
     @FXML
     void handleMoThongKeHangHoa(ActionEvent event) {
-        // Kiểm tra phân quyền tương tự như các chức năng thống kê khác của bạn
-        if (utils.UserSession.getInstance().getUser() != null && 
-            !"Quản lý".equalsIgnoreCase(utils.UserSession.getInstance().getUser().getChucVu())) {
-            new Alert(Alert.AlertType.WARNING, "Bạn không có quyền truy cập Báo Cáo Thống Kê Hàng Hóa.").show();
-            return;
-        }
         setMenuButtonActive(event);
-        chuyenTrangVaHighlight("/gui/main/GUI_ThongKeHangHoa.fxml", "Hàng Hóa");
+        utils.SceneUtils.switchPage("/gui/main/GUI_ThongKeHangHoa.fxml");
     }
 
     private void loadDataFromServer() {

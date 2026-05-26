@@ -89,9 +89,9 @@ public class Dialog_ChiTietHoaDonController {
             String filePath = HoaDonPdfExporter.xuatPDF(currentHoaDon, chiTiet);
 
             // Tự động mở file PDF
-            // if (Desktop.isDesktopSupported()) {
-            //     Desktop.getDesktop().open(new File(filePath));
-            // }
+             if (java.awt.Desktop.isDesktopSupported()) {
+                 java.awt.Desktop.getDesktop().open(new java.io.File(filePath));
+             }
 
             Alert a = new Alert(Alert.AlertType.INFORMATION,
                 "Xuất hóa đơn thành công!\nFile: " + filePath, ButtonType.OK);

@@ -131,6 +131,8 @@ public class GUI_ThongKeDoanhThuController {
 
         // Bật lại auto reload và tải dữ liệu lần đầu
         suppressAutoReload = false;
+        // Đặt placeholder "---" để tránh nháy khi mới load trang
+        setLoadingPlaceholders();
         loadDataThongKe();
     }
 
@@ -143,6 +145,21 @@ public class GUI_ThongKeDoanhThuController {
         if (executorService != null && !executorService.isShutdown()) {
             executorService.shutdownNow();
         }
+    }
+
+    /**
+     * Đặt placeholder "---" cho tất cả KPI labels trước khi dữ liệu được tải.
+     * Tránh hiện số 0 mặc định gây nháy giao diện.
+     */
+    private void setLoadingPlaceholders() {
+        if (lblTongDoanhThu != null)     lblTongDoanhThu.setText("---");
+        if (lblTongDoanhThuPercent != null) lblTongDoanhThuPercent.setText("");
+        if (lblTongDonHang != null)      lblTongDonHang.setText("---");
+        if (lblTongDonHangPercent != null) lblTongDonHangPercent.setText("");
+        if (lblGiaTrungBinh != null)     lblGiaTrungBinh.setText("---");
+        if (lblGiaTrungBinhPercent != null) lblGiaTrungBinhPercent.setText("");
+        if (lblSoKhachHang != null)      lblSoKhachHang.setText("---");
+        if (lblSoKhachHangPercent != null) lblSoKhachHangPercent.setText("");
     }
 
     private void setupAutoReload() {

@@ -176,7 +176,10 @@ public class Dialog_ChiTietPhieuDoiTraController {
     @FXML
     void handleInPhieu() {
         try {
-            utils.PhieuDoiTraPdfExporter.xuatPDF(currentPdt, listChiTiet, listThuocDoi);
+            String filePath = utils.PhieuDoiTraPdfExporter.xuatPDF(currentPdt, listChiTiet, listThuocDoi, thueVAT);
+             if (java.awt.Desktop.isDesktopSupported()) {
+                 java.awt.Desktop.getDesktop().open(new java.io.File(filePath));
+             }
             SceneUtils.showAlert(Alert.AlertType.INFORMATION, "Đã xuất phiếu đổi trả thành công!");
         } catch (Exception e) {
             e.printStackTrace();

@@ -73,7 +73,7 @@ public class PhieuDoiTraPdfExporter {
         }
     }
 
-    public static String xuatPDF(PhieuDoiTraView pdt, List<Object[]> listChiTiet, List<Object[]> listThuocDoi) throws Exception {
+    public static String xuatPDF(PhieuDoiTraView pdt, List<Object[]> listChiTiet, List<Object[]> listThuocDoi, double thueVAT) throws Exception {
         Path dir = Paths.get("exports/phieudoitra");
         Files.createDirectories(dir);
 
@@ -145,7 +145,7 @@ public class PhieuDoiTraPdfExporter {
         Paragraph pTra = new Paragraph("DANH SÁCH THUỐC KHÁCH TRẢ LẠI", fBold);
         pTra.setSpacingAfter(5);
         doc.add(pTra);
-        doc.add(createTableChiTiet(listChiTiet, fHead, fNormal, true));
+        doc.add(createTableChiTiet(listChiTiet, fHead, fNormal, true, thueVAT));
 
         // ── THUỐC KHÁCH NHẬN (nếu Đổi SP) ──
         if (pdt.isDoiSanPham() && listThuocDoi != null && !listThuocDoi.isEmpty()) {
@@ -153,7 +153,7 @@ public class PhieuDoiTraPdfExporter {
             Paragraph pDoi = new Paragraph("DANH SÁCH THUỐC KHÁCH NHẬN ĐỔI", fBold);
             pDoi.setSpacingAfter(5);
             doc.add(pDoi);
-            doc.add(createTableChiTiet(listThuocDoi, fHead, fNormal, false));
+            doc.add(createTableChiTiet(listThuocDoi, fHead, fNormal, false, thueVAT));
         }
 
         // ── TỔNG KẾT BÙ/HOÀN TIỀN ──
@@ -170,7 +170,7 @@ public class PhieuDoiTraPdfExporter {
         } else {
             double tongTienTra = 0;
             if (listChiTiet != null) {
-                tongTienTra = listChiTiet.stream().mapToDouble(r -> (double) r[6]).sum();
+                tongTienTra = listChiTiet.stream().mapToDouble(r -> (double) r[6]).sum() * (1 + thueVAT / 100.0);
             }
             double phiPhat = pdt.getPhiPhat();
             double tongHoan = Math.max(0, tongTienTra - phiPhat);
@@ -201,7 +201,7 @@ public class PhieuDoiTraPdfExporter {
         return filePath;
     }
 
-    private static PdfPTable createTableChiTiet(List<Object[]> dataList, Font fHead, Font fNormal, boolean isThuocTra) throws Exception {
+    private static PdfPTable createTableChiTiet(List<Object[]> dataList, Font fHead, Font fNormal, boolean isThuocTra, double thueVAT) throws Exception {
         PdfPTable table = new PdfPTable(5);
         table.setWidthPercentage(100);
         table.setWidths(new float[] { 0.8f, 3.5f, 1.2f, 1.0f, 2.0f });
@@ -240,8 +240,8 @@ public class PhieuDoiTraPdfExporter {
                 Object[] arr = (Object[]) item;
                 tenThuoc = arr[0] != null ? (String) arr[0] : "—";
                 soDoi = ((Number) arr[4]).intValue();
-                donGia = ((Number) arr[5]).doubleValue();
-                thanhTien = ((Number) arr[6]).doubleValue();
+                donGia = ((Number) arr[5]).doubleValue() * (1 + thueVAT / 100.0);
+                thanhTien = ((Number) arr[6]).doubleValue() * (1 + thueVAT / 100.0);
             } else { // Object[] từ parse JSON/String (maQuyDoi, tenThuoc, tenDonVi, soLuong, donGia)
                 Object[] arr = (Object[]) item;
                 tenThuoc = arr[1] != null ? (String) arr[1] : "—";

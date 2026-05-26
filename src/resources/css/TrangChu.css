@@ -313,16 +313,16 @@
 }
 
 .table-row-cell:filled:selected {
-    -fx-background-color: #38bdf8;
-    -fx-text-fill: white;
+    -fx-background-color: #0ea5e9 !important;
+    -fx-text-fill: white !important;
     -fx-background-insets: 0;
     -fx-border-color: #0ea5e9;
     -fx-border-width: 0 0 0 4;
 }
 
 .table-row-cell:filled:selected:hover {
-    -fx-background-color: #0ea5e9;
-    -fx-text-fill: white;
+    -fx-background-color: #0ea5e9 !important;
+    -fx-text-fill: white !important;
 }
 
 .table-row-cell .table-cell {
@@ -331,9 +331,15 @@
     -fx-font-size: 14px;
 }
 
-.table-row-cell:selected .table-cell {
+.table-row-cell:selected .table-cell,
+.table-row-cell:selected .text-dark-red,
+.table-row-cell:selected .text-orange,
+.table-row-cell:selected .text-green,
+.table-row-cell:selected .text-xanh-bien,
+.table-row-cell:selected .text-vang-cam,
+.table-row-cell:selected .text-do {
     -fx-text-fill: white !important;
-    -fx-font-weight: bold;
+    -fx-font-weight: bold !important;
 }
 
 
@@ -368,6 +374,27 @@
 
 .warning-table .table-row-cell:hover {
     -fx-background-color: #f8fafc;
+}
+
+.warning-table .table-row-cell:filled:selected,
+.warning-table .table-row-cell:selected {
+    -fx-background-color: #0ea5e9 !important;
+    -fx-background-insets: 0;
+    -fx-border-color: #0ea5e9;
+    -fx-border-width: 0 0 0 4;
+}
+
+.warning-table .table-row-cell:filled:selected:hover,
+.warning-table .table-row-cell:selected:hover {
+    -fx-background-color: #0ea5e9 !important;
+}
+
+.warning-table .table-row-cell:selected .table-cell,
+.warning-table .table-row-cell:selected .text-dark-red,
+.warning-table .table-row-cell:selected .text-orange,
+.warning-table .table-row-cell:selected .text-green {
+    -fx-text-fill: white !important;
+    -fx-font-weight: bold !important;
 }
 
 

@@ -87,8 +87,8 @@
                               <Button fx:id="btnDonDatHang" onAction="#moQuanLyDonDatHang" styleClass="sub-btn" text="Quản Lý Đơn Đặt Hàng" />
                               <Button fx:id="btnNhapKho" onAction="#moTrangNhapKho" styleClass="sub-btn" text="Nhập Kho" />
                               <Button fx:id="btnXuatKho" onAction="#moTrangXuatKho" styleClass="sub-btn" text="Xuất Kho" />
-                              <Button onAction="#moTrangKiemKeKho"  styleClass="sub-btn" text="Kiểm Kê Kho" />
-                              <Button onAction="#moTrangGiaiQuyetKiemKe"  styleClass="sub-btn" text="Giải Quyết Kiểm Kê" />
+                              <Button fx:id="btnKiemKeKho" onAction="#moTrangKiemKeKho"  styleClass="sub-btn" text="Kiểm Kê Kho" />
+                              <Button fx:id="btnGiaiQuyetKiemKe" onAction="#moTrangGiaiQuyetKiemKe"  styleClass="sub-btn" text="Giải Quyết Kiểm Kê" />
                            </VBox>
                         </content>
                      </TitledPane>
@@ -120,7 +120,6 @@
                               <Button fx:id="btnDanhMucNguoiDung" onAction="#handleMoQuanLyNguoiDung" styleClass="sub-btn" text="Danh Mục Người Dùng" />
                               <Button fx:id="btnPhanQuyen" onAction="#handleMoPhanQuyen" styleClass="sub-btn" text="Phân Quyền Người Dùng" />
                               <Button fx:id="btnNhatKy" onAction="#handleMoNhatKy" styleClass="sub-btn" text="Nhật Ký Hoạt Động" />
-                              <Button onAction="#handleMoDoiMatKhau" styleClass="sub-btn" text="Đổi mật khẩu" />
                            </VBox>
                         </content>
                      </TitledPane>
@@ -140,6 +139,11 @@
             </ScrollPane>
             
             <Region VBox.vgrow="ALWAYS" />
+            
+            <Button fx:id="btnDoiMatKhau" onAction="#handleMoDoiMatKhau" alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="50.0" prefWidth="220.0" styleClass="sidebar-btn-logout" text="Đổi Mật Khẩu">
+               <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/ic_logout.png" /></ImageView></graphic>
+               <style>-fx-background-color: #1e3a5f; -fx-text-fill: #90cdf4;</style>
+            </Button>
             
             <Button fx:id="btnDangXuat" onAction="#handleDangXuat" alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="50.0" prefWidth="220.0" styleClass="sidebar-btn-logout" text="Đăng Xuất">
                <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../../resources/icons/ic_logout.png" /></ImageView></graphic>

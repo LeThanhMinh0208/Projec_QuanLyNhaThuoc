@@ -143,6 +143,21 @@
                                     <Tooltip text="Lấy giá từ bảng giá mặc định đang hiệu lực cho các thuốc chưa có giá" />
                                 </tooltip>
                             </Button>
+                            
+                            <Button text="⬇ Tải file mẫu Excel" onAction="#handleTaiFileMauExcel"
+                                    style="-fx-background-color: linear-gradient(to right, #10b981, #059669); -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 8 15; -fx-cursor: hand; -fx-background-radius: 8;">
+                                <tooltip>
+                                    <Tooltip text="Tải xuống file Excel chứa danh sách thuốc để nhập giá hàng loạt" />
+                                </tooltip>
+                            </Button>
+                            
+                            <Button text="⬆ Nhập giá từ Excel" onAction="#handleNhapGiaTuExcel"
+                                    style="-fx-background-color: linear-gradient(to right, #f59e0b, #d97706); -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 8 15; -fx-cursor: hand; -fx-background-radius: 8;">
+                                <tooltip>
+                                    <Tooltip text="Nhập danh sách giá bán từ file Excel bạn đã điền" />
+                                </tooltip>
+                            </Button>
+                            
                             <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="300.0" styleClass="search-box">
                                 <Label styleClass="search-icon" text="🔍" />
                                 <TextField fx:id="txtTimKiemTab2" promptText="Tìm theo tên thuốc..."
