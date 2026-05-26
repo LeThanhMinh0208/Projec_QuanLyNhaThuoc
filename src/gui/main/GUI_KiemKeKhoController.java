@@ -224,7 +224,7 @@ public class GUI_KiemKeKhoController {
             }
         });
 
-        // CHỐNG NUỐT CLICK
+        // Chống nuốt click khi bấm nút trong bảng
         viewDangDem.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
             javafx.scene.Node target = (javafx.scene.Node) event.getTarget();
             while (target != null) {
@@ -271,22 +271,24 @@ public class GUI_KiemKeKhoController {
             private void xuLyNhapLieu(String text) {
                 try {
                     int slNhap = Integer.parseInt(text.trim());
-                    if (slNhap < 0) slNhap = 0; // Chặn số âm
-                    
+                    if (slNhap < 0) slNhap = 0;
+
                     int idx = getIndex();
                     ChiTietKiemKeUI rowData = (idx >= 0 && idx < tableChiTietDem.getItems().size())
                             ? tableChiTietDem.getItems().get(idx) : null;
                     if (rowData != null && rowData.tongNhapBanDau > 0 && slNhap > rowData.tongNhapBanDau) {
-                        slNhap = rowData.tongNhapBanDau;
-                        final int slThuc = slNhap;
-                        javafx.application.Platform.runLater(() -> {
+                        final int giaiHan = rowData.tongNhapBanDau;
+                        final int slNhapFinal = slNhap;
+                        cancelEdit();
+                        javafx.application.Platform.runLater(() ->
                             AlertUtils.showAlert(Alert.AlertType.WARNING, "Vượt quá giới hạn",
-                                    "Số lượng đếm không được vượt quá tổng số lượng nhập ban đầu của lô (" + slThuc + " viên)!");
-                        });
+                                    "Số lượng đếm (" + slNhapFinal + ") vượt quá tổng nhập ban đầu của lô (" + giaiHan + " viên).\nVui lòng nhập lại.")
+                        );
+                        return;
                     }
                     commitEdit(slNhap);
-                } catch (NumberFormatException ex) { 
-                    commitEdit(getItem() != null ? getItem() : 0); 
+                } catch (NumberFormatException ex) {
+                    commitEdit(getItem() != null ? getItem() : 0);
                 }
             }
 
@@ -343,7 +345,6 @@ public class GUI_KiemKeKhoController {
     }
 
     private void handleChotDem(ChiTietKiemKeUI row) {
-        // Defer to let any pending text-field focusLoss commit run first
         javafx.application.Platform.runLater(() -> {
             int soLuong = row.getSoLuongKiemTra();
             if (row.tongNhapBanDau > 0 && soLuong > row.tongNhapBanDau) {
@@ -494,12 +495,10 @@ public class GUI_KiemKeKhoController {
                             if (slNhap < 0) slNhap = 0; 
                             for (ChiTietKiemKeUI ui : dsChiTiet) {
                                 if (ui.maLoThuoc.toUpperCase().equals(maLo)) {
-                                    
                                     if (ui.tongNhapBanDau > 0 && slNhap > ui.tongNhapBanDau) {
-                                        slNhap = ui.tongNhapBanDau;
-                                        canhBaoList.add(maLo);
+                                        canhBaoList.add(maLo + " (đếm " + slNhap + ", tối đa " + ui.tongNhapBanDau + ")");
+                                        break;
                                     }
-                                    
                                     ui.setSoLuongKiemTra(slNhap);
                                     tuDongLuuTungDong(ui);
                                     count++;
@@ -512,8 +511,9 @@ public class GUI_KiemKeKhoController {
                 
                 String tb = "Đã cập nhật thành công " + count + " lô thuốc từ file!";
                 if (!canhBaoList.isEmpty()) {
-                    tb += "\n⚠️ Có " + canhBaoList.size() + " lô thuốc vượt quá số lượng nhập ban đầu đã được tự động điều chỉnh về mức tối đa.";
-                    AlertUtils.showAlert(Alert.AlertType.WARNING, "Import CSV Thành Công (Có Cảnh Báo)", tb);
+                    tb += "\n\n⚠️ " + canhBaoList.size() + " lô bị bỏ qua (vượt số lượng nhập ban đầu), vui lòng nhập thủ công hoặc import lại:\n• "
+                            + String.join("\n• ", canhBaoList);
+                    AlertUtils.showAlert(Alert.AlertType.WARNING, "Import CSV Có Cảnh Báo", tb);
                 } else {
                     AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Import CSV Thành Công", tb);
                 }
