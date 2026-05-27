@@ -268,7 +268,7 @@ public class GUI_QuanLyCongNoController {
 
         // KIỂM TRA QUAN TRỌNG: Chỉ cho phép thu tiền khi NCC đang nợ mình (Công nợ bị ÂM)
         if (selected.getCongNo() >= 0) {
-            utils.AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Không thể thu tiền", "Nhà cung cấp này không nợ tiền cửa hàng.\nChức năng này chỉ dùng để thu hồi tiền khi NCC nợ lại do trả hàng (Công nợ hiện số Âm).");
+            utils.AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Không thể thu tiền", "Nhà cung cấp này không nợ tiền cửa hàng.\nChức năng này chỉ dùng để thu hồi tiền khi NCC nợ\n(Công nợ hiện số Âm).");
             return;
         }
 

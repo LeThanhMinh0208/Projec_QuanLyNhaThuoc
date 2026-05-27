@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import utils.*;
 
+import java.io.File;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,6 +26,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javafx.event.ActionEvent;
+import javafx.stage.FileChooser;
 
 public class Dialog_XuatTraNCCController {
     
@@ -306,91 +309,174 @@ public class Dialog_XuatTraNCCController {
     }
 
     @FXML
-    private void handleImportCSV(javafx.event.ActionEvent event) {
-        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
-        fileChooser.setTitle("Chọn file CSV Trả hàng NCC");
-        fileChooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("CSV Files", "*.csv"));
-        java.io.File file = fileChooser.showOpenDialog(lblTongTien.getScene().getWindow());
+    private void handleTaiFileMau(ActionEvent event) {
+        NhaCungCap ncc = cbNhaCungCap.getValue();
+        if (ncc == null) {
+            AlertUtils.showAlert(Alert.AlertType.WARNING, "Chưa chọn NCC",
+                "Vui lòng chọn Nhà Cung Cấp trước khi tải file mẫu.");
+            cbNhaCungCap.requestFocus();
+            return;
+        }
 
-        if (file != null) {
-            try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(file), "UTF-8"))) {
-                String line;
-                int lineNumber = 0;
-                String tenNCCFile = "";
-                int count = 0;
-                
-                dsTraTam.clear();
-                cbNhaCungCap.setDisable(false);
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Lưu file mẫu trả hàng NCC");
+        fc.setInitialFileName("MauTraHang_" + ncc.getTenNhaCungCap().replaceAll("[^a-zA-Z0-9_]", "_") + ".xlsx");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+        File file = fc.showSaveDialog(lblTongTien.getScene().getWindow());
+        if (file == null) return;
 
-                while ((line = br.readLine()) != null) {
-                    lineNumber++;
-                    if (lineNumber == 1 && line.startsWith("\uFEFF")) line = line.substring(1);
-                    if (line.trim().isEmpty()) continue;
+        try {
+            String sql = "SELECT t.tenThuoc, t.donViCoBan, l.maLoThuoc, l.viTriKho, l.soLuongTon " +
+                         "FROM LoThuoc l JOIN Thuoc t ON l.maThuoc = t.maThuoc " +
+                         "WHERE l.maNhaCungCap = ? AND l.soLuongTon > 0 AND l.trangThai = 1 " +
+                         "ORDER BY t.tenThuoc, l.maLoThuoc";
 
-                    String[] cols = line.split(line.contains(";") ? ";" : ",");
+            List<TraHangNCCExcelExporter.LoRow> dsLo = new ArrayList<>();
+            try (Connection con = connectDB.ConnectDB.getInstance().getConnection();
+                 PreparedStatement pst = con.prepareStatement(sql)) {
+                pst.setString(1, ncc.getMaNhaCungCap());
+                ResultSet rs = pst.executeQuery();
+                while (rs.next()) {
+                    dsLo.add(new TraHangNCCExcelExporter.LoRow(
+                        rs.getString("tenThuoc"),
+                        rs.getString("donViCoBan"),
+                        rs.getString("maLoThuoc"),
+                        rs.getString("viTriKho"),
+                        rs.getInt("soLuongTon")
+                    ));
+                }
+            }
 
-                    if (lineNumber == 1) {
-                        if (cols.length >= 2) {
-                            tenNCCFile = cols[1].trim().replaceAll("^\"|\"$", "");
-                            for (NhaCungCap ncc : cbNhaCungCap.getItems()) {
-                                if (ncc.getTenNhaCungCap().equalsIgnoreCase(tenNCCFile)) {
-                                    cbNhaCungCap.getSelectionModel().select(ncc);
-                                    break;
-                                }
-                            }
-                        }
+            if (dsLo.isEmpty()) {
+                AlertUtils.showAlert(Alert.AlertType.WARNING, "Không có dữ liệu",
+                    "Nhà cung cấp này không có lô thuốc nào đang tồn kho.");
+                return;
+            }
+
+            TraHangNCCExcelExporter.xuatFileMau(ncc.getTenNhaCungCap(), "", dsLo, file);
+            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công",
+                "Đã tạo file mẫu:\n" + file.getAbsolutePath());
+            try { java.awt.Desktop.getDesktop().open(file); } catch (Exception ignored) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể tạo file mẫu: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleImportExcel(ActionEvent event) {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Chọn file Excel Trả Hàng NCC");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+        File file = fc.showOpenDialog(lblTongTien.getScene().getWindow());
+        if (file == null) return;
+
+        try {
+            TraHangNCCExcelImporter.KetQua kq = TraHangNCCExcelImporter.docFileExcel(file.getAbsolutePath());
+
+            if (kq.tenNCC.isEmpty()) {
+                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không đọc được Nhà Cung Cấp từ file.");
+                return;
+            }
+
+            // Tìm và chọn NCC
+            NhaCungCap nccFound = null;
+            for (NhaCungCap ncc : cbNhaCungCap.getItems()) {
+                if (ncc.getTenNhaCungCap().equalsIgnoreCase(kq.tenNCC)) {
+                    nccFound = ncc;
+                    break;
+                }
+            }
+            if (nccFound == null) {
+                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi file",
+                    "Nhà cung cấp \"" + kq.tenNCC + "\" không tồn tại trong hệ thống!");
+                return;
+            }
+
+            cbNhaCungCap.setDisable(false);
+            cbNhaCungCap.getSelectionModel().select(nccFound);
+
+            dsTraTam.clear();
+            List<String> dsLoi = new ArrayList<>();
+            int successCount = 0;
+
+            for (TraHangNCCExcelImporter.DongDuLieu dong : kq.dsDong) {
+                if (dong.soLo.isEmpty()) {
+                    dsLoi.add("\"" + dong.tenThuoc + "\" — thiếu số lô");
+                    continue;
+                }
+
+                String sqlFindLo = "SELECT l.*, t.tenThuoc, t.maThuoc FROM LoThuoc l " +
+                                   "JOIN Thuoc t ON l.maThuoc = t.maThuoc " +
+                                   "WHERE t.tenThuoc = ? AND l.maLoThuoc = ? AND l.maNhaCungCap = ? " +
+                                   "AND l.soLuongTon > 0 AND l.trangThai = 1";
+
+                try (Connection con = connectDB.ConnectDB.getInstance().getConnection();
+                     PreparedStatement pst = con.prepareStatement(sqlFindLo)) {
+                    pst.setString(1, dong.tenThuoc);
+                    pst.setString(2, dong.soLo);
+                    pst.setString(3, nccFound.getMaNhaCungCap());
+                    ResultSet rs = pst.executeQuery();
+
+                    if (!rs.next()) {
+                        dsLoi.add("\"" + dong.tenThuoc + "\" lô \"" + dong.soLo +
+                                  "\" không có trong kho của " + kq.tenNCC);
                         continue;
                     }
 
-                    if (lineNumber == 2) continue;
+                    double giaNhap   = rs.getDouble("giaNhap");
+                    int    tonKho    = rs.getInt("soLuongTon");
+                    String maThuoc   = rs.getString("maThuoc");
+                    String maLo      = rs.getString("maLoThuoc");
 
-                    if (cols.length < 3) continue;
-                    String tenThuocFile = cols[0].trim().replaceAll("^\"|\"$", "");
-                    String soLoFile = cols[1].trim().replaceAll("^\"|\"$", "");
-                    int slTra = Integer.parseInt(cols[2].replaceAll("[^\\d]", ""));
+                    int slTra = (dong.soLuongTra == -1) ? tonKho : dong.soLuongTra;
 
-                    NhaCungCap selectedNCC = cbNhaCungCap.getValue();
-                    if (selectedNCC == null) break;
-
-                    String sqlFindLo = "SELECT l.*, t.tenThuoc FROM LoThuoc l " +
-                                       "JOIN Thuoc t ON l.maThuoc = t.maThuoc " +
-                                       "WHERE t.tenThuoc = ? AND l.maLoThuoc = ? AND l.maNhaCungCap = ?";
-                    
-                    try (Connection con = connectDB.ConnectDB.getInstance().getConnection();
-                         PreparedStatement pst = con.prepareStatement(sqlFindLo)) {
-                        pst.setString(1, tenThuocFile);
-                        pst.setString(2, soLoFile);
-                        pst.setString(3, selectedNCC.getMaNhaCungCap());
-                        ResultSet rs = pst.executeQuery();
-                        
-                        if (rs.next()) {
-                            double giaNhap = rs.getDouble("giaNhap");
-                            int tonHT = rs.getInt("soLuongTon");
-                            String maThuoc = rs.getString("maThuoc");
-                            
-                            if (slTra <= tonHT) {
-                                dsTraTam.add(new ChiTietPhieuXuat(null, maThuoc, soLoFile, slTra, giaNhap, slTra * giaNhap));
-                                count++;
-                            }
-                        }
+                    if (slTra <= 0) {
+                        dsLoi.add("\"" + dong.tenThuoc + "\" lô \"" + dong.soLo +
+                                  "\" — số lượng trả phải lớn hơn 0");
+                        continue;
                     }
-                }
+                    if (slTra > tonKho) {
+                        dsLoi.add("\"" + dong.tenThuoc + "\" lô \"" + dong.soLo +
+                                  "\" — SL trả (" + slTra + ") vượt quá tồn kho (" + tonKho + ")");
+                        continue;
+                    }
 
-                if (count > 0) {
-                    cbNhaCungCap.setDisable(true);
-                    tableThuocTra.refresh();
-                    tinhTongTien();
-                    AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã nạp xong " + count + " mặt hàng trả cho " + tenNCCFile);
-                } else {
-                    AlertUtils.showAlert(Alert.AlertType.WARNING, "Thông báo", "Không tìm thấy dữ liệu khớp hoặc NCC không chính xác!");
-                }
+                    // Bỏ qua nếu lô đã có trong danh sách
+                    boolean duplicate = false;
+                    for (ChiTietPhieuXuat ct : dsTraTam) {
+                        if (ct.getSoLo().equals(maLo)) { duplicate = true; break; }
+                    }
+                    if (duplicate) continue;
 
-            } catch (Exception e) {
-                e.printStackTrace();
-                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Lỗi đọc file: " + e.getMessage());
+                    dsTraTam.add(new ChiTietPhieuXuat(null, maThuoc, maLo, slTra, giaNhap, slTra * giaNhap));
+                    successCount++;
+                }
             }
+
+            if (successCount > 0) {
+                cbNhaCungCap.setDisable(true);
+                cbNhaCungCap.setStyle("-fx-opacity: 1; -fx-background-color: #f1f5f9; -fx-font-weight: bold;");
+            }
+
+            if (!kq.lyDo.isEmpty()) txtGhiChu.setText(kq.lyDo);
+            tableThuocTra.refresh();
+            tinhTongTien();
+
+            StringBuilder msg = new StringBuilder(
+                "Đã nạp " + successCount + "/" + kq.dsDong.size() + " lô thuốc của [" + kq.tenNCC + "].");
+            if (!dsLoi.isEmpty()) {
+                msg.append("\n\nCác mục không hợp lệ:");
+                for (String err : dsLoi) msg.append("\n• ").append(err);
+            }
+            Alert.AlertType type = dsLoi.isEmpty() ? Alert.AlertType.INFORMATION : Alert.AlertType.WARNING;
+            AlertUtils.showAlert(type, dsLoi.isEmpty() ? "Thành công" : "Hoàn thành (có cảnh báo)", msg.toString());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể đọc file: " + e.getMessage());
         }
     }
-    
+
     @FXML private void handleHuyBo() { ((Stage) txtGhiChu.getScene().getWindow()).close(); }
 }

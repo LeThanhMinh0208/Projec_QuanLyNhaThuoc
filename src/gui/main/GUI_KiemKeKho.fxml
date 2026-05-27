@@ -22,7 +22,8 @@
                 <Button text="⚡ Kiểm Biến Động" onAction="#handleKiemKeThongMinh" styleClass="btn-blue" prefHeight="40" prefWidth="230" />
                 <Button text="✔ Kiểm Tất Cả" onAction="#handleKiemTatCa" styleClass="btn-orange" prefHeight="40" prefWidth="230" />
                 
-                <Button text="📂 Import CSV" onAction="#handleImportCSVChonThuoc" styleClass="btn-yellow" prefHeight="40" prefWidth="230" />
+                <Button text="📥 Nhập từ Excel" onAction="#handleImportExcelChonThuoc" styleClass="btn-yellow" prefHeight="40" prefWidth="180" />
+                <Button text="📄 Tải File Mẫu" onAction="#handleTaiFileMauChonThuoc" styleClass="btn-gray" prefHeight="40" prefWidth="160" />
                 
                 <HBox HBox.hgrow="ALWAYS" />
 <Button text="☑ Lọc đã chọn" 
@@ -72,6 +73,7 @@
                 </TableView>
             </VBox>
             <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                <Button onAction="#handleTaiFileMauDemSoLuong" prefHeight="45.0" prefWidth="160.0" styleClass="btn-gray" text="📄 Tải File Mẫu" />
                 <Button onAction="#handleImportCSV" prefHeight="45.0" prefWidth="160.0" styleClass="btn-yellow" text="📂 Import CSV" />
                 <Button onAction="#handleNopPhieuKiemKe" prefHeight="45.0" prefWidth="180.0" styleClass="btn-green" text="Nộp phiếu" />
             </HBox>

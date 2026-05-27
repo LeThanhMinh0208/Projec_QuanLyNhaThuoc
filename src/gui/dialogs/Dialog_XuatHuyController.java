@@ -84,45 +84,94 @@ public class Dialog_XuatHuyController implements Initializable {
     }
 
     @FXML
-    private void handleImportCSV(javafx.event.ActionEvent event) {
-        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
-        fileChooser.setTitle("Chọn file CSV Xuất Hủy");
-        fileChooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("CSV Files", "*.csv"));
-        File file = fileChooser.showOpenDialog(txtNguoiLap.getScene().getWindow());
+    private void handleTaiFileMau(ActionEvent event) {
+        javafx.stage.FileChooser fc = new javafx.stage.FileChooser();
+        fc.setTitle("Lưu File Mẫu Xuất Hủy");
+        fc.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+        fc.setInitialFileName("MauXuatHuyThuoc.xlsx");
+        File file = fc.showSaveDialog(txtNguoiLap.getScene().getWindow());
+        if (file == null) return;
 
-        if (file != null) {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"))) {
-                String line; int lineNumber = 0; int count = 0;
-                dsHuyTam.clear();
-                while ((line = br.readLine()) != null) {
-                    lineNumber++;
-                    if (lineNumber == 1 && line.startsWith("\uFEFF")) line = line.substring(1);
-                    if (lineNumber == 1 || line.trim().isEmpty()) continue;
+        String sql = "SELECT t.tenThuoc, l.maLoThuoc, l.viTriKho, l.soLuongTon " +
+                     "FROM LoThuoc l JOIN Thuoc t ON l.maThuoc = t.maThuoc " +
+                     "WHERE l.soLuongTon > 0 AND l.trangThai = 1 " +
+                     "ORDER BY t.tenThuoc, l.maLoThuoc";
+        List<XuatHuyExcelExporter.LoRow> dsLo = new ArrayList<>();
+        try (Connection con = connectDB.ConnectDB.getInstance().getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                dsLo.add(new XuatHuyExcelExporter.LoRow(
+                    rs.getString("tenThuoc"),
+                    rs.getString("maLoThuoc"),
+                    rs.getString("viTriKho"),
+                    rs.getInt("soLuongTon")
+                ));
+            }
+        } catch (Exception e) {
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Lỗi truy vấn: " + e.getMessage());
+            return;
+        }
 
-                    String[] cols = line.split(line.contains(";") ? ";" : ",");
-                    if (cols.length < 3) continue;
+        try {
+            XuatHuyExcelExporter.xuatFileMau(txtGhiChu.getText(), dsLo, file);
+            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã tạo file mẫu:\n" + file.getName());
+        } catch (Exception e) {
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể tạo file: " + e.getMessage());
+        }
+    }
 
-                    String tenThuoc = cols[0].trim().replaceAll("^\"|\"$", "");
-                    String soLo = cols[1].trim().replaceAll("^\"|\"$", "");
-                    int slHuy = Integer.parseInt(cols[2].replaceAll("[^\\d]", ""));
+    @FXML
+    private void handleImportExcel(ActionEvent event) {
+        javafx.stage.FileChooser fc = new javafx.stage.FileChooser();
+        fc.setTitle("Chọn file Excel Xuất Hủy");
+        fc.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+        File file = fc.showOpenDialog(txtNguoiLap.getScene().getWindow());
+        if (file == null) return;
 
-                    String sql = "SELECT l.* FROM LoThuoc l JOIN Thuoc t ON l.maThuoc = t.maThuoc " +
-                                 "WHERE t.tenThuoc = ? AND l.maLoThuoc = ?";
-                    try (Connection con = connectDB.ConnectDB.getInstance().getConnection();
-                         PreparedStatement pst = con.prepareStatement(sql)) {
-                        pst.setString(1, tenThuoc); pst.setString(2, soLo);
-                        ResultSet rs = pst.executeQuery();
-                        if (rs.next()) {
-                            if (slHuy <= rs.getInt("soLuongTon")) {
-                                dsHuyTam.add(new ChiTietPhieuXuat(null, rs.getString("maThuoc"), soLo, slHuy, rs.getDouble("giaNhap"), slHuy * rs.getDouble("giaNhap")));
-                                count++;
-                            }
+        try {
+            XuatHuyExcelImporter.KetQua kq = XuatHuyExcelImporter.docFileExcel(file.getPath());
+            if (kq.lyDo != null && !kq.lyDo.isEmpty()) txtGhiChu.setText(kq.lyDo);
+
+            dsHuyTam.clear();
+            List<String> dsLoi = new ArrayList<>();
+            int count = 0;
+
+            for (XuatHuyExcelImporter.DongDuLieu dong : kq.dsDong) {
+                String sqlQ = "SELECT l.maThuoc, l.soLuongTon, l.giaNhap FROM LoThuoc l " +
+                             "JOIN Thuoc t ON l.maThuoc = t.maThuoc " +
+                             "WHERE t.tenThuoc = ? AND l.maLoThuoc = ? AND l.soLuongTon > 0";
+                try (Connection con = connectDB.ConnectDB.getInstance().getConnection();
+                     PreparedStatement pst = con.prepareStatement(sqlQ)) {
+                    pst.setString(1, dong.tenThuoc);
+                    pst.setString(2, dong.soLo);
+                    ResultSet rs = pst.executeQuery();
+                    if (rs.next()) {
+                        if (dong.soLuongHuy == -1) continue;
+                        int tonKho = rs.getInt("soLuongTon");
+                        int slHuy = dong.soLuongHuy;
+                        if (slHuy > tonKho) {
+                            dsLoi.add(dong.tenThuoc + " / " + dong.soLo + " (SL hủy vượt tồn kho)");
+                            continue;
                         }
+                        double giaNhap = rs.getDouble("giaNhap");
+                        dsHuyTam.add(new ChiTietPhieuXuat(null, rs.getString("maThuoc"), dong.soLo, slHuy, giaNhap, slHuy * giaNhap));
+                        count++;
+                    } else {
+                        dsLoi.add(dong.tenThuoc + " / " + dong.soLo + " (không tìm thấy trong hệ thống)");
                     }
                 }
-                tableThuocHuy.refresh();
-                AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã nạp xong " + count + " lô thuốc cần hủy.");
-            } catch (Exception e) { AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Lỗi đọc file: " + e.getMessage()); }
+            }
+
+            tableThuocHuy.refresh();
+            if (!dsLoi.isEmpty()) {
+                AlertUtils.showAlert(Alert.AlertType.WARNING, "Hoàn tất (có lỗi)",
+                    "Đã nạp " + count + " lô hợp lệ.\nCác lô không hợp lệ:\n- " + String.join("\n- ", dsLoi));
+            } else {
+                AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã nạp " + count + " lô thuốc cần hủy.");
+            }
+        } catch (Exception e) {
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Lỗi đọc file: " + e.getMessage());
         }
     }
 

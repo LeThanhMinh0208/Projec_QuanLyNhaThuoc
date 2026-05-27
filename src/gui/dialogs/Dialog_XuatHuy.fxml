@@ -8,7 +8,12 @@
       <AnchorPane prefHeight="70.0" styleClass="dialog-header-gradient">
          <children>
             <Label layoutX="25.0" layoutY="20.0" styleClass="dialog-header-title" text="🗑 LẬP PHIẾU XUẤT HỦY THUỐC" AnchorPane.leftAnchor="25.0" />
-            <Button onAction="#handleImportCSV" styleClass="btn-import-header" text="📥 Nhập từ file CSV" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="18.0" />
+            <HBox spacing="10.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="15.0">
+               <children>
+                  <Button onAction="#handleTaiFileMau" styleClass="btn-import-header" style="-fx-background-color: #f59e0b;" text="📄 Tải File Mẫu" />
+                  <Button onAction="#handleImportExcel" styleClass="btn-import-header" text="📥 Nhập từ file Excel" />
+               </children>
+            </HBox>
          </children>
       </AnchorPane>
 

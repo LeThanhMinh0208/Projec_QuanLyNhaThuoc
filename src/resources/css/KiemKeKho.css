@@ -527,6 +527,31 @@
 .table-row-cell:selected .text-chua-chot { -fx-text-fill: white !important; }
 
 /* =======================================================
+   NÚT TẢI FILE MẪU (Teal / Cyan)
+   ======================================================= */
+.btn-gray {
+    -fx-background-color: #0891b2 !important;
+    -fx-text-fill: white !important;
+    -fx-font-weight: 900 !important;
+    -fx-font-size: 14px !important;
+    -fx-background-radius: 30 !important;
+    -fx-border-radius: 30 !important;
+    -fx-cursor: hand !important;
+    -fx-alignment: CENTER !important;
+    -fx-border-color: transparent !important;
+    -fx-effect: dropshadow(three-pass-box, rgba(8, 145, 178, 0.35), 8, 0, 0, 2) !important;
+}
+.btn-gray:hover {
+    -fx-background-color: #0e7490 !important;
+    -fx-translate-y: -2px;
+    -fx-effect: dropshadow(three-pass-box, rgba(14, 116, 144, 0.55), 12, 0, 0, 4) !important;
+}
+.btn-gray:pressed {
+    -fx-translate-y: 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(8, 145, 178, 0.2), 4, 0, 0, 1) !important;
+}
+
+/* =======================================================
    NÚT TIỆN ÍCH MÀU TÍM VIOLET (Sắp xếp / Lọc)
    ======================================================= */
 .btn-purple {

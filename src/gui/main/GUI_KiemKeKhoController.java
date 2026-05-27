@@ -423,59 +423,93 @@ public class GUI_KiemKeKhoController {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
+    private static final String HEADER_DEM  = "MALOTHUOC,SOLUONG";
+    private static final String HEADER_CHON = "MALOTHUOC";
+
+    @FXML
+    void handleTaiFileMauDemSoLuong(ActionEvent event) {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Lưu file mẫu CSV kiểm kê");
+        fc.setInitialFileName("MauKiemKe_DemSoLuong.csv");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        File file = fc.showSaveDialog(null);
+        if (file == null) return;
+        try (java.io.PrintWriter pw = new java.io.PrintWriter(
+                new java.io.OutputStreamWriter(new java.io.FileOutputStream(file),
+                        java.nio.charset.StandardCharsets.UTF_8))) {
+            pw.println(HEADER_DEM);
+            for (ChiTietKiemKeUI ui : dsChiTiet) pw.println(ui.maLoThuoc + ",0");
+            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công",
+                    "Đã tạo file mẫu:
+" + file.getAbsolutePath());
+            if (java.awt.Desktop.isDesktopSupported()) java.awt.Desktop.getDesktop().open(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể tạo file mẫu.");
+        }
+    }
+
     @FXML
     void handleImportCSV(ActionEvent event) {
         FileChooser fc = new FileChooser();
         fc.setTitle("Chọn file CSV nhập số lượng đếm");
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
         File file = fc.showOpenDialog(null);
-        if (file != null) {
-            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                String line; int count = 0; boolean isFirstLine = true;
-                List<String> canhBaoList = new ArrayList<>(); // Lưu lại các mã lô bị lố giới hạn
-                
-                while ((line = br.readLine()) != null) {
-                    if (isFirstLine) {
-                        line = line.replace("\uFEFF", "");
-                        isFirstLine = false;
-                        if (!line.toUpperCase().startsWith("LO")) continue;
+        if (file == null) return;
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line; int count = 0; boolean isFirstLine = true;
+            List<String> canhBaoList = new ArrayList<>();
+
+            while ((line = br.readLine()) != null) {
+                if (isFirstLine) {
+                    String header = line.replace("﻿", "").trim();
+                    isFirstLine = false;
+                    if (!header.equalsIgnoreCase(HEADER_DEM)) {
+                        AlertUtils.showAlert(Alert.AlertType.ERROR, "Sai định dạng file",
+                                "File không đúng mẫu!
+Dòng đầu tiên phải là: " + HEADER_DEM
+                                + "
+Vui lòng dùng nút 'Tải File Mẫu' để tải đúng định dạng.");
+                        return;
                     }
-                    String[] parts = line.split(",");
-                    if (parts.length >= 2) {
-                        String maLo = parts[0].trim().toUpperCase();
-                        try {
-                            int slNhap = Integer.parseInt(parts[1].trim());
-                            if (slNhap < 0) slNhap = 0; 
-                            for (ChiTietKiemKeUI ui : dsChiTiet) {
-                                if (ui.maLoThuoc.toUpperCase().equals(maLo)) {
-                                    
-                                    if (ui.tongNhapBanDau > 0 && slNhap > ui.tongNhapBanDau) {
-                                        slNhap = ui.tongNhapBanDau;
-                                        canhBaoList.add(maLo);
-                                    }
-                                    
-                                    ui.setSoLuongKiemTra(slNhap);
-                                    tuDongLuuTungDong(ui);
-                                    count++;
+                    continue;
+                }
+                String[] parts = line.split(",");
+                if (parts.length >= 2) {
+                    String maLo = parts[0].trim().toUpperCase();
+                    try {
+                        int slNhap = Integer.parseInt(parts[1].trim());
+                        if (slNhap < 0) slNhap = 0;
+                        for (ChiTietKiemKeUI ui : dsChiTiet) {
+                            if (ui.maLoThuoc.toUpperCase().equals(maLo)) {
+                                if (ui.tongNhapBanDau > 0 && slNhap > ui.tongNhapBanDau) {
+                                    canhBaoList.add(maLo + " (đếm " + slNhap + ", tối đa " + ui.tongNhapBanDau + ")");
+                                    break;
                                 }
+                                ui.setSoLuongKiemTra(slNhap);
+                                tuDongLuuTungDong(ui);
+                                count++;
                             }
-                        } catch (NumberFormatException ignored) {}
-                    }
+                        }
+                    } catch (NumberFormatException ignored) {}
                 }
-                tableChiTietDem.refresh();
-                
-                String tb = "Đã cập nhật thành công " + count + " lô thuốc từ file!";
-                if (!canhBaoList.isEmpty()) {
-                    tb += "\n⚠️ Có " + canhBaoList.size() + " lô thuốc vượt quá số lượng nhập ban đầu đã được tự động điều chỉnh về mức tối đa.";
-                    AlertUtils.showAlert(Alert.AlertType.WARNING, "Import CSV Thành Công (Có Cảnh Báo)", tb);
-                } else {
-                    AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Import CSV Thành Công", tb);
-                }
-                
-            } catch (Exception e) {
-                e.printStackTrace();
-                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi đọc file", "Định dạng file không hợp lệ.");
             }
+            tableChiTietDem.refresh();
+            String tb = "Đã cập nhật thành công " + count + " lô thuốc từ file!";
+            if (!canhBaoList.isEmpty()) {
+                tb += "
+
+⚠️ " + canhBaoList.size() + " lô bị bỏ qua (vượt số lượng nhập ban đầu):
+• "
+                        + String.join("
+• ", canhBaoList);
+                AlertUtils.showAlert(Alert.AlertType.WARNING, "Import CSV Có Cảnh Báo", tb);
+            } else {
+                AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Import CSV Thành Công", tb);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi đọc file", "Không thể đọc file.");
         }
     }
 
@@ -530,45 +564,59 @@ public class GUI_KiemKeKhoController {
     }
 
     @FXML
-    void handleImportCSVChonThuoc(ActionEvent event) {
+    void handleTaiFileMauChonThuoc(ActionEvent event) {
         FileChooser fc = new FileChooser();
-        fc.setTitle("Chọn file CSV danh sách Mã Lô cần kiểm kê");
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        fc.setTitle("Lưu File Mẫu Chọn Lô Kiểm Kê");
+        fc.setInitialFileName("MauKiemKe.xlsx");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+        File file = fc.showSaveDialog(null);
+        if (file == null) return;
+        java.util.List<utils.KiemKeChonLoExcelExporter.LoRow> dsLo = new ArrayList<>();
+        for (LoThuocUI lo : dsLoThuoc) {
+            dsLo.add(new utils.KiemKeChonLoExcelExporter.LoRow(
+                lo.getThuoc().getTenThuoc(),
+                lo.getMaLoThuoc(),
+                lo.getSoLuongTon()
+            ));
+        }
+        try {
+            utils.KiemKeChonLoExcelExporter.xuatFileMau(dsLo, file);
+            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã tạo file mẫu: " + file.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể tạo file mẫu.");
+        }
+    }
+
+    @FXML
+    void handleImportExcelChonThuoc(ActionEvent event) {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Chọn file Excel danh sách lô kiểm kê");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
         File file = fc.showOpenDialog(null);
-        if (file != null) {
-            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                String line; int count = 0;
-                for (LoThuocUI lo : dsLoThuoc) lo.setSelected(false);
-                List<String> listMaLoImport = new ArrayList<>();
-                boolean isFirstLine = true;
-                while ((line = br.readLine()) != null) {
-                    if (isFirstLine) {
-                        line = line.replace("\uFEFF", "");
-                        isFirstLine = false;
-                        if (!line.toUpperCase().startsWith("LO")) continue;
-                    }
-                    String[] parts = line.split(",");
-                    if (parts.length >= 1) listMaLoImport.add(parts[0].trim().toUpperCase());
+        if (file == null) return;
+        try {
+            java.util.List<String> maLoChon = utils.KiemKeChonLoExcelImporter.docFileExcel(file.getPath());
+            for (LoThuocUI lo : dsLoThuoc) lo.setSelected(false);
+            int count = 0;
+            for (LoThuocUI lo : dsLoThuoc) {
+                if (maLoChon.contains(lo.getMaLoThuoc().toUpperCase())) {
+                    lo.setSelected(true);
+                    count++;
                 }
-                for (LoThuocUI lo : dsLoThuoc) {
-                    if (listMaLoImport.contains(lo.getMaLoThuoc().toUpperCase())) {
-                        lo.setSelected(true);
-                        count++;
-                    }
-                }
-                tableChonThuoc.refresh();
-                capNhatSoLuongChon();
-                if (count > 0)
-                    AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công",
-                            "Đã quét và tick chọn tự động " + count + " lô thuốc từ file!");
-                else
-                    AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo",
-                            "Không tìm thấy Mã Lô nào trong file khớp với kho hiện tại!");
-            } catch (Exception e) {
-                e.printStackTrace();
-                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi đọc file",
-                        "Định dạng file không hợp lệ! Vui lòng kiểm tra lại file CSV.");
             }
+            tableChonThuoc.refresh();
+            capNhatSoLuongChon();
+            if (count > 0)
+                AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công",
+                        "Đã tick chọn tự động " + count + " lô thuốc từ file!");
+            else
+                AlertUtils.showAlert(Alert.AlertType.WARNING, "Cảnh báo",
+                        "Không tìm thấy Mã Lô nào trong file khớp với kho hiện tại!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi đọc file",
+                    "Không thể đọc file Excel. Vui lòng kiểm tra lại!");
         }
     }
 

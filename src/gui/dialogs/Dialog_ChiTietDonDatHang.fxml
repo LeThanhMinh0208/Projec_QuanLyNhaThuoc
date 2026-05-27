@@ -65,15 +65,24 @@
                <padding><Insets bottom="5.0" left="5.0" right="5.0" top="5.0" /></padding>
             </VBox>
 
-            <HBox alignment="CENTER_RIGHT" spacing="20.0">
+            <HBox alignment="CENTER_RIGHT" spacing="12.0">
                <children>
                   <Label text="Tổng tiền dự kiến:" styleClass="dialog-info-label" style="-fx-font-size: 16px;" />
                   <Label fx:id="lblTongTienDuKien" text="0 VNĐ" styleClass="text-total-price" />
                   <Region HBox.hgrow="ALWAYS" />
-                  
-                  <Button onAction="#handleDong" prefHeight="45.0" prefWidth="130.0" styleClass="btn-close" text="Đóng" />
-                  <Button fx:id="btnHuyDon" onAction="#handleHuyDon" prefHeight="45.0" prefWidth="130.0" styleClass="btn-danger" text="Hủy Đơn" />
-                  <Button onAction="#handleInDonHang" prefHeight="45.0" prefWidth="150.0" styleClass="btn-print" text="IN PHIẾU ✨" />
+
+                  <Button onAction="#handleDong" prefHeight="42.0" prefWidth="155.0"
+                          style="-fx-background-color: #475569; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand; -fx-font-size: 13px;"
+                          text="✖ Đóng" />
+                  <Button fx:id="btnHuyDon" onAction="#handleHuyDon" prefHeight="42.0" prefWidth="155.0"
+                          style="-fx-background-color: linear-gradient(to bottom, #ef4444, #dc2626); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand; -fx-font-size: 13px;"
+                          text="🗑 Hủy Đơn" />
+                  <Button onAction="#handleXuatExcel" prefHeight="42.0" prefWidth="155.0"
+                          style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand; -fx-font-size: 13px;"
+                          text="📊 Xuất Excel" />
+                  <Button onAction="#handleInDonHang" prefHeight="42.0" prefWidth="155.0"
+                          style="-fx-background-color: linear-gradient(to bottom, #0ea5e9, #0284c7); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand; -fx-font-size: 13px;"
+                          text="🖨 In Phiếu" />
                </children>
             </HBox>
          </children>
