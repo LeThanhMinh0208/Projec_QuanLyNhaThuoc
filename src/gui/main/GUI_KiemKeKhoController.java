@@ -440,8 +440,7 @@ public class GUI_KiemKeKhoController {
             pw.println(HEADER_DEM);
             for (ChiTietKiemKeUI ui : dsChiTiet) pw.println(ui.maLoThuoc + ",0");
             AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công",
-                    "Đã tạo file mẫu:
-" + file.getAbsolutePath());
+                    "Đã tạo file mẫu:\n" + file.getAbsolutePath());
             if (java.awt.Desktop.isDesktopSupported()) java.awt.Desktop.getDesktop().open(file);
         } catch (Exception e) {
             e.printStackTrace();
@@ -466,10 +465,8 @@ public class GUI_KiemKeKhoController {
                     isFirstLine = false;
                     if (!header.equalsIgnoreCase(HEADER_DEM)) {
                         AlertUtils.showAlert(Alert.AlertType.ERROR, "Sai định dạng file",
-                                "File không đúng mẫu!
-Dòng đầu tiên phải là: " + HEADER_DEM
-                                + "
-Vui lòng dùng nút 'Tải File Mẫu' để tải đúng định dạng.");
+                                "File không đúng mẫu!\nDòng đầu tiên phải là: " + HEADER_DEM
+                                + "\nVui lòng dùng nút 'Tải File Mẫu' để tải đúng định dạng.");
                         return;
                     }
                     continue;
@@ -497,12 +494,8 @@ Vui lòng dùng nút 'Tải File Mẫu' để tải đúng định dạng.");
             tableChiTietDem.refresh();
             String tb = "Đã cập nhật thành công " + count + " lô thuốc từ file!";
             if (!canhBaoList.isEmpty()) {
-                tb += "
-
-⚠️ " + canhBaoList.size() + " lô bị bỏ qua (vượt số lượng nhập ban đầu):
-• "
-                        + String.join("
-• ", canhBaoList);
+                tb += "\n\n⚠️ " + canhBaoList.size() + " lô bị bỏ qua (vượt số lượng nhập ban đầu):\n• "
+                        + String.join("\n• ", canhBaoList);
                 AlertUtils.showAlert(Alert.AlertType.WARNING, "Import CSV Có Cảnh Báo", tb);
             } else {
                 AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Import CSV Thành Công", tb);
