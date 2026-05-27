@@ -161,16 +161,23 @@ public class Dialog_SuaThuocController {
 
     private String copyAnhVaoThuMuc(File sourceFile, String maThuoc)
             throws IOException {
-        Path destDir = Paths.get(THUOC_IMAGE_DIR);
-        Files.createDirectories(destDir);
-
         String original = sourceFile.getName();
         String ext = original.substring(original.lastIndexOf('.'));
         String newFileName = maThuoc + ext;
-        Path destPath = destDir.resolve(newFileName);
 
-        Files.copy(sourceFile.toPath(), destPath,
-            StandardCopyOption.REPLACE_EXISTING);
+        // 1. Copy vào thư mục src để đồng bộ Git
+        Path destDirSrc = Paths.get("src/resources/images/images_thuoc/");
+        Files.createDirectories(destDirSrc);
+        Path destPathSrc = destDirSrc.resolve(newFileName);
+        Files.copy(sourceFile.toPath(), destPathSrc, StandardCopyOption.REPLACE_EXISTING);
+
+        // 2. Copy vào thư mục bin để JavaFX hiển thị được ngay lập tức tại runtime
+        Path destDirBin = Paths.get("bin/resources/images/images_thuoc/");
+        if (Files.exists(Paths.get("bin"))) {
+            Files.createDirectories(destDirBin);
+            Path destPathBin = destDirBin.resolve(newFileName);
+            Files.copy(sourceFile.toPath(), destPathBin, StandardCopyOption.REPLACE_EXISTING);
+        }
 
         return newFileName;
     }

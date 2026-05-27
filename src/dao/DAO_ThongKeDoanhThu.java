@@ -346,7 +346,7 @@ public class DAO_ThongKeDoanhThu {
                 "    SELECT maHoaDon, SUM(soLuong * donGia) as tongTien FROM ChiTietHoaDon GROUP BY maHoaDon" +
                 ")" +
                 "SELECT TOP " + top + " " +
-                "ISNULL(kh.hoTen, 'Khách lẻ') as tenKhachHang, " +
+                "ISNULL(kh.hoTen, N'Khách lẻ') as tenKhachHang, " +
                 "COUNT(hd.maHoaDon) as soDon, " +
                 "ISNULL(SUM(CASE WHEN hd.thueVAT > 0 THEN cts.tongTien * (1 + hd.thueVAT/100) ELSE cts.tongTien END), 0) as doanhThu " +
                 "FROM HoaDon hd " +
