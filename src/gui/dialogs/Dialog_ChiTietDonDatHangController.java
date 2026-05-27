@@ -3,8 +3,12 @@ package gui.dialogs;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import javafx.stage.FileChooser;
+import utils.ChiTietDonDatHangExcelExporter;
 
 import dao.DAO_DonDatHang;
 import entity.ChiTietDonDatHang;
@@ -73,11 +77,11 @@ public class Dialog_ChiTietDonDatHangController {
             "GIAO_DU".equals(trangThaiGocDB))) {
 
             btnHuyDon.setDisable(true);
-            btnHuyDon.setStyle("-fx-background-color: #fca5a5; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;");
+            btnHuyDon.setStyle("-fx-background-color: #fca5a5; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20;");
 
         } else {
             btnHuyDon.setDisable(false);
-            btnHuyDon.setStyle("-fx-background-color: linear-gradient(to bottom, #ef4444, #dc2626); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;");
+            btnHuyDon.setStyle("-fx-background-color: linear-gradient(to bottom, #ef4444, #dc2626); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;");
         }
 
         setupTable();
@@ -199,7 +203,7 @@ public class Dialog_ChiTietDonDatHangController {
                 donHienTai.setTrangThai("DA_HUY");
                 tableChiTiet.refresh(); 
                 btnHuyDon.setDisable(true); 
-                btnHuyDon.setStyle("-fx-background-color: #fca5a5; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;");
+                btnHuyDon.setStyle("-fx-background-color: #fca5a5; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20;");
                 AlertUtils.showAlert(AlertType.INFORMATION, "Thành công", "Đã hủy đơn hàng thành công!");
             } else {
                 AlertUtils.showAlert(AlertType.ERROR, "Lỗi", "Có lỗi xảy ra khi cập nhật CSDL. Vui lòng thử lại!");
@@ -318,6 +322,47 @@ public class Dialog_ChiTietDonDatHangController {
         Scene scene = new Scene(root, 750, 650);
         previewStage.setScene(scene);
         previewStage.show();
+    }
+
+    @FXML void handleXuatExcel(ActionEvent event) {
+        if (donHienTai == null || listChiTiet == null || listChiTiet.isEmpty()) {
+            AlertUtils.showAlert(AlertType.WARNING, "Cảnh báo", "Đơn hàng này rỗng, không có dữ liệu để xuất!");
+            return;
+        }
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Lưu file nhập kho");
+        fc.setInitialFileName("NhapKho_" + donHienTai.getMaDonDatHang() + ".xlsx");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files (*.xlsx)", "*.xlsx"));
+        File file = fc.showSaveDialog(lblMaDon.getScene().getWindow());
+        if (file == null) return;
+        try {
+            List<ChiTietDonDatHangExcelExporter.DrugRow> rows = new ArrayList<>();
+            for (ChiTietDonDatHang ct : listChiTiet) {
+                rows.add(new ChiTietDonDatHangExcelExporter.DrugRow(
+                    ct.getThuoc().getTenThuoc(),
+                    ct.getDonViQuyDoi().getTenDonVi(),
+                    ct.getSoLuongDat(),
+                    ct.getSoLuongDaNhan(),
+                    ct.getMaLo(),
+                    ct.getNgaySanXuatTemp(),
+                    ct.getHanSuDung()
+                ));
+            }
+            String ghiChu = donHienTai.getGhiChu();
+            ChiTietDonDatHangExcelExporter.xuatFileNhapKho(
+                donHienTai.getMaDonDatHang(),
+                donHienTai.getNhaCungCap().getTenNhaCungCap(),
+                ghiChu,
+                rows,
+                file
+            );
+            AlertUtils.showAlert(AlertType.INFORMATION, "Thành công",
+                "Đã xuất file nhập kho:\n" + file.getAbsolutePath());
+            if (java.awt.Desktop.isDesktopSupported()) java.awt.Desktop.getDesktop().open(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertUtils.showAlert(AlertType.ERROR, "Lỗi", "Không thể xuất file: " + e.getMessage());
+        }
     }
 
     @FXML void handleDong(ActionEvent event) {

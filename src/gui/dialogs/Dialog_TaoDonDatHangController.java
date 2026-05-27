@@ -34,10 +34,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.stage.FileChooser;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import utils.DonDatHangExcelExporter;
+import utils.DonDatHangExcelImporter;
 
 public class Dialog_TaoDonDatHangController {
 
@@ -381,119 +380,85 @@ public class Dialog_TaoDonDatHangController {
         stage.close();
     }
     @FXML
-    void handleImportCSV(ActionEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Chọn file CSV Đơn Đặt Hàng");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
-        File file = fileChooser.showOpenDialog(lblTongTien.getScene().getWindow());
-
-        if (file != null) {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"))) {
-                String line;
-                int lineNumber = 0;
-                String tenNCCFile = "";
-                int countSuccess = 0;
-                
-                listChiTiet.clear();
-
-                while ((line = br.readLine()) != null) {
-                    lineNumber++;
-                    
-                    // 1. XỬ LÝ LỖI BOM (Ký tự ẩn đầu file CSV)
-                    if (lineNumber == 1 && line.startsWith("\uFEFF")) {
-                        line = line.substring(1);
-                    }
-
-                    // Tách cột bằng dấu phẩy hoặc chấm phẩy
-                    String separator = line.contains(";") ? ";" : ",";
-                    String[] cols = line.split(separator);
-                    
-                    if (cols.length == 0) continue;
-
-                    // 2. DÒNG 1: LẤY TÊN NHÀ CUNG CẤP
-                    if (lineNumber == 1) {
-                        if (cols.length >= 2) {
-                            tenNCCFile = cols[1].trim().replaceAll("^\"|\"$", ""); // Bỏ dấu ngoặc kép nếu có
-                        }
-                        continue;
-                    } 
-                    
-                    // Dòng 2 là tiêu đề -> Bỏ qua
-                    if (lineNumber == 2) continue;
-
-                    // 3. DÒNG 3 TRỞ ĐI: ĐỌC DỮ LIỆU THUỐC
-                    if (lineNumber >= 3) {
-                        if (cols[0] == null || cols[0].trim().isEmpty()) continue;
-                        
-                        String tenThuocFile = cols[0].trim().replaceAll("^\"|\"$", "");
-                        
-                        // Parse số lượng và giá an toàn
-                        int sl = 0;
-                        double giaCSV = 0;
-                        try {
-                            if (cols.length > 1) sl = Integer.parseInt(cols[1].replaceAll("[^\\d]", ""));
-                            if (cols.length > 2) giaCSV = Double.parseDouble(cols[2].replaceAll("[^\\d.]", ""));
-                        } catch (Exception e) {
-                            System.err.println("Lỗi parse số tại dòng " + lineNumber + ": " + e.getMessage());
-                        }
-
-                        // Tìm thuốc trong MasterList (Xóa bỏ mọi khoảng trắng thừa)
-                        Thuoc thuocFound = null;
-                        for (Thuoc t : masterListThuoc) {
-                            if (t.getTenThuoc().trim().equalsIgnoreCase(tenThuocFile)) {
-                                thuocFound = t;
-                                break;
-                            }
-                        }
-
-                        if (thuocFound != null) {
-                            // Lấy đơn vị quy đổi lớn nhất
-                            DonViQuyDoi dvLonNhat = new dao.DAO_DonViQuyDoi().getDonViLonNhatCuaThuoc(thuocFound.getMaThuoc());
-                            if (dvLonNhat != null) {
-                                ChiTietDonDatHang ct = new ChiTietDonDatHang();
-                                ct.setThuoc(thuocFound);
-                                ct.setDonViQuyDoi(dvLonNhat);
-                                ct.setSoLuongDat(sl);
-                                ct.setSoLuongDaNhan(0);
-                                
-                                if (giaCSV > 0) {
-                                    ct.setDonGiaDuKien(giaCSV);
-                                } else {
-                                    double giaGoc = daoThuoc.getGiaNhapGanNhat(thuocFound.getMaThuoc());
-                                    ct.setDonGiaDuKien(giaGoc * dvLonNhat.getTyLeQuyDoi());
-                                }
-                                
-                                listChiTiet.add(ct);
-                                countSuccess++;
-                            } else {
-                                System.err.println("⚠️ Thuốc '" + tenThuocFile + "' chưa có đơn vị quy đổi trong DB!");
-                            }
-                        } else {
-                            System.err.println("❌ Không tìm thấy thuốc trong DB: '" + tenThuocFile + "'");
-                        }
-                    }
-                }
-
-                // TỰ ĐỘNG CHỌN NCC THEO TÊN
-                if (!tenNCCFile.isEmpty()) {
-                    for (NhaCungCap ncc : cbNhaCungCap.getItems()) {
-                        if (ncc.getTenNhaCungCap().trim().equalsIgnoreCase(tenNCCFile)) {
-                            cbNhaCungCap.getSelectionModel().select(ncc);
-                            break;
-                        }
-                    }
-                }
-
-                tableChiTiet.refresh();
-                tinhTongTien();
-                AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công", 
-                    "Đã nạp thành công " + countSuccess + " loại thuốc từ file CSV!\n" +
-                    "Sếp hãy kiểm tra log Console nếu thấy thiếu thuốc.");
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Lỗi đọc file: " + e.getMessage());
+    void handleTaiFileMauDonDatHang(ActionEvent event) {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Lưu file mẫu đặt hàng");
+        fc.setInitialFileName("MauDonDatHang.xlsx");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files (*.xlsx)", "*.xlsx"));
+        File file = fc.showSaveDialog(lblTongTien.getScene().getWindow());
+        if (file == null) return;
+        try {
+            List<DonDatHangExcelExporter.DrugRow> rows = new java.util.ArrayList<>();
+            for (Thuoc t : masterListThuoc) {
+                DonViQuyDoi dv = new dao.DAO_DonViQuyDoi().getDonViLonNhatCuaThuoc(t.getMaThuoc());
+                rows.add(new DonDatHangExcelExporter.DrugRow(t.getTenThuoc(), dv != null ? dv.getTenDonVi() : ""));
             }
+            DonDatHangExcelExporter.xuatFileMau(rows, file);
+            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công",
+                    "Đã tạo file mẫu:\n" + file.getAbsolutePath());
+            if (java.awt.Desktop.isDesktopSupported()) java.awt.Desktop.getDesktop().open(file);
+        } catch (Exception e) {
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể tạo file: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    void handleImportCSV(ActionEvent event) {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Chọn file Excel Đơn Đặt Hàng");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files (*.xlsx)", "*.xlsx"));
+        File file = fc.showOpenDialog(lblTongTien.getScene().getWindow());
+        if (file == null) return;
+        try {
+            DonDatHangExcelImporter.KetQua kq = DonDatHangExcelImporter.docFileExcel(file.getAbsolutePath());
+            listChiTiet.clear();
+            int countSuccess = 0, countNotFound = 0;
+
+            for (DonDatHangExcelImporter.DongDuLieu dong : kq.dsDong) {
+                Thuoc thuocFound = null;
+                for (Thuoc t : masterListThuoc) {
+                    if (t.getTenThuoc().trim().equalsIgnoreCase(dong.tenThuoc)) {
+                        thuocFound = t;
+                        break;
+                    }
+                }
+                if (thuocFound != null) {
+                    DonViQuyDoi dvLonNhat = new dao.DAO_DonViQuyDoi().getDonViLonNhatCuaThuoc(thuocFound.getMaThuoc());
+                    if (dvLonNhat != null) {
+                        ChiTietDonDatHang ct = new ChiTietDonDatHang();
+                        ct.setThuoc(thuocFound);
+                        ct.setDonViQuyDoi(dvLonNhat);
+                        ct.setSoLuongDat(dong.soLuong);
+                        ct.setSoLuongDaNhan(0);
+                        double giaGoc = daoThuoc.getGiaNhapGanNhat(thuocFound.getMaThuoc());
+                        ct.setDonGiaDuKien(giaGoc * dvLonNhat.getTyLeQuyDoi());
+                        listChiTiet.add(ct);
+                        countSuccess++;
+                    }
+                } else {
+                    System.err.println("Khong tim thay thuoc: '" + dong.tenThuoc + "'");
+                    countNotFound++;
+                }
+            }
+
+            if (!kq.nhaCungCap.isEmpty()) {
+                for (NhaCungCap ncc : cbNhaCungCap.getItems()) {
+                    if (ncc.getTenNhaCungCap().trim().equalsIgnoreCase(kq.nhaCungCap)) {
+                        cbNhaCungCap.getSelectionModel().select(ncc);
+                        break;
+                    }
+                }
+            }
+            if (!kq.ghiChu.isEmpty()) txtGhiChu.setText(kq.ghiChu);
+
+            tableChiTiet.refresh();
+            tinhTongTien();
+            AlertUtils.showAlert(Alert.AlertType.INFORMATION, "Thành công",
+                    "Đã nạp " + countSuccess + " loại thuốc từ file Excel."
+                    + (countNotFound > 0 ? "\nKhông tìm thấy " + countNotFound + " thuốc trong hệ thống." : ""));
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertUtils.showAlert(Alert.AlertType.ERROR, "Lỗi", "Lỗi đọc file: " + e.getMessage());
         }
     }
 }

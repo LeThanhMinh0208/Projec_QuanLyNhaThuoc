@@ -89,7 +89,7 @@
                                  <children>
                                     <Label style="-fx-padding: 15 15 5 15;" styleClass="label-header" text="Chi Tiết Hàng Thực Nhận" />
                                     <Region HBox.hgrow="ALWAYS" />
-                                    <Button onAction="#handleImportCSV" prefHeight="35.0" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 8;" text="📥 Nhập từ file CSV" />
+                                    <Button onAction="#handleImportCSV" prefHeight="35.0" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 8;" text="📥 Nhập từ file Excel" />
                                  </children>
                                  <padding>
                                     <Insets right="15.0" top="10.0" />
