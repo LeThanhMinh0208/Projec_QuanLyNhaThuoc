@@ -397,8 +397,8 @@ INSERT INTO NhanVien (maNhanVien, tenDangNhap, matKhau, hoTen, chucVu, caLamViec
 ('NV002', 'lethanhminh', '123456', N'Lê Thanh Minh', N'Nhân Viên', N'Ca Sáng', '0378123395'),
 ('NV003', 'nguyenhoanglong', '123456', N'Nguyễn Hoàng Long', N'Nhân Viên', N'Ca Chiều', '0398757483'),
 ('NV004', 'tatuankiet', '123456', N'Tạ Tuấn Kiệt', N'Nhân Viên', N'Ca Sáng', '0944556677'),
-('NV005', 'nguyenminhkhoi', '123456', N'Nguyễn Minh Khôi', N'Nhân Viên', N'Ca Tối', '0901889900'),
-('NV006', 'tranducnguyen', '123456', N'Trần Đức Nguyên', N'Nhân Viên', N'Ca Chiều', '0977223344');
+('NV005', 'nguyenminhkhoi', '123456', N'Nguyễn Minh Khôi', N'Nhân Viên', N'Ca Tối', '0829482829'),
+('NV006', 'tranducnguyen', '123456', N'Trần Đức Nguyên', N'Nhân Viên', N'Ca Chiều', '0366950890');
 GO
 
 INSERT INTO KhachHang (maKhachHang, hoTen, sdt, diaChi, diemTichLuy) VALUES
@@ -832,7 +832,18 @@ INSERT INTO HoaDon (maHoaDon, maKhachHang, maNhanVien, ngayLap, thueVAT, hinhThu
 ('HD0020', 'KH008', 'NV004', '2026-04-12 16:45:22.990', 8.0, 'CHUYEN_KHOAN', N'Khách mua thuốc lẻ'),
 ('HD0021', 'KH004', 'NV003', '2026-04-14 09:05:11.400', 8.0, 'CHUYEN_KHOAN', N'Khách mua thuốc lẻ'),
 ('HD0022', 'KH007', 'NV006', '2026-04-16 18:30:50.550', 8.0, 'TIEN_MAT', N'Khách mua thuốc lẻ'),
-('HD0023', 'KH006', 'NV002', '2026-04-18 15:20:10.100', 8.0, 'THE', N'Khách mua thuốc lẻ');
+('HD0023', 'KH006', 'NV002', '2026-04-18 15:20:10.100', 8.0, 'THE', N'Khách mua thuốc lẻ'),
+('HD0024', 'KH001', 'NV002', '2026-05-02 09:15:00.000', 8.0, 'CHUYEN_KHOAN', N'Khách mua thuốc lẻ'),
+('HD0025', 'KH003', 'NV003', '2026-05-04 14:20:00.000', 8.0, 'TIEN_MAT', N'Khách mua thuốc lẻ'),
+('HD0026', 'KH002', 'NV004', '2026-05-07 10:35:00.000', 8.0, 'THE', N'Khách mua thuốc lẻ'),
+('HD0027', NULL, 'NV005', '2026-05-10 16:45:00.000', 8.0, 'TIEN_MAT', N'Khách mua thuốc lẻ'),
+('HD0028', 'KH007', 'NV006', '2026-05-12 11:10:00.000', 8.0, 'CHUYEN_KHOAN', N'Khách mua thuốc lẻ'),
+('HD0029', 'KH006', 'NV002', '2026-05-15 15:55:00.000', 8.0, 'TIEN_MAT', N'Khách mua thuốc lẻ'),
+('HD0030', 'KH004', 'NV003', '2026-05-18 09:40:00.000', 8.0, 'CHUYEN_KHOAN', N'Khách mua thuốc lẻ'),
+('HD0031', NULL, 'NV004', '2026-05-20 17:15:00.000', 8.0, 'THE', N'Khách mua thuốc lẻ'),
+('HD0032', 'KH005', 'NV005', '2026-05-22 13:20:00.000', 8.0, 'TIEN_MAT', N'Khách mua thuốc lẻ'),
+('HD0033', 'KH008', 'NV006', '2026-05-24 10:05:00.000', 8.0, 'THE', N'Khách mua thuốc lẻ'),
+('HD0034', 'KH002', 'NV002', '2026-05-26 18:30:00.000', 8.0, 'CHUYEN_KHOAN', N'Khách mua thuốc lẻ');
 GO
 
 INSERT INTO ChiTietHoaDon (maHoaDon, maBangGia, maQuyDoi, maLoThuoc, soLuong, donGia) VALUES
@@ -884,13 +895,32 @@ INSERT INTO ChiTietHoaDon (maHoaDon, maBangGia, maQuyDoi, maLoThuoc, soLuong, do
 ('HD0020', 'BG0001', 'QD00062', 'LO00556', 1, 201600),  
 ('HD0021', 'BG0001', 'QD01119', 'LO01119', 1, 6200),    
 ('HD0022', 'BG0001', 'QD00083', 'LO01179', 2, 228000),  
-('HD0023', 'BG0001', 'QD02239', 'LO02239', 1, 26000);   
+('HD0023', 'BG0001', 'QD02239', 'LO02239', 1, 26000),
+('HD0024', 'BG0001', 'QD00094', 'LO01538', 2, 86400),
+('HD0024', 'BG0001', 'QD00128', 'LO02671', 1, 202400),
+('HD0025', 'BG0001', 'QD00118', 'LO02363', 3, 128200),
+('HD0026', 'BG0001', 'QD00840', 'LO00840', 2, 78000),
+('HD0026', 'BG0001', 'QD01977', 'LO01977', 5, 4100),
+('HD0027', 'BG0001', 'QD00077', 'LO00931', 1, 61800),
+('HD0027', 'BG0001', 'QD00104', 'LO01820', 2, 65600),
+('HD0028', 'BG0001', 'QD00125', 'LO02594', 4, 23800),
+('HD0029', 'BG0001', 'QD00066', 'LO00639', 1, 496800),
+('HD0030', 'BG0001', 'QD00090', 'LO01365', 2, 249600),
+('HD0030', 'BG0001', 'QD02296', 'LO02296', 1, 58000),
+('HD0031', 'BG0001', 'QD00129', 'LO02729', 2, 68400),
+('HD0032', 'BG0001', 'QD00096', 'LO01551', 3, 30400),
+('HD0032', 'BG0001', 'QD02363', 'LO02363', 5, 13500),
+('HD0033', 'BG0001', 'QD00556', 'LO00556', 2, 42000),
+('HD0034', 'BG0001', 'QD00121', 'LO02413', 1, 104500),
+('HD0034', 'BG0001', 'QD01435', 'LO01435', 3, 8300);
 GO
 
 INSERT INTO DonThuoc (maDonThuoc, maHoaDon, tenBacSi, chanDoan, hinhAnhDon, thongTinBenhNhan) VALUES
 ('DT0005', 'HD0005', N'BS Lê Thu Thủy', N'Viêm họng cấp', 'DT0005.png', N'Bệnh nhân khám tại BV'),
 ('DT0008', 'HD0008', N'BS Phạm Hữu Trí', N'Viêm họng cấp', 'DT0008.png', N'Bệnh nhân khám tại BV'),
-('DT0013', 'HD0013', N'BS Phạm Hữu Trí', N'Viêm họng cấp', 'DT0013.png', N'Bệnh nhân khám tại BV');
+('DT0013', 'HD0013', N'BS Phạm Hữu Trí', N'Viêm họng cấp', 'DT0013.png', N'Bệnh nhân khám tại BV'),
+('DT0027', 'HD0027', N'BS Nguyễn Văn A', N'Viêm phế quản cấp', 'DT0027.png', N'Bệnh nhân khám tại BV'),
+('DT0033', 'HD0033', N'BS Trần Thị B', N'Thiếu vitamin', 'DT0033.png', N'Bệnh nhân khám tại BV');
 GO
 
 UPDATE HoaDon
