@@ -31,7 +31,12 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.Node;
+import javafx.stage.Popup;
+import javafx.scene.layout.StackPane;
+import javafx.geometry.Bounds;
 import utils.ThongKeHangHoaExcelExporter;
 import utils.ThongKeHangHoaPdfExporter;
 
@@ -248,12 +253,16 @@ public class GUI_ThongKeHangHoaController {
                     seriesLine.setName("Doanh thu ngày (đ)");
                     
                     DateTimeFormatter formatDayMonth = DateTimeFormatter.ofPattern("dd/MM");
+                    Map<String, Double> doanhThuByLabel = new java.util.HashMap<>();
                     for (Map<String, Object> row : bienDong) {
                         Object ngayObj = row.get("ngay");
                         String label = (ngayObj instanceof LocalDate) ? ((LocalDate) ngayObj).format(formatDayMonth) : String.valueOf(ngayObj);
-                        seriesLine.getData().add(new XYChart.Data<>(label, toDouble(row.get("doanhThuNgay"))));
+                        double doanhThu = toDouble(row.get("doanhThuNgay"));
+                        doanhThuByLabel.put(label, doanhThu);
+                        seriesLine.getData().add(new XYChart.Data<>(label, doanhThu));
                     }
                     chartBienDongDoanhThu.getData().add(seriesLine);
+                    Platform.runLater(() -> installTooltips(seriesLine, doanhThuByLabel));
 
                     // 3. Nạp dữ liệu PieChart Cơ cấu tỷ trọng nhóm hàng
                     chartCoCauDoanhThu.getData().clear();
@@ -366,5 +375,50 @@ public class GUI_ThongKeHangHoaController {
         alert.setHeaderText(header);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    private void installTooltips(XYChart.Series<String, Number> series, Map<String, Double> dataByLabel) {
+        for (XYChart.Data<String, Number> point : series.getData()) {
+            String xLabel = point.getXValue();
+            Double value = dataByLabel.get(xLabel);
+            if (value == null) {
+                continue;
+            }
+
+            Popup popup = createTooltipPopup(xLabel, value);
+            if (point.getNode() != null) {
+                attachImmediatePopup(point.getNode(), popup);
+            } else {
+                point.nodeProperty().addListener((obs, oldNode, newNode) -> {
+                    if (newNode != null) {
+                        attachImmediatePopup(newNode, popup);
+                    }
+                });
+            }
+        }
+    }
+
+    private Popup createTooltipPopup(String xLabel, double value) {
+        Label valueLabel = new Label(xLabel + "\n" + df.format(value) + " ₫");
+        valueLabel.setStyle("-fx-background-color: rgba(255,255,255,0.98); -fx-border-color: #f97316; -fx-border-width: 1.5; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #0f172a; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 10 6 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 8, 0, 0, 2);");
+        valueLabel.setMouseTransparent(true);
+
+        Popup popup = new Popup();
+        popup.setAutoHide(false);
+        popup.setHideOnEscape(false);
+        popup.getContent().add(new StackPane(valueLabel));
+        return popup;
+    }
+
+    private void attachImmediatePopup(Node node, Popup popup) {
+        node.setOnMouseEntered(event -> {
+            Bounds bounds = node.localToScreen(node.getBoundsInLocal());
+            if (bounds != null) {
+                if (!popup.isShowing()) {
+                    popup.show(node, bounds.getMinX() + bounds.getWidth() / 2, bounds.getMinY() - 42);
+                }
+            }
+        });
+        node.setOnMouseExited(event -> popup.hide());
     }
 }

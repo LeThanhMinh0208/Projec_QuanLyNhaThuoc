@@ -31,6 +31,10 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.Node;
+import javafx.stage.Popup;
+import javafx.scene.layout.StackPane;
+import javafx.geometry.Bounds;
 import utils.ThongKeTonKhoExcelExporter;
 import utils.ThongKeTonKhoPdfExporter;
 
@@ -369,12 +373,22 @@ public class GUI_ThongKeTonKhoController {
         seriesNhap.setName("Nhập");
         XYChart.Series<String, Number> seriesXuat = new XYChart.Series<>();
         seriesXuat.setName("Xuất");
+        Map<String, Integer> nhapByLabel = new java.util.HashMap<>();
+        Map<String, Integer> xuatByLabel = new java.util.HashMap<>();
         for (Map<String, Object> row : data) {
             String label = ((LocalDate) row.get("ngay")).format(DateTimeFormatter.ofPattern("dd/MM"));
-            seriesNhap.getData().add(new XYChart.Data<>(label, toInt(row.get("soLuongNhap"))));
-            seriesXuat.getData().add(new XYChart.Data<>(label, toInt(row.get("soLuongXuat"))));
+            int nhap = toInt(row.get("soLuongNhap"));
+            int xuat = toInt(row.get("soLuongXuat"));
+            nhapByLabel.put(label, nhap);
+            xuatByLabel.put(label, xuat);
+            seriesNhap.getData().add(new XYChart.Data<>(label, nhap));
+            seriesXuat.getData().add(new XYChart.Data<>(label, xuat));
         }
         chartBienDong.getData().addAll(seriesNhap, seriesXuat);
+        Platform.runLater(() -> {
+            installTooltips(seriesNhap, nhapByLabel, "Nhập: ");
+            installTooltips(seriesXuat, xuatByLabel, "Xuất: ");
+        });
     }
 
     private void loadChartTopTonKho(List<Map<String, Object>> data) {
@@ -477,5 +491,50 @@ public class GUI_ThongKeTonKhoController {
         alert.setHeaderText(header);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    private void installTooltips(XYChart.Series<String, Number> series, Map<String, Integer> dataByLabel, String prefix) {
+        for (XYChart.Data<String, Number> point : series.getData()) {
+            String xLabel = point.getXValue();
+            Integer value = dataByLabel.get(xLabel);
+            if (value == null) {
+                continue;
+            }
+
+            Popup popup = createTooltipPopup(xLabel, value, prefix);
+            if (point.getNode() != null) {
+                attachImmediatePopup(point.getNode(), popup);
+            } else {
+                point.nodeProperty().addListener((obs, oldNode, newNode) -> {
+                    if (newNode != null) {
+                        attachImmediatePopup(newNode, popup);
+                    }
+                });
+            }
+        }
+    }
+
+    private Popup createTooltipPopup(String xLabel, int value, String prefix) {
+        Label valueLabel = new Label(xLabel + "\n" + prefix + df.format(value));
+        valueLabel.setStyle("-fx-background-color: rgba(255,255,255,0.98); -fx-border-color: #f97316; -fx-border-width: 1.5; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #0f172a; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 10 6 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 8, 0, 0, 2);");
+        valueLabel.setMouseTransparent(true);
+
+        Popup popup = new Popup();
+        popup.setAutoHide(false);
+        popup.setHideOnEscape(false);
+        popup.getContent().add(new StackPane(valueLabel));
+        return popup;
+    }
+
+    private void attachImmediatePopup(Node node, Popup popup) {
+        node.setOnMouseEntered(event -> {
+            Bounds bounds = node.localToScreen(node.getBoundsInLocal());
+            if (bounds != null) {
+                if (!popup.isShowing()) {
+                    popup.show(node, bounds.getMinX() + bounds.getWidth() / 2, bounds.getMinY() - 42);
+                }
+            }
+        });
+        node.setOnMouseExited(event -> popup.hide());
     }
 }
