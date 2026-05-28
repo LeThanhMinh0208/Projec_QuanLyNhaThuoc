@@ -481,15 +481,30 @@ public class GUI_ThongKeDoanhThuController {
         loadChartTopSanPham(dataTopSanPham);
     }
 
-    private void loadChartThoiGian(LocalDate tuNgay, LocalDate denNgay, List<Map<String, Object>> data) {
+     private void loadChartThoiGian(LocalDate tuNgay, LocalDate denNgay, List<Map<String, Object>> data) {
         chartThoiGian.getData().clear();
         chartThoiGian.setCreateSymbols(true);
-        yAxisThoiGian.setLabel("Doanh thu (VND)");
-        xAxisThoiGian.setLabel(buildRangeLabel(tuNgay, denNgay));
+        yAxisThoiGian.setLabel("Doanh thu (đ)");
+        xAxisThoiGian.setLabel("");
+        // Rotate X-axis labels to prevent overflow when many dates
+        xAxisThoiGian.setTickLabelRotation(45);
+        xAxisThoiGian.setTickMarkVisible(true);
+
+        // Cập nhật tiêu đề biểu đồ theo định dạng "Biến Động Doanh Thu (dd/MM - dd/MM)"
+        if (lblChartThoiGianTitle != null) {
+            DateTimeFormatter dmFmt = DateTimeFormatter.ofPattern("dd/MM");
+            if (tuNgay.equals(denNgay)) {
+                lblChartThoiGianTitle.setText("Biến Động Doanh Thu (" + tuNgay.format(dmFmt) + ")");
+            } else {
+                lblChartThoiGianTitle.setText("Biến Động Doanh Thu (" + tuNgay.format(dmFmt) + " - " + denNgay.format(dmFmt) + ")");
+            }
+        }
 
         Map<LocalDate, Double> doanhThuByNgay = new HashMap<>();
         for (Map<String, Object> row : data) {
-            LocalDate ngay = (LocalDate) row.get("ngay");
+            Object ngayObj = row.get("ngay");
+            if (ngayObj == null) continue;
+            LocalDate ngay = (LocalDate) ngayObj;
             double doanhThu = ((Number) row.get("doanhThu")).doubleValue();
             doanhThuByNgay.put(ngay, doanhThu);
         }
@@ -498,13 +513,32 @@ public class GUI_ThongKeDoanhThuController {
         series.setName("Doanh Thu");
         Map<String, Double> doanhThuByLabel = new HashMap<>();
 
-        LocalDate cursor = tuNgay;
-        while (!cursor.isAfter(denNgay)) {
-            double doanhThu = doanhThuByNgay.getOrDefault(cursor, 0.0);
-            String xLabel = cursor.format(DateTimeFormatter.ofPattern("dd/MM"));
-            doanhThuByLabel.put(xLabel, doanhThu);
-            series.getData().add(new XYChart.Data<>(xLabel, doanhThu / 1_000_000));
-            cursor = cursor.plusDays(1);
+        // If range > 60 days, show weekly aggregation to avoid too many labels
+        long rangeDays = java.time.temporal.ChronoUnit.DAYS.between(tuNgay, denNgay) + 1;
+        if (rangeDays > 60) {
+            // Group by week
+            DateTimeFormatter weekFmt = DateTimeFormatter.ofPattern("'W'w/yy");
+            java.util.TreeMap<String, Double> weeklyData = new java.util.TreeMap<>();
+            LocalDate cursor2 = tuNgay;
+            while (!cursor2.isAfter(denNgay)) {
+                String weekLabel = cursor2.format(weekFmt);
+                double doanhThu = doanhThuByNgay.getOrDefault(cursor2, 0.0);
+                weeklyData.merge(weekLabel, doanhThu, Double::sum);
+                cursor2 = cursor2.plusDays(1);
+            }
+            for (Map.Entry<String, Double> e : weeklyData.entrySet()) {
+                doanhThuByLabel.put(e.getKey(), e.getValue());
+                series.getData().add(new XYChart.Data<>(e.getKey(), e.getValue()));
+            }
+        } else {
+            LocalDate cursor = tuNgay;
+            while (!cursor.isAfter(denNgay)) {
+                double doanhThu = doanhThuByNgay.getOrDefault(cursor, 0.0);
+                String xLabel = cursor.format(DateTimeFormatter.ofPattern("dd/MM"));
+                doanhThuByLabel.put(xLabel, doanhThu);
+                series.getData().add(new XYChart.Data<>(xLabel, doanhThu));
+                cursor = cursor.plusDays(1);
+            }
         }
 
         chartThoiGian.getData().add(series);
@@ -577,11 +611,21 @@ public class GUI_ThongKeDoanhThuController {
     private void loadChartTopSanPham(List<Map<String, Object>> data) {
         chartTopSanPham.getData().clear();
 
+        // Get X axis and rotate labels to prevent overflow
+        if (chartTopSanPham.getXAxis() instanceof CategoryAxis) {
+            CategoryAxis xAxis = (CategoryAxis) chartTopSanPham.getXAxis();
+            xAxis.setTickLabelRotation(45);
+        }
+
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Số Lượng Bán");
 
         for (Map<String, Object> row : data) {
             String tenThuoc = (String) row.get("tenThuoc");
+            // Truncate long names to prevent X-axis overflow
+            if (tenThuoc != null && tenThuoc.length() > 15) {
+                tenThuoc = tenThuoc.substring(0, 15) + "...";
+            }
             int soLuong = ((Number) row.get("soLuong")).intValue();
             series.getData().add(new XYChart.Data<>(tenThuoc, soLuong));
         }

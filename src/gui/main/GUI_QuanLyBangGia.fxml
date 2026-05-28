@@ -68,7 +68,7 @@
                         <TableColumn fx:id="colNgayKetThuc"  text="Ngày Kết Thúc"  prefWidth="120" />
                         <TableColumn fx:id="colTrangThai"    text="Trạng Thái"      prefWidth="130" />
                         <TableColumn fx:id="colSoLuong"      text="Số Thuốc"        prefWidth="80" />
-                        <TableColumn fx:id="colHanhDong"     text="Hành Động"       prefWidth="200" />
+                        <TableColumn fx:id="colHanhDong"     text="Hành Động"       prefWidth="160" />
                     </columns>
                 </TableView>
             </VBox>

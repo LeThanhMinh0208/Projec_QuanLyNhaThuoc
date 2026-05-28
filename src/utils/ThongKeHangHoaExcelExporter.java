@@ -35,7 +35,9 @@ public class ThongKeHangHoaExcelExporter {
             String danhMuc,
             Map<String, Object> tongQuan,
             List<Map<String, Object>> coCauDoanhThu,
-            List<Map<String, Object>> topSanPham) throws Exception {
+            List<Map<String, Object>> topSanPham,
+            List<Map<String, Object>> chamLC,
+            List<Map<String, Object>> doiTra) throws Exception {
 
         Path dir = Paths.get("exports/thongke");
         Files.createDirectories(dir);
@@ -49,7 +51,7 @@ public class ThongKeHangHoaExcelExporter {
             writeEntry(zos, "xl/_rels/workbook.xml.rels", workbookRels());
             writeEntry(zos, "xl/styles.xml", styles());
             writeEntry(zos, "xl/worksheets/sheet1.xml",
-                    sheet(tuNgay, denNgay, danhMuc, tongQuan, coCauDoanhThu, topSanPham));
+                    sheet(tuNgay, denNgay, danhMuc, tongQuan, coCauDoanhThu, topSanPham, chamLC, doiTra));
         }
         return filePath.toString();
     }
@@ -118,7 +120,9 @@ public class ThongKeHangHoaExcelExporter {
     private static String sheet(LocalDate tuNgay, LocalDate denNgay, String danhMuc,
                                  Map<String, Object> tongQuan,
                                  List<Map<String, Object>> coCauDoanhThu,
-                                 List<Map<String, Object>> topSanPham) {
+                                 List<Map<String, Object>> topSanPham,
+                                 List<Map<String, Object>> chamLC,
+                                 List<Map<String, Object>> doiTra) {
         StringBuilder sb = new StringBuilder();
         StringBuilder merges = new StringBuilder();
         int mergeCount = 0;
@@ -173,17 +177,17 @@ public class ThongKeHangHoaExcelExporter {
                 cv(formatMoney(tongQuan.get("tongDoanhThuSauThue")) + " đ", 5));
         row++;
 
-        // ── II. Tỷ Trọng Doanh Thu Theo Nhóm (PieChart) ──────────────
+        // ── II. Cơ cấu Số Lượng Tiêu Thụ Theo Nhóm (PieChart mới) ──────────────
         merges.append(mr(row)); mergeCount++;
-        row = row(sb, row, cv("II. TỶ TRỌNG DOANH THU THEO NHÓM DANH MỤC ", 6));
-        row = hdr(sb, row, "Nhóm Danh Mục Sản Phẩm", "Doanh Thu Đóng Góp - Sau Thuế (đ)");
+        row = row(sb, row, cv("II. CƠ CẤU SỐ LƯỢNG TIÊU THỤ THEO NHÓM DANH MỤC ", 6));
+        row = hdr(sb, row, "Nhóm Danh Mục Sản Phẩm", "Số Lượng Tiêu Thụ (sản phẩm)");
         if (empty(coCauDoanhThu)) {
             row = row(sb, row, cv("Chưa có dữ liệu phát sinh trong khoảng thời gian này", 4));
         } else {
             for (Map<String, Object> item : coCauDoanhThu) {
                 row = row(sb, row,
                         cv(str(item.get("tenDanhMuc")), 4),
-                        cv(formatMoney(item.get("doanhThu")) + " đ", 5));
+                        cv(formatInt(item.get("soLuong")), 5));
             }
         }
         row++;
@@ -231,6 +235,44 @@ public class ThongKeHangHoaExcelExporter {
                         cv(str(item.get("donVi")), 4),
                         cv(formatInt(item.get("soLuongBan")), 5),
                         cv(formatMoney(item.get("doanhThu")) + " đ", 5));
+            }
+        }
+        row++;
+
+        // ── V. Top 10 Sản Phẩm Bán Ít Nhất ────────────
+        merges.append(mr(row)); mergeCount++;
+        row = row(sb, row, cv("V. TOP 10 SẢN PHẨM BÁN ÍT NHẤT ", 6));
+        row = hdr(sb, row, "STT", "Mã SP", "Tên Sản Phẩm", "Nhóm", "ĐVT", "SL Bán", "");
+        if (empty(chamLC)) {
+            row = row(sb, row, cv("", 4), cv("Chưa có dữ liệu", 4));
+        } else {
+            for (Map<String, Object> item : chamLC) {
+                row = row(sb, row,
+                        cv(str(item.get("stt")), 5),
+                        cv(str(item.get("maThuoc")), 4),
+                        cv(str(item.get("tenThuoc")), 4),
+                        cv(str(item.get("tenDanhMuc")), 4),
+                        cv(str(item.get("donVi")), 4),
+                        cv(formatInt(item.get("soLuongBan")), 5));
+            }
+        }
+        row++;
+
+        // ── VI. Top 10 Sản Phẩm Đổi/Trả Nhiều Nhất ────────────
+        merges.append(mr(row)); mergeCount++;
+        row = row(sb, row, cv("VI. TOP 10 SẢN PHẨM ĐỔI/TRẢ NHIỀU NHẤT ", 6));
+        row = hdr(sb, row, "STT", "Mã SP", "Tên Sản Phẩm", "Nhóm", "ĐVT", "SL Đổi/Trả", "");
+        if (empty(doiTra)) {
+            row = row(sb, row, cv("", 4), cv("Chưa có dữ liệu", 4));
+        } else {
+            for (Map<String, Object> item : doiTra) {
+                row = row(sb, row,
+                        cv(str(item.get("stt")), 5),
+                        cv(str(item.get("maThuoc")), 4),
+                        cv(str(item.get("tenThuoc")), 4),
+                        cv(str(item.get("tenDanhMuc")), 4),
+                        cv(str(item.get("donVi")), 4),
+                        cv(formatInt(item.get("soLuongDoiTra")), 5));
             }
         }
 

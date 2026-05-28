@@ -21,8 +21,6 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
@@ -31,12 +29,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.Node;
-import javafx.stage.Popup;
-import javafx.scene.layout.StackPane;
-import javafx.geometry.Bounds;
 import utils.ThongKeHangHoaExcelExporter;
 import utils.ThongKeHangHoaPdfExporter;
 
@@ -45,19 +38,17 @@ public class GUI_ThongKeHangHoaController {
     @FXML private DatePicker dpTuNgay, dpDenNgay;
     @FXML private ComboBox<String> cbKhoangNhanh, cbDanhMuc;
 
-    @FXML private Label lblTongMatHang, lblTongMatHangPercent, lblChartBienDongTitle;
+    @FXML private Label lblTongMatHang, lblTongMatHangPercent;
     @FXML private Label lblTongSoLuongBan, lblDoanhThuGoc, lblDoanhThuSauThue;
 
-    // Biểu đồ đường biến động theo ngày (Có trong FXML)
-    @FXML private LineChart<String, Number> chartBienDongDoanhThu;
-    @FXML private CategoryAxis xAxisBienDong;
-    @FXML private NumberAxis yAxisBienDong;
+    // Biểu đồ 1: PieChart - Cơ cấu số lượng tiêu thụ theo danh mục
+    @FXML private PieChart chartCoCauSoLuong;
 
-    // Biểu đồ tròn cơ cấu (Có trong FXML)
-    @FXML private PieChart chartCoCauDoanhThu;
+    // Biểu đồ 2: BarChart - Top 10 sản phẩm bán ít nhất
+    @FXML private BarChart<String, Number> chartBanItNhat;
 
-    // Biểu đồ cột Top 10 sản phẩm
-    @FXML private BarChart<String, Number> chartTop10SanPham;
+    // Biểu đồ 3: BarChart - Top 10 sản phẩm bị đổi/trả nhiều nhất
+    @FXML private BarChart<String, Number> chartDoiTra;
 
     // Bảng 1: Sản phẩm bán chạy
     @FXML private TableView<Map<String, Object>> tableBanChay;
@@ -80,13 +71,15 @@ public class GUI_ThongKeHangHoaController {
     private AtomicLong lastRequestId = new AtomicLong(0);
     private boolean isActive = true;
 
-    // Cache dữ liệu cục bộ phục vụ việc xuất báo cáo file tuần tự
+    // Cache dữ liệu cho xuất báo cáo
     private LocalDate currentTuNgay;
     private LocalDate currentDenNgay;
     private String currentDanhMuc;
     private Map<String, Object> currentTongQuan;
-    private List<Map<String, Object>> currentCoCauDoanhThu;
+    private List<Map<String, Object>> currentCoCauSoLuong;
     private List<Map<String, Object>> currentTopSanPham;
+    private List<Map<String, Object>> currentChamLC;
+    private List<Map<String, Object>> currentDoiTra;
 
     @FXML
     public void initialize() {
@@ -100,21 +93,14 @@ public class GUI_ThongKeHangHoaController {
         cbDanhMuc.setItems(FXCollections.observableArrayList(daoTonKho.getDanhMucThuoc()));
         cbDanhMuc.setValue("Tất cả");
 
-        chartCoCauDoanhThu.setVisible(true);
-        
         setupTables();
         setupAutoReload();
 
         suppressAutoReload = false;
-        // Đặt placeholder "---" để tránh nháy khi mới load trang
         setLoadingPlaceholders();
         loadDataThongKe();
     }
 
-    /**
-     * Dừng tất cả background tasks khi controller bị thay thế.
-     * Được gọi từ SceneUtils trước khi load trang mới.
-     */
     public void stopBackgroundTasks() {
         isActive = false;
         if (executorService != null && !executorService.isShutdown()) {
@@ -122,10 +108,6 @@ public class GUI_ThongKeHangHoaController {
         }
     }
 
-    /**
-     * Đặt placeholder "---" cho tất cả KPI labels trước khi dữ liệu được tải.
-     * Tránh hiện số 0 mặc định gây nháy giao diện.
-     */
     private void setLoadingPlaceholders() {
         if (lblTongMatHang != null)    lblTongMatHang.setText("---");
         if (lblTongMatHangPercent != null) lblTongMatHangPercent.setText("");
@@ -213,90 +195,86 @@ public class GUI_ThongKeHangHoaController {
         final LocalDate reportTu = tuNgay;
         final LocalDate reportDen = denNgay;
         final String reportDanhMuc = cbDanhMuc.getValue();
-
-        // Tạo ID request để tránh race condition (chỉ request mới nhất mới update UI)
         final long requestId = lastRequestId.incrementAndGet();
 
         executorService.submit(() -> {
             try {
-                Map<String, Object> tongQuan = daoHangHoa.getTongQuan(reportTu, reportDen, reportDanhMuc);
-                List<Map<String, Object>> coCau = daoHangHoa.getDoanhThuTheoDanhMuc(reportTu, reportDen, reportDanhMuc);
-                List<Map<String, Object>> topSanPham = daoHangHoa.getTopSanPhamBanChay(reportTu, reportDen, reportDanhMuc, 10);
-                List<Map<String, Object>> bienDong = daoHangHoa.getBienDongDoanhThuTheoNgay(reportTu, reportDen, reportDanhMuc);
+                // Load song song 5 truy vấn
+                Map<String, Object> tongQuan      = daoHangHoa.getTongQuan(reportTu, reportDen, reportDanhMuc);
+                List<Map<String, Object>> coCauSL = daoHangHoa.getSoLuongTieuThuTheoDanhMuc(reportTu, reportDen, reportDanhMuc);
+                List<Map<String, Object>> chamLC   = daoHangHoa.getTopSanPhamBanItNhat(reportTu, reportDen, reportDanhMuc, 10);
+                List<Map<String, Object>> doiTra   = daoHangHoa.getTopSanPhamBiDoiTra(reportTu, reportDen, 10);
+                List<Map<String, Object>> topSP    = daoHangHoa.getTopSanPhamBanChay(reportTu, reportDen, reportDanhMuc, 10);
 
-                // Kiểm tra còn là request mới nhất không
-                if (requestId != lastRequestId.get() || !isActive) {
-                    return;
-                }
+                if (requestId != lastRequestId.get() || !isActive) return;
 
-                currentTuNgay = reportTu;
-                currentDenNgay = reportDen;
-                currentDanhMuc = reportDanhMuc;
-                currentTongQuan = tongQuan;
-                currentCoCauDoanhThu = coCau;
-                currentTopSanPham = topSanPham;
+                currentTuNgay      = reportTu;
+                currentDenNgay     = reportDen;
+                currentDanhMuc     = reportDanhMuc;
+                currentTongQuan    = tongQuan;
+                currentCoCauSoLuong = coCauSL;
+                currentTopSanPham  = topSP;
+                currentChamLC      = chamLC;
+                currentDoiTra      = doiTra;
 
                 Platform.runLater(() -> {
                     if (requestId != lastRequestId.get() || !isActive) return;
 
-                    // 1. Cập nhật khối thẻ số liệu tổng quan KPI
+                    // ─── KPI Cards ───
                     lblTongMatHang.setText(df.format(tongQuan.get("tongMatHangDaBan")));
                     lblTongSoLuongBan.setText(df.format(tongQuan.get("tongSoLuongBan")));
                     lblDoanhThuGoc.setText(df.format(tongQuan.get("tongDoanhThuGoc")) + " đ");
                     lblDoanhThuSauThue.setText(df.format(tongQuan.get("tongDoanhThuSauThue")) + " đ");
 
-                    lblChartBienDongTitle.setText("Biến Động Doanh Thu (" + reportTu.format(DateTimeFormatter.ofPattern("dd/MM")) + " - " + reportDen.format(DateTimeFormatter.ofPattern("dd/MM")) + ")");
-
-                    // 2. Nạp dữ liệu vẽ LineChart Biến động doanh thu theo chuỗi ngày
-                    chartBienDongDoanhThu.getData().clear();
-                    XYChart.Series<String, Number> seriesLine = new XYChart.Series<>();
-                    seriesLine.setName("Doanh thu ngày (đ)");
-                    
-                    DateTimeFormatter formatDayMonth = DateTimeFormatter.ofPattern("dd/MM");
-                    Map<String, Double> doanhThuByLabel = new java.util.HashMap<>();
-                    for (Map<String, Object> row : bienDong) {
-                        Object ngayObj = row.get("ngay");
-                        String label = (ngayObj instanceof LocalDate) ? ((LocalDate) ngayObj).format(formatDayMonth) : String.valueOf(ngayObj);
-                        double doanhThu = toDouble(row.get("doanhThuNgay"));
-                        doanhThuByLabel.put(label, doanhThu);
-                        seriesLine.getData().add(new XYChart.Data<>(label, doanhThu));
-                    }
-                    chartBienDongDoanhThu.getData().add(seriesLine);
-                    Platform.runLater(() -> installTooltips(seriesLine, doanhThuByLabel));
-
-                    // 3. Nạp dữ liệu PieChart Cơ cấu tỷ trọng nhóm hàng
-                    chartCoCauDoanhThu.getData().clear();
-                    if (coCau != null && !coCau.isEmpty()) {
-                        chartCoCauDoanhThu.setVisible(true);
-                        for (Map<String, Object> row : coCau) {
-                            String tenDanhMuc = String.valueOf(row.get("tenDanhMuc"));
-                            double doanhThu = toDouble(row.get("doanhThu"));
-                            
-                            if (doanhThu > 0.01) {
-                                chartCoCauDoanhThu.getData().add(new PieChart.Data(tenDanhMuc, doanhThu));
+                    // ─── Biểu đồ 1: PieChart - Cơ cấu số lượng tiêu thụ theo danh mục ───
+                    chartCoCauSoLuong.getData().clear();
+                    if (coCauSL != null && !coCauSL.isEmpty()) {
+                        chartCoCauSoLuong.setVisible(true);
+                        for (Map<String, Object> row : coCauSL) {
+                            int soLuong = toInt(row.get("soLuong"));
+                            if (soLuong > 0) {
+                                String tenDanhMuc = String.valueOf(row.get("tenDanhMuc"));
+                                chartCoCauSoLuong.getData().add(new PieChart.Data(tenDanhMuc, soLuong));
                             }
                         }
                     } else {
-                        chartCoCauDoanhThu.setVisible(false);
+                        chartCoCauSoLuong.setVisible(false);
                     }
 
-                    // 4. Vẽ BarChart Top 10 sản phẩm
-                    chartTop10SanPham.getData().clear();
-                    XYChart.Series<String, Number> seriesTop10 = new XYChart.Series<>();
-                    seriesTop10.setName("Số lượng bán");
-                    for (Map<String, Object> row : topSanPham) {
+                    // ─── Biểu đồ 2: BarChart - Top 10 sản phẩm bán ít nhất ───
+                    chartBanItNhat.getData().clear();
+                    if (chartBanItNhat.getXAxis() instanceof CategoryAxis) {
+                        ((CategoryAxis) chartBanItNhat.getXAxis()).setTickLabelRotation(40);
+                    }
+                    XYChart.Series<String, Number> seriesBanIt = new XYChart.Series<>();
+                    seriesBanIt.setName("Số Lượng Bán");
+                    for (Map<String, Object> row : chamLC) {
                         String tenSP = String.valueOf(row.get("tenThuoc"));
-                        if (tenSP.length() > 15) tenSP = tenSP.substring(0, 15) + "...";
-                        int soLuong = toInt(row.get("soLuongBan"));
-                        seriesTop10.getData().add(new XYChart.Data<>(tenSP, soLuong));
+                        if (tenSP.length() > 14) tenSP = tenSP.substring(0, 14) + "…";
+                        seriesBanIt.getData().add(new XYChart.Data<>(tenSP, toInt(row.get("soLuongBan"))));
                     }
-                    chartTop10SanPham.getData().add(seriesTop10);
+                    chartBanItNhat.getData().add(seriesBanIt);
 
-                    // 5. Đổ dữ liệu vào 2 bảng TableView hiển thị số liệu chi tiết
-                    tableBanChay.setItems(FXCollections.observableArrayList(topSanPham));
-                    
-                    // Sắp xếp theo doanh thu giảm dần cho bảng thứ 2
-                    List<Map<String, Object>> topDoanhThu = new ArrayList<>(topSanPham);
+                    // ─── Biểu đồ 3: BarChart - Top 10 sản phẩm bị đổi/trả nhiều nhất ───
+                    chartDoiTra.getData().clear();
+                    if (chartDoiTra.getXAxis() instanceof CategoryAxis) {
+                        ((CategoryAxis) chartDoiTra.getXAxis()).setTickLabelRotation(40);
+                    }
+                    XYChart.Series<String, Number> seriesDoiTra = new XYChart.Series<>();
+                    seriesDoiTra.setName("Số Lượng Đổi/Trả");
+                    if (doiTra != null && !doiTra.isEmpty()) {
+                        for (Map<String, Object> row : doiTra) {
+                            String tenSP = String.valueOf(row.get("tenThuoc"));
+                            if (tenSP.length() > 14) tenSP = tenSP.substring(0, 14) + "…";
+                            seriesDoiTra.getData().add(new XYChart.Data<>(tenSP, toInt(row.get("soLuongDoiTra"))));
+                        }
+                    }
+                    chartDoiTra.getData().add(seriesDoiTra);
+
+                    // ─── Bảng chi tiết ───
+                    tableBanChay.setItems(FXCollections.observableArrayList(topSP));
+
+                    List<Map<String, Object>> topDoanhThu = new ArrayList<>(topSP);
                     topDoanhThu.sort((a, b) -> Double.compare(toDouble(b.get("doanhThu")), toDouble(a.get("doanhThu"))));
                     tableDoanhThuCao.setItems(FXCollections.observableArrayList(topDoanhThu));
                 });
@@ -327,7 +305,8 @@ public class GUI_ThongKeHangHoaController {
             }
             String filePath = ThongKeHangHoaExcelExporter.xuatExcel(
                     currentTuNgay, currentDenNgay, currentDanhMuc,
-                    currentTongQuan, currentCoCauDoanhThu, currentTopSanPham);
+                    currentTongQuan, currentCoCauSoLuong, currentTopSanPham,
+                    currentChamLC, currentDoiTra);
             openFile(filePath);
         } catch (Exception e) {
             e.printStackTrace();
@@ -344,7 +323,8 @@ public class GUI_ThongKeHangHoaController {
             }
             String filePath = ThongKeHangHoaPdfExporter.xuatPDF(
                     currentTuNgay, currentDenNgay, currentDanhMuc,
-                    currentTongQuan, currentCoCauDoanhThu, currentTopSanPham);
+                    currentTongQuan, currentCoCauSoLuong, currentTopSanPham,
+                    currentChamLC, currentDoiTra);
             openFile(filePath);
         } catch (Exception e) {
             e.printStackTrace();
@@ -375,50 +355,5 @@ public class GUI_ThongKeHangHoaController {
         alert.setHeaderText(header);
         alert.setContentText(content);
         alert.showAndWait();
-    }
-
-    private void installTooltips(XYChart.Series<String, Number> series, Map<String, Double> dataByLabel) {
-        for (XYChart.Data<String, Number> point : series.getData()) {
-            String xLabel = point.getXValue();
-            Double value = dataByLabel.get(xLabel);
-            if (value == null) {
-                continue;
-            }
-
-            Popup popup = createTooltipPopup(xLabel, value);
-            if (point.getNode() != null) {
-                attachImmediatePopup(point.getNode(), popup);
-            } else {
-                point.nodeProperty().addListener((obs, oldNode, newNode) -> {
-                    if (newNode != null) {
-                        attachImmediatePopup(newNode, popup);
-                    }
-                });
-            }
-        }
-    }
-
-    private Popup createTooltipPopup(String xLabel, double value) {
-        Label valueLabel = new Label(xLabel + "\n" + df.format(value) + " ₫");
-        valueLabel.setStyle("-fx-background-color: rgba(255,255,255,0.98); -fx-border-color: #f97316; -fx-border-width: 1.5; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #0f172a; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 10 6 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 8, 0, 0, 2);");
-        valueLabel.setMouseTransparent(true);
-
-        Popup popup = new Popup();
-        popup.setAutoHide(false);
-        popup.setHideOnEscape(false);
-        popup.getContent().add(new StackPane(valueLabel));
-        return popup;
-    }
-
-    private void attachImmediatePopup(Node node, Popup popup) {
-        node.setOnMouseEntered(event -> {
-            Bounds bounds = node.localToScreen(node.getBoundsInLocal());
-            if (bounds != null) {
-                if (!popup.isShowing()) {
-                    popup.show(node, bounds.getMinX() + bounds.getWidth() / 2, bounds.getMinY() - 42);
-                }
-            }
-        });
-        node.setOnMouseExited(event -> popup.hide());
     }
 }
