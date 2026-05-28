@@ -78,7 +78,9 @@ public class ThongKeHangHoaPdfExporter {
             String danhMuc,
             Map<String, Object> tongQuan,
             List<Map<String, Object>> coCauDoanhThu,
-            List<Map<String, Object>> topSanPham) throws Exception {
+            List<Map<String, Object>> topSanPham,
+            List<Map<String, Object>> chamLC,
+            List<Map<String, Object>> doiTra) throws Exception {
 
         Path dir = Paths.get("exports/thongke");
         Files.createDirectories(dir);
@@ -138,14 +140,14 @@ public class ThongKeHangHoaPdfExporter {
                 formatMoney(tongQuan.get("tongDoanhThuSauThue")) + " đ", fLabel, fBold);
         doc.add(kpiTable);
 
-        // ── II. Tỷ Trọng Doanh Thu Theo Nhóm (PieChart) ─────────────────
+        // ── II. Cơ Cấu Số Lượng Tiêu Thụ Theo Nhóm (PieChart mới) ─────────
         addSimpleTable(doc,
-                "II. Tỷ trọng doanh thu theo nhóm danh mục ",
-                new String[]{"Nhóm Danh Mục Sản Phẩm", "Doanh Thu Đóng Góp / Sau Thuế (đ)"},
+                "II. Cơ cấu số lượng tiêu thụ theo nhóm danh mục ",
+                new String[]{"Nhóm Danh Mục Sản Phẩm", "Số Lượng Tiêu Thụ (sản phẩm)"},
                 coCauDoanhThu, fSection, fHead, fNormal,
                 row -> new String[]{
                         str(row.get("tenDanhMuc")),
-                        formatMoney(row.get("doanhThu")) + " đ"
+                        formatInt(row.get("soLuong"))
                 });
 
         // ── III. Top 10 Sản Phẩm Bán Chạy Nhất (BarChart + TableView 1) ─
@@ -182,6 +184,34 @@ public class ThongKeHangHoaPdfExporter {
                         str(row.get("donVi")),
                         formatInt(row.get("soLuongBan")),
                         formatMoney(row.get("doanhThu")) + " đ"
+                });
+
+        // ── V. Top 10 Sản Phẩm Bán Ít Nhất ──────────────────────────────
+        addSimpleTable(doc,
+                "V. Top 10 sản phẩm bán ít nhất ",
+                new String[]{"STT", "Mã SP", "Tên Sản Phẩm", "Nhóm", "ĐVT", "SL Bán"},
+                chamLC, fSection, fHead, fNormal,
+                row -> new String[]{
+                        str(row.get("stt")),
+                        str(row.get("maThuoc")),
+                        str(row.get("tenThuoc")),
+                        str(row.get("tenDanhMuc")),
+                        str(row.get("donVi")),
+                        formatInt(row.get("soLuongBan"))
+                });
+
+        // ── VI. Top 10 Sản Phẩm Đổi/Trả Nhiều Nhất ──────────────────────
+        addSimpleTable(doc,
+                "VI. Top 10 sản phẩm đổi/trả nhiều nhất ",
+                new String[]{"STT", "Mã SP", "Tên Sản Phẩm", "Nhóm", "ĐVT", "SL Đổi/Trả"},
+                doiTra, fSection, fHead, fNormal,
+                row -> new String[]{
+                        str(row.get("stt")),
+                        str(row.get("maThuoc")),
+                        str(row.get("tenThuoc")),
+                        str(row.get("tenDanhMuc")),
+                        str(row.get("donVi")),
+                        formatInt(row.get("soLuongDoiTra"))
                 });
 
         doc.close();

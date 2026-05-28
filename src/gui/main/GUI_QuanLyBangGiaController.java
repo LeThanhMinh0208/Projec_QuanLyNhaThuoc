@@ -37,6 +37,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -168,53 +170,37 @@ public class GUI_QuanLyBangGiaController {
         });
 
         colHanhDong.setCellFactory(col -> new TableCell<>() {
-            // Sửa text thành ngắn gọn giống ảnh
-            private final Button btnXem = new Button("Xem");
-            private final Button btnVHH = new Button("Vô Hiệu");
-            private final Button btnXuatExcel = new Button("Xuất Excel");
-            private final HBox box = new HBox(8, btnXem, btnVHH, btnXuatExcel);
+            // MenuButton gộp 3 hành động thành nút "⋮" - hiển thị tốt trên màn hình nhỏ
+            private final MenuButton menuBtn = new MenuButton("⋮ Hành Động");
+            private final MenuItem miXem = new MenuItem("👁 Xem Chi Tiết");
+            private final MenuItem miVHH = new MenuItem("🚫 Vô Hiệu Hóa");
+            private final MenuItem miExcel = new MenuItem("📊 Xuất Excel");
+
             {
-                box.setAlignment(javafx.geometry.Pos.CENTER);
+                menuBtn.getItems().addAll(miXem, miVHH, miExcel);
+                menuBtn.setStyle(
+                    "-fx-background-color: #e0f2fe; -fx-text-fill: #0284c7; -fx-font-weight: bold;" +
+                    "-fx-font-size: 12px; -fx-background-radius: 20; -fx-cursor: hand; -fx-padding: 5 14;"
+                );
+                miXem.setStyle("-fx-font-size: 13px;");
+                miVHH.setStyle("-fx-font-size: 13px; -fx-text-fill: #dc2626;");
+                miExcel.setStyle("-fx-font-size: 13px; -fx-text-fill: #16a34a;");
 
-                final String styleXemNormal = "-fx-background-color: #e0f2fe; -fx-text-fill: #0284c7; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 12; -fx-background-radius: 20; -fx-cursor: hand;";
-                final String styleXemHover  = "-fx-background-color: #0ea5e9; -fx-text-fill: white;   -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 12; -fx-background-radius: 20; -fx-cursor: hand;";
-                final String styleVhhNormal = "-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 12; -fx-background-radius: 20; -fx-cursor: hand;";
-                final String styleVhhHover  = "-fx-background-color: #ef4444; -fx-text-fill: white;   -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 12; -fx-background-radius: 20; -fx-cursor: hand;";
-                final String styleExcelNormal = "-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 12; -fx-background-radius: 20; -fx-cursor: hand;";
-                final String styleExcelHover  = "-fx-background-color: #22c55e; -fx-text-fill: white;   -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 12; -fx-background-radius: 20; -fx-cursor: hand;";
-
-                btnXem.setStyle(styleXemNormal);
-                btnXem.setOnMouseEntered(e -> btnXem.setStyle(styleXemHover));
-                btnXem.setOnMouseExited(e  -> btnXem.setStyle(styleXemNormal));
-
-                btnVHH.setStyle(styleVhhNormal);
-                btnVHH.setOnMouseEntered(e -> { if (!btnVHH.isDisabled()) btnVHH.setStyle(styleVhhHover); });
-                btnVHH.setOnMouseExited(e  -> { if (!btnVHH.isDisabled()) btnVHH.setStyle(styleVhhNormal); });
-
-                btnXuatExcel.setStyle(styleExcelNormal);
-                btnXuatExcel.setOnMouseEntered(e -> btnXuatExcel.setStyle(styleExcelHover));
-                btnXuatExcel.setOnMouseExited(e  -> btnXuatExcel.setStyle(styleExcelNormal));
-
-                btnXem.setOnAction(e -> moDialogChiTiet(getTableView().getItems().get(getIndex())));
-                btnVHH.setOnAction(e -> handleVoHieuHoa(getTableView().getItems().get(getIndex())));
-                btnXuatExcel.setOnAction(e -> handleXuatExcel(getTableView().getItems().get(getIndex())));
+                miXem.setOnAction(e -> moDialogChiTiet(getTableView().getItems().get(getIndex())));
+                miVHH.setOnAction(e -> handleVoHieuHoa(getTableView().getItems().get(getIndex())));
+                miExcel.setOnAction(e -> handleXuatExcel(getTableView().getItems().get(getIndex())));
             }
             @Override protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty) { setGraphic(null); return; }
                 BangGia bg = getTableView().getItems().get(getIndex());
                 String tt = tinhTrangThai(bg);
-                
-                // Chuyển nút Vô Hiệu thành màu xám nếu bị disable
-                if (!tt.contains("hiệu lực") || tt.contains("Chưa")) {
-                    btnVHH.setDisable(true);
-                    btnVHH.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #94a3b8; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 12; -fx-background-radius: 20;");
-                } else {
-                    btnVHH.setDisable(false);
-                    btnVHH.setStyle("-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 12; -fx-background-radius: 20; -fx-cursor: hand;");
-                }
-                
-                setGraphic(box);
+
+                // Vô hiệu hóa menu item "Vô Hiệu Hóa" nếu bảng giá không đang có hiệu lực
+                miVHH.setDisable(!tt.contains("hiệu lực") || tt.contains("Chưa"));
+
+                setAlignment(javafx.geometry.Pos.CENTER);
+                setGraphic(menuBtn);
             }
         });
         tableBangGia.setItems(masterBangGia);

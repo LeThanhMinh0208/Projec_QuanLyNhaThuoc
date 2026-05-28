@@ -139,7 +139,7 @@
     <HBox spacing="28" VBox.vgrow="ALWAYS" style="-fx-padding: 44 0 0 0; -fx-min-height: 280;">
         <!-- TOP 5 KHÁCH HÀNG -->
         <VBox styleClass="chart-panel" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" style="-fx-min-height: 280;">
-            <Label text="Top 5 Khách Hàng Mua Nhiều Nhất (Tháng)" styleClass="chart-title" />
+            <Label text="Top 5 Khách Hàng Mua Nhiều Nhất" styleClass="chart-title" />
             <TableView fx:id="tableTopKhachHang" VBox.vgrow="ALWAYS" style="-fx-padding: 0;" styleClass="stat-table-view" minHeight="240" prefHeight="240">
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
