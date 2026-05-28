@@ -278,7 +278,7 @@ public class DAO_DonDatHang {
 			} } catch (SQLException e) { e.printStackTrace(); }
         }
     }
-    public String getMaDonGiaoThieu(String maDonGoc) {
+    public String getMaDonGiaoThieu(java.sql.Connection con, String maDonGoc) {
         String baseId = maDonGoc;
         if (maDonGoc.contains(".")) {
             baseId = maDonGoc.substring(0, maDonGoc.indexOf("."));
@@ -289,15 +289,10 @@ public class DAO_DonDatHang {
 
         String sql = "SELECT maDonDatHang FROM DonDatHang WHERE maDonDatHang LIKE ?";
 
-        // SỬA CHỖ NÀY: Dùng Connection riêng, tách biệt hoàn toàn để không đá nhau với hàm Cha
-        java.sql.Connection con = null;
         java.sql.PreparedStatement pst = null;
         java.sql.ResultSet rs = null;
 
         try {
-            connectDB.ConnectDB.getInstance();
-			// Lấy kết nối mới hoàn toàn
-            con = ConnectDB.getConnection();
             pst = con.prepareStatement(sql);
             pst.setString(1, baseId + ".%");
             rs = pst.executeQuery();
@@ -319,8 +314,6 @@ public class DAO_DonDatHang {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            // Chỉ đóng ResultSet và PreparedStatement, TUYỆT ĐỐI KHÔNG ĐÓNG Connection
-            // Vì thằng DAO_PhieuNhap vẫn đang dùng nó để làm việc!
             try { if (rs != null) {
 				rs.close();
 			} } catch (Exception e) {}

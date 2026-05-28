@@ -235,6 +235,10 @@ public class Dialog_SuaDonViQuyDoiController {
             return "Tên đơn vị 2 và đơn vị 3 phải khác nhau.";
         }
 
+        if (!tenBac2.isBlank() && !tenBac3.isBlank() && tyLeBac3 <= tyLeBac2) {
+            return "Tỷ lệ quy đổi của đơn vị 3 phải lớn hơn tỷ lệ quy đổi của đơn vị 2.";
+        }
+
         return null;
     }
 

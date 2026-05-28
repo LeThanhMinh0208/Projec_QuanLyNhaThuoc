@@ -147,7 +147,7 @@ public class DAO_PhieuNhap {
                 }
 
                 dao.DAO_DonDatHang daoDon = new dao.DAO_DonDatHang();
-                String maDonMoi = daoDon.getMaDonGiaoThieu(donGoc.getMaDonDatHang());
+                String maDonMoi = daoDon.getMaDonGiaoThieu(con, donGoc.getMaDonDatHang());
 
                 String sqlInsertNewDon = "INSERT INTO DonDatHang (maDonDatHang, maNhaCungCap, maNhanVien, ngayDat, ngayGiaoDuKien, tongTienDuTinh, trangThai, ghiChu) VALUES (?, ?, ?, GETDATE(), DATEADD(day, ?, GETDATE()), ?, 'CHO_GIAO', ?)";
                 try (PreparedStatement pstInsertNew = con.prepareStatement(sqlInsertNewDon)) {
